@@ -1,0 +1,13 @@
+name = "PopGen"
+uuid = "af524d12-c74b-11e9-22a8-3b091653023f"
+authors = ["Pavel Dimens", "Jason Selwyn"]
+version = "0.1.0"
+
+[compat]
+julia = "1.1.1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
