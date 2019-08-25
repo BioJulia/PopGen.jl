@@ -87,6 +87,7 @@ Example:\n
 "aitoff", "sinusoidal"
 """
 function plot_locations(x::PopObj; region::String = "world", projection::String = "orthographic")
+    length(x.longitude) == 0 && error("No location data present in your PopObj")
     if projection ∉ ["equirectangular", "mercator", "orthographic", "natural earth",
                     "kavrayskiy7", "miller", "robinson", "eckert4",
                     "azimuthal equal area", "azimuthal equidistant",
