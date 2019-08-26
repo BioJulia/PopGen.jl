@@ -15,7 +15,7 @@ Pkg.clone("https://github.com/pdimens/PopGen.jl")
 
 or invoke the package manager with `]` in the REPL and use
 ```julia
-clone(https://github.com/pdimens/PopGen.jl)
+add "https://github.com/pdimens/PopGen.jl"
 ```
 after the package is installed, load it with `using PopGen`
 
