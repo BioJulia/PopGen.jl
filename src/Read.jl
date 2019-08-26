@@ -1,17 +1,19 @@
 """
-    Read.genepop(infile::String; ploidy::Int64 = 2, popsep::Any = "POP", numpop::Int64)
+    genepop(infile::String; ploidy::Int64 = 2, popsep::Any = "POP", numpop::Int64)
 Load a Genepop format file into memory as a PopObj object.
 - `infile` : path to Genepop file
 - `ploidy` : ploidy of the organism
 - `popsep` : word that separates populations in `infile` (default: "POP")
-- `numpop` : number of populations in `infile` (used for checking parser)
+- `numpops` : number of populations in `infile` (used for checking parser)
 File must follow standard Genepop formatting:
 - First line is a comment (and skipped)
-- Loci are listed after comment as one-per-line without commas or in single comma-separated row
+- Loci are listed after first line as one-per-line without commas or in single comma-separated row
 - A line with a particular keyword (default "POP") must delimit populations
 - File is tab or space delimted
 
-usage: `waspsNY = Read.genepop("wasp_hive.gen", ploidy = 2, popsep = "POP", numpops = 2);`
+# Example
+
+ `waspsNY = genepop("wasp_hive.gen", ploidy = 2, popsep = "POP", numpops = 2);`
 
 Genepop file example:  \n
 ---------------------
@@ -68,7 +70,7 @@ end
 """
     csv(infile::String; delim::Union{Char,String,Regex}, ploidy::Int64 = 2, location::Bool = false)
 Load a CSV-type file into memory as a PopObj object
-- `infile` : path to Genepop file
+- `infile` : path to CSV file
 - `delim` values can be space (" "), comma (","), tab ("\\t"), etc.
 - `ploidy` : ploidy of the organism
 - `location` : decimal degrees longitude/latitude provided as values 3/4

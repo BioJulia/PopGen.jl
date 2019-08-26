@@ -7,7 +7,7 @@ makedocs(;
         "Home" => "index.md",
     ],
     repo="https://github.com/pdimens/PopGen.jl/blob/{commit}{path}#L{line}",
-    sitename="PopGen.jl",
+    sitename="PopGen",
     authors="Pavel Dimens, Jason Selwyn",
     assets=String[],
 )
