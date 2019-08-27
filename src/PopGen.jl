@@ -38,6 +38,7 @@ include("PopObj.jl")
 include("Read.jl")
 include("Manipulate.jl")
 include("Plotting.jl")
+include("Datasets.jl")
 
 
 end # module PopGen
