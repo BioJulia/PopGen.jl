@@ -11,7 +11,6 @@ mutable struct PopObj
     loci::Array{String,1}
     ploidy::Int64
     genotypes::Dict
-#	hier			to be implemented later
     longitude::Array{Union{Int64,Float64},1}
     latitude::Array{Union{Int64,Float64},1}
 end
@@ -32,6 +31,9 @@ Accessing any of these fields is done with a dot `.` accessor and can use the `[
 julia> a = genepop("/test/testdata.gen", numpops = 7) ;
 
 julia> a.ind[1:6]
+```
+
+```
 6-element Array{String,1}:
  "cca_001"
  "cca_002"
@@ -39,8 +41,13 @@ julia> a.ind[1:6]
  "cca_005"
  "cca_007"
  "cca_008"
+```
 
+```julia
 julia> a.loci[1:6]
+```
+
+```
 6-element Array{String,1}:
  "Contig_35208"
  "Contig_23109"
@@ -48,8 +55,13 @@ julia> a.loci[1:6]
  "Contig_10742"
  "Contig_14898"
  "Contig_8483" 
+```
 
+```julia
 julia> a.ploidy
+```
+
+```
 2
 ```
 
@@ -59,6 +71,9 @@ Given the volume of information that can be present in a `PopObj`, we defined a 
 
 ```julia
 julia> a
+```
+
+```
 Object of type PopObj:
 No location data provided
 
@@ -94,6 +109,9 @@ Notice the `No location data provided` text on the second line of output above. 
 julia> a.latitude = rand(1:50, 212) ; a.longitude = rand(1:50, 212)	; # assign random location data
 
 julia> a
+```
+
+```
 Object of type PopObj:
 
 Longitude:

@@ -152,7 +152,7 @@ end
 
 
 """
-    genotypes(x::PopObj; inds::Array{String,1})
+    genotypes(x::PopObj; inds::Union{String, Array, Nothing}= nothing)
 Get all the genotypes of specific individuals within a `PopObj`.
 - Names must be in quotes
 
@@ -188,7 +188,7 @@ end
 #### Find missing ####
 
 """
-    Base.missing(x::PopObj; plot::Bool = false)
+    Base.missing(x::PopObj)
 Identify and count missing loci in each individual of a `PopObj`. Returns a tuple
 of `DataFrames`: loci per individual, number per loci.
 
@@ -243,7 +243,7 @@ end
 ##### Removal #####
 
 """
-    remove_loci!(x::PopObj; loci::Union{String, Array{String,1}})
+    remove_loci!(x::PopObj, loci::Union{String, Array{String,1}})
 Removes selected loci from a `PopObj`.
 
 Examples:
@@ -282,9 +282,9 @@ Removes selected individuals from a `PopObj`.
 
 Examples:
 
-`remove_ind!(sunflowers, "west_011")`
+`remove_inds!(sunflowers, "west_011")`
 
-`remove_ind!(sunflowers, ["west_011", "west_003", "east_051"])`
+`remove_inds!(sunflowers, ["west_011", "west_003", "east_051"])`
 """
 function remove_inds!(x::PopObj, inds::Union{String, Array{String,1}})
     # get inds indices

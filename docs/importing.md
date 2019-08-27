@@ -38,15 +38,15 @@ Arguments:
 Keyword Arguments:
 
 - `delim::Union{Char,String,Regex}` : delimiter of the file, can be a string, character, or regex
-  - comma: `delim = ","`
-  - space: `delim = " "`
-  - tab: `delim = "\t"`
-  - etc.
+    - comma: `delim = ","`
+    - space: `delim = " "`
+    - tab: `delim = "\t"`
+    - etc.
 - `ploidy::Int64` : single integer of the ploidy of the samples in the file (default = 2)
-  - haploid: `ploidy = 1`
-  - diploid: `ploidy = 2`
-  - triploid: `ploidy = 3`
-  - etc.
+    - haploid: `ploidy = 1`
+    - diploid: `ploidy = 2`
+    - triploid: `ploidy = 3`
+    - etc.
 - `location::Bool = false` : true/false of whether location data is present in the file (default = false)
 
 
@@ -57,7 +57,7 @@ Files must follow standard Genepop formatting:
 - First line is a comment (and skipped)
 - Loci are listed after first line as one-per-line without commas or in single comma-separated row
 - A line with a particular keyword must delimit populations
-  - **Must** be the same word each time and not a unique population name
+    - **Must** be the same word each time and not a unique population name
 - File is tab or space delimted
 
 **Formatting Example**
@@ -93,10 +93,10 @@ Arguments:
 Keyword Arguments:
 
 - `ploidy::Int64` : single integer of the ploidy of the samples in the file (default = 2)
-  - haploid: `ploidy = 1`
-  - diploid: `ploidy = 2`
-  - triploid: `ploidy = 3`
-  - etc.
+    - haploid: `ploidy = 1`
+    - diploid: `ploidy = 2`
+    - triploid: `ploidy = 3`
+    - etc.
 - `popsep::String` : word that separates populations in `infile` (default: "POP")
 - `numpops::Int64` : number of populations present in `infile` (used for early error checking)
 

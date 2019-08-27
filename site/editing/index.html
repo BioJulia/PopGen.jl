@@ -1,0 +1,632 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="Population genetics in Julia">
+      
+      
+      
+        <meta name="author" content="Pavel Dimens and Jason Selwyn">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../img/favicon.ico">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.1">
+    
+    
+      
+        <title>Editing PopObj - PopGen.jl</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.30686662.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#757575">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.74668098.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="grey" data-md-color-accent="">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#editing-popobj-elements" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="PopGen.jl" class="md-header-nav__button md-logo">
+          
+            <img src="../img/favicon.ico" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              PopGen.jl
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Editing PopObj
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/pdimens/PopGen.jl/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="PopGen.jl" class="md-nav__button md-logo">
+      
+        <img src="../img/favicon.ico" width="48" height="48">
+      
+    </a>
+    PopGen.jl
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/pdimens/PopGen.jl/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../aboutdocs/" title="Docs "Guide"" class="md-nav__link">
+      Docs "Guide"
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../install/" title="Installing" class="md-nav__link">
+      Installing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../popobj/" title="The PopObj" class="md-nav__link">
+      The PopObj
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../importing/" title="Importing Data" class="md-nav__link">
+      Importing Data
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../viewing/" title="Viewing Data" class="md-nav__link">
+      Viewing Data
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Editing PopObj
+      </label>
+    
+    <a href="./" title="Editing PopObj" class="md-nav__link md-nav__link--active">
+      Editing PopObj
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#add-location-data" title="add location data" class="md-nav__link">
+    add location data
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-decimal-minutes-data" title="adding decimal minutes data" class="md-nav__link">
+    adding decimal minutes data
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rename-populations" title="rename populations" class="md-nav__link">
+    rename populations
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-loci" title="remove loci" class="md-nav__link">
+    remove loci
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-individuals" title="remove individuals" class="md-nav__link">
+    remove individuals
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../plotting/" title="Plotting" class="md-nav__link">
+      Plotting
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../contr/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#add-location-data" title="add location data" class="md-nav__link">
+    add location data
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-decimal-minutes-data" title="adding decimal minutes data" class="md-nav__link">
+    adding decimal minutes data
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rename-populations" title="rename populations" class="md-nav__link">
+    rename populations
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-loci" title="remove loci" class="md-nav__link">
+    remove loci
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-individuals" title="remove individuals" class="md-nav__link">
+    remove individuals
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/pdimens/PopGen.jl/edit/master/docs/editing.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="editing-popobj-elements">Editing PopObj elements</h1>
+<p>Following standard Julia convention, functions ending with <code>!</code>  are mutable, meaning they will edit the input. </p>
+<ul>
+<li>To follow along, load in the provided test data in <code>/test/testdata.gen</code></li>
+</ul>
+<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">PopGen</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">genepop</span><span class="p">(</span><span class="s">&quot;/test/testdata.gen&quot;</span><span class="p">,</span> <span class="n">numpops</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Keep in mind, your path to that file is probably different. <strong>If using windows</strong> make sure to change your backslashes "\" to forward slashes "/" </p>
+<h2 id="add-location-data">add location data</h2>
+<p>Location data can be added by directly accessing the fields <code>.longitude</code> and <code>.latitude</code> in your <code>PopObj</code></p>
+<div class="codehilite"><pre><span></span><span class="n">a</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="o">:</span><span class="mi">50</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span>   <span class="c"># creates 212 unique random numbers between 1 and 50</span>
+<span class="n">a</span><span class="o">.</span><span class="n">latitdue</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">20</span><span class="o">:</span><span class="mi">30</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span>   <span class="c"># creates 212 unique random numbers between 20 and 30</span>
+</pre></div>
+
+
+<p>However, if your data is in decimal minutes rather than decimal degrees, use the <code>locations!</code> function to add it to the fields. This function will do a conversion for you.</p>
+<h3 id="adding-decimal-minutes-data">adding decimal minutes data</h3>
+<div class="codehilite"><pre><span></span><span class="n">locations!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">xloc</span><span class="o">::</span><span class="kt">Array</span><span class="p">,</span> <span class="n">yloc</span><span class="o">::</span><span class="kt">Array</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Adds location data (longitude, latitude) to <code>PopObj</code>. Takes decimal degrees or decimal minutes format. <strong>Must</strong> use minus-sign instead of cardinal directions (i.e. 14 32.11W is <strong>not</strong> vaild). Location data must be in order of  individuals (<code>ind</code>). Replaces existing <code>PopObj</code> location data.</p>
+<ul>
+<li>Decimal Degrees : <code>-11.431</code></li>
+<li>Decimal Minutes : <code>"-11 43.11"</code> (must use space and double-quotes)</li>
+</ul>
+<p>If conversion is not necessary, can directly assign <code>PopObj.longitude</code> and <code>PopObj.latitude</code> as shown above.</p>
+<h2 id="rename-populations">rename populations</h2>
+<div class="codehilite"><pre><span></span><span class="n">popid!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">rename</span><span class="o">::</span><span class="kt">Dict</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Rename the population ID's of <code>PopObj.popid</code>. Uses a <code>Dict</code> of <code>[popid] =&gt; replacement</code> to rename</p>
+<p>Example:</p>
+<div class="codehilite"><pre><span></span><span class="c"># create a dictionary of name conversions</span>
+<span class="n">new_popnames</span> <span class="o">=</span> <span class="kt">Dict</span><span class="p">(</span><span class="mi">1</span> <span class="o">=&gt;</span> <span class="s">&quot;Cape Canaveral&quot;</span><span class="p">,</span>
+                    <span class="mi">2</span> <span class="o">=&gt;</span> <span class="s">&quot;Georgia&quot;</span><span class="p">,</span>
+                    <span class="mi">3</span> <span class="o">=&gt;</span> <span class="s">&quot;S Carolina&quot;</span><span class="p">,</span>
+                    <span class="mi">4</span> <span class="o">=&gt;</span> <span class="s">&quot;FL Keys&quot;</span><span class="p">,</span>
+                    <span class="mi">5</span> <span class="o">=&gt;</span> <span class="s">&quot;Mideast Gulf&quot;</span><span class="p">,</span>
+                    <span class="mi">6</span> <span class="o">=&gt;</span> <span class="s">&quot;Northeast Gulf&quot;</span><span class="p">,</span>
+                    <span class="mi">7</span> <span class="o">=&gt;</span> <span class="s">&quot;Southeast Gulf&quot;</span><span class="p">)</span>
+
+<span class="n">popid!</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">rename</span> <span class="o">=</span> <span class="n">new_popnames</span><span class="p">)</span>
+</pre></div>
+
+
+<h2 id="remove-loci">remove loci</h2>
+<div class="codehilite"><pre><span></span><span class="n">remove_loci!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">loci</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="n">String</span><span class="p">,</span> <span class="kt">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}})</span>
+</pre></div>
+
+
+<p>Removes selected loci from a <code>PopObj</code>.</p>
+<p>Examples:</p>
+<div class="codehilite"><pre><span></span><span class="n">remove_loci!</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s">&quot;contig_35208&quot;</span><span class="p">)</span>
+
+<span class="n">remove_loci!</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;contig_35208&quot;</span><span class="p">,</span> <span class="s">&quot;contig_23109&quot;</span><span class="p">,</span> <span class="s">&quot;contig_4493&quot;</span><span class="p">])</span>
+</pre></div>
+
+
+<h2 id="remove-individuals">remove individuals</h2>
+<div class="codehilite"><pre><span></span><span class="n">remove_inds!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">inds</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}})</span>
+</pre></div>
+
+
+<p>Removes selected individuals from a <code>PopObj</code>.</p>
+<p>Examples:</p>
+<div class="codehilite"><pre><span></span><span class="n">remove_inds!</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s">&quot;cca_001&quot;</span><span class="p">)</span>
+
+<span class="n">remove_inds</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;cca_001&quot;</span><span class="p">,</span><span class="s">&quot;cca_002&quot;</span><span class="p">,</span> <span class="s">&quot;cca_003&quot;</span><span class="p">])</span>
+</pre></div>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../viewing/" title="Viewing Data" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Viewing Data
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../plotting/" title="Plotting" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Plotting
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.c648116f.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>
