@@ -135,11 +135,12 @@ The functions within `PopGen` are almost always explicitly typed, so if you are 
 
 !!! info "TL;DR"
     Reading these docs, pay attention to semicolons in the function argument lists.
-    -- arguments before a semicolon have no keyword and follow an explicit order
+    
 
+    -  arguments before a semicolon have no keyword and follow an explicit order
     -  arguments after a semicolon have a keyword `argument = value` and their order doesn't matter
-    - `MethodError: no methods matching` is likely an issue on your side and not on our side :)
-        - unless we accidentally forgot to export a function!
+    - `MethodError: no methods matching` is more likely an issue on your side and not on our side :smile:
+        - unless we accidentally forgot to export a function! :facepalm:
 
 Broadly speaking, there are two types of function declarations in Julia: ones with keywords and ones without keywords. The term "keywords" refers to an input argument that has the format `argument = value`. This format is present in many of the functions in this and other packages, however there are some specifics to understand when functions use keywords and when they don't. 
 

@@ -9,7 +9,11 @@ using PopGen
 a = genepop("/test/testdata.gen", numpops = 7)
 ```
 
-Keep in mind, your path to that file is probably different. **If using windows** make sure to change your backslashes "\" to forward slashes "/" 
+!!! info "keep in mind" 
+    your path to that file is probably different, so make sure you set it correctly to where it is on your system.
+
+!!! reminder "Windows users"
+    make sure to change your backslashes "\" to forward slashes "/" 
 
 
 
@@ -36,7 +40,7 @@ loci(x::PopObj, loci = nothing)
 ```
 
 View the genotypes of all individuals for specific loci in a `PopObj`.
-Default shows all genotypes for all individuals. Use `loci =` to specify a single
+Default shows all genotypes for all individuals. Add a second argument (no keywords!) to specify a single
 locus or array of loci to display.
 
 Examples:
@@ -67,7 +71,8 @@ Example:
 locations(a)
 ```
 
-Use `locations!` to add spatial data to a `PopObj`
+!!! info
+    use `locations!` to add spatial data to a `PopObj`
 
 
 
@@ -122,22 +127,25 @@ genotypes(a, inds = ["cca_001", "cca_002", "cca_003"])
 
 
 
-## find missing
+## missing loci
 
 ```julia
 missing(x::PopObj)
 ```
 
-Identify and count missing loci in each individual of a `PopObj`. Returns a tuple of two 
-`DataFrames`: loci per individual, number per loci.
+Identify and count missing loci in each individual of a `PopObj`. Returns a tuple of two `DataFrames`: loci per individual, number per loci.
 
 Example:
 
 ```julia
 missing(a)
-
-miss_ind, miss_loci = missing(a)
 ```
 
 !!! info
-    since `missing` outputs a tuple of 2 DataFrames, so you can also assign two variables simultaneously to inherit the values of these dataframes, as with the second example.
+    since `missing` outputs a tuple of 2 DataFrames, so you can assign two variables simultaneously to inherit the values of these dataframes, like so:
+
+    ```julia
+    miss_ind, miss_loci = missing(a)
+    ```
+    
+    If you're coming from R, this concept of multiple assignment probably sounds crazy, but it's pretty common in Python and Julia! Embrace the convenience!

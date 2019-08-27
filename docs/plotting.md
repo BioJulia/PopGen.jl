@@ -9,7 +9,7 @@ The output of many functions are formatted for use in your favorite Julia plotti
 ```julia
 plot_missing(x::PopObj; color = false)
 ```
-Return an interactive plot of the number of missing loci in individuals of a `PopObj`, along with the number of missing individuals per locus. To set a custom color palette, use `color = [color1, color2, ...]`
+Return an interactive plot of the number of missing loci in individuals of a `PopObj`, along with the number of missing individuals per locus. To set a custom color palette for the boxplots, use `color = [color1, color2, ...]`
 
 Example:
 
@@ -29,7 +29,7 @@ using PlotlyJS
 PlotlyJS.savehtml(plot_missing(a), "filename.html")
 ```
 
-This will save it in the current working directly as whatever you replace `filename.html` with. If you want the file to work properly offline, add a third option argument `:embed`, although be aware it inflates the file size (~3.5mb for the test data). 
+This will save it in the current working directly as whatever you replace `filename.html` with. If you want the file to work properly offline, add a third argument `:embed`, although be aware it inflates the file size (~3.5mb for the test data). 
 
 ## plot sample locations
 

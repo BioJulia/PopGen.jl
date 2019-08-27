@@ -15,8 +15,14 @@ nav:
 - Home: index.md
 - Docs "Guide": aboutdocs.md
 - Installing: install.md
-- The PopObj: popobj.md
-- Importing Data: importing.md
+- The PopObj type:
+    - What's a PopObj: popobj_type.md
+    - Accessing: popobj_accessing.md
+    - Location data: popobj_location.md
+- Importing Data: 
+    - CSV and delimited: delimited.md
+    - Genepop: genepop.md
+    - VCF: vcf.md
 - Viewing Data: viewing.md
 - Editing PopObj: editing.md
 - Plotting: plotting.md
