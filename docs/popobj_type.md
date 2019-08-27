@@ -1,4 +1,4 @@
-For the PopGen.jl package to be consistent, a standard flexible data structure needs to be defined. The solution is a custom type called a `PopObj` (pronounced "pop ob" with a silent j because it rolls of the tongue better). If you haven't already guessed, it's a combination of the words Population and Object. The struct is defined as:
+For the PopGen.jl package to be consistent, a standard flexible data structure needs to be defined. The solution is a custom type called a `PopObj`. The struct is defined as:
 
 ```julia
 mutable struct PopObj
@@ -11,6 +11,12 @@ mutable struct PopObj
     latitude::Array{Union{Int64,Float64},1}
 end
 ```
+
+!!! info "pronouncing "PopObj" "
+    If you haven't already guessed, `PopObj` is a combination of the words Population and Object. PopObj is pronounced "pop ob" with a silent j because it rolls of the tongue better, but writing it as PopOb looks weird. 
+    
+    Yes, I have lost sleep over this detail.    
+    - Pavel
 
 ### ind 
 

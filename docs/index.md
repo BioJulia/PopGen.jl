@@ -2,13 +2,29 @@
 
 
 
-This is the documentation for the PopGen.jl package. If you're reading this, you're likely interested in doing some kind of population genetics analyses. Please read through the docs and try the tutorial out to get a feel for what PopGen.jl can do. 
+This is the documentation for the PopGen.jl package. If you're reading this, you're likely interested in doing some kind of population genetics analyses. Please read through the docs and try the functions out with the test data in `/test/testdata.gen` to get a feel for what PopGen.jl can do. 
 
 ## About
 
 PopGen.jl is an attempt to shift population genetics analyses away from the patchwork of available pop-gen packages present in the R and Python languages, and combine it with the speed, power, fun(?), and community of the Julia language. We hope to implement common analyses (heterozygosity, kinship, FST, Tajima's D, etc.) in *sane*, user friendly ways, with syntax used within the package being consistent with the rest of the Julia ecosystem.
 
 
+
+## Goal
+
+To be a comprehensive package for population genetics analyses and visualization that's fast and user friendly. This project is developed with a particular mantra: **Sanity, Sensibility, Accessibility**.
+
+**Sanity**
+
+Functions are written in a way such that their use is sane and natural. When possible (or sensible), we use full words for input variables or other components of input/output. All functions in this package have their first argument as the input data without keywords. Always. We also try to minimize redundancy, such as the function `remove_loci!`, where the loci you wish you remove are listed as the second argument without a keyword, because the name of the function is already self explanatory, and the first argument will always be the input data, therefor having a keyword argument `loci = ` would be redundant. 
+
+**Sensibility**
+
+Functions need to be sensible, both in what they do and how they do it. This means that functions should include only the most relevant arguments, and the most sensible defaults for arguments. It also means the outputs need to be flexible enough to use with other Julia packages. As an example, `plot_missing` takes the entire `PopObj` as an argument rather than a user specifying specific elements, and it returns a pre-configured plot for basic data visualization. The only arguments are a custom color palette, if so desired. However, the purpose of that plot is for data exploration, so the specification of plotting attributes is unnecessary because those plots will never be in publications. If a user wants to make their own plots using that information, they can do that with the dataframes produced from `missing`, which is exactly what `plot_missing` does under the hood!
+
+**Accessibility**
+
+Documentation is everything! We recognize Julia is a comparatively young language, and we know which languages and packages other population geneticists are using for their work. We *want* you to be comfortable using `PopGen.jl`, and that means investing a lot of time into writing thorough documentation intended for users (vs developers). We also recognize that you (the reader) might not be very familiar with Julia, or any language other than R (which is ok!), so we've written a section on clarifying some Julia concepts/conventions that will make reading this documentation a whole lot clearer. It is by no means a replacement for sitting down and learning the Julia language a bit ([here is a great online book on that](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html)), but it should hopefully reduce the barrier of entry somewhat.
 
 ## Why Julia and not Python or R?
 

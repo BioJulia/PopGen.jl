@@ -13,7 +13,7 @@ repo_url: https://github.com/pdimens/PopGen.jl
 
 nav:
 - Home: index.md
-- Docs "Guide": aboutdocs.md
+- A Julia Primer: juliaprimer.md
 - Installing: install.md
 - The PopObj type:
     - What's a PopObj: popobj_type.md
