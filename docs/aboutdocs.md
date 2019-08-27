@@ -24,7 +24,7 @@ julia> x
 12
 ```
 
-Julia will still process the command and assign `10 + 2 to `x`, but it won't show you the output in the terminal. We sometimes include a semicolon after commands in these docs to mimic what the REPL output would look like without spitting back out an array of over 200 values. **These semicolons are optional** 
+Julia will still process the command and assign `10 + 2` to `x`, but it won't show you the output in the terminal. We sometimes include a semicolon after commands in these docs to mimic what the REPL output would look like without spitting back out an array of over 200 values. **These semicolons are optional** 
 
 
 

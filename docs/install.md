@@ -10,7 +10,7 @@ Invoke the package manager with `]` in the REPL and use
 add "https://github.com/pdimens/PopGen.jl"
 ```
 
-after the package is installed, load it with `using PopGen`
+
 
 If using Jupyter Notebooks or nteract, install the package in julia with
 
@@ -42,11 +42,11 @@ using PopGen
     ```
       17.415902 seconds (19.88 M allocations: 1.022 GiB, 2.79% gc time)
     ```
-
+    
     ```julia
     julia> @time using PopGen
     ```
-
+    
     ```
       0.100233 seconds (64.07 k allocations: 3.123 MiB, 6.02% gc time)
     ```
