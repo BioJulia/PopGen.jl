@@ -39,9 +39,9 @@ function genepop(infile::String; ploidy::Int64 = 2, popsep::Any = "POP", numpops
             expected : $numpops
             detected : $(length(gpop)-1) ")
     end
-    if length(split(gpop[1], ",")) > 1
-        locinames = split(gpop[1],",") |> Array{String,1}
-    else
+    if length(gpop[1]) == 1     # loci horizontally stacked
+        locinames = strip.(split(gpop[1]|> join, ",") |> Array{String,1})
+    else                        # loci vertically stacked
         locinames = gpop[1]
     end
     d = Dict(i => [] for i in locinames)

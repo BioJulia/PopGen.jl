@@ -12,7 +12,7 @@ nancy = nancycats()
 """
 function nancycats()
     println("Downloading nancycats data")
-    download("https://github.com/pdimens/PopGen.jl/raw/master/test/nancycats.gen","testdata")
+    download("https://github.com/pdimens/PopGen.jl/raw/master/test/nancycats.gen","testdata") ;
     x = genepop("testdata", popsep = "pop", numpops = 4)
     rm("testdata")
     return x
@@ -30,8 +30,8 @@ Example:
 sharks = gulfsharks()
 """
 function gulfsharks()
-    println("Downloading Blacknose shark data from Dimens et al. 2019")
-    download("https://github.com/pdimens/PopGen.jl/raw/master/test/testdata.gen","testdata")
+    println("Downloading Blacknose shark data used in Dimens et al. 2019")
+    download("https://github.com/pdimens/PopGen.jl/raw/master/test/testdata.gen","testdata") ;
     x = genepop("testdata", numpops = 7)
     rm("testdata")
     return x
