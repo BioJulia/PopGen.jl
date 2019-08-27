@@ -2,8 +2,6 @@
 
 Population Genetics functions in Julia.
 
-![https://pdimens.github.io/PopGen.jl/](https://img.shields.io/badge/docs-stable-blue.svg)
-
 
 This is a fork of the (currently) unmaintained `PopGen.jl` in `BioJulia` with the goal of merging our work with it. 
 
