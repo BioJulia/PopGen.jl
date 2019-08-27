@@ -41,15 +41,17 @@ locus or array of loci to display.
 
 Examples:
 
-```julia
+``` julia tab="all loci"
 loci(a)
-
-loci(a, "contig_35208")
-
-loci(a, ["contig_35208", "contig_23109", "contig_4493"])
 ```
 
+``` julia tab="single locus"
+loci(a, "contig_35208")
+```
 
+``` julia tab="multiple loci"
+loci(a, ["contig_35208", "contig_23109", "contig_4493"])
+```
 
 ## locations
 
@@ -81,13 +83,16 @@ Use `listall = true` to display all individuals (`ind`) and their `popid` instea
 
 Examples:
 
-```julia
+``` julia tab="summary of unique pops"
 popid(a)
+```
 
+``` julia tab="every individual's population ID"
 popid(a, listall = true)
 ```
 
-Using `popid!` to change the names of the populations
+!!! info
+    Use `popid!` to change the names of the populations
 
 
 
@@ -103,15 +108,17 @@ Show all the genotypes of specific individuals within a `PopObj`.  Default is to
 
 Examples:
 
-```julia
+``` julia tab="all individuals"
 genotypes(a)
-
-genotypes(a, inds = "cca_001")
-
-genotypes(a, inds = ["cca_001", "cca_002", "cca_003"])
 ```
 
+``` julia tab="single individual"
+genotypes(a, inds = "cca_001")
+```
 
+``` julia tab="multiple individuals"
+genotypes(a, inds = ["cca_001", "cca_002", "cca_003"])
+```
 
 
 
@@ -121,16 +128,16 @@ genotypes(a, inds = ["cca_001", "cca_002", "cca_003"])
 missing(x::PopObj)
 ```
 
-
-
 Identify and count missing loci in each individual of a `PopObj`. Returns a tuple of two 
 `DataFrames`: loci per individual, number per loci.
 
 Example:
 
 ```julia
-missing(a)		# will display things
+missing(a)
 
 miss_ind, miss_loci = missing(a)
 ```
 
+!!! info
+    since `missing` outputs a tuple of 2 DataFrames, so you can also assign two variables simultaneously to inherit the values of these dataframes, as with the second example.

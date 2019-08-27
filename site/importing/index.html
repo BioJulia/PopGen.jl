@@ -449,23 +449,33 @@
 <li>Population ID's must be second value in row</li>
 <li><strong>Optional:</strong> longitude (x) values third value in row, latitude (y) fourth</li>
 </ul>
-<p><strong>Formatting example</strong></p>
-<div class="codehilite"><pre><span></span>Locus1,Locus2,Locus3
+<p><strong>Formatting examples</strong></p>
+<div class="superfences-tabs">
+<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
+<label for="__tab_1_0">without locations</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>Locus1,Locus2,Locus3
 sierra_01,1,001001,002002,001001
 sierra_02,1,001001,001001,001002
 snbarb_03,2,001001,001001,001002
 snbarb_02,2,001001,001001,001001
 snbarb_03,2,001002,001001,001001
-</pre></div>
-
-
+</pre></div></div>
+<input name="__tabs_1" type="radio" id="__tab_1_1" />
+<label for="__tab_1_1">with locations</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>Locus1,Locus2,Locus3
+sierra_01,1,14.1,15.2,001001,002002,001001
+sierra_02,1,34.1,26.1,001001,001001,001002
+snbarb_03,2,45.1,-11.2,001001,001001,001002
+snbarb_02,2,-11.5,11.6,001001,001001,001001
+snbarb_03,2,-3.1,43.2,001002,001001,001001
+</pre></div></div>
+</div>
 <p>To import a CSV into Julia as a <code>PopObj</code>:</p>
 <div class="codehilite"><pre><span></span><span class="n">csv</span><span class="p">(</span><span class="n">infile</span><span class="p">;</span> <span class="n">delim</span><span class="p">,</span> <span class="n">ploidy</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
 
 <span class="c"># Example</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">csv</span><span class="p">(</span><span class="s">&quot;/data/cali_poppy.csv&quot;</span><span class="p">,</span> <span class="n">delim</span> <span class="o">=</span> <span class="s">&quot;,&quot;</span><span class="p">,</span> <span class="n">ploidy</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
-
 
 <p>Arguments:</p>
 <ul>
@@ -490,14 +500,19 @@ snbarb_03,2,001002,001001,001001
 <li><code>location::Bool = false</code> : true/false of whether location data is present in the file (default = false)</li>
 </ul>
 <h2 id="genepop">Genepop</h2>
-<p>Files must follow standard Genepop formatting:
-- First line is a comment (and skipped)
-- Loci are listed after first line as one-per-line without commas or in single comma-separated row
-- A line with a particular keyword must delimit populations
-    - <strong>Must</strong> be the same word each time and not a unique population name
-- File is tab or space delimted</p>
-<p><strong>Formatting Example</strong></p>
-<div class="codehilite"><pre><span></span>Wasp populations in New York
+<p>Files must follow standard Genepop formatting:</p>
+<ul>
+<li>First line is a comment (and skipped)</li>
+<li>Loci are listed after first line as one-per-line without commas or in single comma-separated row</li>
+<li>A line with a particular keyword must delimit populations</li>
+<li><strong>Must</strong> be the same word each time and not a unique population name</li>
+<li>File is tab or space delimted</li>
+</ul>
+<p><strong>Formatting Examples</strong></p>
+<div class="superfences-tabs">
+<input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
+<label for="__tab_2_0">loci stacked vertically</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>Wasp populations in New York
 Locus1
 Locus2
 Locus3
@@ -510,9 +525,22 @@ Newcomb_01,  254230 564558 080100
 Newcomb_02,  000230 564558 090080
 Newcomb_03,  254230 000000 090100
 Newcomb_04,  254230 564000 090120
-</pre></div>
-
-
+</pre></div></div>
+<input name="__tabs_2" type="radio" id="__tab_2_1" />
+<label for="__tab_2_1">loci stacked horizontally</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>Wasp populations in New York
+Locus1,Locus2,Locus3
+POP
+Oneida_01,  250230 564568 110100
+Oneida_02,  252238 568558 100120
+Oneida_03,  254230 564558 090100
+POP
+Newcomb_01,  254230 564558 080100
+Newcomb_02,  000230 564558 090080
+Newcomb_03,  254230 000000 090100
+Newcomb_04,  254230 564000 090120
+</pre></div></div>
+</div>
 <p>To import a genepop file into Julia as a <code>PopObj</code>:</p>
 <div class="codehilite"><pre><span></span><span class="n">genepop</span><span class="p">(</span><span class="n">infile</span><span class="p">;</span> <span class="n">ploidy</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">popsep</span> <span class="o">=</span> <span class="s">&quot;POP&quot;</span><span class="p">,</span> <span class="n">numpop</span><span class="p">)</span>
 
@@ -520,9 +548,10 @@ Newcomb_04,  254230 564000 090120
 <span class="n">b</span> <span class="o">=</span> <span class="n">genepop</span><span class="p">(</span><span class="s">&quot;/data/wasp_hive.gen&quot;</span><span class="p">,</span> <span class="n">ploidy</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">popsep</span> <span class="o">=</span> <span class="s">&quot;POP&quot;</span><span class="p">,</span> <span class="n">numpops</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 
-
-<p>Arguments:
-- <code>infile::String</code> : path to genepop file, in quotes</p>
+<p>Arguments:</p>
+<ul>
+<li><code>infile::String</code> : path to genepop file, in quotes</li>
+</ul>
 <p>Keyword Arguments:</p>
 <ul>
 <li><code>ploidy::Int64</code> : single integer of the ploidy of the samples in the file (default = 2)<ul>
@@ -535,7 +564,10 @@ Newcomb_04,  254230 564000 090120
 <li><code>popsep::String</code> : word that separates populations in <code>infile</code> (default: "POP")</li>
 <li><code>numpops::Int64</code> : number of populations present in <code>infile</code> (used for early error checking)</li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>By default, the file reader will assign numbers as population ID's in order of appearance in the genepop file. Use the <code>popid!</code> function to rename these with your own population ID's.</p>
+</div>
 <h2 id="vcf">VCF</h2>
 <p>On the To-Do list!</p>
                 

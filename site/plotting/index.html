@@ -429,15 +429,12 @@
                 <h1 id="plotting">Plotting</h1>
 <p>The output of many functions are formatted for use in your favorite Julia plotting environments, such as <code>Plots</code>, <code>Makie</code>, <code>PlotlyJS</code>, <code>PyPlot</code>, <code>Gadfly</code>, etc. However, some convenience plots are provided to assist with speedy data visualization and exploration. </p>
 <h2 id="plot-missing-data">plot missing data</h2>
-<div class="codehilite"><pre><span></span><span class="n">plot_missing</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">color</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
+<p><div class="codehilite"><pre><span></span><span class="n">plot_missing</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">color</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
 </pre></div>
-
-
-<p>Return an interactive plot of the number of missing loci in individuals of a <code>PopObj</code>, along with the number of missing individuals per locus. To set a custom color palette, use <code>color = [color1, color2, ...]</code></p>
+Return an interactive plot of the number of missing loci in individuals of a <code>PopObj</code>, along with the number of missing individuals per locus. To set a custom color palette, use <code>color = [color1, color2, ...]</code></p>
 <p>Example:</p>
 <div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">plot_missing</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 </pre></div>
-
 
 <p><img alt="missing_plot" src="../img/missing_plot.png" /></p>
 <p>If you would like to save the interactive plot as a local HTML file (does not require Plotly account):</p>
@@ -445,7 +442,6 @@
 
 <span class="n">PlotlyJS</span><span class="o">.</span><span class="n">savehtml</span><span class="p">(</span><span class="n">plot_missing</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="s">&quot;filename.html&quot;</span><span class="p">)</span>
 </pre></div>
-
 
 <p>This will save it in the current working directly as whatever you replace <code>filename.html</code> with. If you want the file to work properly offline, add a third option argument <code>:embed</code>, although be aware it inflates the file size (~3.5mb for the test data). </p>
 <h2 id="plot-sample-locations">plot sample locations</h2>
@@ -460,11 +456,9 @@
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">plot_locations</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 </pre></div>
 
-
 <p><img alt="world plot" src="../img/locations_plot_world.png" /></p>
 <div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">plot_locations</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">region</span> <span class="o">=</span> <span class="s">&quot;north america&quot;</span><span class="p">,</span> <span class="n">projection</span> <span class="o">=</span> <span class="s">&quot;mercator&quot;</span><span class="p">)</span><span class="sb">`</span>
 </pre></div>
-
 
 <p><img alt="north america plot" src="../img/locations_plot_na.png" /></p>
 <p><strong>regions</strong></p>

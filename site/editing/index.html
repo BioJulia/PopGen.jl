@@ -489,7 +489,6 @@
 <span class="n">a</span> <span class="o">=</span> <span class="n">genepop</span><span class="p">(</span><span class="s">&quot;/test/testdata.gen&quot;</span><span class="p">,</span> <span class="n">numpops</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
 </pre></div>
 
-
 <p>Keep in mind, your path to that file is probably different. <strong>If using windows</strong> make sure to change your backslashes "\" to forward slashes "/" </p>
 <h2 id="add-location-data">add location data</h2>
 <p>Location data can be added by directly accessing the fields <code>.longitude</code> and <code>.latitude</code> in your <code>PopObj</code></p>
@@ -497,12 +496,10 @@
 <span class="n">a</span><span class="o">.</span><span class="n">latitdue</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">20</span><span class="o">:</span><span class="mi">30</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span>   <span class="c"># creates 212 unique random numbers between 20 and 30</span>
 </pre></div>
 
-
 <p>However, if your data is in decimal minutes rather than decimal degrees, use the <code>locations!</code> function to add it to the fields. This function will do a conversion for you.</p>
 <h3 id="adding-decimal-minutes-data">adding decimal minutes data</h3>
 <div class="codehilite"><pre><span></span><span class="n">locations!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">xloc</span><span class="o">::</span><span class="kt">Array</span><span class="p">,</span> <span class="n">yloc</span><span class="o">::</span><span class="kt">Array</span><span class="p">)</span>
 </pre></div>
-
 
 <p>Adds location data (longitude, latitude) to <code>PopObj</code>. Takes decimal degrees or decimal minutes format. <strong>Must</strong> use minus-sign instead of cardinal directions (i.e. 14 32.11W is <strong>not</strong> vaild). Location data must be in order of  individuals (<code>ind</code>). Replaces existing <code>PopObj</code> location data.</p>
 <ul>
@@ -511,11 +508,9 @@
 </ul>
 <p>If conversion is not necessary, can directly assign <code>PopObj.longitude</code> and <code>PopObj.latitude</code> as shown above.</p>
 <h2 id="rename-populations">rename populations</h2>
-<div class="codehilite"><pre><span></span><span class="n">popid!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">rename</span><span class="o">::</span><span class="kt">Dict</span><span class="p">)</span>
+<p><div class="codehilite"><pre><span></span><span class="n">popid!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">rename</span><span class="o">::</span><span class="kt">Dict</span><span class="p">)</span>
 </pre></div>
-
-
-<p>Rename the population ID's of <code>PopObj.popid</code>. Uses a <code>Dict</code> of <code>[popid] =&gt; replacement</code> to rename</p>
+Rename the population ID's of <code>PopObj.popid</code>. Uses a <code>Dict</code> of <code>[popid] =&gt; replacement</code> to rename</p>
 <p>Example:</p>
 <div class="codehilite"><pre><span></span><span class="c"># create a dictionary of name conversions</span>
 <span class="n">new_popnames</span> <span class="o">=</span> <span class="kt">Dict</span><span class="p">(</span><span class="mi">1</span> <span class="o">=&gt;</span> <span class="s">&quot;Cape Canaveral&quot;</span><span class="p">,</span>
@@ -529,11 +524,9 @@
 <span class="n">popid!</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">rename</span> <span class="o">=</span> <span class="n">new_popnames</span><span class="p">)</span>
 </pre></div>
 
-
 <h2 id="remove-loci">remove loci</h2>
 <div class="codehilite"><pre><span></span><span class="n">remove_loci!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">loci</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="n">String</span><span class="p">,</span> <span class="kt">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}})</span>
 </pre></div>
-
 
 <p>Removes selected loci from a <code>PopObj</code>.</p>
 <p>Examples:</p>
@@ -542,11 +535,9 @@
 <span class="n">remove_loci!</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;contig_35208&quot;</span><span class="p">,</span> <span class="s">&quot;contig_23109&quot;</span><span class="p">,</span> <span class="s">&quot;contig_4493&quot;</span><span class="p">])</span>
 </pre></div>
 
-
 <h2 id="remove-individuals">remove individuals</h2>
 <div class="codehilite"><pre><span></span><span class="n">remove_inds!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">inds</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}})</span>
 </pre></div>
-
 
 <p>Removes selected individuals from a <code>PopObj</code>.</p>
 <p>Examples:</p>

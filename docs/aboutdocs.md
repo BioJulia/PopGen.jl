@@ -126,13 +126,20 @@ This error is telling us "there is no such function called `add`, who's inputs a
 
 The functions within `PopGen` are almost always explicitly typed, so if you are getting the `MethodError: no method matching` error, then you are inputting the incorrect types into the function, or perhaps your inputs for the arguments are in the wrong order (see "Functions with and without keywords" below). 
 
-**So keep in mind**
-
-MethodError's can definitely get annoying, but they are usually the result of incorrect input from the user and not buggy programming by the developers. Please take that into consideration before assuming something is broken or bugged.
+!!! Note "keep in mind"
+    MethodError's can definitely get annoying, but they are usually the result of incorrect input from the user and not buggy programming by the developers. Please take that into consideration before assuming something is broken or bugged.
 
 
 
 ## Functions with and without keywords 
+
+!!! info "TL;DR"
+    Reading these docs, pay attention to semicolons in the function argument lists.
+    -- arguments before a semicolon have no keyword and follow an explicit order
+
+    -  arguments after a semicolon have a keyword `argument = value` and their order doesn't matter
+    - `MethodError: no methods matching` is likely an issue on your side and not on our side :)
+        - unless we accidentally forgot to export a function!
 
 Broadly speaking, there are two types of function declarations in Julia: ones with keywords and ones without keywords. The term "keywords" refers to an input argument that has the format `argument = value`. This format is present in many of the functions in this and other packages, however there are some specifics to understand when functions use keywords and when they don't. 
 
@@ -164,11 +171,3 @@ end
 
 In this format, everything that comes **before** the semicolon follows the strict rules from **Format 1**, and everything that comes **after** the semicolon is a keyword argument. Keyword arguments have the flexibility to not require any particular input order. However, you **must** use the keywords to declare those arguments, or you will receive another `MethodError: no method matching`, which is, as we've mentioned, annoying. 
 
-### TL;DR
-
-Reading these docs, pay attention to semicolons in the function argument lists.
-
-- arguments before a semicolon have no keyword and follow an explicit order
-- arguments after a semicolon have a keyword `argument = value` and their order doesn't matter
-- `MethodError: no methods matching` is likely an issue on your side and not on our side :)
-    - unless we accidentally forgot to export a function!

@@ -491,93 +491,108 @@
 <span class="n">a</span> <span class="o">=</span> <span class="n">genepop</span><span class="p">(</span><span class="s">&quot;/test/testdata.gen&quot;</span><span class="p">,</span> <span class="n">numpops</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
 </pre></div>
 
-
 <p>Keep in mind, your path to that file is probably different. <strong>If using windows</strong> make sure to change your backslashes "\" to forward slashes "/" </p>
 <h2 id="individualsample-names">individual/sample names</h2>
 <div class="codehilite"><pre><span></span><span class="n">indnames</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">)</span>
 </pre></div>
-
 
 <p>View individual/sample names in a <code>PopObj</code>. This is equivalent to <code>PopObj.ind</code></p>
 <p>Example:</p>
 <div class="codehilite"><pre><span></span><span class="n">indnames</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 </pre></div>
 
-
 <h2 id="loci">loci</h2>
 <div class="codehilite"><pre><span></span><span class="n">loci</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">loci</span> <span class="o">=</span> <span class="nb">nothing</span><span class="p">)</span>
 </pre></div>
-
 
 <p>View the genotypes of all individuals for specific loci in a <code>PopObj</code>.
 Default shows all genotypes for all individuals. Use <code>loci =</code> to specify a single
 locus or array of loci to display.</p>
 <p>Examples:</p>
-<div class="codehilite"><pre><span></span><span class="n">loci</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-
-<span class="n">loci</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s">&quot;contig_35208&quot;</span><span class="p">)</span>
-
-<span class="n">loci</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;contig_35208&quot;</span><span class="p">,</span> <span class="s">&quot;contig_23109&quot;</span><span class="p">,</span> <span class="s">&quot;contig_4493&quot;</span><span class="p">])</span>
-</pre></div>
-
-
+<div class="superfences-tabs">
+<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
+<label for="__tab_1_0">all loci</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">loci</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_1" type="radio" id="__tab_1_1" />
+<label for="__tab_1_1">single locus</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">loci</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s">&quot;contig_35208&quot;</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_1" type="radio" id="__tab_1_2" />
+<label for="__tab_1_2">multiple loci</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">loci</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;contig_35208&quot;</span><span class="p">,</span> <span class="s">&quot;contig_23109&quot;</span><span class="p">,</span> <span class="s">&quot;contig_4493&quot;</span><span class="p">])</span>
+</pre></div></div>
+</div>
 <h2 id="locations">locations</h2>
 <div class="codehilite"><pre><span></span><span class="n">locations</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">)</span>
 </pre></div>
-
 
 <p>View location data (<code>.longitude</code> and <code>.latitude</code>) in a <code>PopObj</code></p>
 <p>Example:</p>
 <div class="codehilite"><pre><span></span><span class="n">locations</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 </pre></div>
 
-
 <p>Use <code>locations!</code> to add spatial data to a <code>PopObj</code></p>
 <h2 id="population-ids">population ID's</h2>
 <div class="codehilite"><pre><span></span><span class="n">popid</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">listall</span><span class="o">::</span><span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
 </pre></div>
 
-
 <p>View unique population ID's in a <code>PopObj</code>. Default (<code>listall = false</code>) shows basic summary table of unique populations and the number of individuals in them.  </p>
 <p>Use <code>listall = true</code> to display all individuals (<code>ind</code>) and their <code>popid</code> instead.</p>
 <p>Examples:</p>
-<div class="codehilite"><pre><span></span><span class="n">popid</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-
-<span class="n">popid</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">listall</span> <span class="o">=</span> <span class="kc">true</span><span class="p">)</span>
-</pre></div>
-
-
-<p>Using <code>popid!</code> to change the names of the populations</p>
+<div class="superfences-tabs">
+<input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
+<label for="__tab_2_0">summary of unique pops</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">popid</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_2" type="radio" id="__tab_2_1" />
+<label for="__tab_2_1">every individual's population ID</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">popid</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">listall</span> <span class="o">=</span> <span class="kc">true</span><span class="p">)</span>
+</pre></div></div>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Use <code>popid!</code> to change the names of the populations</p>
+</div>
 <h2 id="genotypes">genotypes</h2>
 <div class="codehilite"><pre><span></span><span class="n">genotypes</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">inds</span> <span class="o">=</span> <span class="nb">nothing</span><span class="p">)</span>
 </pre></div>
-
 
 <p>Show all the genotypes of specific individuals within a <code>PopObj</code>.  Default is to show all individuals so use <code>inds =</code> to specify individuals.</p>
 <ul>
 <li>Names must be in quotes</li>
 </ul>
 <p>Examples:</p>
-<div class="codehilite"><pre><span></span><span class="n">genotypes</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-
-<span class="n">genotypes</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">inds</span> <span class="o">=</span> <span class="s">&quot;cca_001&quot;</span><span class="p">)</span>
-
-<span class="n">genotypes</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;cca_001&quot;</span><span class="p">,</span> <span class="s">&quot;cca_002&quot;</span><span class="p">,</span> <span class="s">&quot;cca_003&quot;</span><span class="p">])</span>
-</pre></div>
-
-
+<div class="superfences-tabs">
+<input name="__tabs_3" type="radio" id="__tab_3_0" checked="checked" />
+<label for="__tab_3_0">all individuals</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">genotypes</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_3" type="radio" id="__tab_3_1" />
+<label for="__tab_3_1">single individual</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">genotypes</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">inds</span> <span class="o">=</span> <span class="s">&quot;cca_001&quot;</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_3" type="radio" id="__tab_3_2" />
+<label for="__tab_3_2">multiple individuals</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">genotypes</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;cca_001&quot;</span><span class="p">,</span> <span class="s">&quot;cca_002&quot;</span><span class="p">,</span> <span class="s">&quot;cca_003&quot;</span><span class="p">])</span>
+</pre></div></div>
+</div>
 <h2 id="find-missing">find missing</h2>
 <div class="codehilite"><pre><span></span><span class="n">missing</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">)</span>
 </pre></div>
 
-
 <p>Identify and count missing loci in each individual of a <code>PopObj</code>. Returns a tuple of two 
 <code>DataFrames</code>: loci per individual, number per loci.</p>
 <p>Example:</p>
-<div class="codehilite"><pre><span></span><span class="n">missing</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>      <span class="c"># will display things</span>
+<div class="codehilite"><pre><span></span><span class="n">missing</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
 <span class="n">miss_ind</span><span class="p">,</span> <span class="n">miss_loci</span> <span class="o">=</span> <span class="n">missing</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 </pre></div>
+
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>since <code>missing</code> outputs a tuple of 2 DataFrames, so you can also assign two variables simultaneously to inherit the values of these dataframes, as with the second example.</p>
+</div>
                 
                   
                 

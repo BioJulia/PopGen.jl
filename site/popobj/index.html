@@ -428,7 +428,7 @@
                 
                 <h1 id="the-popobj-type">the PopObj type</h1>
 <h2 id="what-is-a-popobj">What is a PopObj</h2>
-<p>For the PopGen.jl package to be consistent, a standard flexible data structure needs to be defined. The solution is a custom type called a <code>PopObj</code> (pronounced "pop ob" with a silent j because it rolls of the tongue better).  The struct is defined as:</p>
+<p>For the PopGen.jl package to be consistent, a standard flexible data structure needs to be defined. The solution is a custom type called a <code>PopObj</code> (pronounced "pop ob" with a silent j because it rolls of the tongue better). If you haven't already guessed, it's a combination of the words Population and Object. The struct is defined as:</p>
 <div class="codehilite"><pre><span></span><span class="k">mutable</span> <span class="k">struct</span> <span class="n">PopObj</span>
     <span class="n">ind</span><span class="o">::</span><span class="kt">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span>
     <span class="n">popid</span><span class="o">::</span><span class="kt">Array</span><span class="p">{</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="n">String</span><span class="p">},</span><span class="mi">1</span><span class="p">}</span>
@@ -439,7 +439,6 @@
     <span class="n">latitude</span><span class="o">::</span><span class="kt">Array</span><span class="p">{</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Int64</span><span class="p">,</span><span class="kt">Float64</span><span class="p">},</span><span class="mi">1</span><span class="p">}</span>
 <span class="k">end</span>
 </pre></div>
-
 
 <ul>
 <li><strong>ind</strong> : the individual/sample names</li>
@@ -455,50 +454,33 @@
 <li><strong>latitude</strong> : latitude data of samples (decimal degrees)</li>
 </ul>
 <p>Accessing any of these fields is done with a dot <code>.</code> accessor and can use the <code>[]</code>slice accessor, as per standard Julia convention:</p>
-<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">genepop</span><span class="p">(</span><span class="s">&quot;/test/testdata.gen&quot;</span><span class="p">,</span> <span class="n">numpops</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span> <span class="p">;</span>
+<div class="codehilite"><pre><span></span>julia&gt; a = genepop(&quot;/test/testdata.gen&quot;, numpops = 7) ;
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">a</span><span class="o">.</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">6</span><span class="p">]</span>
-</pre></div>
-
-
-<div class="codehilite"><pre><span></span>6-element Array{String,1}:
+julia&gt; a.ind[1:6]
+6-element Array{String,1}:
  &quot;cca_001&quot;
  &quot;cca_002&quot;
  &quot;cca_003&quot;
  &quot;cca_005&quot;
  &quot;cca_007&quot;
  &quot;cca_008&quot;
-</pre></div>
 
-
-<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">a</span><span class="o">.</span><span class="n">loci</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">6</span><span class="p">]</span>
-</pre></div>
-
-
-<div class="codehilite"><pre><span></span>6-element Array{String,1}:
+ julia&gt; a.loci[1:6]
+ 6-element Array{String,1}:
  &quot;Contig_35208&quot;
  &quot;Contig_23109&quot;
  &quot;Contig_4493&quot; 
  &quot;Contig_10742&quot;
  &quot;Contig_14898&quot;
  &quot;Contig_8483&quot; 
+
+ julia&gt; a.ploidy
+ 2
 </pre></div>
-
-
-<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">a</span><span class="o">.</span><span class="n">ploidy</span>
-</pre></div>
-
-
-<div class="codehilite"><pre><span></span>2
-</pre></div>
-
 
 <p>Given the volume of information that can be present in a <code>PopObj</code>, we defined a custom <code>Base.show(::PopObj)</code> to summarize the data rather than regurgitate everything on the screen. </p>
-<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">a</span>
-</pre></div>
-
-
-<div class="codehilite"><pre><span></span>Object of type PopObj:
+<div class="codehilite"><pre><span></span>julia&gt; a
+Object of type PopObj:
 No location data provided
 
 Number of individuals: 212
@@ -523,16 +505,12 @@ Number of populations: 7
 Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 </pre></div>
 
-
 <h2 id="location-data">Location Data</h2>
 <p>Notice the <code>No location data provided</code> text on the second line of output above. That text exists as a "heads up" rather than a warning because <strong>location data is optional</strong> for a <code>PopObj</code>. There are functions that use location information (e.g. <code>locations</code>and <code>plot_locations</code>), but most don't, so it's not a dealbreaker. If you add location information, displaying the <code>PopObj</code> again will show you output now including this information:</p>
-<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">a</span><span class="o">.</span><span class="n">latitude</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="o">:</span><span class="mi">50</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span> <span class="p">;</span> <span class="n">a</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="o">:</span><span class="mi">50</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span> <span class="p">;</span> <span class="c"># assign random location data</span>
+<div class="codehilite"><pre><span></span>julia&gt; a.latitude = rand(1:50, 212) ; a.longitude = rand(1:50, 212) ; # assign random location data
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">a</span>
-</pre></div>
-
-
-<div class="codehilite"><pre><span></span>Object of type PopObj:
+julia&gt; a
+Object of type PopObj:
 
 Longitude:
 [&quot;26&quot;, &quot;7&quot;, &quot;21&quot;] … [&quot;25&quot;, &quot;26&quot;, &quot;29&quot;]
