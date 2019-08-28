@@ -44,7 +44,7 @@ function genepop(infile::String; ploidy::Int64 = 2, popsep::Any = "POP", numpops
     else                        # loci vertically stacked
         locinames = gpop[1]
     end
-    d = Dict(i => [] for i in locinames)
+    d = Dict(string(i) => [] for i in locinames)
     popid = []
     indnames = []
     for i in 2:length(gpop)
@@ -95,7 +95,7 @@ snbarb_03,2,001002,001001,001001 \n
 function csv(infile::String; delim::Union{Char,String,Regex} = ",", ploidy::Int64 = 2, location::Bool = false)
     gpop = open(readlines,infile)
     locinames = split(gpop[1], delim)
-    d = Dict(i => [] for i in locinames)
+    d = Dict(string(i) => [] for i in locinames)
     popid = []
     indnames = []
     locx = []
@@ -129,8 +129,8 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", ploidy::Int6
             end
             push!(indnames, tmp[1])
             push!(popid, tmp[2])
-            push!(locx, tmp[3])
-            push!(locy, tmp[4])
+            push!(locx, parse.(Float64,tmp[3]))
+            push!(locy, parse.(Float64,tmp[4]))
         end
     end
     println("\n", "Input File : ", abspath(infile) )
