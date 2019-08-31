@@ -1,0 +1,1175 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="Population genetics in Julia">
+      
+      
+      
+        <meta name="author" content="Pavel Dimens and Jason Selwyn">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../img/favicon.ico">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.1">
+    
+    
+      
+        <title>Accessing - PopGen.jl</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.30686662.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#757575">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.74668098.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="grey" data-md-color-accent="">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#loading-in-the-data" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="PopGen.jl" class="md-header-nav__button md-logo">
+          
+            <img src="../img/favicon.ico" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              PopGen.jl
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Accessing
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/pdimens/PopGen.jl/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="PopGen.jl" class="md-nav__button md-logo">
+      
+        <img src="../img/favicon.ico" width="48" height="48">
+      
+    </a>
+    PopGen.jl
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/pdimens/PopGen.jl/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../juliaprimer/" title="Getting started" class="md-nav__link">
+      Getting started
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../install/" title="Installing" class="md-nav__link">
+      Installing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      The PopObj type
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        The PopObj type
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../popobj_type/" title="What's a PopObj" class="md-nav__link">
+      What's a PopObj
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Accessing
+      </label>
+    
+    <a href="./" title="Accessing" class="md-nav__link md-nav__link--active">
+      Accessing
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#loading-in-the-data" title="Loading in the data" class="md-nav__link">
+    Loading in the data
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trying-out-the-standard-accessors" title="Trying out the standard accessors" class="md-nav__link">
+    Trying out the standard accessors
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ind" title=".ind" class="md-nav__link">
+    .ind
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#popid" title=".popid" class="md-nav__link">
+    .popid
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loci" title=".loci" class="md-nav__link">
+    .loci
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ploidy" title=".ploidy" class="md-nav__link">
+    .ploidy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#genotypes" title=".genotypes" class="md-nav__link">
+    .genotypes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#latitude" title=".latitude" class="md-nav__link">
+    .latitude
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#latitude_1" title=".latitude" class="md-nav__link">
+    .latitude
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#slices" title="Slices" class="md-nav__link">
+    Slices
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operating-on-accessors" title="Operating on accessors" class="md-nav__link">
+    Operating on accessors
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-to-avoid" title="🛑❌ What to avoid! ❌🛑" class="md-nav__link">
+    🛑❌ What to avoid! ❌🛑
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../popobj_location/" title="Location data" class="md-nav__link">
+      Location data
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
+      Importing Data
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Importing Data
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../delimited/" title="CSV and delimited" class="md-nav__link">
+      CSV and delimited
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../genepop/" title="Genepop" class="md-nav__link">
+      Genepop
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../vcf/" title="VCF" class="md-nav__link">
+      VCF
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../commands/" title="View/edit PopObj" class="md-nav__link">
+      View/edit PopObj
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../examples/" title="Example data" class="md-nav__link">
+      Example data
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../contr/" title="Contributing" class="md-nav__link">
+      Contributing
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#loading-in-the-data" title="Loading in the data" class="md-nav__link">
+    Loading in the data
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trying-out-the-standard-accessors" title="Trying out the standard accessors" class="md-nav__link">
+    Trying out the standard accessors
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ind" title=".ind" class="md-nav__link">
+    .ind
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#popid" title=".popid" class="md-nav__link">
+    .popid
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loci" title=".loci" class="md-nav__link">
+    .loci
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ploidy" title=".ploidy" class="md-nav__link">
+    .ploidy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#genotypes" title=".genotypes" class="md-nav__link">
+    .genotypes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#latitude" title=".latitude" class="md-nav__link">
+    .latitude
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#latitude_1" title=".latitude" class="md-nav__link">
+    .latitude
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#slices" title="Slices" class="md-nav__link">
+    Slices
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operating-on-accessors" title="Operating on accessors" class="md-nav__link">
+    Operating on accessors
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-to-avoid" title="🛑❌ What to avoid! ❌🛑" class="md-nav__link">
+    🛑❌ What to avoid! ❌🛑
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/pdimens/PopGen.jl/edit/master/docs/PopObj_accessing.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                  <h1>Accessing</h1>
+                
+                <p>A little hands-on training will probably go a long way, so let's through some of the functions available in PopGen.jl with the included data. This tutorial will include both inputs and outputs so you can be confident what you're seeing in your Julia session is exactly what's supposed to happen. Sometimes the outputs can be a little lengthy, so they will be arranged in code "tabs", where the left-most tab is the input named after what it's accomplishing, and the right tab is the output of running the command. </p>
+<h2 id="loading-in-the-data">Loading in the data</h2>
+<p>Let's keep things simple by loading in the nancycats data and calling it <code>ncats</code></p>
+<div class="superfences-tabs">
+<input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
+<label for="__tab_1_0">load nancycats</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span> <span class="o">=</span> <span class="n">nancycats</span><span class="p">()</span>
+</pre></div></div>
+<input name="__tabs_1" type="radio" id="__tab_1_1" />
+<label for="__tab_1_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>Input File : /home/pdimens/.julia/packages/PopGen/h9b1q/data/data/nancycats.csv
+Object of type PopObj:
+No location data provided
+
+Number of individuals: 237
+[&quot;N215&quot;, &quot;N216&quot;, &quot;N217&quot;] … [&quot;N281&quot;, &quot;N289&quot;, &quot;N290&quot;]
+
+Number of loci: 9
+[&quot;fca8&quot;, &quot;fca23&quot;, &quot;fca43&quot;] … [&quot;fca90&quot;, &quot;fca96&quot;, &quot;fca37&quot;]
+
+Ploidy: 2
+Number of populations: 17
+
+   #Inds | Pop
+   --------------
+     10  |  1
+     22  |  2
+     12  |  3
+     23  |  4
+     15  |  5
+     11  |  6
+     14  |  7
+     10  |  8
+     9   |  9
+     11  |  10
+     20  |  11
+     14  |  12
+     13  |  13
+     17  |  14
+     11  |  15
+     12  |  16
+     13  |  17
+
+Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+</pre></div></div>
+</div>
+<p>Note the last line of the output. These fields can be accessed by name using the dot <code>.</code> accessor.</p>
+<h2 id="trying-out-the-standard-accessors">Trying out the standard accessors</h2>
+<p>Now that we have nancycats loaded in, we can use standard Julia accessor  conventions to view the elements within our PopObj.</p>
+<h3 id="ind">.ind</h3>
+<p>This will access the names of the individuals as they appeared in the data.</p>
+<div class="superfences-tabs">
+<input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
+<label for="__tab_2_0">.ind</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">ind</span>
+</pre></div></div>
+<input name="__tabs_2" type="radio" id="__tab_2_1" />
+<label for="__tab_2_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>237-element Array{String,1}:
+ &quot;N215&quot;
+ &quot;N216&quot;
+ &quot;N217&quot;
+ &quot;N218&quot;
+ &quot;N219&quot;
+ &quot;N220&quot;
+ &quot;N221&quot;
+ &quot;N222&quot;
+ &quot;N223&quot;
+ &quot;N224&quot;
+ &quot;N7&quot;  
+ &quot;N141&quot;
+ &quot;N142&quot;
+ &quot;N143&quot;
+ &quot;N144&quot;
+ &quot;N145&quot;
+ &quot;N146&quot;
+ &quot;N147&quot;
+ &quot;N148&quot;
+ &quot;N149&quot;
+ ⋮ 
+ &quot;N256&quot;
+ &quot;N257&quot;
+ &quot;N258&quot;
+ &quot;N259&quot;
+ &quot;N260&quot;
+ &quot;N261&quot;
+ &quot;N262&quot;
+ &quot;N282&quot;
+ &quot;N283&quot;
+ &quot;N288&quot;
+ &quot;N291&quot;
+ &quot;N292&quot;
+ &quot;N293&quot;
+ &quot;N294&quot;
+ &quot;N295&quot;
+ &quot;N296&quot;
+ &quot;N297&quot;
+ &quot;N281&quot;
+ &quot;N289&quot;
+ &quot;N290&quot;
+</pre></div></div>
+</div>
+<h3 id="popid">.popid</h3>
+<p>This will access the names of the populations associated with each individual, in the same order as the  individuals.</p>
+<div class="superfences-tabs">
+<input name="__tabs_3" type="radio" id="__tab_3_0" checked="checked" />
+<label for="__tab_3_0">.popid</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">ind</span>
+</pre></div></div>
+<input name="__tabs_3" type="radio" id="__tab_3_1" />
+<label for="__tab_3_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>237-element Array{Union{Int64, String},1}:
+ &quot;1&quot; 
+ &quot;1&quot; 
+ &quot;1&quot; 
+ &quot;1&quot; 
+ &quot;1&quot; 
+ &quot;1&quot; 
+ &quot;1&quot; 
+ &quot;1&quot; 
+ &quot;1&quot; 
+ &quot;1&quot; 
+ &quot;2&quot; 
+ &quot;2&quot; 
+ &quot;2&quot; 
+ &quot;2&quot; 
+ &quot;2&quot; 
+ &quot;2&quot; 
+ &quot;2&quot; 
+ &quot;2&quot; 
+ &quot;2&quot; 
+ &quot;2&quot; 
+ ⋮   
+ &quot;16&quot;
+ &quot;16&quot;
+ &quot;16&quot;
+ &quot;16&quot;
+ &quot;16&quot;
+ &quot;16&quot;
+ &quot;16&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+ &quot;17&quot;
+</pre></div></div>
+</div>
+<p>These ID's aren't super informative. Later, we'll change them using the <code>popid!</code> command.</p>
+<h3 id="loci">.loci</h3>
+<p>This will access the names of the loci as they appeared in the data.</p>
+<div class="superfences-tabs">
+<input name="__tabs_4" type="radio" id="__tab_4_0" checked="checked" />
+<label for="__tab_4_0">.loci</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">ind</span>
+</pre></div></div>
+<input name="__tabs_4" type="radio" id="__tab_4_1" />
+<label for="__tab_4_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>9-element Array{String,1}:
+ &quot;fca8&quot; 
+ &quot;fca23&quot;
+ &quot;fca43&quot;
+ &quot;fca45&quot;
+ &quot;fca77&quot;
+ &quot;fca78&quot;
+ &quot;fca90&quot;
+ &quot;fca96&quot;
+ &quot;fca37&quot;
+</pre></div></div>
+</div>
+<h3 id="ploidy">.ploidy</h3>
+<p>This shows you the ploidy of the data, which is user-provided when loading in real data.</p>
+<div class="superfences-tabs">
+<input name="__tabs_5" type="radio" id="__tab_5_0" checked="checked" />
+<label for="__tab_5_0">.ploidy</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">ind</span>
+</pre></div></div>
+<input name="__tabs_5" type="radio" id="__tab_5_1" />
+<label for="__tab_5_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>2
+</pre></div></div>
+</div>
+<h3 id="genotypes">.genotypes</h3>
+<p>This is the core of the PopObj type and it displays a <code>Dict</code> of loci corresponding to an array of tuples that have the genotypes of each individual in the order with which they appear in <code>.ind</code>. Due to the way <code>Dicts</code> parse (they do not have indices), viewing <code>.genotypes</code> will likely show you a different order of loci each time you display it. Worry not! Their values (the genotypes) are arrays, therefor indexed, and respect the order of <code>.ind</code>. Under the hood, PopGen.jl uses <code>.ind</code> and <code>.loci</code> to iterate over <code>.genotypes</code>, so ultimately, the order of loci is respected, even though there isn't any good analytical reason for it.</p>
+<div class="superfences-tabs">
+<input name="__tabs_6" type="radio" id="__tab_6_0" checked="checked" />
+<label for="__tab_6_0">.genotypes</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">genotypes</span>
+</pre></div></div>
+<input name="__tabs_6" type="radio" id="__tab_6_1" />
+<label for="__tab_6_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span># the output scales to your REPL width
+
+Dict{String,Array{Any,1}} with 9 entries:
+  &quot;fca77&quot; =&gt; Any[(156, 156), (156, 156), (156, 152), (150, 150), (152, 152), (…
+  &quot;fca96&quot; =&gt; Any[(113, 113), (113, 113), (113, 113), (91, 10, 5), (113, 113), …
+  &quot;fca23&quot; =&gt; Any[(136, 146), (146, 146), (136, 146), (138, 138), (146, 140), (…
+  &quot;fca78&quot; =&gt; Any[(142, 148), (142, 148), (142, 142), (142, 148), (142, 148), (…
+  &quot;fca8&quot;  =&gt; Any[(0, 0), (0, 0), (135, 143), (135, 133), (135, 133), (135, 143…
+  &quot;fca45&quot; =&gt; Any[(116, 120), (120, 126), (116, 116), (116, 126), (126, 126), (…
+  &quot;fca37&quot; =&gt; Any[(208, 208), (208, 208), (210, 210), (208, 208), (208, 208), (…
+  &quot;fca43&quot; =&gt; Any[(139, 139), (139, 145), (141, 141), (139, 141), (145, 141), (…
+  &quot;fca90&quot; =&gt; Any[(199, 199), (199, 185), (197, 197), (199, 199), (199, 193), (…
+</pre></div></div>
+</div>
+<p>Since <code>genotypes</code> is a <code>Dict</code>, you access it using standard Julia <code>Dict</code> conventions.  This includes the <code>keys</code> and <code>values</code> commands, or you can access the genotypes of specific loci with square brackets and the locus name in quotes:</p>
+<div class="superfences-tabs">
+<input name="__tabs_7" type="radio" id="__tab_7_0" checked="checked" />
+<label for="__tab_7_0">Dict at key</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">genotypes</span><span class="p">[</span><span class="s">&quot;fca8&quot;</span><span class="p">]</span>
+</pre></div></div>
+<input name="__tabs_7" type="radio" id="__tab_7_1" />
+<label for="__tab_7_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>237-element Array{Any,1}:
+ (0, 0)    
+ (0, 0)    
+ (135, 143)
+ (135, 133)
+ (135, 133)
+ (135, 143)
+ (135, 135)
+ (135, 143)
+ (143, 137)
+ (135, 135)
+ (137, 141)
+ (133, 129)
+ (133, 129)
+ (133, 133)
+ (135, 131)
+ (135, 129)
+ (133, 129)
+ (135, 129)
+ (135, 135)
+ (135, 131)
+ ⋮         
+ (139, 139)
+ (137, 139)
+ (137, 139)
+ (143, 137)
+ (135, 139)
+ (143, 139)
+ (135, 139)
+ (135, 133)
+ (135, 133)
+ (133, 141)
+ (133, 141)
+ (133, 123)
+ (133, 123)
+ (133, 141)
+ (133, 141)
+ (133, 141)
+ (143, 133)
+ (135, 141)
+ (143, 137)
+ (135, 141)
+</pre></div></div>
+</div>
+<h3 id="latitude">.latitude</h3>
+<p>This accesses the latitude information of the PopObj. If there is none, like in the nancycats data, it returns an empty array.</p>
+<div class="superfences-tabs">
+<input name="__tabs_8" type="radio" id="__tab_8_0" checked="checked" />
+<label for="__tab_8_0">.latitude</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">latitude</span>
+</pre></div></div>
+<input name="__tabs_8" type="radio" id="__tab_8_1" />
+<label for="__tab_8_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>0-element Array{Union{Float64, Int64},1}
+</pre></div></div>
+</div>
+<h3 id="latitude_1">.latitude</h3>
+<p>This accesses the longitude information of the PopObj. Like before, iIf there is none, like in the nancycats data, it returns an empty array.</p>
+<div class="superfences-tabs">
+<input name="__tabs_9" type="radio" id="__tab_9_0" checked="checked" />
+<label for="__tab_9_0">.longitude</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">longitude</span>
+</pre></div></div>
+<input name="__tabs_9" type="radio" id="__tab_9_1" />
+<label for="__tab_9_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>0-element Array{Union{Float64, Int64},1}
+</pre></div></div>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Seeing some location info</p>
+<p>The nancycats data has some weird coordinate system for information, so those data were omitted. If you want a proof of concept for <code>.longitude</code> and <code>.latitude</code>, load in <code>gulfsharks</code> and try it out. We'll use <code>hcat</code> (horizontal concatination) to horizontally bind the individual names, their latitude, and longitude. Later, you'll see that the <code>locations</code> command does this and a bit more</p>
+<div class="superfences-tabs">
+<input name="__tabs_10" type="radio" id="__tab_10_0" checked="checked" />
+<label for="__tab_10_0">load gulfsharks</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">sharks</span> <span class="o">=</span> <span class="n">gulfsharks</span><span class="p">()</span> <span class="p">;</span>    <span class="c"># semicolon just supresses printing output</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">hcat</span><span class="p">(</span><span class="n">sharks</span><span class="o">.</span><span class="n">ind</span><span class="p">,</span> <span class="n">sharks</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">sharks</span><span class="o">.</span><span class="n">longitude</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_10" type="radio" id="__tab_10_1" />
+<label for="__tab_10_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>212×3 Array{Any,2}:
+&quot;cc_001&quot;   28.3062  -80.5993
+&quot;cc_002&quot;   28.3079  -80.5995
+&quot;cc_003&quot;   28.3023  -80.5996
+&quot;cc_005&quot;   28.6123  -80.4225
+&quot;cc_007&quot;   27.8666  -80.3578
+&quot;cc_008&quot;   27.8666  -80.3579
+&quot;cc_009&quot;   27.8682  -80.3482
+&quot;cc_010&quot;   27.8711  -80.3482
+&quot;cc_012&quot;   28.4815  -80.4303
+&quot;cc_013&quot;   28.2421  -80.2494
+&quot;cc_014&quot;   28.2428  -80.2496
+&quot;cc_015&quot;   28.2378  -80.2496
+&quot;cc_016&quot;   28.2414  -80.2498
+&quot;cc_017&quot;   28.236   -80.2495
+&quot;cc_018&quot;   28.2364  -80.2494
+&quot;cc_019&quot;   28.3906  -80.4963
+&quot;cc_020&quot;   28.3902  -80.4968
+&quot;cc_021&quot;   28.3861  -80.4967
+&quot;cc_022&quot;   28.3869  -80.4966
+&quot;cc_023&quot;   28.3865  -80.496 
+⋮                           
+&quot;seg_001&quot;  29.8901  -87.7189
+&quot;seg_003&quot;  30.1943  -88.0007
+&quot;seg_009&quot;  30.0021  -88.0493
+&quot;seg_010&quot;  30.0069  -88.049 
+&quot;seg_011&quot;  29.8362  -88.1675
+&quot;seg_012&quot;  29.5057  -88.0546
+&quot;seg_014&quot;  30.1428  -88.2974
+&quot;seg_015&quot;  30.2074  -88.36  
+&quot;seg_016&quot;  30.1151  -88.3922
+&quot;seg_018&quot;  29.8362  -88.168 
+&quot;seg_021&quot;  29.9466  -86.0399
+&quot;seg_023&quot;  29.9969  -85.6494
+&quot;seg_024&quot;  29.6966  -87.4403
+&quot;seg_025&quot;  30.064   -86.5374
+&quot;seg_026&quot;  30.0696  -86.5376
+&quot;seg_027&quot;  29.9065  -86.0905
+&quot;seg_028&quot;  30.0532  -87.3661
+&quot;seg_029&quot;  30.0522  -87.3662
+&quot;seg_030&quot;  29.8234  -85.7143
+&quot;seg_031&quot;  29.8234  -85.7143
+</pre></div></div>
+</div>
+</div>
+<h2 id="slices">Slices</h2>
+<p>You can likewise use slices to access parts of these data. If you're migrating from R or Python, it's the simple bracket accessor you're already familiar with to pull out a range of values. Julia just calls them slices. </p>
+<p>Let's look at a slice of <code>.ind</code>.</p>
+<div class="superfences-tabs">
+<input name="__tabs_11" type="radio" id="__tab_11_0" checked="checked" />
+<label for="__tab_11_0">slice .ind</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">6</span><span class="p">]</span>
+</pre></div></div>
+<input name="__tabs_11" type="radio" id="__tab_11_1" />
+<label for="__tab_11_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>6-element Array{String,1}:
+ &quot;N215&quot;
+ &quot;N216&quot;
+ &quot;N217&quot;
+ &quot;N218&quot;
+ &quot;N219&quot;
+ &quot;N220&quot;
+</pre></div></div>
+</div>
+<p>and we can do this for all the accessors, except <code>genotypes</code>, because it's a dictionary and has slightly different syntax, which we'll get to in a moment. Here's another example: </p>
+<div class="superfences-tabs">
+<input name="__tabs_12" type="radio" id="__tab_12_0" checked="checked" />
+<label for="__tab_12_0">slice .loci</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">ncats</span><span class="o">.</span><span class="n">loci</span><span class="p">[</span><span class="mi">3</span><span class="o">:</span><span class="k">end</span><span class="p">]</span>
+</pre></div></div>
+<input name="__tabs_12" type="radio" id="__tab_12_1" />
+<label for="__tab_12_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>7-element Array{String,1}:
+ &quot;fca43&quot;
+ &quot;fca45&quot;
+ &quot;fca77&quot;
+ &quot;fca78&quot;
+ &quot;fca90&quot;
+ &quot;fca96&quot;
+ &quot;fca37&quot;
+</pre></div></div>
+</div>
+<div class="admonition info">
+<p class="admonition-title">:end</p>
+<p>All things start at 1, so there is no need for a special word for it. On the other hand, objects can have unknown lengths or varied lengths as you work with them. In Julia, use the word <code>end</code> in a slice range to indicate you want it to go to the end,, regardless of length or known size. </p>
+</div>
+<h2 id="operating-on-accessors">Operating on accessors</h2>
+<p>These accessors follow the exact same format as the dot operator in Python, or the <code>$</code> operator in R, meaning these objects can be assigned to new variables, you can operate on them, iterate over them, etc. </p>
+<p>Here's a simple example to display the unique population ID's in your PopObj</p>
+<div class="superfences-tabs">
+<input name="__tabs_13" type="radio" id="__tab_13_0" checked="checked" />
+<label for="__tab_13_0">unique</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">unique</span><span class="p">(</span><span class="n">ncats</span><span class="o">.</span><span class="n">popid</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_13" type="radio" id="__tab_13_1" />
+<label for="__tab_13_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>17-element Array{Union{Int64, String},1}:
+ &quot;1&quot; 
+ &quot;2&quot; 
+ &quot;3&quot; 
+ &quot;4&quot; 
+ &quot;5&quot; 
+ &quot;6&quot; 
+ &quot;7&quot; 
+ &quot;8&quot; 
+ &quot;9&quot; 
+ &quot;10&quot;
+ &quot;11&quot;
+ &quot;12&quot;
+ &quot;13&quot;
+ &quot;14&quot;
+ &quot;15&quot;
+ &quot;16&quot;
+ &quot;17&quot;
+</pre></div></div>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Pipes</p>
+<p>Julia has native piping (much like BASH) which uses the syntax <code>|&gt;</code> (pipe + greater-than). With a pipe, <code>unique(ncats.popid)</code> can also be rewritten as <code>ncats.popid |&gt; unique</code> for the same result. It's often a matter of preference for which you consider more readable. Use the <code>Pipe</code> package for even more robust piping where you can specify which argument the pipe relates to!</p>
+</div>
+<h2 id="what-to-avoid">🛑❌ What to avoid! ❌🛑</h2>
+<p>Given the relationships of the ordered list of individuals (<code>.ind</code>), their population ID's (<code>.popid</code>), and the order of genotypes in <code>.genotypes</code>, <strong>NEVER USE <code>sort</code>, <code>sort!</code>, or manually arrange/add/delete anything in <code>.ind</code> or <code>popid</code>!!!</strong> There are included functions <code>remove_loci!</code> and <code>remove_inds!</code> that do that kind of thing. That being said, you can rename individuals and their popid's without issue. Just no manual moving or deleting!</p>
+<p>Let's look at what happens when you mananually delete an individual
+<div class="codehilite"><pre><span></span>julia&gt; pop!(ncats.ind)
+&quot;N290&quot;
+</pre></div>
+Well, that seems benign, it removed the last individual from nancycats... Except it didn't, not fully. There is still a <code>popid</code> associated with that individual, and each of the 9 loci still have a genotype for it. If you had location data, it would still be there too. Now, the lengths of everything is messed up!
+<div class="codehilite"><pre><span></span>julia&gt; length(ncats.ind)
+236
+
+julia&gt; length(ncats.popid)
+237
+
+julia&gt; length(ncats.genotypes[&quot;fca8&quot;])
+237
+</pre></div></p>
+<p>This is obviously a problem, and if you manually delete an individual from somewhere in the middle, then all the <code>popid</code>s and genotypes following it are shifted one, associated with the wrong individual. You would have to manually delete all the traces of this individual, which is annoying. Instead, did that work for you with the <code>remove_ind!</code> command!</p>
+                
+                  
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../popobj_type/" title="What's a PopObj" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                What's a PopObj
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../popobj_location/" title="Location data" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Location data
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.c648116f.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>
