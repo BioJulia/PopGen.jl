@@ -6,6 +6,34 @@ Equivalent to `PopObj.inds`
 """
 indnames(x::PopObj) = x.ind
 
+"""
+    summary(x::PopObj)
+Prints a summary of the information contained in a PopObj
+"""
+function summary(x::PopObj)
+    println("Object of type PopObj:")
+    if length(x.latitude) ==0 && length(x.longitude) == 0
+        println("No location data provided")
+    else
+        println("\nLongitude:")
+        println(string.(x.longitude[1:3]) , " \u2026 ", string.(x.longitude[end-2:end]), "\n")
+        println("Latitude:")
+        println(string.(x.latitude[1:3]) , " \u2026 ", string.(x.latitude[end-2:end]), "\n")
+    end
+    println("\nNumber of individuals: $(length(x.ind))")
+    println(x.ind[1:3] , " \u2026 ", x.ind[end-2:end], "\n")
+    println("Number of loci: $(length(x.loci))")
+    println(x.loci[1:3], " \u2026 " , x.loci[end-2:end], "\n" )
+    println("Ploidy: $(x.ploidy)")
+    println("Number of populations: $(length(x.popid |> unique))","\n")
+    println("   #Inds | Pop","\n", "   --------------")
+    popcounts = hcat([sum(x.popid .== i) for i in unique(x.popid)],unique(x.popid))
+    for eachpop in 1:length(popcounts)÷2
+        println("   ", popcounts[eachpop], " | ", popcounts[eachpop,2])
+    end
+    println("\nAvailable fields: ind, popid, loci, ploidy, genotypes, longitude, latitude")
+end
+
 
 """
     loci(x::PopObj)
