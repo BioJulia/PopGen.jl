@@ -24,9 +24,9 @@ julia> plot_missing(a)
 If you would like to save the interactive plot as a local HTML file (does not require Plotly account):
 
 ```julia
-using PlotlyJS
+julia> using PlotlyJS
 
-PlotlyJS.savehtml(plot_missing(a), "filename.html")
+julia> PlotlyJS.savehtml(plot_missing(a), "filename.html")
 ```
 
 This will save it in the current working directly as whatever you replace `filename.html` with. If you want the file to work properly offline, add a third argument `:embed`, although be aware it inflates the file size (~3.5mb for the test data). 
@@ -35,13 +35,11 @@ This will save it in the current working directly as whatever you replace `filen
 
     plot_locations(x::PopObj; region = "world", projection = "orthographic")
 
-Returns a simple lower resolution interactive scatterplot of the individuals in a `PopObj`. Default `region` and `projection` are "world" and "orthographic", respectively. If a specific region is set, the plot will default to "mercator" projection unless `projection =` is used to specify a different one.
+Returns a simple lower resolution interactive scatterplot of the individuals in a `PopObj`. Default `region` and `projection` are "world" and "orthographic", respectively. If a specific region is set, the plot will default to "mercator" projection unless `projection =` is used to specify a different one. You can freely zoom and pan this plot as you can any other Plotly plot.
 
 Example:
 
 ```julia
-julia> a.latitude = rand(10:30, 212); a.longitude = rand(-99:-80, 212) ;
-
 julia> plot_locations(a)
 ```
 
@@ -94,7 +92,7 @@ julia> plot_locations(a, region = "north america", projection = "mercator")`
 As before, you can save the plot to an HTML file:
 
 ```julia
-using PlotlyJS
+julia> using PlotlyJS
 
-PlotlyJS.savehtml(plot_locations(a, region = "north america", projection = "mercator"), "filename.html")
+julia> PlotlyJS.savehtml(plot_locations(a, region = "north america", projection = "mercator"), "filename.html")
 ```

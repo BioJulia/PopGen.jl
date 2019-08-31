@@ -23,7 +23,7 @@ export PopObj,
     popid!,
     genotypes,
     remove_inds!,
-    remove_loci,
+    remove_loci!,
     missing,
     plot_missing,
     plot_locations

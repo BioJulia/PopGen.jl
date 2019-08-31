@@ -1,7 +1,7 @@
 Accessing any of these fields is done with a dot `.` accessor and can use the `[]`slice accessor, as per standard Julia convention:
 
 ```
-julia> a = genepop("/test/testdata.gen", numpops = 7) ;
+julia> a = gulfsharks() ;
 
 julia> a.ind[1:6]
 6-element Array{String,1}:
@@ -34,3 +34,11 @@ julia> a.ind[1:6]
  "6"
  "7"
 ```
+
+
+
+See the "Accessing a PopObj" tutorial for some practice.
+
+!!! failure "manual editing"
+
+    Given the relationship of the ordered list of individuals, their population ID's, and the order of their genotypes in `.genotypes`, **NEVER** do any manual adding, removing, or sorting on `.ind`, `.popid`, or the arrays for any locus in `.genotypes`.

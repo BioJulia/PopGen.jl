@@ -42,11 +42,14 @@ Newcomb_04,  254230 564000 090120
 
 ## Import a genepop file into Julia as a `PopObj`
 
+!!! warning "Windows users"
+    make sure to change your backslashes "\" to forward slashes "/" 
+
 ```julia
-genepop(infile; ploidy = 2, popsep = "POP", numpop)
+genepop(infile; ploidy = 2, popsep = "POP", numpops)
 
 # Example
-b = genepop("/data/wasp_hive.gen", ploidy = 2, popsep = "POP", numpops = 2)
+julia> b = genepop("/data/wasp_hive.gen", ploidy = 2, popsep = "POP", numpops = 2)
 ```
 
 ### Arguments
@@ -56,12 +59,12 @@ b = genepop("/data/wasp_hive.gen", ploidy = 2, popsep = "POP", numpops = 2)
 ### Keyword Arguments
 
 - `#!julila ploidy::Int64` : single integer of the ploidy of the samples in the file (default = 2)
-  - haploid: `ploidy = 1`
-  - diploid: `ploidy = 2`
-  - triploid: `ploidy = 3`
-  - etc.
+    - haploid: `ploidy = 1`
+    - diploid: `ploidy = 2`
+    - triploid: `ploidy = 3`
+    - etc.
 - `#!julila popsep::String` : word that separates populations in `infile` (default: "POP")
 - `#!julila numpops::Int64` : number of populations present in `infile` (used for early error checking)
 
-!!! note
+!!! info "Default population names"
     By default, the file reader will assign numbers as population ID's in order of appearance in the genepop file. Use the `popid!` function to rename these with your own population ID's.

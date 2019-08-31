@@ -3,12 +3,7 @@
 Notice the `No location data provided` text on the second line of output when you show a `PopObj`, like demonstrated on the previous page. That text exists as a "heads up" rather than a warning because **location data is optional** for a `PopObj`. There are functions that use location information (e.g. `locations`and `plot_locations`), but most don't, so it's not a dealbreaker. If you add location information, displaying the `PopObj` again will show you output now including this information:
 
 ```
-# assign random location data
-julia> a.latitude = rand(1:50, 212) ; 
-
-julia> a.longitude = rand(1:50, 212) ;
-
-julia> a
+julia> a = gulfsharks()
 Object of type PopObj:
 
 Longitude:

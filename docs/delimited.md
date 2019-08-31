@@ -3,7 +3,7 @@
 - Loci names must be first row
 - Individuals names must be first value in row
 - Population ID's must be second value in row
-- **Optional:** longitude (x) values third value in row, latitude (y) fourth
+- **Optional:** longitude (x) values third value in row, latitude (y) fourth value in row
 
 ### Formatting examples
 
@@ -29,11 +29,14 @@ snbarb_03,2,-3.1,43.2,001002,001001,001001
 
 ## Importing a CSV into Julia as a `PopObj`
 
+!!! warning "Windows users"
+    make sure to change your backslashes "\" to forward slashes "/" 
+    
 ```julia
 csv(infile; delim, ploidy = 2, location = false)
 
 # Example
-a = csv("/data/cali_poppy.csv", delim = ",", ploidy = 2)
+julia> a = csv("/data/cali_poppy.csv", delim = ",", ploidy = 2)
 ```
 
 ### Arguments
@@ -43,13 +46,13 @@ a = csv("/data/cali_poppy.csv", delim = ",", ploidy = 2)
 ### Keyword Arguments
 
 - `#!julia delim::Union{Char,String,Regex}` : delimiter of the file, can be a string, character, or regex
-  - comma: `delim = ","`
-  - space: `delim = " "`
-  - tab: `delim = "\t"`
-  - etc.
+    - comma: `delim = ","`
+    - space: `delim = " "`
+    - tab: `delim = "\t"`
+    - etc.
 - `#!julia ploidy::Int64` : single integer of the ploidy of the samples in the file (default = 2)
-  - haploid: `ploidy = 1`
-  - diploid: `ploidy = 2`
-  - triploid: `ploidy = 3`
-  - etc.
+    - haploid: `ploidy = 1`
+    - diploid: `ploidy = 2`
+    - triploid: `ploidy = 3`
+    - etc.
 - `#!julia location::Bool = false` : true/false of whether location data is present in the file (default = false)

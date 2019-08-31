@@ -6,8 +6,8 @@ We absolutely welcome contributors to this package/project! Contributing can tak
 - Pointing out bugs (and troubleshooting them if possible!)
 - Testing your data against the available code
 - Writing new functions or methods for existing functions
+- Writing or editing the docs
 - Spreading the word on social media
-
 - Words of encouragement
 
 

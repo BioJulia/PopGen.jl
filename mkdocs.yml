@@ -13,19 +13,18 @@ repo_url: https://github.com/pdimens/PopGen.jl
 
 nav:
 - Home: index.md
-- A Julia Primer: juliaprimer.md
+- Getting started: juliaprimer.md
 - Installing: install.md
 - The PopObj type:
     - What's a PopObj: popobj_type.md
-    - Accessing: popobj_accessing.md
+    - Accessing: PopObj_accessing.md
     - Location data: popobj_location.md
 - Importing Data: 
     - CSV and delimited: delimited.md
     - Genepop: genepop.md
     - VCF: vcf.md
-- Viewing Data: viewing.md
-- Editing PopObj: editing.md
-- Plotting: plotting.md
+- View/edit PopObj: commands.md
+- Example data: examples.md
 - Contributing: contr.md
 
 
