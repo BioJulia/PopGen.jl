@@ -2,7 +2,7 @@
     summary(x::PopObj)
 Print concise overview of data contained in a `PopObj`.
 """
-function summary(x::PopObj)
+function Base.summary(x::PopObj)
     println("Object of type PopObj:")
     if length(x.latitude) ==0 && length(x.longitude) == 0
         println("No location data provided")
