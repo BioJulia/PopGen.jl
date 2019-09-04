@@ -1,4 +1,4 @@
-These are the included PopObj viewing and manipulating commands. Using standard Julia conventions, only commands ending with a bang `!` are mutable, meaning they alter the input data. This means that a command like `popid` will show you population ID's, whereas `popid!` will change them in your `PopObj` input. 
+These are the included PopObj viewing and manipulating commands. Using standard Julia conventions, only commands ending with a bang `!` are mutable, meaning they alter the input data. So, commands like `popid` will show you population ID's, whereas `popid!` will change them in your `PopObj`. The mutable commands here alter the data in your `PopObj`, but not the source data (i.e. the files used to create the `PopObj`).
 
 
 To follow along like a tutorial,  use the `gulfsharks` data. Load the data in if you haven't already:
@@ -440,7 +440,12 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 
 ## genotypes per individual
 ### view specific genotypes
-Sometimes you want/need to view genotypes of specific individuals, and that's what `genotypes` is for. By default, the command will show you a DataFrame of the genotypes of all individuals for all loci.
+
+```julia
+genotypes(x::PopObj, inds = Union{String, Array{String,1}})
+```
+
+By default, the command will show you a DataFrame of the genotypes of all individuals for all loci.
 
 ``` julia tab="genotypes"
 julia> genotypes(sharks)
@@ -503,6 +508,11 @@ julia> genotypes(sharks, inds = ["cc_008", "meg_015"])
 
 ## missing data
 ### view missing data
+
+```julia
+missing(x::PopObj)
+```
+
 Used to show missingness information-- that is, loci missing allele information. This command outputs two DataFrames, the first being a count of number of missing loci per individual, the other being the number of times a locus is missing across individuals. 
 
 ``` julia tab="missing"
@@ -510,7 +520,7 @@ julia> missing(sharks)
 ```
 
 ``` tab="output"
-(212×4 DataFrames.DataFrame. Omitted printing of 1 columns
+by_ind = (212×4 DataFrames.DataFrame. Omitted printing of 1 columns
 │ Row │ ind     │ population │ nmissing │
 │     │ String  │ String     │ Any      │
 ├─────┼─────────┼────────────┼──────────┤
@@ -529,7 +539,7 @@ julia> missing(sharks)
 │ 209 │ seg_028 │ 7          │ 25       │
 │ 210 │ seg_029 │ 7          │ 0        │
 │ 211 │ seg_030 │ 7          │ 1        │
-│ 212 │ seg_031 │ 7          │ 1        │, 2213×2 DataFrames.DataFrame
+│ 212 │ seg_031 │ 7          │ 1        │, by_loci = 2213×2 DataFrames.DataFrame
 │ Row  │ locus        │ nmissing │
 │      │ String       │ Any      │
 ├──────┼──────────────┼──────────┤
@@ -551,7 +561,52 @@ julia> missing(sharks)
 │ 2213 │ contig_2784  │ 7        │)
 ```
 
-Since `missing` outputs a tuple of dataframes, an easier way to use this function is with multiple assignment:
+`missing` outputs a named tuple of dataframes, which means there are two options for assignment:
+
+#### single assignment
+The first DataFrame of the named tuple is named `by_ind` and the second named `by_loci`. If you assign a single variable to this tuple, it will inherit those names as accessors like so:
+
+``` julia tab="single assignment"
+julia> miss = missing(sharks) ;
+```
+
+``` tab="by_ind"
+julia> miss.by_ind
+212×4 DataFrame. Omitted printing of 1 columns
+│ Row │ ind     │ population │ nmissing │
+│     │ String  │ String     │ Int64    │
+├─────┼─────────┼────────────┼──────────┤
+│ 1   │ cc_001  │ 1          │ 124      │
+│ 2   │ cc_002  │ 1          │ 94       │
+│ 3   │ cc_003  │ 1          │ 100      │
+│ 4   │ cc_005  │ 1          │ 0        │
+⋮
+│ 208 │ seg_027 │ 7          │ 2        │
+│ 209 │ seg_028 │ 7          │ 25       │
+│ 210 │ seg_029 │ 7          │ 0        │
+│ 211 │ seg_030 │ 7          │ 1        │
+│ 212 │ seg_031 │ 7          │ 1        │
+```
+
+``` tab="by_loci"
+julia> miss.by_loci
+2213×2 DataFrame
+│ Row  │ locus        │ nmissing │
+│      │ String       │ Int64    │
+├──────┼──────────────┼──────────┤
+│ 1    │ contig_35208 │ 0        │
+│ 2    │ contig_23109 │ 6        │
+│ 3    │ contig_4493  │ 3        │
+│ 4    │ contig_10742 │ 2        │
+⋮
+│ 2209 │ contig_27356 │ 2        │
+│ 2210 │ contig_475   │ 0        │
+│ 2211 │ contig_19384 │ 5        │
+│ 2212 │ contig_22368 │ 3        │
+│ 2213 │ contig_2784  │ 7        │
+```
+#### multiple assignment
+Python has this feature, however, if you're migrating from R, multiple assignment probably looks weird, or like flat-out sorcery. Whenever a function returns a tuple of values, like `missing` does, you can assign as many variables to it at once.
 
 ``` julia tab="missing"
 julia> df1,df2 = missing(sharks) ;
@@ -605,8 +660,8 @@ julia> df2
 │ 2213 │ contig_2784  │ 7        │
 ```
 
-!!! info
-     Python has this feature, however, if you're migrating from R, multiple assignment probably looks weird, or like flat-out sorcery. Whenever a function returns a tuple of values, like `missing` does, you can assign as many variables to it at once. For example:
+!!! info "a simple example"
+    If this still looks weird to you, here is a simple example to help wrap your mind around it.
     ``` julia 
     a,b,c,d = (1,2,3,[4,5,6,7])
     ```
@@ -621,7 +676,6 @@ julia> df2
     d = [4, 5, 6, 7]
     
     embrace the convenience!
-
 
 ### plot missing data
 
@@ -651,10 +705,6 @@ julia> plot_missing(sharks)
     ```
     
     - use a third argument `:embed` to make the plots fully viewable offline. The output files are much larger (relatively) because it embeds the Plotly javeascript into the file. For context, the`gulfsharks` plot file is ~3.5mb when using `:embed`
-
-
-​    
-​    
 
 
 ## location data
@@ -726,7 +776,10 @@ julia> locations!(a, long, lat)	;
 ```
 
 ### plot location data
-You're encouraged to plot locations however you think is best. For convenience and speed, we provide a `plot_locations` command to make a decent, albeit simple interactive plot (Plotly) and save some time. Have a look at the command in more detail under "Functions" for some configuration options.
+```julia
+plot_locations(x::PopObj, region = "world", projection = "orthogonal")
+```
+You're encouraged to plot locations how you see fit. For convenience and speed, we provide this command to make a decent, albeit simple interactive plot (Plotly) and save some time. There is a sizeable list of available map projections and regions if you look this function up in the `help?>` REPL prompt. 
 
 ```julia
 julia> plot_locations(sharks)

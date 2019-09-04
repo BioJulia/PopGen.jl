@@ -80,7 +80,10 @@ function locations(x::PopObj)
         println("\t\tLengths:")
         println("longitude: $(length(x.longitude)) | latitude: $(length(x.latitude))")
     else
-        DataFrame(ind = x.ind, population = x.popid, longitude = x.longitude, latitude = x.latitude)
+        DataFrame(ind = x.ind,
+                  population = x.popid,
+                  longitude = x.longitude,
+                  latitude = x.latitude)
     end
 end
 
@@ -135,8 +138,10 @@ function locations!(x::PopObj; xloc::Array, yloc::Array)
         end
         x.longitude = xlocConverted
         x.latitude = ylocConverted
-        println("  xloc    yloc")
-        hcat(x.xloc, x.yloc)
+        DataFrame(ind = x.ind,
+                  population = x.popid,
+                  longitude = x.longitude,
+                  latitude = x.latitude)
     end
 end
 
@@ -240,33 +245,16 @@ function Base.missing(x::PopObj)
     end
     ind_df = DataFrame(ind = x.ind,
                        population = string.(x.popid),
-                       nmissing = nmissing,
+                       nmissing = Int.(nmissing),
                        loci = missing_array
                        )
-    # missing per locus
-    d = Dict()
-    for b in ind_df[!, :4]
-        for c in b
-            if c ∉ keys(d)
-                d[c] = 1
-            else
-                d[c] += 1
-            end
-        end
-    end
+    #missing per locus
 
-    # add loci without any missing
-    countarray = []
-    for locus in x.loci
-        if locus ∉ keys(d)
-            d[locus] = 0
-        end
-        push!(countarray, d[locus])
-    end
+    counts= [count(j->j==(0,0),x.genotypes[i]) for i in x.loci]
 
-    #convert to DF and sort
-    loci_df = DataFrame(locus = x.loci, nmissing = countarray)
-    return (ind_df, loci_df)
+    #convert to DF
+    loci_df = DataFrame(locus = x.loci, nmissing = counts)
+    return (by_ind = ind_df, by_loci = loci_df)
 end
 
 ##### Removal #####
@@ -301,7 +289,7 @@ function remove_loci!(x::PopObj, loci::Union{String,Array{String,1}})
     for each in loci
         delete!(x.genotypes, each)  # remove genotypes
     end
-    return x
+    return summary(x)
 end
 
 
@@ -341,5 +329,5 @@ function remove_inds!(x::PopObj, inds::Union{String, Array{String,1}})
     for each in x.loci
         deleteat!(x.genotypes[each], idx)
     end
-    return x
+    return summary(x)
 end
