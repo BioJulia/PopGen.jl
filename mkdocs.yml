@@ -25,7 +25,7 @@ nav:
     - VCF: vcf.md
 - View/edit PopObj: commands.md
 - Example data: examples.md
-- Contributing: contr.md
+- Community: community.md
 
 
 markdown_extensions:

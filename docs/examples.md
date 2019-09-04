@@ -4,12 +4,12 @@ PopGen.jl provides two datasets as examples, each with their own easy-to-remembe
 
 ## nancycats
 
-We include the familiar nancycats microsatellite data, as featured in `adegenet`, for easy importing into PopGen.jl as a `PopObj`. 
+We include the familiar nancycats microsatellite data, as featured in `adegenet`, for easy importing into PopGen.jl as a `PopObj`.  
 
 To use those data, simply invoke `nancycats()` without any arguments.
 
 ```
-julia> ncats = nancycats()
+julia> ncats = nancycats() ; summary(ncats)
 Object of type PopObj:
 No location data provided
 
@@ -54,7 +54,7 @@ We also include the SNP dataset used in Dimens *et al.* 2019 "[A **genomic** ass
 To use those data, simply invoke `gulfsharks()` without any arguments. 
 
 ```jullia
-julia> sharks = gulfsharks()
+julia> sharks = gulfsharks() ; summary(sharks)
 Object of type PopObj:
 
 Longitude:
