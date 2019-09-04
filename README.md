@@ -19,5 +19,6 @@ add "https://github.com/pdimens/PopGen.jl"
 ```
 after the package is installed, load it with `using PopGen`
 
-Feel free to play around with the test data in `/test/testdata.gen`
+Feel free to play around with the test data `nancycats` and `gulfsharks`!
 
+[Get in on the discussion and work by joining our community Slack channel!](https://pdimens.github.io/PopGen.jl/community/)
