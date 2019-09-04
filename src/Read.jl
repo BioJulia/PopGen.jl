@@ -55,7 +55,7 @@ function genepop(infile::String; ploidy::Int64 = 2, popsep::Any = "POP", numpops
             unphasedloci = split( strip(gpop[i][j]), r"\s|\t")[2:end] |> Array{String,1}
             # phase genotypes by ploidy
             for locus in unphasedloci
-                phasedlocus = parse.(Int64,[join(i) for i in Iterators.partition(locus,length(locus)÷ploidy)])  |> Tuple
+                phasedlocus = parse.(Int64,[join(i) for i in Iterators.partition(locus,length(locus)÷ploidy)])  |> sort |> Tuple
                 push!(phasedloci, phasedlocus)
             end
             for (loc,geno) in zip(locinames, phasedloci)
@@ -121,7 +121,7 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", ploidy::Int6
             # phase loci according to ploidy
             phasedloci = []
             for locus in tmp[5:end]
-                phasedlocus = parse.(Int64,[join(i) for i in Iterators.partition(locus,length(locus)÷ploidy)])|> Tuple
+                phasedlocus = parse.(Int64,[join(i) for i in Iterators.partition(locus,length(locus)÷ploidy)])|> sort |> Tuple
                 push!(phasedloci, phasedlocus)
             end
             for (loc,geno) in zip(locinames, phasedloci)

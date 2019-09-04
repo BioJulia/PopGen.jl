@@ -7,11 +7,10 @@ A little hands-on training will probably go a long way, so let's through some of
 Let's keep things simple by loading in the nancycats data and calling it `ncats`
 
 ``` julia tab="load nancycats"
-julia> ncats = nancycats()
+julia> ncats = nancycats() ; summary(ncats)
 ```
 
 ```  tab="output"
-Input File : /home/pdimens/.julia/packages/PopGen/h9b1q/data/data/nancycats.csv
 Object of type PopObj:
 No location data provided
 
@@ -344,7 +343,8 @@ julia> ncats.longitude
     ```
 
 ## Slices
-You can likewise use slices to access parts of these data. If you're migrating from R or Python, it's the simple bracket accessor you're already familiar with to pull out a range of values. Julia just calls them slices. 
+### general
+You can likewise use slices to access parts of these data. If you're migrating from R or Python, it's the simple bracket accessor you're already familiar with, used to pull out a range of values. Julia just calls them slices. 
 
 Let's look at a slice of `.ind`.
 
@@ -362,7 +362,7 @@ julia> ncats.ind[1:6]
  "N220"
 ```
 
-and we can do this for all the accessors, except `genotypes`, because it's a dictionary and has slightly different syntax, which we'll get to in a moment. Here's another example: 
+Here's another example: 
 
 ``` julia tab="slice .loci"
 julia> ncats.loci[3:end]
@@ -381,8 +381,28 @@ julia> ncats.loci[3:end]
 
 !!! info ":end"
      All things start at 1, so there is no need for a special word for it. On the other hand, objects can have unknown lengths or varied lengths as you work with them. In Julia, use the word `end` in a slice range to indicate you want it to go to the end,, regardless of length or known size. 
-     
+
+
+### genotypes
+We can do this for all the accessors, except `genotypes`, because it's a dictionary and has slightly different syntax. To use slices on `genotypes`, you will need to call the locus by name using the `Dict` syntax, then take a slice of that:
+
+``` julia tab="slice genotypes"
+julia> ncats.genotypes["fca8"][1:3]
+```
+
+``` tab="output"
+3-element Array{Any,1}:
+ (0, 0)    
+ (0, 0)    
+ (135, 143)
+```
+
+
+
+
+
 ## Operating on accessors
+
 These accessors follow the exact same format as the dot operator in Python, or the `$` operator in R, meaning these objects can be assigned to new variables, you can operate on them, iterate over them, etc. 
 
 Here's a simple example to display the unique population ID's in your PopObj

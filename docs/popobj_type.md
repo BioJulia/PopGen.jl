@@ -108,10 +108,12 @@ latitude data of samples (decimal degrees)
 
 ## Viewing a PopObj
 
-Given the volume of information that can be present in a `PopObj`, we defined a custom `Base.show(::PopObj)` to summarize the data rather than regurgitate everything on the screen. 
+Given the volume of information that can be present in a `PopObj`, we recommend `summary()` to summarize the data rather than regurgitate everything on the screen. 
 
 ```
-julia> a = gulfsharks()
+julia> a = gulfsharks() ;
+
+julia> summary(a)
 Object of type PopObj:
 No location data provided
 
@@ -139,9 +141,8 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 
 
 
-For context, this is what `gulfsharks` looks like without a custom `show` function 🤮 :
+For context, this is what `gulfsharks` looks like without a semicolon at the end 🤮 :
 
 ![popobj_raw](img/popobj_raw.png)
 
-
-
+We chose not to define a custom `Base.show` method to facilitate Atom/Juno visibility and drop-downs. 

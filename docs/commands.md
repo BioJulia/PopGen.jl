@@ -6,7 +6,7 @@ To follow along like a tutorial,  use the `gulfsharks` data. Load the data in if
 ```julia
 julia> using PopGen
 
-julia> sharks = gulfsharks()
+julia> sharks = gulfsharks() ;
 ```
 
 
@@ -54,12 +54,14 @@ indnames(sharks)
 remove_inds!(x::PopObj, inds::Union{Array{String,1}})
 ```
 
-Removes selected individuals from a `PopObj`. Input can be a single individual, or an array of individuals.
+Removes selected individuals from a `PopObj`. Input can be a single individual, or an array of individuals. Will output entire `PopObj`, so it's better to use a semicolon to suppress the output. Use `summary` or `.ind` if you want to confirm that the individuals were removed. This command will inform you if individuals were not found in the data.
 
 Examples:
 
 ``` julia tab="single individual"
-julia> remove_inds!(sharks, "cc_001")
+julia> remove_inds!(sharks, "cc_001") ;
+
+julia> summary(sharks)
 ```
 
 ``` tab="single output"
@@ -95,7 +97,9 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 ```
 
 ``` julia tab="multiple individuals"
-julia> remove_inds!(sharks, ["cc_001","cc_002", "cc_003"])
+julia> remove_inds!(sharks, ["cc_001","cc_002", "cc_003"]) ; 
+
+julia> summary(sharks)
 ```
 
 ``` tab="multiple output"
@@ -140,7 +144,7 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 ```julia
 popid(x::PopObj; listall::Bool = false)
 ```
-Just as you can view population ID's with `.popid`, you can also view them with the `popid()` command, which by default shows you a summary of the number of individuals in each population, just like you see when importing a file.  The `#Inds` means "number of individuals", and `Pop` refers to the population names.
+Just as you can view population ID's with `.popid`, you can also view them with the `popid()` command, which by default shows you a summary of the number of individuals in each population, just like you see when using `summary`.  The `#Inds` means "number of individuals", and `Pop` refers to the population names.
 
 ``` julia tab="popid"
 julia> popid(sharks)
@@ -355,6 +359,8 @@ Examples:
 ``` julia tab="single locus"
 julia> remove_loci!(sharks, "contig_35208") ;
 
+julia> summary(sharks)
+
 ```
 
 ``` tab="single output"
@@ -390,7 +396,9 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 ```
 
 ``` julia tab="multiple loci"
-julia> remove_loci!(sharks, ["contig_35208", "contig_23109", "contig_4493"])
+julia> remove_loci!(sharks, ["contig_35208", "contig_23109", "contig_4493"]) ;
+
+julia> summary(sharks)
 ```
 
 ``` tab="multiple output"
@@ -596,11 +604,31 @@ julia> df2
 │ 2212 │ contig_22368 │ 3        │
 │ 2213 │ contig_2784  │ 7        │
 ```
+
+!!! info
+     Python has this feature, however, if you're migrating from R, multiple assignment probably looks weird, or like flat-out sorcery. Whenever a function returns a tuple of values, like `missing` does, you can assign as many variables to it at once. For example:
+    ``` julia 
+    a,b,c,d = (1,2,3,[4,5,6,7])
+    ```
+    where 
+    
+    a = 1
+    
+    b = 2
+    
+    c = 3
+    
+    d = [4, 5, 6, 7]
+    
+    embrace the convenience!
+
+
 ### plot missing data
+
 ```julia
 plot_missing(x::PopObj; color = false)
 ```
-Return an interactive plot of the number of missing loci in individuals of a `PopObj`, along with the number of missing individuals per locus. To set a custom color palette for the boxplots, use `color = [color1, color2, ...]`
+Return an interactive plot of the number of missing loci in individuals of a `PopObj`, along with the number of missing individuals per locus. Use `color = [color1, color2, ...]` to set a custom color palette for the boxplots. 
 
 Example:
 
@@ -608,6 +636,25 @@ Example:
 julia> plot_missing(sharks)
 ```
 ![missing_plot](img/missing_plot.png)
+
+!!! info "saving interactive plots"
+    To save the interactive plots, you can use the `savehtml` function from the `PlotlyJS.jl` package:
+    ```julia 
+    PlotlyJS.savehtml(plot, "filename.html")
+    ```
+    If you don't specify a full path in the filename, it will save it in your current working directory.
+    ```julia
+    #example
+    julia> using PlotlyJS ;
+    
+    julia> PlotlyJS.savehtml(plot_missing(sharks), "/home/pdimens/missingness.html")
+    ```
+    
+    - use a third argument `:embed` to make the plots fully viewable offline. The output files are much larger (relatively) because it embeds the Plotly javeascript into the file. For context, the`gulfsharks` plot file is ~3.5mb when using `:embed`
+
+
+​    
+​    
 
 
 ## location data
@@ -656,7 +703,7 @@ julia> sharks.longitude = rand(1:50, 212) ;   # creates 212 unique random number
 julia> sharks.latitdue = rand(20:30, 212) ;	# creates 212 unique random numbers between 20 and 30
 ```
 
-However, if your data is in decimal minutes rather than decimal degrees, use the `locations!` function to add it to the fields. This function will do a conversion from decimal minutes to decimal degrees for you.
+However, if your data is in decimal minutes rather than decimal degrees, use the `locations!` function to add it to the fields. This function will do a conversion from decimal minutes to decimal degrees for you. To import those data into Julia, you'll likely want to use the wonderful `CSV.jl` package first.  
 
 ####  decimal minutes data
 ```julia
@@ -668,7 +715,7 @@ Adds location data (longitude, latitude) to `PopObj`. Takes decimal degrees or d
 - Decimal Degrees : `-11.431`
 - Decimal Minutes : `"-11 43.11"` (must use space and double-quotes)
 
-If conversion is not necessary, can directly assign `PopObj.longitude` and `PopObj.latitude` as shown above. If you want to keep things consistent, you can still use `locations!` to assign both at once:
+If conversion is not necessary, can directly assign `PopObj.longitude` and `PopObj.latitude` as shown above. If you still wanted to use `locations!` but don't need a conversion, it still works:
 
 ```julia
 julia> long = a.longitude = rand(1:50, 212) ; 
@@ -679,7 +726,7 @@ julia> locations!(a, long, lat)	;
 ```
 
 ### plot location data
-You're welcome to plot locations your own way, but for simplicity, we provide a simple `plot_locations` command to make a decent, albeit simple interactive plot (Plotly) and save some time. Have a look at the command in more detail under "Functions" for some configuration options.
+You're encouraged to plot locations however you think is best. For convenience and speed, we provide a `plot_locations` command to make a decent, albeit simple interactive plot (Plotly) and save some time. Have a look at the command in more detail under "Functions" for some configuration options.
 
 ```julia
 julia> plot_locations(sharks)

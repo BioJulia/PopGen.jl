@@ -10,7 +10,7 @@ module PopGen
 using DataFrames, PlotlyJS, Statistics
 
 export PopObj,
-    show,
+    summary,
     csv,
     genepop,
     nancycats,
