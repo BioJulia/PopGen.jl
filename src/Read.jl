@@ -65,6 +65,10 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
         end
     end
     ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
+    for (loc, ploid) in zip(locinames, ploidy)
+        miss_geno = fill(0,ploid) |> Tuple
+        replace!(d[loc], miss_geno => missing)
+    end
     samples_df = DataFrame(name = string.(indnames),
                            population = categorical(popid),
                            ploidy = ploidy,
@@ -156,6 +160,10 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
         end
     end
     ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
+    for (loc, ploid) in zip(locinames, ploidy)
+        miss_geno = fill(0,ploid) |> Tuple
+        replace!(d[loc], miss_geno => missing)
+    end
     samples_df = DataFrame(name = string.(indnames),
                            population = categorical(popid),
                            ploidy = ploidy,

@@ -46,11 +46,11 @@ function loci(x::PopObj, loci::Union{String, Array, Nothing}= nothing)
     df = genotypes(x) ;
     if loci != nothing
         if typeof(loci) == String
-            loci ∉ x.loci && error("locus $loci not found in PopObj")
+            loci ∉ string.(names(x.loci)) && error("locus $loci not found in PopObj")
             return df[!, [:ind, :population, Symbol(loci)]]
         else
             for locus in loci[2:end]
-                locus ∉ x.loci && println("NOTICE: locus \"$locus\" not found in PopObj!")
+                locus ∉ string.(names(x.loci)) && println("NOTICE: locus \"$locus\" not found in PopObj!")
             end
             println()
 
@@ -73,54 +73,54 @@ function locations(x::PopObj)
 end
 
 """
-    locations!(x::PopObj; xloc::Array, yloc::Array)
-Add location data (longitude `xloc`, latitude `yloc`) to `PopObj`. Takes decimal
+    locations!(x::PopObj; lat::Array, long::Array)
+Add location data (latitude `lat`, longitude `long`) to `PopObj`. Takes decimal
 degrees or decimal minutes format. **Must** use `-` symbol instead of cardinal directions.
 Location data must be in order of `ind`. Replaces existing `PopObj` location data.
 - Decimal Degrees : `-11.431`
 - Decimal Minutes : `"-11 43.11"` (must use space and double-quotes)
 
-If conversion is not necessary, can directly assign `PopObj.longitude` and `PopObj.latitude`
+If conversion is not necessary, can directly assign `PopObj.samples.longitude` and `PopObj.samples.latitude`
 """
-function locations!(x::PopObj; xloc::Array, yloc::Array)
+function locations!(x::PopObj; lat::Array, long::Array)
     # test for decimal degrees vs decimal minutes
-    if occursin(" ", string(xloc[1])) == false && occursin(" ", string(yloc[1])) == false
-        x.samples.longitude = xloc ;
-        x.samples.latitude = yloc ;
+    if occursin(" ", string(lat[1])) == false && occursin(" ", string(long[1])) == false
+        x.samples.longitude = lat ;
+        x.samples.latitude = long ;
     else
         # make sure decimal minutes are Strings
-        if typeof(xloc) != Array{String,1}
-            xloc = string.(xloc)
+        if typeof(lat) != Array{String,1}
+            lat = string.(lat)
         end
-        if typeof(yloc) != Array{String,1}
-            yloc = string.(yloc)
+        if typeof(long) != Array{String,1}
+            long = string.(long)
         end
-        # convert xloc to decimal degrees
-        xlocConverted = []
-        for value in xloc
+        # convert lat to decimal degrees
+        latConverted = []
+        for value in lat
             tmp = split(value, " ")
             if parse(Float64,tmp[1]) < 0   # if negative, subtract
                 decideg = parse(Float64, tmp[1]) - round((parse(Float64,tmp[2])/60), digits = 3)
-                push!(xlocConverted, decideg)
+                push!(latConverted, decideg)
             else                           # if positive, add
                 decideg = parse(Float64, tmp[1]) + round((parse(Float64,tmp[2])/60), digits = 3)
-                push!(xlocConverted, decideg)
+                push!(latConverted, decideg)
             end
         end
-        # convert yloc to decimal degrees
-        ylocConverted = []
-        for value in yloc
+        # convert long to decimal degrees
+        longConverted = []
+        for value in long
             tmp = split(value, " ")
             if parse(Float64,tmp[1]) < 0
                 decideg = parse(Float64, tmp[1]) - round((parse(Float64,tmp[2])/60), digits = 3)
-                push!(ylocConverted, decideg)
+                push!(longConverted, decideg)
             else
                 decideg = parse(Float64, tmp[1]) + round((parse(Float64,tmp[2])/60), digits = 3)
-                push!(ylocConverted, decideg)
+                push!(longConverted, decideg)
             end
         end
-        x.samples.longitude = xlocConverted
-        x.samples.latitude = ylocConverted
+        x.samples.longitude = latConverted
+        x.samples.latitude = longConverted
         return x.samples
     end
 end
@@ -208,7 +208,7 @@ of `DataFrames`: loci per individual, number per loci.
 
 Example:
 
-`aardvark = genepop("aardvark.gen", numpop = 5)`  # load file to PopObj
+`aardvark = genepop("aardvark.gen", numpop = 5) ;`  # load file to PopObj
 
 `missing_ind,missing_loc = missing(aardvark)`
 """
@@ -219,7 +219,7 @@ function Base.missing(x::PopObj)
     nmissing = []
     missing_array = []
     for each in 1:length(df[:,1])
-        miss_idx = findall(i -> i == (0,0), df[each,:])
+        miss_idx = findall(i -> i === missing, df[each,:])
         push!(nmissing, miss_idx |> length)
         push!(missing_array, String.(miss_idx))
     end
@@ -229,29 +229,12 @@ function Base.missing(x::PopObj)
                        loci = missing_array
                        )
     # missing per locus
-    d = Dict()
-    for b in ind_df[!, :4]
-        for c in b
-            if c ∉ keys(d)
-                d[c] = 1
-            else
-                d[c] += 1
-            end
-        end
+    f(x) = map(eachcol(x)) do col
+        count(i->i===missing, col) ### REPLACE WITH MISSING
     end
 
-    # add loci without any missing
-    countarray = []
-    for locus in string.(names(x.loci))
-        if locus ∉ keys(d)
-            d[locus] = 0
-        end
-        push!(countarray, d[locus])
-    end
-
-    #convert to DF and sort
-    loci_df = DataFrame(locus = string.(names(x.loci)), nmissing = countarray)
-    return (ind_df, loci_df)
+    loci_df = DataFrame(locus = string.(names(x.loci)), nmissing = f(x.loci))
+    return (by_ind = ind_df, by_loci = loci_df)
 end
 
 ##### Removal #####
@@ -269,24 +252,19 @@ Examples:
 function remove_loci!(x::PopObj, loci::Union{String,Array{String,1}})
     # get individuals indices
     if typeof(loci) == String
-        loci ∉ x.loci && error("Locus \"$loci\" not found")
-        idx = findfirst(i -> i == loci, x.loci)
+        sym_loci = Symbol(loci)
+        sym_loci ∉ names(x.loci) && error("Locus \"$loci\" not found")
+        return select!(x.loci, Not(sym_loci))
     else
-        idx = []
-        for each in loci
-            if each ∉ x.loci
+        sym_loci = Symbol.(loci)
+        for each in sym_loci
+            if each ∉ names(x.loci)
                 println("NOTICE: locus \"$each\" not found")
                 continue
             end
-            push!(idx, findfirst(i -> i == each, x.loci) )
         end
-        println()
+        return select!(x.loci, Not(sym_loci))
     end
-    deleteat!(x.loci, idx) # remove locus names
-    for each in loci
-        delete!(x.genotypes, each)  # remove genotypes
-    end
-    return x
 end
 
 
@@ -316,15 +294,7 @@ function remove_inds!(x::PopObj, inds::Union{String, Array{String,1}})
         end
         println()
     end
-    deleteat!(x.samples.name, idx)  # remove name(s)
-    deleteat!(x.samples.population, idx)    # remove population(s)
-    if length(x.samples.longitude) != 0 && length(x.samples.latitude) != 0
-        deleteat!(x.samples.longitude, idx)    # remove xloc(s)
-        deleteat!(x.samples.longitude, idx)    # remove yloc(s)
-    end
-    # remove inds from all loci genotypes
-    for each in x.loci
-        deleteat!(x.genotypes[each], idx)
-    end
+    deleterows!(x.samples, idx)
+    deleterows!(x.loci, idx)
     return x
 end
