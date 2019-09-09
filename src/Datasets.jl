@@ -28,7 +28,7 @@ Example:
 """
 function gulfsharks()
     filename = normpath(joinpath(@__DIR__,"..","data", "data", "gulfsharks.gen"))
-    yloc = [-80.59928
+    xloc = [-80.59928
             -80.59954
             -80.59958
             -80.42248
@@ -241,7 +241,7 @@ function gulfsharks()
             -85.71432
             -85.71432
             ]
-    xloc = [28.30624
+    yloc = [28.30624
             28.30787
             28.30234
             28.61234
@@ -455,6 +455,6 @@ function gulfsharks()
             29.82344
             ]
     x = genepop(filename, numpops = 7)
-    x.latitude = xloc ; x.longitude = yloc
+    x.samples.latitude = yloc ; x.samples.longitude = xloc
     return x
 end
