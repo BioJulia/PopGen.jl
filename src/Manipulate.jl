@@ -1,10 +1,10 @@
 """
-    indnames(x::PopObj)
+    sample_names(x::PopObj)
 View individual/sample names in a `PopObj`
 
-Equivalent to `PopObj.inds`
+Equivalent to `PopObj.samples.name`
 """
-indnames(x::PopObj) = x.ind
+sample_names(x::PopObj) = x.samples.name
 
 """
     summary(x::PopObj)
@@ -12,26 +12,23 @@ Prints a summary of the information contained in a PopObj
 """
 function summary(x::PopObj)
     println("Object of type PopObj:")
-    if length(x.latitude) ==0 && length(x.longitude) == 0
-        println("No location data provided")
-    else
-        println("\nLongitude:")
-        println(string.(x.longitude[1:3]) , " \u2026 ", string.(x.longitude[end-2:end]), "\n")
-        println("Latitude:")
-        println(string.(x.latitude[1:3]) , " \u2026 ", string.(x.latitude[end-2:end]), "\n")
-    end
-    println("\nNumber of individuals: $(length(x.ind))")
-    println(x.ind[1:3] , " \u2026 ", x.ind[end-2:end], "\n")
-    println("Number of loci: $(length(x.loci))")
-    println(x.loci[1:3], " \u2026 " , x.loci[end-2:end], "\n" )
-    println("Ploidy: $(x.ploidy)")
-    println("Number of populations: $(length(x.popid |> unique))","\n")
-    println("   #Inds | Pop","\n", "   --------------")
-    popcounts = hcat([sum(x.popid .== i) for i in unique(x.popid)],unique(x.popid))
+    println("\nLongitude:")
+    println("$(x.samples.longitude[1:6])" , " \u2026 ", "$(x.samples.longitude[end-5:end])", "\n")
+    println("Latitude:")
+    println("$(x.samples.latitude[1:6])" , " \u2026 ", "$(x.samples.latitude[end-5:end])", "\n")
+    println("Number of individuals: $(length(x.samples.name))")
+    println(x.samples.name[1:3] , " \u2026 ", x.samples.name[end-2:end], "\n")
+    println("Number of loci: $(size(x.loci,2))")
+    println(string.(names(x.loci))[1:3], " \u2026 " , string.(names(x.loci))[end-2:end], "\n" )
+    println("Ploidy:")
+    println("$(x.samples.ploidy[1:6])", " \u2026 ", "$(x.samples.ploidy[end-7:end])")
+    println("Number of populations: $(length(x.samples.population |> unique))","\n")
+    println("#Inds | Pop","\n", "--------------")
+    popcounts = hcat([sum(x.samples.population .== i) for i in unique(x.samples.population)],unique(x.samples.population))
     for eachpop in 1:length(popcounts)÷2
-        println("   ", popcounts[eachpop], " | ", popcounts[eachpop,2])
+        println(popcounts[eachpop], " | ", popcounts[eachpop,2])
     end
-    println("\nAvailable fields: ind, popid, loci, ploidy, genotypes, longitude, latitude")
+    println("\nAvailable .samples fields: .name, .population, .ploidy, .longitude, .latitude")
 end
 
 
@@ -72,15 +69,7 @@ View location data (`.longitude` and `.latitude`) in a `PopObj`
 Use `locations!` to add spatial data to a `PopObj`
 """
 function locations(x::PopObj)
-    if length(x.longitude) == 0 && length(x.latitude) == 0
-        @info "location data not provided"
-    elseif length(x.longitude) != length(x.latitude)
-        @warn "dimensions of longitude and latitude data not equal"
-        println("\t\tLengths:")
-        println("longitude: $(length(x.longitude)) | latitude: $(length(x.latitude))")
-    else
-        DataFrame(ind = x.ind, population = x.popid, longitude = x.longitude, latitude = x.latitude)
-    end
+    DataFrame(name = x.samples.name, population = x.samples.population, longitude = x.samples.longitude, latitude = x.samples.latitude)
 end
 
 """
@@ -96,10 +85,8 @@ If conversion is not necessary, can directly assign `PopObj.longitude` and `PopO
 function locations!(x::PopObj; xloc::Array, yloc::Array)
     # test for decimal degrees vs decimal minutes
     if occursin(" ", string(xloc[1])) == false && occursin(" ", string(yloc[1])) == false
-        x.longitude = xloc ;
-        x.latitude = yloc ;
-        println("  xloc    yloc")
-        hcat(x.xloc, x.yloc)
+        x.samples.longitude = xloc ;
+        x.samples.latitude = yloc ;
     else
         # make sure decimal minutes are Strings
         if typeof(xloc) != Array{String,1}
@@ -132,27 +119,26 @@ function locations!(x::PopObj; xloc::Array, yloc::Array)
                 push!(ylocConverted, decideg)
             end
         end
-        x.longitude = xlocConverted
-        x.latitude = ylocConverted
-        println("  xloc    yloc")
-        hcat(x.xloc, x.yloc)
+        x.samples.longitude = xlocConverted
+        x.samples.latitude = ylocConverted
+        return x.samples
     end
 end
 
 
 """
-    popid(x::PopObj; listall::Bool = false)
+    populations(x::PopObj; listall::Bool = false)
 View unique population ID's in a `PopObj`.
 
-`listall = true`, displays `ind` and their `popid` instead (default = `false`).
+`listall = true`, displays `ind` and their `population` instead (default = `false`).
 """
-function popid(x::PopObj; listall::Bool = false)
+function population(x::PopObj; listall::Bool = false)
     if listall == true
-        DataFrame(ind = x.ind, population = x.popid)
+        DataFrame(name = x.samples.name, population = x.samples.population)
     else
         println( "   ", " #Inds | Pop " )
         println( "   ", "--------------" )
-        popcounts = hcat([sum(x.popid .== i) for i in unique(x.popid)],unique(x.popid))
+        popcounts = hcat([sum(x.samples.population .== i) for i in unique(x.samples.population)],unique(x.samples.population))
         for eachpop in 1:length(popcounts)÷2
             println("\t", popcounts[eachpop], "\t", " |", "\t", popcounts[eachpop,2])
         end
@@ -160,22 +146,22 @@ function popid(x::PopObj; listall::Bool = false)
 end
 
 """
-    popid!(x::PopObj; rename::Dict)
-Rename the population ID's of `PopObj.popid`.
+    populations!(x::PopObj; rename::Dict)
+Rename the population ID's of `PopObj.population`.
 
-Uses a `Dict` of `[popid] => replacement` to rename
+Uses a `Dict` of `[population] => replacement` to rename populations
 
 Example:
 
 potatopops = Dict(1 => "Idaho", 2 => "Russet")
 
-popid!(potatoes, rename = potatopops)
+population!(potatoes, rename = potatopops)
 """
-function popid!(x::PopObj; rename::Dict)
+function population!(x::PopObj; rename::Dict)
     for eachkey in keys(rename)
-        replace!(x.popid, eachkey => rename[eachkey])
+        replace!(x.samples.population, eachkey => rename[eachkey])
     end
-    popid(x, listall = true)
+    population(x, listall = true)
 end
 
 
@@ -191,17 +177,17 @@ genotypes(eggplant, inds = ["ital_001", "ital_101", "spai_031"])
 genotypes(eggplant, inds = "ital_001")
 """
 function genotypes(x::PopObj; inds::Union{String, Array, Nothing}= nothing)
-    df = x.genotypes |> DataFrame ;
-    insertcols!(df, 1, :ind => x.ind) ;
-    insertcols!(df, 2, :population => categorical(x.popid))
+    df = deepcopy(x.loci)
+    insertcols!(df, 1, :ind => x.samples.name) ;
+    insertcols!(df, 2, :population => categorical(x.samples.population))
     if inds != nothing
         if typeof(inds) == String
-            inds ∉ x.ind && error("individual $inds not found in PopObj")
+            inds ∉ x.samples.name && error("individual $inds not found in PopObj")
             return df[df.ind .== inds, :]
         else
             tmp = df[df.ind .== inds[1], :]
             for ind in inds[2:end]
-                ind ∉ x.ind && println("NOTICE: individual \"$ind\" not found in PopObj!")
+                ind ∉ x.samples.name && println("NOTICE: individual \"$ind\" not found in PopObj!")
                 tmp = vcat(tmp, df[df.ind .== ind, :])
             end
             println()
@@ -227,8 +213,8 @@ Example:
 `missing_ind,missing_loc = missing(aardvark)`
 """
 function Base.missing(x::PopObj)
-    df = x.genotypes |> DataFrame
-    insertcols!(df, 1, :ind => x.ind)
+    df = deepcopy(x.loci)
+    insertcols!(df, 1, :ind => x.samples.name)
     # missing per individual
     nmissing = []
     missing_array = []
@@ -237,8 +223,8 @@ function Base.missing(x::PopObj)
         push!(nmissing, miss_idx |> length)
         push!(missing_array, String.(miss_idx))
     end
-    ind_df = DataFrame(ind = x.ind,
-                       population = string.(x.popid),
+    ind_df = DataFrame(ind = x.samples.name,
+                       population = x.samples.population,
                        nmissing = nmissing,
                        loci = missing_array
                        )
@@ -256,7 +242,7 @@ function Base.missing(x::PopObj)
 
     # add loci without any missing
     countarray = []
-    for locus in x.loci
+    for locus in string.(names(x.loci))
         if locus ∉ keys(d)
             d[locus] = 0
         end
@@ -264,7 +250,7 @@ function Base.missing(x::PopObj)
     end
 
     #convert to DF and sort
-    loci_df = DataFrame(locus = x.loci, nmissing = countarray)
+    loci_df = DataFrame(locus = string.(names(x.loci)), nmissing = countarray)
     return (ind_df, loci_df)
 end
 
@@ -317,24 +303,24 @@ Examples:
 function remove_inds!(x::PopObj, inds::Union{String, Array{String,1}})
     # get inds indices
     if typeof(inds) == String
-        inds ∉ x.ind && error("ind \"$inds\" not found")
-        idx = findfirst(i -> i == inds, x.ind)
+        inds ∉ x.samples.name && error("ind \"$inds\" not found")
+        idx = findfirst(i -> i == inds, x.samples.name)
     else
         idx = []
         for ind in inds
-            if ind ∉ x.ind
+            if ind ∉ x.samples.name
                 println("NOTICE: ind \"$ind\" not found!")
                 continue
             end
-            push!(idx, findfirst(i -> i == ind, x.ind) )
+            push!(idx, findfirst(i -> i == ind, x.samples.name) )
         end
         println()
     end
-    deleteat!(x.ind, idx)  # remove name(s)
-    deleteat!(x.popid, idx)    # remove popid(s)
-    if length(x.longitude) != 0 && length(x.latitude) != 0
-        deleteat!(x.longitude, idx)    # remove xloc(s)
-        deleteat!(x.longitude, idx)    # remove yloc(s)
+    deleteat!(x.samples.name, idx)  # remove name(s)
+    deleteat!(x.samples.population, idx)    # remove population(s)
+    if length(x.samples.longitude) != 0 && length(x.samples.latitude) != 0
+        deleteat!(x.samples.longitude, idx)    # remove xloc(s)
+        deleteat!(x.samples.longitude, idx)    # remove yloc(s)
     end
     # remove inds from all loci genotypes
     for each in x.loci
