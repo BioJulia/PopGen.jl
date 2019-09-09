@@ -10,7 +10,9 @@ module PopGen
 using DataFrames, PlotlyJS, Statistics
 
 export PopObj,
-    show,
+    summary,
+    nancycats,
+    gulfsharks,
     csv,
     genepop,
     indnames,
