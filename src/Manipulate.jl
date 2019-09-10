@@ -33,28 +33,46 @@ end
 
 
 """
-    loci(x::PopObj)
-View the genotypes of all individuals for specific loci in a `PopObj`.
-Default shows all genotypes for all individuals. Use `loci =` to specify a single
-locus or array of loci to display.
+    isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}, loci::Union{String, Array, Nothing})
+View the genotypes of specific samples for specific loci in a `PopObj`.
+Default shows all genotypes for all individuals.
 
-`loci(wild_rice, "snp_451")`
+`loci(nancycats, loci = "fca8")`
 
-`loci(wild_rice, ["snp_451", "snp_011", "snp_314"])`
+`loci(nancycats, samples = "N226", loci = ["fca8", "fca23"])`
 """
-function loci(x::PopObj, loci::Union{String, Array, Nothing}= nothing)
-    df = genotypes(x) ;
+function isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= nothing, loci::Union{String, Array, Nothing}= nothing)
+    if loci == nothing && samples == nothing
+        @warn "please specify either loci= or samples=, otherwise use PopObj.loci"
+    end
+    df = deepcopy(x.loci)
+    insertcols!(df, 1, :name => x.samples.name) ;
+    insertcols!(df, 2, :population => categorical(x.samples.population))
+    if samples != nothing
+        if typeof(samples) == String
+            samples ∉ x.samples.name && error("individual $samples not found in PopObj")
+            tmp = df[df.name .== samples, :]
+        else
+            tmp = df[df.name .== samples[1], :]
+            for ind in samples[2:end]
+                ind ∉ x.samples.name && println("NOTICE: individual \"$ind\" not found in PopObj!")
+                tmp = vcat(tmp, df[df.name .== ind, :])
+            end
+            println()
+        end
+    else
+        tmp = df
+    end
     if loci != nothing
         if typeof(loci) == String
             loci ∉ string.(names(x.loci)) && error("locus $loci not found in PopObj")
-            return df[!, [:ind, :population, Symbol(loci)]]
+            return tmp[!, [:name, :population, Symbol(loci)]]
         else
             for locus in loci[2:end]
                 locus ∉ string.(names(x.loci)) && println("NOTICE: locus \"$locus\" not found in PopObj!")
             end
             println()
-
-            return df[!, append!([:ind, :population], Symbol.(loci))]
+            return tmp[!, append!([:name, :population], Symbol.(loci))]
         end
     else
         return df
@@ -163,41 +181,6 @@ function population!(x::PopObj; rename::Dict)
     end
     population(x, listall = true)
 end
-
-
-"""
-    genotypes(x::PopObj; inds::Union{String, Array, Nothing}= nothing)
-Get all the genotypes of specific individuals within a `PopObj`.
-- Names must be in quotes
-
-Examples:
-
-genotypes(eggplant, inds = ["ital_001", "ital_101", "spai_031"])
-
-genotypes(eggplant, inds = "ital_001")
-"""
-function genotypes(x::PopObj; inds::Union{String, Array, Nothing}= nothing)
-    df = deepcopy(x.loci)
-    insertcols!(df, 1, :ind => x.samples.name) ;
-    insertcols!(df, 2, :population => categorical(x.samples.population))
-    if inds != nothing
-        if typeof(inds) == String
-            inds ∉ x.samples.name && error("individual $inds not found in PopObj")
-            return df[df.ind .== inds, :]
-        else
-            tmp = df[df.ind .== inds[1], :]
-            for ind in inds[2:end]
-                ind ∉ x.samples.name && println("NOTICE: individual \"$ind\" not found in PopObj!")
-                tmp = vcat(tmp, df[df.ind .== ind, :])
-            end
-            println()
-            return tmp
-        end
-    else
-        return df
-    end
-end
-
 
 #### Find missing ####
 
