@@ -37,9 +37,9 @@ end
 View the genotypes of specific samples for specific loci in a `PopObj`.
 Default shows all genotypes for all individuals.
 
-`loci(nancycats, loci = "fca8")`
+`isolate_genotypes(nancycats, loci = "fca8")`
 
-`loci(nancycats, samples = "N226", loci = ["fca8", "fca23"])`
+`isolate_genotypes(nancycats, samples = "N226", loci = ["fca8", "fca23"])`
 """
 function isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= nothing, loci::Union{String, Array, Nothing}= nothing)
     if loci == nothing && samples == nothing
@@ -154,11 +154,11 @@ function population(x::PopObj; listall::Bool = false)
     if listall == true
         DataFrame(name = x.samples.name, population = x.samples.population)
     else
-        println( "   ", " #Inds | Pop " )
-        println( "   ", "--------------" )
+        println(" #Inds | Pop " )
+        println(" --------------" )
         popcounts = hcat([sum(x.samples.population .== i) for i in unique(x.samples.population)],unique(x.samples.population))
         for eachpop in 1:length(popcounts)÷2
-            println("\t", popcounts[eachpop], "\t", " |", "\t", popcounts[eachpop,2])
+            println(" ", popcounts[eachpop], "\t", " |", "\t", popcounts[eachpop,2])
         end
     end
 end
@@ -186,14 +186,12 @@ end
 
 """
     Base.missing(x::PopObj)
-Identify and count missing loci in each individual of a `PopObj`. Returns a tuple
-of `DataFrames`: loci per individual, number per loci.
+Identify and count missing loci in each sample of a `PopObj`. Returns a tuple
+of `DataFrames`: loci per sample, number per loci.
 
 Example:
 
-`aardvark = genepop("aardvark.gen", numpop = 5) ;`  # load file to PopObj
-
-`missing_ind,missing_loc = missing(aardvark)`
+`missing_ind,missing_loc = missing(gulfsharks)`
 """
 function Base.missing(x::PopObj)
     df = deepcopy(x.loci)
@@ -213,7 +211,7 @@ function Base.missing(x::PopObj)
                        )
     # missing per locus
     f(x) = map(eachcol(x)) do col
-        count(i->i===missing, col) ### REPLACE WITH MISSING
+        count(i->i===missing, col)
     end
 
     loci_df = DataFrame(locus = string.(names(x.loci)), nmissing = f(x.loci))
@@ -228,9 +226,9 @@ Removes selected loci from a `PopObj`.
 
 Examples:
 
-`remove_loci!(tulips, "north_011")`
+`remove_loci!(nancycats, "fca8")`
 
-`remove_loci!(tulips, ["north_011", "north_003", "south_051"])`
+`remove_loci!(tulips, ["fca8", "fca23"])`
 """
 function remove_loci!(x::PopObj, loci::Union{String,Array{String,1}})
     # get individuals indices
@@ -252,16 +250,16 @@ end
 
 
 """
-    remove_inds!(x::PopObj, inds::Union{Array{String,1}})
-Removes selected individuals from a `PopObj`.
+    remove_samples!(x::PopObj, inds::Union{Array{String,1}})
+Removes selected samples from a `PopObj`.
 
 Examples:
 
-`remove_inds!(sunflowers, "west_011")`
+`remove_samples!(nancycats, "N100")`
 
-`remove_inds!(sunflowers, ["west_011", "west_003", "east_051"])`
+`remove_samples!(nancycats, ["N100", "N102", "N211"])`
 """
-function remove_inds!(x::PopObj, inds::Union{String, Array{String,1}})
+function remove_samples!(x::PopObj, inds::Union{String, Array{String,1}})
     # get inds indices
     if typeof(inds) == String
         inds ∉ x.samples.name && error("ind \"$inds\" not found")

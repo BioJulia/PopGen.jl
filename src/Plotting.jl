@@ -38,6 +38,7 @@ function plot_missing(x::PopObj; color = false)
                           marker_color = "rgb(217, 217, 217)",
                           name = "",
                           text = "loci",
+                          xbins_size = 1,
                           showlegend = false)
 
     layout_ind = Layout(title = "Number of missing loci per population",
