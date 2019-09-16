@@ -75,7 +75,7 @@ function isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= no
             return tmp[!, append!([:name, :population], Symbol.(loci))]
         end
     else
-        return df
+        return tmp
     end
 end
 

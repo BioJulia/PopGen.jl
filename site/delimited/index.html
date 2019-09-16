@@ -386,8 +386,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#importing-a-csv-into-julia-as-a-popobj" title="Importing a CSV into Julia as a PopObj" class="md-nav__link">
-    Importing a CSV into Julia as a PopObj
+  <a href="#import-a-csvdelimited-file-as-a-popobj" title="Import a CSV/delimited file as a PopObj" class="md-nav__link">
+    Import a CSV/delimited file as a PopObj
   </a>
   
     <nav class="md-nav">
@@ -482,8 +482,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../contr/" title="Contributing" class="md-nav__link">
-      Contributing
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
     </a>
   </li>
 
@@ -527,8 +527,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#importing-a-csv-into-julia-as-a-popobj" title="Importing a CSV into Julia as a PopObj" class="md-nav__link">
-    Importing a CSV into Julia as a PopObj
+  <a href="#import-a-csvdelimited-file-as-a-popobj" title="Import a CSV/delimited file as a PopObj" class="md-nav__link">
+    Import a CSV/delimited file as a PopObj
   </a>
   
     <nav class="md-nav">
@@ -602,15 +602,15 @@ snbarb_02,2,-11.5,11.6,001001,001001,001001
 snbarb_03,2,-3.1,43.2,001002,001001,001001
 </pre></div></div>
 </div>
-<h2 id="importing-a-csv-into-julia-as-a-popobj">Importing a CSV into Julia as a <code>PopObj</code></h2>
+<h2 id="import-a-csvdelimited-file-as-a-popobj">Import a CSV/delimited file as a <code>PopObj</code></h2>
 <div class="admonition warning">
 <p class="admonition-title">Windows users</p>
 <p>make sure to change your backslashes "\" to forward slashes "/" </p>
 </div>
-<div class="codehilite"><pre><span></span><span class="n">csv</span><span class="p">(</span><span class="n">infile</span><span class="p">;</span> <span class="n">delim</span><span class="p">,</span> <span class="n">ploidy</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><span class="n">csv</span><span class="p">(</span><span class="n">infile</span><span class="p">;</span> <span class="n">delim</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
 
 <span class="c"># Example</span>
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">csv</span><span class="p">(</span><span class="s">&quot;/data/cali_poppy.csv&quot;</span><span class="p">,</span> <span class="n">delim</span> <span class="o">=</span> <span class="s">&quot;,&quot;</span><span class="p">,</span> <span class="n">ploidy</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">csv</span><span class="p">(</span><span class="s">&quot;/data/cali_poppy.csv&quot;</span><span class="p">,</span> <span class="n">delim</span> <span class="o">=</span> <span class="s">&quot;,&quot;</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 
 <h3 id="arguments">Arguments</h3>
@@ -626,13 +626,7 @@ snbarb_03,2,-3.1,43.2,001002,001001,001001
 <li>etc.</li>
 </ul>
 </li>
-<li><code class="codehilite"><span class="n">ploidy</span><span class="o">::</span><span class="kt">Int64</span></code> : single integer of the ploidy of the samples in the file (default = 2)<ul>
-<li>haploid: <code>ploidy = 1</code></li>
-<li>diploid: <code>ploidy = 2</code></li>
-<li>triploid: <code>ploidy = 3</code></li>
-<li>etc.</li>
-</ul>
-</li>
+<li><code class="codehilite"><span class="n">digits</span><span class="o">::</span><span class="kt">Int64</span></code> : the number of digits used to denote an allele (default = 3)</li>
 <li><code class="codehilite"><span class="n">location</span><span class="o">::</span><span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span></code> : true/false of whether location data is present in the file (default = false)</li>
 </ul>
                 

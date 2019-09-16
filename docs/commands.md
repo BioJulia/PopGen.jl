@@ -93,7 +93,7 @@ Number of populations: 7
 	 20	 |	6
 	 20	 |	7
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```
 
 ``` julia tab="multiple individuals"
@@ -133,7 +133,7 @@ Number of populations: 7
 	 20	 |	6
 	 20	 |	7
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```
 
 !!! info "sample not found!"
@@ -296,7 +296,7 @@ julia> isolate_genotypes(sharks)
 │ 212 │ seg_031 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
 ```
 
-Add a second argument  `loci=` specify a single locus (string) or multiple loci (array of strings) to display
+Add the argument  `loci=` specify a single locus (string) or multiple loci (array of strings) to display
 
 ``` julia tab="single locus"
 julia> isolate_genotypes(sharks, loci = "contig_10001")
@@ -352,7 +352,52 @@ julia> isolate_genotypes(sharks, loci = ["contig_10001", "contig_10028"])
 │ 212 │ seg_031 │ 7            │ (1, 1)       │ (1, 1)       │
 ```
 
-### remove loci
+
+
+### view samples
+
+Add the argument  `samples=` specify a single sample (string) or multiple samples (array of strings) to display
+
+```julia tab="single sample"
+julia> isolate_genotypes(sharks, samples = "cc_001")
+```
+
+``` tab="single output"
+1×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
+│ Row │ name   │ population    │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
+│     │ String │ Categorical…⍰ │ Any          │ Any          │ Any          │ Any          │
+├─────┼────────┼───────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
+│ 1   │ cc_001 │ 1             │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
+```
+
+```julia tab="multiple samples"
+2×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
+│ Row │ name    │ population    │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
+│     │ String  │ Categorical…⍰ │ Any          │ Any          │ Any          │ Any          │
+├─────┼─────────┼───────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
+│ 1   │ cc_001  │ 1             │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
+│ 2   │ seg_028 │ 7             │ (1, 1)       │ (1, 1)       │ (1, 2)       │ (2, 2)       │
+```
+
+It also means that you can combine the keywords `samples=` and `loci=` to further specify your output:
+
+```julia tab="both keywords"
+isolate_genotypes(sharks, samples= ["cc_001", "seg_028"], loci = "contig_10013")
+```
+
+``` tab="output"
+2×3 DataFrames.DataFrame
+│ Row │ name    │ population    │ contig_10013 │
+│     │ String  │ Categorical…⍰ │ Any          │
+├─────┼─────────┼───────────────┼──────────────┤
+│ 1   │ cc_001  │ 1             │ (1, 1)       │
+│ 2   │ seg_028 │ 7             │ (1, 1)       │
+```
+
+
+
+## remove loci
+
 ```julia
 remove_loci!(x::PopObj, loci::Union{String, Array{String,1}})
 ```
@@ -397,7 +442,7 @@ Number of populations: 7
      20  |  6
      20  |  7
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```
 
 ``` julia tab="multiple loci"
@@ -437,79 +482,13 @@ Number of populations: 7
      20  |  6
      20  |  7
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```
 
 !!! info "locus not found!"
     If removing a single locus and it is not found in the PopObj, an error will be returned. However, if removing multiple loci, you will receive a notice above the PopObj summary indicating which loci were not found, while removing the ones that were.
 
-## genotypes per individual
-### view specific genotypes
 
-```julia
-genotypes(x::PopObj, inds = Union{String, Array{String,1}})
-```
-
-By default, the command will show you a DataFrame of the genotypes of all individuals for all loci.
-
-``` julia tab="genotypes"
-julia> genotypes(sharks)
-```
-
-``` tab="output"
-212×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
-│ Row │ ind     │ population   │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
-│     │ String  │ Categorical… │ Any          │ Any          │ Any          │ Any          │
-├─────┼─────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
-│ 1   │ cc_001  │ 1            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
-│ 2   │ cc_002  │ 1            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
-│ 3   │ cc_003  │ 1            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (1, 1)       │
-│ 4   │ cc_005  │ 1            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (2, 1)       │
-│ 5   │ cc_007  │ 1            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 1)       │
-│ 6   │ cc_008  │ 1            │ (1, 1)       │ (1, 2)       │ (2, 1)       │ (1, 1)       │
-│ 7   │ cc_009  │ 1            │ (1, 1)       │ (1, 2)       │ (2, 1)       │ (2, 1)       │
-⋮
-│ 205 │ seg_024 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
-│ 206 │ seg_025 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 207 │ seg_026 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 208 │ seg_027 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (2, 2)       │
-│ 209 │ seg_028 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 210 │ seg_029 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 211 │ seg_030 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 212 │ seg_031 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
-```
-
-Using the `inds = ` keyword argument,  you can specify a single individual (string) or multiple individuals (array of strings) to view only a subset
-
-``` julia tab="single genotypes"
-julia> genotypes(sharks, inds = "key_037")
-```
-
-``` tab="single output"
-1×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
-│ Row │ ind     │ population   │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
-│     │ String  │ Categorical… │ Any          │ Any          │ Any          │ Any          │
-├─────┼─────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
-│ 1   │ key_037 │ 4            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 1)       │
-
-```
-
-``` julia tab="multiple genotypes"
-julia> genotypes(sharks, inds = ["cc_008", "meg_015"])
-```
-
-``` tab="multiple output"
-2×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
-│ Row │ ind     │ population   │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
-│     │ String  │ Categorical… │ Any          │ Any          │ Any          │ Any          │
-├─────┼─────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
-│ 1   │ cc_008  │ 1            │ (1, 1)       │ (1, 2)       │ (2, 1)       │ (1, 1)       │
-│ 2   │ meg_015 │ 5            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (2, 2)       │
-
-```
-
-!!! info
-    Since many of the outputs of these functions are in DataFrame format, you have the flexibility to use the tools in `DataFrames.jl` as well as `Query.jl` to filter and subset these data even further. 
 
 ## missing data
 ### view missing data
@@ -518,7 +497,7 @@ julia> genotypes(sharks, inds = ["cc_008", "meg_015"])
 missing(x::PopObj)
 ```
 
-Used to show missingness information-- that is, loci missing allele information. This command outputs two DataFrames, the first being a count of number of missing loci per individual, the other being the number of times a locus is missing across individuals. 
+Used to show missingness information-- that is, loci missing allele information. This command outputs two DataFrames, the first being a count of number of missing loci per samples, the other being the number of times a locus is missing across samples. 
 
 ``` julia tab="missing"
 julia> missing(sharks)
@@ -526,7 +505,7 @@ julia> missing(sharks)
 
 ``` tab="output"
 by_ind = (212×4 DataFrames.DataFrame. Omitted printing of 1 columns
-│ Row │ ind     │ population │ nmissing │
+│ Row │ name    │ population │ nmissing │
 │     │ String  │ String     │ Any      │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -569,16 +548,16 @@ by_ind = (212×4 DataFrames.DataFrame. Omitted printing of 1 columns
 `missing` outputs a named tuple of dataframes, which means there are two options for assignment:
 
 #### single assignment
-The first DataFrame of the named tuple is named `by_ind` and the second named `by_loci`. If you assign a single variable to this tuple, it will inherit those names as accessors like so:
+The first DataFrame of the named tuple is named `by_sample` and the second named `by_loci`. If you assign a single variable to this tuple, it will inherit those names as accessors like so:
 
 ``` julia tab="single assignment"
 julia> miss = missing(sharks) ;
 ```
 
 ``` tab="by_ind"
-julia> miss.by_ind
+julia> miss.by_sample
 212×4 DataFrame. Omitted printing of 1 columns
-│ Row │ ind     │ population │ nmissing │
+│ Row │ name    │ population │ nmissing │
 │     │ String  │ String     │ Int64    │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -620,7 +599,7 @@ julia> df1,df2 = missing(sharks) ;
 ``` tab="df1"
 julia> df1
 212×4 DataFrames.DataFrame. Omitted printing of 1 columns
-│ Row │ ind     │ population │ nmissing │
+│ Row │ name    │ population │ nmissing │
 │     │ String  │ String     │ Any      │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -753,9 +732,9 @@ julia> locations(sharks)
 Location data can be added by directly accessing the fields `.longitude` and `.latitude` in your `PopObj`, such as this example:
 
 ```julia
-julia> sharks.longitude = rand(1:50, 212) ;   # creates 212 unique random numbers between 1 and 50
+julia> sharks.samples.longitude = rand(1:50, 212) ;   # creates 212 unique random numbers between 1 and 50
 
-julia> sharks.latitdue = rand(20:30, 212) ;	# creates 212 unique random numbers between 20 and 30
+julia> sharks.samples.latitdue = rand(20:30, 212) ;	# creates 212 unique random numbers between 20 and 30
 ```
 
 However, if your data is in decimal minutes rather than decimal degrees, use the `locations!` function to add it to the fields. This function will do a conversion from decimal minutes to decimal degrees for you. To import those data into Julia, you'll likely want to use the wonderful `CSV.jl` package first.  

@@ -442,8 +442,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../contr/" title="Contributing" class="md-nav__link">
-      Contributing
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
     </a>
   </li>
 
@@ -496,7 +496,7 @@
                 
                 <h2 id="location-data">Location Data</h2>
 <p>Notice the <code>No location data provided</code> text on the second line of output when you show a <code>PopObj</code>, like demonstrated on the previous page. That text exists as a "heads up" rather than a warning because <strong>location data is optional</strong> for a <code>PopObj</code>. There are functions that use location information (e.g. <code>locations</code>and <code>plot_locations</code>), but most don't, so it's not a dealbreaker. If you add location information, displaying the <code>PopObj</code> again will show you output now including this information:</p>
-<div class="codehilite"><pre><span></span>julia&gt; a = gulfsharks()
+<div class="codehilite"><pre><span></span>julia&gt; a = gulfsharks() ; summary(a)
 Object of type PopObj:
 
 Longitude:

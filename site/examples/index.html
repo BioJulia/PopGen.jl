@@ -447,8 +447,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../contr/" title="Contributing" class="md-nav__link">
-      Contributing
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
     </a>
   </li>
 
@@ -508,9 +508,9 @@
                 
                 <p>PopGen.jl provides two datasets as examples, each with their own easy-to-remember function for retrieving those data. </p>
 <h2 id="nancycats">nancycats</h2>
-<p>We include the familiar nancycats microsatellite data, as featured in <code>adegenet</code>, for easy importing into PopGen.jl as a <code>PopObj</code>. </p>
+<p>We include the familiar nancycats microsatellite data, as featured in <code>adegenet</code>, for easy importing into PopGen.jl as a <code>PopObj</code>.  </p>
 <p>To use those data, simply invoke <code>nancycats()</code> without any arguments.</p>
-<div class="codehilite"><pre><span></span>julia&gt; ncats = nancycats()
+<div class="codehilite"><pre><span></span>julia&gt; ncats = nancycats() ; summary(ncats)
 Object of type PopObj:
 No location data provided
 
@@ -550,7 +550,7 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 <h2 id="gulfsharks">gulfsharks</h2>
 <p>We also include the SNP dataset used in Dimens <em>et al.</em> 2019 "<a href="https://link.springer.com/article/10.1007/s00227-019-3533-1">A <strong>genomic</strong> assessment of movement and gene flow around the South Florida vicariance zone in the migratory coastal <strong>blacknose shark</strong>, <em>Carcharhinus acronotus</em></a>" since it was already on hand. Like <code>nancycats</code>, we provide a convenient function to load these data into PopGen.jl as a <code>PopObj</code>.</p>
 <p>To use those data, simply invoke <code>gulfsharks()</code> without any arguments. </p>
-<div class="codehilite"><pre><span></span>julia&gt; sharks = gulfsharks()
+<div class="codehilite"><pre><span></span>julia&gt; sharks = gulfsharks() ; summary(sharks)
 Object of type PopObj:
 
 Longitude:
@@ -616,13 +616,13 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
           </a>
         
         
-          <a href="../contr/" title="Contributing" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../community/" title="Community" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Contributing
+                Community
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

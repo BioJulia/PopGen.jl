@@ -326,7 +326,7 @@ julia> ncats.samples.latitude
 
 ### .longitude
 
-This accesses the longitude information of the PopObj. Like before, iIf there is none, like in the nancycats data, it returns an empty array.
+This accesses the longitude information of the PopObj. Like before, if there is none, like in the nancycats data, it returns an array of missing values.
 
 ```julia tab=".longitude"
 julia> ncats.samples.longitude

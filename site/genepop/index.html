@@ -398,8 +398,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#import-a-genepop-file-into-julia-as-a-popobj" title="Import a genepop file into Julia as a PopObj" class="md-nav__link">
-    Import a genepop file into Julia as a PopObj
+  <a href="#import-a-genepop-file-as-a-popobj" title="Import a genepop file as a PopObj" class="md-nav__link">
+    Import a genepop file as a PopObj
   </a>
   
     <nav class="md-nav">
@@ -482,8 +482,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../contr/" title="Contributing" class="md-nav__link">
-      Contributing
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
     </a>
   </li>
 
@@ -527,8 +527,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#import-a-genepop-file-into-julia-as-a-popobj" title="Import a genepop file into Julia as a PopObj" class="md-nav__link">
-    Import a genepop file into Julia as a PopObj
+  <a href="#import-a-genepop-file-as-a-popobj" title="Import a genepop file as a PopObj" class="md-nav__link">
+    Import a genepop file as a PopObj
   </a>
   
     <nav class="md-nav">
@@ -581,7 +581,7 @@
 <li>Loci are listed after first line as one-per-line without commas or in single comma-separated row</li>
 <li>A line with a particular keyword must delimit populations</li>
 <li><strong>Must</strong> be the same word each time and not a unique population name</li>
-<li>File is tab or space delimted</li>
+<li>File is tab or space delimited</li>
 </ul>
 <h3 id="formatting-examples">Formatting Examples</h3>
 <div class="superfences-tabs">
@@ -616,15 +616,15 @@ Newcomb_03,  254230 000000 090100
 Newcomb_04,  254230 564000 090120
 </pre></div></div>
 </div>
-<h2 id="import-a-genepop-file-into-julia-as-a-popobj">Import a genepop file into Julia as a <code>PopObj</code></h2>
+<h2 id="import-a-genepop-file-as-a-popobj">Import a genepop file as a <code>PopObj</code></h2>
 <div class="admonition warning">
 <p class="admonition-title">Windows users</p>
 <p>make sure to change your backslashes "\" to forward slashes "/" </p>
 </div>
-<div class="codehilite"><pre><span></span><span class="n">genepop</span><span class="p">(</span><span class="n">infile</span><span class="p">;</span> <span class="n">ploidy</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">popsep</span> <span class="o">=</span> <span class="s">&quot;POP&quot;</span><span class="p">,</span> <span class="n">numpops</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><span class="n">genepop</span><span class="p">(</span><span class="n">infile</span><span class="p">;</span> <span class="n">digits</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">popsep</span> <span class="o">=</span> <span class="s">&quot;POP&quot;</span><span class="p">,</span> <span class="n">numpops</span><span class="p">)</span>
 
 <span class="c"># Example</span>
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">genepop</span><span class="p">(</span><span class="s">&quot;/data/wasp_hive.gen&quot;</span><span class="p">,</span> <span class="n">ploidy</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">popsep</span> <span class="o">=</span> <span class="s">&quot;POP&quot;</span><span class="p">,</span> <span class="n">numpops</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">genepop</span><span class="p">(</span><span class="s">&quot;/data/wasp_hive.gen&quot;</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">popsep</span> <span class="o">=</span> <span class="s">&quot;POP&quot;</span><span class="p">,</span> <span class="n">numpops</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 
 <h3 id="arguments">Arguments</h3>
@@ -633,13 +633,7 @@ Newcomb_04,  254230 564000 090120
 </ul>
 <h3 id="keyword-arguments">Keyword Arguments</h3>
 <ul>
-<li><code class="codehilite">ploidy::Int64</code> : single integer of the ploidy of the samples in the file (default = 2)<ul>
-<li>haploid: <code>ploidy = 1</code></li>
-<li>diploid: <code>ploidy = 2</code></li>
-<li>triploid: <code>ploidy = 3</code></li>
-<li>etc.</li>
-</ul>
-</li>
+<li><code class="codehilite">digits::Int64</code> : the number of digits used to denote an allele (default = 3)</li>
 <li><code class="codehilite">popsep::String</code> : word that separates populations in <code>infile</code> (default: "POP")</li>
 <li><code class="codehilite">numpops::Int64</code> : number of populations present in <code>infile</code> (used for early error checking)</li>
 </ul>

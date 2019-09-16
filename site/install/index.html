@@ -238,8 +238,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../aboutdocs/" title="Docs "Guide"" class="md-nav__link">
-      Docs "Guide"
+    <a href="../juliaprimer/" title="Getting started" class="md-nav__link">
+      Getting started
     </a>
   </li>
 
@@ -290,13 +290,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#performance-notes" title="Performance notes:" class="md-nav__link">
-    Performance notes:
-  </a>
-  
-</li>
-      
       
       
       
@@ -313,10 +306,58 @@
       
 
 
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      The PopObj type
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        The PopObj type
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
   <li class="md-nav__item">
-    <a href="../popobj/" title="The PopObj" class="md-nav__link">
-      The PopObj
+    <a href="../popobj_type/" title="What's a PopObj" class="md-nav__link">
+      What's a PopObj
     </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../PopObj_accessing/" title="Accessing" class="md-nav__link">
+      Accessing
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../popobj_location/" title="Location data" class="md-nav__link">
+      Location data
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
   </li>
 
     
@@ -325,9 +366,69 @@
       
 
 
-  <li class="md-nav__item">
-    <a href="../importing/" title="Importing Data" class="md-nav__link">
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
       Importing Data
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Importing Data
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../delimited/" title="CSV and delimited" class="md-nav__link">
+      CSV and delimited
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../genepop/" title="Genepop" class="md-nav__link">
+      Genepop
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../vcf/" title="VCF" class="md-nav__link">
+      VCF
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../commands/" title="View/edit PopObj" class="md-nav__link">
+      View/edit PopObj
     </a>
   </li>
 
@@ -338,8 +439,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../viewing/" title="Viewing Data" class="md-nav__link">
-      Viewing Data
+    <a href="../examples/" title="Example data" class="md-nav__link">
+      Example data
     </a>
   </li>
 
@@ -350,32 +451,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../editing/" title="Editing PopObj" class="md-nav__link">
-      Editing PopObj
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../plotting/" title="Plotting" class="md-nav__link">
-      Plotting
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../contr/" title="Contributing" class="md-nav__link">
-      Contributing
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
     </a>
   </li>
 
@@ -414,13 +491,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#performance-notes" title="Performance notes:" class="md-nav__link">
-    Performance notes:
-  </a>
-  
-</li>
-      
       
       
       
@@ -447,37 +517,27 @@
 <div class="codehilite"><pre><span></span><span class="n">add</span> <span class="s">&quot;https://github.com/pdimens/PopGen.jl&quot;</span>
 </pre></div>
 
-
-<p>after the package is installed, load it with <code>using PopGen</code></p>
 <p>If using Jupyter Notebooks or nteract, install the package in julia with</p>
 <div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">Pkg</span>
 <span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;https://github.com/pdimens/PopGen.jl&quot;</span><span class="p">)</span> 
 </pre></div>
 
-
 <p>Feel free to play around with the test data in <code>/test/testdata.gen</code></p>
 <h2 id="using-popgen">Using PopGen</h2>
 <p>Like all Julia packages, to activate <code>PopGen</code>, simply run:</p>
-<div class="codehilite"><pre><span></span><span class="k">using</span> <span class="n">PopGen</span>
+<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">PopGen</span>
 </pre></div>
 
+<div class="admonition note">
+<p class="admonition-title">Performance notes</p>
+<p>If you're migrating to Julia from Python or R (or Matlab, etc.), you'll think Julia is slow and laggy because loading packages and running stuff has a noticeable wait time (10-40sec). However, if this is your first time in Julia, then it's worth mentioning that this lag is "compilation overhead". What this means is, Julia tries to pre-compile as much code as possible (into optimized machine code) when running something or loading a package. This lag exists <strong>only the first time</strong> you run something. Every subsequent run of a function, even with different parameters, will be <strong>substantially</strong> faster, and in most cases instant. If you want to test this yourself, try to run a line of code twice with <code>@time</code> before the function and compare the results. Here's an example:
+<div class="codehilite"><pre><span></span>julia&gt; @time using PopGen
+17.415902 seconds (19.88 M allocations: 1.022 GiB, 2.79% gc time)
 
-<h2 id="performance-notes">Performance notes:</h2>
-<p>If you're migrating to Julia from Python or R (or Matlab, etc.), you'll think Julia is slow and laggy because loading packages and running stuff has a noticeable wait time (10-40sec). However, if this is your first time in Julia, then it's worth mentioning that this lag is "compilation overhead". What this means is, Julia tries to pre-compile as much code as possible (into optimized machine code) when running something or loading a package. This lag exists <strong>only the first time</strong> you run something. Every subsequent run of a function, even with different parameters, will be <strong>substantially</strong> faster, and in most cases instant. If you want to test this yourself, try to run a line of code twice with <code>@time</code> before the function and compare the results. Here's an example:</p>
-<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="nd">@time</span> <span class="k">using</span> <span class="n">PopGen</span>
-</pre></div>
-
-
-<div class="codehilite"><pre><span></span>  17.415902 seconds (19.88 M allocations: 1.022 GiB, 2.79% gc time)
-</pre></div>
-
-
-<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="nd">@time</span> <span class="k">using</span> <span class="n">PopGen</span>
-</pre></div>
-
-
-<div class="codehilite"><pre><span></span>  0.100233 seconds (64.07 k allocations: 3.123 MiB, 6.02% gc time)
-</pre></div>
+julia&gt; @time using PopGen
+0.100233 seconds (64.07 k allocations: 3.123 MiB, 6.02% gc time)
+</pre></div></p>
+</div>
                 
                   
                 
@@ -498,7 +558,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../aboutdocs/" title="Docs "Guide"" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../juliaprimer/" title="Getting started" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -507,19 +567,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Docs "Guide"
+                Getting started
               </span>
             </div>
           </a>
         
         
-          <a href="../popobj/" title="The PopObj" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../popobj_type/" title="What's a PopObj" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                The PopObj
+                What's a PopObj
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

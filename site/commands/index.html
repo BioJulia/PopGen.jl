@@ -459,8 +459,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#genotypes-per-locus" title="genotypes per locus" class="md-nav__link">
-    genotypes per locus
+  <a href="#display-specific-loci-andor-samples" title="display specific loci and/or samples" class="md-nav__link">
+    display specific loci and/or samples
   </a>
   
     <nav class="md-nav">
@@ -474,8 +474,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#remove-loci" title="remove loci" class="md-nav__link">
-    remove loci
+  <a href="#view-samples" title="view samples" class="md-nav__link">
+    view samples
   </a>
   
 </li>
@@ -486,22 +486,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#genotypes-per-individual" title="genotypes per individual" class="md-nav__link">
-    genotypes per individual
+  <a href="#remove-loci" title="remove loci" class="md-nav__link">
+    remove loci
   </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#view-specific-genotypes" title="view specific genotypes" class="md-nav__link">
-    view specific genotypes
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -517,6 +504,26 @@
   <a href="#view-missing-data" title="view missing data" class="md-nav__link">
     view missing data
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-assignment" title="single assignment" class="md-nav__link">
+    single assignment
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multiple-assignment" title="multiple assignment" class="md-nav__link">
+    multiple assignment
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -608,8 +615,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../contr/" title="Contributing" class="md-nav__link">
-      Contributing
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
     </a>
   </li>
 
@@ -687,8 +694,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#genotypes-per-locus" title="genotypes per locus" class="md-nav__link">
-    genotypes per locus
+  <a href="#display-specific-loci-andor-samples" title="display specific loci and/or samples" class="md-nav__link">
+    display specific loci and/or samples
   </a>
   
     <nav class="md-nav">
@@ -702,8 +709,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#remove-loci" title="remove loci" class="md-nav__link">
-    remove loci
+  <a href="#view-samples" title="view samples" class="md-nav__link">
+    view samples
   </a>
   
 </li>
@@ -714,22 +721,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#genotypes-per-individual" title="genotypes per individual" class="md-nav__link">
-    genotypes per individual
+  <a href="#remove-loci" title="remove loci" class="md-nav__link">
+    remove loci
   </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#view-specific-genotypes" title="view specific genotypes" class="md-nav__link">
-    view specific genotypes
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -745,6 +739,26 @@
   <a href="#view-missing-data" title="view missing data" class="md-nav__link">
     view missing data
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-assignment" title="single assignment" class="md-nav__link">
+    single assignment
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multiple-assignment" title="multiple assignment" class="md-nav__link">
+    multiple assignment
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -828,22 +842,22 @@
                 
                   <h1>View/edit PopObj</h1>
                 
-                <p>These are the included PopObj viewing and manipulating commands. Using standard Julia conventions, only commands ending with a bang <code>!</code> are mutable, meaning they alter the input data. This means that a command like <code>popid</code> will show you population ID's, whereas <code>popid!</code> will change them in your <code>PopObj</code> input. </p>
+                <p>These are the included PopObj viewing and manipulating commands. Using standard Julia conventions, only commands ending with a bang <code>!</code> are mutable, meaning they alter the input data. So, commands like <code>popid</code> will show you population ID's, whereas <code>popid!</code> will change them in your <code>PopObj</code>. The mutable commands here alter the data in your <code>PopObj</code>, but not the source data (i.e. the files used to create the <code>PopObj</code>).</p>
 <p>To follow along like a tutorial,  use the <code>gulfsharks</code> data. Load the data in if you haven't already:</p>
 <div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">PopGen</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">sharks</span> <span class="o">=</span> <span class="n">gulfsharks</span><span class="p">()</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">sharks</span> <span class="o">=</span> <span class="n">gulfsharks</span><span class="p">()</span> <span class="p">;</span>
 </pre></div>
 
 <h2 id="individuals">individuals</h2>
 <h3 id="view-individuals-names">view individuals' names</h3>
-<p><div class="codehilite"><pre><span></span><span class="n">indnames</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">)</span>
+<p><div class="codehilite"><pre><span></span><span class="n">sample_names</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">)</span>
 </pre></div>
-View individual/sample names in a <code>PopObj</code>. This is equivalent to <code>PopObj.ind</code></p>
+View individual/sample names in a <code>PopObj</code>. This is equivalent to <code>PopObj.samples.name</code></p>
 <div class="superfences-tabs">
 <input name="__tabs_1" type="radio" id="__tab_1_0" checked="checked" />
 <label for="__tab_1_0">indnames</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">indnames</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">sample_names</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div></div>
 <input name="__tabs_1" type="radio" id="__tab_1_1" />
 <label for="__tab_1_1">output</label>
@@ -871,15 +885,17 @@ View individual/sample names in a <code>PopObj</code>. This is equivalent to <co
 </pre></div></div>
 </div>
 <h3 id="remove-individuals">remove individuals</h3>
-<div class="codehilite"><pre><span></span><span class="n">remove_inds!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">inds</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}})</span>
+<div class="codehilite"><pre><span></span><span class="n">remove_samples!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">samp_id</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="n">String</span><span class="p">,</span> <span class="kt">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}})</span>
 </pre></div>
 
-<p>Removes selected individuals from a <code>PopObj</code>. Input can be a single individual, or an array of individuals.</p>
+<p>Removes selected individuals from a <code>PopObj</code>. Input can be a single sample, or an array of samples. Will output entire <code>PopObj</code>, so it's better to use a semicolon to suppress the output. Use <code>summary</code> or <code>.name</code>  if you want to confirm that the samples were removed. This command will inform you if samples were not found in the data.</p>
 <p>Examples:</p>
 <div class="superfences-tabs">
 <input name="__tabs_2" type="radio" id="__tab_2_0" checked="checked" />
 <label for="__tab_2_0">single individual</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">remove_inds!</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="s">&quot;cc_001&quot;</span><span class="p">)</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">remove_samples!</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="s">&quot;cc_001&quot;</span><span class="p">)</span> <span class="p">;</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">summary</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div></div>
 <input name="__tabs_2" type="radio" id="__tab_2_1" />
 <label for="__tab_2_1">single output</label>
@@ -911,11 +927,13 @@ Number of populations: 7
      20  |  6
      20  |  7
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 </pre></div></div>
 <input name="__tabs_2" type="radio" id="__tab_2_2" />
 <label for="__tab_2_2">multiple individuals</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">remove_inds!</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;cc_001&quot;</span><span class="p">,</span><span class="s">&quot;cc_002&quot;</span><span class="p">,</span> <span class="s">&quot;cc_003&quot;</span><span class="p">])</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">remove_samples!</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;cc_001&quot;</span><span class="p">,</span><span class="s">&quot;cc_002&quot;</span><span class="p">,</span> <span class="s">&quot;cc_003&quot;</span><span class="p">])</span> <span class="p">;</span> 
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">summary</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div></div>
 <input name="__tabs_2" type="radio" id="__tab_2_3" />
 <label for="__tab_2_3">multiple output</label>
@@ -949,41 +967,42 @@ Number of populations: 7
      20  |  6
      20  |  7
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 </pre></div></div>
 </div>
 <div class="admonition info">
-<p class="admonition-title">ind not found!</p>
-<p>If removing a single individual and it is not found in the PopObj, an error will be returned. However, if removing multiple individuals, you will receive a notice above the PopObj summary indicating which individuals were not found, while removing the ones that were.</p>
+<p class="admonition-title">sample not found!</p>
+<p>If removing a single sample and it is not found in the PopObj, an error will be returned. However, if removing multiple samples, you will receive a notice above the PopObj summary indicating which individuals were not found, while removing the ones that were.</p>
 </div>
 <h2 id="population-ids">population ID's</h2>
 <h3 id="view-population-names">view population names</h3>
-<p><div class="codehilite"><pre><span></span><span class="n">popid</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">listall</span><span class="o">::</span><span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
+<p><div class="codehilite"><pre><span></span><span class="n">populations</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">listall</span><span class="o">::</span><span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
 </pre></div>
-Just as you can view population ID's with <code>.popid</code>, you can also view them with the <code>popid()</code> command, which by default shows you a summary of the number of individuals in each population, just like you see when importing a file.  The <code>#Inds</code> means "number of individuals", and <code>Pop</code> refers to the population names.</p>
+Just as you can view population ID's with <code>.population</code>, you can also view them with the <code>populations</code> command, which by default shows you a summary of the number of individuals in each population, much like you see when using <code>summary</code>.  </p>
 <div class="superfences-tabs">
 <input name="__tabs_3" type="radio" id="__tab_3_0" checked="checked" />
 <label for="__tab_3_0">popid</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">popid</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">populations</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div></div>
 <input name="__tabs_3" type="radio" id="__tab_3_1" />
 <label for="__tab_3_1">output</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>    #Inds | Pop 
-   --------------
-    21   |  1
-    30   |  2
-    28   |  3
-    65   |  4
-    28   |  5
-    20   |  6
-    20   |  7
+<div class="superfences-content"><div class="codehilite"><pre><span></span>│ Row │ population    │ count │
+│     │ Categorical…⍰ │ Int32 │
+├─────┼───────────────┼───────┤
+│ 1   │ 1             │ 21    │
+│ 2   │ 2             │ 30    │
+│ 3   │ 3             │ 28    │
+│ 4   │ 4             │ 65    │
+│ 5   │ 5             │ 28    │
+│ 6   │ 6             │ 20    │
+│ 7   │ 7             │ 20    │
 </pre></div></div>
 </div>
 <p>You can use the keyword <code>listall=true</code> to display each individual and their associated population as a DataFrame. You'll notice the DataFrame looks remarkably like the first two columns of the one from <code>locations</code>, and it sort of is. Unlike <code>locations</code>, this will not give you an error when location data is missing. </p>
 <div class="superfences-tabs">
 <input name="__tabs_4" type="radio" id="__tab_4_0" checked="checked" />
 <label for="__tab_4_0">listall=true</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">popid</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="n">listall</span><span class="o">=</span><span class="kc">true</span><span class="p">)</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">populations</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="n">listall</span><span class="o">=</span><span class="kc">true</span><span class="p">)</span>
 </pre></div></div>
 <input name="__tabs_4" type="radio" id="__tab_4_1" />
 <label for="__tab_4_1">output</label>
@@ -1008,6 +1027,10 @@ Just as you can view population ID's with <code>.popid</code>, you can also view
 │ 211 │ seg_030 │ 7          │
 │ 212 │ seg_031 │ 7          │
 </pre></div></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">synonymous functions</p>
+<p>You can use the command <code>population</code> for the same functionality. We made the commands <code>population</code> and <code>populations</code> synonymous so you wouldn't have to memorize if the name was singular or plural-- it just works! This also applies to <code>populations!</code> and <code>population!</code></p>
 </div>
 <h3 id="rename-populations">rename populations</h3>
 <p><div class="codehilite"><pre><span></span><span class="n">popid!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">rename</span><span class="o">::</span><span class="kt">Dict</span><span class="p">)</span>
@@ -1073,16 +1096,16 @@ Rename the population ID's of a <code>PopObj</code> (the <code>.popid</code>). U
 │ 212 │ seg_031 │ Southeast Gulf │
 </pre></div></div>
 </div>
-<h2 id="genotypes-per-locus">genotypes per locus</h2>
+<h2 id="display-specific-loci-andor-samples">display specific loci and/or samples</h2>
 <h3 id="view-loci">view loci</h3>
-<div class="codehilite"><pre><span></span><span class="n">loci</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">loci</span> <span class="o">=</span> <span class="nb">nothing</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><span class="n">isolate_genotypes</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">samples</span><span class="o">=</span> <span class="nb">nothing</span><span class="p">,</span> <span class="n">loci</span><span class="o">=</span> <span class="nb">nothing</span><span class="p">)</span>
 </pre></div>
 
-<p>View the genotypes of all individuals for specific loci in a <code>PopObj</code>.  Default shows all genotypes for all individuals. Returns a DataFrame.</p>
+<p>Default shows all genotypes for all individuals. Returns a DataFrame.</p>
 <div class="superfences-tabs">
 <input name="__tabs_6" type="radio" id="__tab_6_0" checked="checked" />
 <label for="__tab_6_0">all loci</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">loci</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">isolate_genotypes</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div></div>
 <input name="__tabs_6" type="radio" id="__tab_6_1" />
 <label for="__tab_6_1">output</label>
@@ -1108,11 +1131,11 @@ Rename the population ID's of a <code>PopObj</code> (the <code>.popid</code>). U
 │ 212 │ seg_031 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
 </pre></div></div>
 </div>
-<p>Add a second argument (no keywords!) to specify a single locus (string) or multiple loci (array of strings) to display</p>
+<p>Add the argument  <code>loci=</code> specify a single locus (string) or multiple loci (array of strings) to display</p>
 <div class="superfences-tabs">
 <input name="__tabs_7" type="radio" id="__tab_7_0" checked="checked" />
 <label for="__tab_7_0">single locus</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">loci</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="s">&quot;contig_10001&quot;</span><span class="p">)</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">isolate_genotypes</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="n">loci</span> <span class="o">=</span> <span class="s">&quot;contig_10001&quot;</span><span class="p">)</span>
 </pre></div></div>
 <input name="__tabs_7" type="radio" id="__tab_7_1" />
 <label for="__tab_7_1">single output</label>
@@ -1139,7 +1162,7 @@ Rename the population ID's of a <code>PopObj</code> (the <code>.popid</code>). U
 </pre></div></div>
 <input name="__tabs_7" type="radio" id="__tab_7_2" />
 <label for="__tab_7_2">multiple loci</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">loci</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;contig_10001&quot;</span><span class="p">,</span> <span class="s">&quot;contig_10028&quot;</span><span class="p">])</span>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">isolate_genotypes</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="n">loci</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;contig_10001&quot;</span><span class="p">,</span> <span class="s">&quot;contig_10028&quot;</span><span class="p">])</span>
 </pre></div></div>
 <input name="__tabs_7" type="radio" id="__tab_7_3" />
 <label for="__tab_7_3">multiple output</label>
@@ -1165,19 +1188,62 @@ Rename the population ID's of a <code>PopObj</code> (the <code>.popid</code>). U
 │ 212 │ seg_031 │ 7            │ (1, 1)       │ (1, 1)       │
 </pre></div></div>
 </div>
-<h3 id="remove-loci">remove loci</h3>
+<h3 id="view-samples">view samples</h3>
+<p>Add the argument  <code>samples=</code> specify a single sample (string) or multiple samples (array of strings) to display</p>
+<div class="superfences-tabs">
+<input name="__tabs_8" type="radio" id="__tab_8_0" checked="checked" />
+<label for="__tab_8_0">single sample</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">isolate_genotypes</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="s">&quot;cc_001&quot;</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_8" type="radio" id="__tab_8_1" />
+<label for="__tab_8_1">single output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>1×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
+│ Row │ name   │ population    │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
+│     │ String │ Categorical…⍰ │ Any          │ Any          │ Any          │ Any          │
+├─────┼────────┼───────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
+│ 1   │ cc_001 │ 1             │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
+</pre></div></div>
+<input name="__tabs_8" type="radio" id="__tab_8_2" />
+<label for="__tab_8_2">multiple samples</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="mi">2</span><span class="n">×2215</span> <span class="n">DataFrames</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span> <span class="n">Omitted</span> <span class="n">printing</span> <span class="n">of</span> <span class="mi">2209</span> <span class="n">columns</span>
+<span class="n">│</span> <span class="n">Row</span> <span class="n">│</span> <span class="n">name</span>    <span class="n">│</span> <span class="n">population</span>    <span class="n">│</span> <span class="n">contig_10001</span> <span class="n">│</span> <span class="n">contig_10013</span> <span class="n">│</span> <span class="n">contig_10028</span> <span class="n">│</span> <span class="n">contig_10035</span> <span class="n">│</span>
+<span class="n">│</span>     <span class="n">│</span> <span class="n">String</span>  <span class="n">│</span> <span class="n">Categorical…⍰</span> <span class="n">│</span> <span class="kt">Any</span>          <span class="n">│</span> <span class="kt">Any</span>          <span class="n">│</span> <span class="kt">Any</span>          <span class="n">│</span> <span class="kt">Any</span>          <span class="n">│</span>
+<span class="n">├─────┼─────────┼───────────────┼──────────────┼──────────────┼──────────────┼──────────────┤</span>
+<span class="n">│</span> <span class="mi">1</span>   <span class="n">│</span> <span class="n">cc_001</span>  <span class="n">│</span> <span class="mi">1</span>             <span class="n">│</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>       <span class="n">│</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>       <span class="n">│</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>       <span class="n">│</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>       <span class="n">│</span>
+<span class="n">│</span> <span class="mi">2</span>   <span class="n">│</span> <span class="n">seg_028</span> <span class="n">│</span> <span class="mi">7</span>             <span class="n">│</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>       <span class="n">│</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>       <span class="n">│</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>       <span class="n">│</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>       <span class="n">│</span>
+</pre></div></div>
+</div>
+<p>It also means that you can combine the keywords <code>samples=</code> and <code>loci=</code> to further specify your output:</p>
+<div class="superfences-tabs">
+<input name="__tabs_9" type="radio" id="__tab_9_0" checked="checked" />
+<label for="__tab_9_0">both keywords</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">isolate_genotypes</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span> <span class="p">[</span><span class="s">&quot;cc_001&quot;</span><span class="p">,</span> <span class="s">&quot;seg_028&quot;</span><span class="p">],</span> <span class="n">loci</span> <span class="o">=</span> <span class="s">&quot;contig_10013&quot;</span><span class="p">)</span>
+</pre></div></div>
+<input name="__tabs_9" type="radio" id="__tab_9_1" />
+<label for="__tab_9_1">output</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>2×3 DataFrames.DataFrame
+│ Row │ name    │ population    │ contig_10013 │
+│     │ String  │ Categorical…⍰ │ Any          │
+├─────┼─────────┼───────────────┼──────────────┤
+│ 1   │ cc_001  │ 1             │ (1, 1)       │
+│ 2   │ seg_028 │ 7             │ (1, 1)       │
+</pre></div></div>
+</div>
+<h2 id="remove-loci">remove loci</h2>
 <div class="codehilite"><pre><span></span><span class="n">remove_loci!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">loci</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="n">String</span><span class="p">,</span> <span class="kt">Array</span><span class="p">{</span><span class="n">String</span><span class="p">,</span><span class="mi">1</span><span class="p">}})</span>
 </pre></div>
 
 <p>Removes selected loci from a <code>PopObj</code>. Input can be a single locus, or an array of loci.</p>
 <p>Examples:</p>
 <div class="superfences-tabs">
-<input name="__tabs_8" type="radio" id="__tab_8_0" checked="checked" />
-<label for="__tab_8_0">single locus</label>
+<input name="__tabs_10" type="radio" id="__tab_10_0" checked="checked" />
+<label for="__tab_10_0">single locus</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">remove_loci!</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="s">&quot;contig_35208&quot;</span><span class="p">)</span> <span class="p">;</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">summary</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div></div>
-<input name="__tabs_8" type="radio" id="__tab_8_1" />
-<label for="__tab_8_1">single output</label>
+<input name="__tabs_10" type="radio" id="__tab_10_1" />
+<label for="__tab_10_1">single output</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>Object of type PopObj:
 
 Longitude:
@@ -1206,14 +1272,16 @@ Number of populations: 7
      20  |  6
      20  |  7
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 </pre></div></div>
-<input name="__tabs_8" type="radio" id="__tab_8_2" />
-<label for="__tab_8_2">multiple loci</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">remove_loci!</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;contig_35208&quot;</span><span class="p">,</span> <span class="s">&quot;contig_23109&quot;</span><span class="p">,</span> <span class="s">&quot;contig_4493&quot;</span><span class="p">])</span>
+<input name="__tabs_10" type="radio" id="__tab_10_2" />
+<label for="__tab_10_2">multiple loci</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">remove_loci!</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;contig_35208&quot;</span><span class="p">,</span> <span class="s">&quot;contig_23109&quot;</span><span class="p">,</span> <span class="s">&quot;contig_4493&quot;</span><span class="p">])</span> <span class="p">;</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">summary</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div></div>
-<input name="__tabs_8" type="radio" id="__tab_8_3" />
-<label for="__tab_8_3">multiple output</label>
+<input name="__tabs_10" type="radio" id="__tab_10_3" />
+<label for="__tab_10_3">multiple output</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>NOTICE: locus &quot;contig_35208&quot; not found
 
 Object of type PopObj:
@@ -1244,80 +1312,19 @@ Number of populations: 7
      20  |  6
      20  |  7
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 </pre></div></div>
 </div>
 <div class="admonition info">
 <p class="admonition-title">locus not found!</p>
 <p>If removing a single locus and it is not found in the PopObj, an error will be returned. However, if removing multiple loci, you will receive a notice above the PopObj summary indicating which loci were not found, while removing the ones that were.</p>
 </div>
-<h2 id="genotypes-per-individual">genotypes per individual</h2>
-<h3 id="view-specific-genotypes">view specific genotypes</h3>
-<p>Sometimes you want/need to view genotypes of specific individuals, and that's what <code>genotypes</code> is for. By default, the command will show you a DataFrame of the genotypes of all individuals for all loci.</p>
-<div class="superfences-tabs">
-<input name="__tabs_9" type="radio" id="__tab_9_0" checked="checked" />
-<label for="__tab_9_0">genotypes</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">genotypes</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
-</pre></div></div>
-<input name="__tabs_9" type="radio" id="__tab_9_1" />
-<label for="__tab_9_1">output</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>212×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
-│ Row │ ind     │ population   │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
-│     │ String  │ Categorical… │ Any          │ Any          │ Any          │ Any          │
-├─────┼─────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
-│ 1   │ cc_001  │ 1            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
-│ 2   │ cc_002  │ 1            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
-│ 3   │ cc_003  │ 1            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (1, 1)       │
-│ 4   │ cc_005  │ 1            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (2, 1)       │
-│ 5   │ cc_007  │ 1            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 1)       │
-│ 6   │ cc_008  │ 1            │ (1, 1)       │ (1, 2)       │ (2, 1)       │ (1, 1)       │
-│ 7   │ cc_009  │ 1            │ (1, 1)       │ (1, 2)       │ (2, 1)       │ (2, 1)       │
-⋮
-│ 205 │ seg_024 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
-│ 206 │ seg_025 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 207 │ seg_026 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 208 │ seg_027 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (2, 2)       │
-│ 209 │ seg_028 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 210 │ seg_029 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 211 │ seg_030 │ 7            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 2)       │
-│ 212 │ seg_031 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
-</pre></div></div>
-</div>
-<p>Using the <code>inds =</code> keyword argument,  you can specify a single individual (string) or multiple individuals (array of strings) to view only a subset</p>
-<div class="superfences-tabs">
-<input name="__tabs_10" type="radio" id="__tab_10_0" checked="checked" />
-<label for="__tab_10_0">single genotypes</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">genotypes</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="n">inds</span> <span class="o">=</span> <span class="s">&quot;key_037&quot;</span><span class="p">)</span>
-</pre></div></div>
-<input name="__tabs_10" type="radio" id="__tab_10_1" />
-<label for="__tab_10_1">single output</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>1×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
-│ Row │ ind     │ population   │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
-│     │ String  │ Categorical… │ Any          │ Any          │ Any          │ Any          │
-├─────┼─────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
-│ 1   │ key_037 │ 4            │ (1, 1)       │ (1, 1)       │ (2, 1)       │ (2, 1)       │
-</pre></div></div>
-<input name="__tabs_10" type="radio" id="__tab_10_2" />
-<label for="__tab_10_2">multiple genotypes</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">genotypes</span><span class="p">(</span><span class="n">sharks</span><span class="p">,</span> <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;cc_008&quot;</span><span class="p">,</span> <span class="s">&quot;meg_015&quot;</span><span class="p">])</span>
-</pre></div></div>
-<input name="__tabs_10" type="radio" id="__tab_10_3" />
-<label for="__tab_10_3">multiple output</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>2×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
-│ Row │ ind     │ population   │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
-│     │ String  │ Categorical… │ Any          │ Any          │ Any          │ Any          │
-├─────┼─────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
-│ 1   │ cc_008  │ 1            │ (1, 1)       │ (1, 2)       │ (2, 1)       │ (1, 1)       │
-│ 2   │ meg_015 │ 5            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (2, 2)       │
-</pre></div></div>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>Since many of the outputs of these functions are in DataFrame format, you have the flexibility to use the tools in <code>DataFrames.jl</code> as well as <code>Query.jl</code> to filter and subset these data even further. </p>
-</div>
 <h2 id="missing-data">missing data</h2>
 <h3 id="view-missing-data">view missing data</h3>
-<p>Used to show missingness information-- that is, loci missing allele information. This command outputs two DataFrames, the first being a count of number of missing loci per individual, the other being the number of times a locus is missing across individuals. </p>
+<div class="codehilite"><pre><span></span><span class="n">missing</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">)</span>
+</pre></div>
+
+<p>Used to show missingness information-- that is, loci missing allele information. This command outputs two DataFrames, the first being a count of number of missing loci per samples, the other being the number of times a locus is missing across samples. </p>
 <div class="superfences-tabs">
 <input name="__tabs_11" type="radio" id="__tab_11_0" checked="checked" />
 <label for="__tab_11_0">missing</label>
@@ -1325,8 +1332,8 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 </pre></div></div>
 <input name="__tabs_11" type="radio" id="__tab_11_1" />
 <label for="__tab_11_1">output</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span>(212×4 DataFrames.DataFrame. Omitted printing of 1 columns
-│ Row │ ind     │ population │ nmissing │
+<div class="superfences-content"><div class="codehilite"><pre><span></span>by_ind = (212×4 DataFrames.DataFrame. Omitted printing of 1 columns
+│ Row │ name    │ population │ nmissing │
 │     │ String  │ String     │ Any      │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -1344,7 +1351,7 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 │ 209 │ seg_028 │ 7          │ 25       │
 │ 210 │ seg_029 │ 7          │ 0        │
 │ 211 │ seg_030 │ 7          │ 1        │
-│ 212 │ seg_031 │ 7          │ 1        │, 2213×2 DataFrames.DataFrame
+│ 212 │ seg_031 │ 7          │ 1        │, by_loci = 2213×2 DataFrames.DataFrame
 │ Row  │ locus        │ nmissing │
 │      │ String       │ Any      │
 ├──────┼──────────────┼──────────┤
@@ -1366,17 +1373,63 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 │ 2213 │ contig_2784  │ 7        │)
 </pre></div></div>
 </div>
-<p>Since <code>missing</code> outputs a tuple of dataframes, an easier way to use this function is with multiple assignment:</p>
+<p><code>missing</code> outputs a named tuple of dataframes, which means there are two options for assignment:</p>
+<h4 id="single-assignment">single assignment</h4>
+<p>The first DataFrame of the named tuple is named <code>by_sample</code> and the second named <code>by_loci</code>. If you assign a single variable to this tuple, it will inherit those names as accessors like so:</p>
 <div class="superfences-tabs">
 <input name="__tabs_12" type="radio" id="__tab_12_0" checked="checked" />
-<label for="__tab_12_0">missing</label>
-<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">df1</span><span class="p">,</span><span class="n">df2</span> <span class="o">=</span> <span class="n">missing</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span> <span class="p">;</span>
+<label for="__tab_12_0">single assignment</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">miss</span> <span class="o">=</span> <span class="n">missing</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span> <span class="p">;</span>
 </pre></div></div>
 <input name="__tabs_12" type="radio" id="__tab_12_1" />
-<label for="__tab_12_1">df1</label>
+<label for="__tab_12_1">by_ind</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>julia&gt; miss.by_sample
+212×4 DataFrame. Omitted printing of 1 columns
+│ Row │ name    │ population │ nmissing │
+│     │ String  │ String     │ Int64    │
+├─────┼─────────┼────────────┼──────────┤
+│ 1   │ cc_001  │ 1          │ 124      │
+│ 2   │ cc_002  │ 1          │ 94       │
+│ 3   │ cc_003  │ 1          │ 100      │
+│ 4   │ cc_005  │ 1          │ 0        │
+⋮
+│ 208 │ seg_027 │ 7          │ 2        │
+│ 209 │ seg_028 │ 7          │ 25       │
+│ 210 │ seg_029 │ 7          │ 0        │
+│ 211 │ seg_030 │ 7          │ 1        │
+│ 212 │ seg_031 │ 7          │ 1        │
+</pre></div></div>
+<input name="__tabs_12" type="radio" id="__tab_12_2" />
+<label for="__tab_12_2">by_loci</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span>julia&gt; miss.by_loci
+2213×2 DataFrame
+│ Row  │ locus        │ nmissing │
+│      │ String       │ Int64    │
+├──────┼──────────────┼──────────┤
+│ 1    │ contig_35208 │ 0        │
+│ 2    │ contig_23109 │ 6        │
+│ 3    │ contig_4493  │ 3        │
+│ 4    │ contig_10742 │ 2        │
+⋮
+│ 2209 │ contig_27356 │ 2        │
+│ 2210 │ contig_475   │ 0        │
+│ 2211 │ contig_19384 │ 5        │
+│ 2212 │ contig_22368 │ 3        │
+│ 2213 │ contig_2784  │ 7        │
+</pre></div></div>
+</div>
+<h4 id="multiple-assignment">multiple assignment</h4>
+<p>Python has this feature, however, if you're migrating from R, multiple assignment probably looks weird, or like flat-out sorcery. Whenever a function returns a tuple of values, like <code>missing</code> does, you can assign as many variables to it at once.</p>
+<div class="superfences-tabs">
+<input name="__tabs_13" type="radio" id="__tab_13_0" checked="checked" />
+<label for="__tab_13_0">missing</label>
+<div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">df1</span><span class="p">,</span><span class="n">df2</span> <span class="o">=</span> <span class="n">missing</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span> <span class="p">;</span>
+</pre></div></div>
+<input name="__tabs_13" type="radio" id="__tab_13_1" />
+<label for="__tab_13_1">df1</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>julia&gt; df1
 212×4 DataFrames.DataFrame. Omitted printing of 1 columns
-│ Row │ ind     │ population │ nmissing │
+│ Row │ name    │ population │ nmissing │
 │     │ String  │ String     │ Any      │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -1396,8 +1449,8 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 │ 211 │ seg_030 │ 7          │ 1        │
 │ 212 │ seg_031 │ 7          │ 1        │
 </pre></div></div>
-<input name="__tabs_12" type="radio" id="__tab_12_2" />
-<label for="__tab_12_2">df2</label>
+<input name="__tabs_13" type="radio" id="__tab_13_2" />
+<label for="__tab_13_2">df2</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>julia&gt; df2
 2213×2 DataFrames.DataFrame
 │ Row  │ locus        │ nmissing │
@@ -1421,26 +1474,53 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 │ 2213 │ contig_2784  │ 7        │
 </pre></div></div>
 </div>
+<div class="admonition info">
+<p class="admonition-title">a simple example</p>
+<p>If this still looks weird to you, here is a simple example to help wrap your mind around it.
+<div class="codehilite"><pre><span></span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span>
+</pre></div>
+where </p>
+<p>a = 1</p>
+<p>b = 2</p>
+<p>c = 3</p>
+<p>d = [4, 5, 6, 7]</p>
+<p>embrace the convenience!</p>
+</div>
 <h3 id="plot-missing-data">plot missing data</h3>
 <p><div class="codehilite"><pre><span></span><span class="n">plot_missing</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">color</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span>
 </pre></div>
-Return an interactive plot of the number of missing loci in individuals of a <code>PopObj</code>, along with the number of missing individuals per locus. To set a custom color palette for the boxplots, use <code>color = [color1, color2, ...]</code></p>
+Return an interactive plot of the number of missing loci in individuals of a <code>PopObj</code>, along with the number of missing individuals per locus. Use <code>color = [color1, color2, ...]</code> to set a custom color palette for the boxplots. </p>
 <p>Example:</p>
 <p><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">plot_missing</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div>
 <img alt="missing_plot" src="../img/missing_plot.png" /></p>
+<div class="admonition info">
+<p class="admonition-title">saving interactive plots</p>
+<p>To save the interactive plots, you can use the <code>savehtml</code> function from the <code>PlotlyJS.jl</code> package:
+<div class="codehilite"><pre><span></span><span class="n">PlotlyJS</span><span class="o">.</span><span class="n">savehtml</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="s">&quot;filename.html&quot;</span><span class="p">)</span>
+</pre></div>
+If you don't specify a full path in the filename, it will save it in your current working directory.
+<div class="codehilite"><pre><span></span><span class="c">#example</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">PlotlyJS</span> <span class="p">;</span>
+
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">PlotlyJS</span><span class="o">.</span><span class="n">savehtml</span><span class="p">(</span><span class="n">plot_missing</span><span class="p">(</span><span class="n">sharks</span><span class="p">),</span> <span class="s">&quot;/home/pdimens/missingness.html&quot;</span><span class="p">)</span>
+</pre></div></p>
+<ul>
+<li>use a third argument <code>:embed</code> to make the plots fully viewable offline. The output files are much larger (relatively) because it embeds the Plotly javeascript into the file. For context, the<code>gulfsharks</code> plot file is ~3.5mb when using <code>:embed</code></li>
+</ul>
+</div>
 <h2 id="location-data">location data</h2>
 <h3 id="view-location-data">view location data</h3>
 <p><div class="codehilite"><pre><span></span><span class="n">locations</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">)</span>
 </pre></div>
 View location data (<code>.longitude</code> and <code>.latitude</code>) in a <code>PopObj</code>If you want to do your own plotting, or just to look at the spatial data of your PopObj, this function is handy. It takes no additional arguments and outputs a DataFrame of individual names, population ID's, and their latitude/longitude information. </p>
 <div class="superfences-tabs">
-<input name="__tabs_13" type="radio" id="__tab_13_0" checked="checked" />
-<label for="__tab_13_0">locations</label>
+<input name="__tabs_14" type="radio" id="__tab_14_0" checked="checked" />
+<label for="__tab_14_0">locations</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">locations</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div></div>
-<input name="__tabs_13" type="radio" id="__tab_13_1" />
-<label for="__tab_13_1">output</label>
+<input name="__tabs_14" type="radio" id="__tab_14_1" />
+<label for="__tab_14_1">output</label>
 <div class="superfences-content"><div class="codehilite"><pre><span></span>212×4 DataFrames.DataFrame
 │ Row │ ind     │ population │ longitude │ latitude │
 │     │ String  │ Union…     │ Union…    │ Union…   │
@@ -1469,12 +1549,12 @@ View location data (<code>.longitude</code> and <code>.latitude</code>) in a <co
 </div>
 <h3 id="add-location-data">add location data</h3>
 <p>Location data can be added by directly accessing the fields <code>.longitude</code> and <code>.latitude</code> in your <code>PopObj</code>, such as this example:</p>
-<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">sharks</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="o">:</span><span class="mi">50</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span> <span class="p">;</span>   <span class="c"># creates 212 unique random numbers between 1 and 50</span>
+<div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">sharks</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="o">:</span><span class="mi">50</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span> <span class="p">;</span>   <span class="c"># creates 212 unique random numbers between 1 and 50</span>
 
-<span class="n">julia</span><span class="o">&gt;</span> <span class="n">sharks</span><span class="o">.</span><span class="n">latitdue</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">20</span><span class="o">:</span><span class="mi">30</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span> <span class="p">;</span> <span class="c"># creates 212 unique random numbers between 20 and 30</span>
+<span class="n">julia</span><span class="o">&gt;</span> <span class="n">sharks</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">latitdue</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">20</span><span class="o">:</span><span class="mi">30</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span> <span class="p">;</span> <span class="c"># creates 212 unique random numbers between 20 and 30</span>
 </pre></div>
 
-<p>However, if your data is in decimal minutes rather than decimal degrees, use the <code>locations!</code> function to add it to the fields. This function will do a conversion from decimal minutes to decimal degrees for you.</p>
+<p>However, if your data is in decimal minutes rather than decimal degrees, use the <code>locations!</code> function to add it to the fields. This function will do a conversion from decimal minutes to decimal degrees for you. To import those data into Julia, you'll likely want to use the wonderful <code>CSV.jl</code> package first.  </p>
 <h4 id="decimal-minutes-data">decimal minutes data</h4>
 <div class="codehilite"><pre><span></span><span class="n">locations!</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">;</span> <span class="n">xloc</span><span class="o">::</span><span class="kt">Array</span><span class="p">,</span> <span class="n">yloc</span><span class="o">::</span><span class="kt">Array</span><span class="p">)</span>
 </pre></div>
@@ -1484,7 +1564,7 @@ View location data (<code>.longitude</code> and <code>.latitude</code>) in a <co
 <li>Decimal Degrees : <code>-11.431</code></li>
 <li>Decimal Minutes : <code>"-11 43.11"</code> (must use space and double-quotes)</li>
 </ul>
-<p>If conversion is not necessary, can directly assign <code>PopObj.longitude</code> and <code>PopObj.latitude</code> as shown above. If you want to keep things consistent, you can still use <code>locations!</code> to assign both at once:</p>
+<p>If conversion is not necessary, can directly assign <code>PopObj.longitude</code> and <code>PopObj.latitude</code> as shown above. If you still wanted to use <code>locations!</code> but don't need a conversion, it still works:</p>
 <div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">long</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">longitude</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="o">:</span><span class="mi">50</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span> <span class="p">;</span> 
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">latitdue</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">20</span><span class="o">:</span><span class="mi">30</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span> <span class="p">;</span>
@@ -1493,7 +1573,9 @@ View location data (<code>.longitude</code> and <code>.latitude</code>) in a <co
 </pre></div>
 
 <h3 id="plot-location-data">plot location data</h3>
-<p>You're welcome to plot locations your own way, but for simplicity, we provide a simple <code>plot_locations</code> command to make a decent, albeit simple interactive plot (Plotly) and save some time. Have a look at the command in more detail under "Functions" for some configuration options.</p>
+<p><div class="codehilite"><pre><span></span><span class="n">plot_locations</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="n">PopObj</span><span class="p">,</span> <span class="n">region</span> <span class="o">=</span> <span class="s">&quot;world&quot;</span><span class="p">,</span> <span class="n">projection</span> <span class="o">=</span> <span class="s">&quot;orthogonal&quot;</span><span class="p">)</span>
+</pre></div>
+You're encouraged to plot locations how you see fit. For convenience and speed, we provide this command to make a decent, albeit simple interactive plot (Plotly) and save some time. There is a sizeable list of available map projections and regions if you look this function up in the <code>help?&gt;</code> REPL prompt. </p>
 <div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="n">plot_locations</span><span class="p">(</span><span class="n">sharks</span><span class="p">)</span>
 </pre></div>
 
