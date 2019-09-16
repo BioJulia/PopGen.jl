@@ -44,7 +44,7 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
     if length(gpop[1]) == 1     # loci horizontally stacked
         locinames = strip.(split(gpop[1]|> join, ",") |> Array{String,1})
     else                        # loci vertically stacked
-        locinames = gpop[1]
+        locinames = replace(gpop[1], "." => "_")
     end
     d = Dict(string(i) => [] for i in locinames)
     popid = []
@@ -116,7 +116,9 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
     open(infile) do file
         for ln in eachline(file)
             if linenum == 1
-                append!(locinames, split(ln, delim))
+                loci_raw = split(ln, delim)
+                loci_safe = replace(loci_raw, "." => "_")
+                append!(locinames, loci_safe)
                 [d[string(i)] = [] for i in locinames]
                 linenum += 1
                 continue
@@ -194,7 +196,7 @@ function vcf(infile::String)
     d = Dict()
     # get genotypes
     for record in vcf_file
-        chr = VCF.chrom(record)
+        chr = replace(VCF.chrom(record), "." => "_")
         pos = VCF.pos(record) |> string
         push!(locinames, chr*"_"*pos)
         geno_raw = [split(i, ('/', '|')) for i in VCF.genotype(record, :, "GT")] |> sort
@@ -205,7 +207,8 @@ function vcf(infile::String)
         # add 1 to shift genos so 0 is 1 and -1 is 0
         geno_shift = [i .+ Int8(1) for i in geno_int]
         geno_final = [replace(i, 0 => missing) for i in geno_shift]
-        d[locinames[end]] = geno_final
+        geno_tuple = [Tuple(i) for i in geno_final]
+        d[locinames[end]] = geno_tuple
     end
     ploidy = length.(d[locinames[1]])
     samples_df = DataFrame(name = sample_names,

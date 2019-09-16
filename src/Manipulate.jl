@@ -10,7 +10,7 @@ sample_names(x::PopObj) = x.samples.name
     summary(x::PopObj)
 Prints a summary of the information contained in a PopObj
 """
-function summary(x::PopObj)
+function Base.summary(x::PopObj)
     println("Object of type PopObj:")
     println("\nLongitude:")
     println("$(x.samples.longitude[1:6])" , " \u2026 ", "$(x.samples.longitude[end-5:end])", "\n")
@@ -21,9 +21,9 @@ function summary(x::PopObj)
     println("Number of loci: $(size(x.loci,2))")
     println(string.(names(x.loci))[1:3], " \u2026 " , string.(names(x.loci))[end-2:end], "\n" )
     println("Ploidy:")
-    println("$(x.samples.ploidy[1:6])", " \u2026 ", "$(x.samples.ploidy[end-7:end])")
+    println("$(x.samples.ploidy[1:3])", " \u2026 ", "$(x.samples.ploidy[end-2:end])")
     println("Number of populations: $(length(x.samples.population |> unique))","\n")
-    println("#Inds | Pop","\n", "--------------")
+    println("#samp_id | Pop","\n", "--------------")
     popcounts = hcat([sum(x.samples.population .== i) for i in unique(x.samples.population)],unique(x.samples.population))
     for eachpop in 1:length(popcounts)÷2
         println(popcounts[eachpop], " | ", popcounts[eachpop,2])
@@ -143,9 +143,8 @@ function locations!(x::PopObj; lat::Array, long::Array)
     end
 end
 
-
 """
-    populations(x::PopObj; listall::Bool = false)
+    population(x::PopObj; listall::Bool = false)
 View unique population ID's in a `PopObj`.
 
 `listall = true`, displays `ind` and their `population` instead (default = `false`).
@@ -154,12 +153,46 @@ function population(x::PopObj; listall::Bool = false)
     if listall == true
         DataFrame(name = x.samples.name, population = x.samples.population)
     else
-        println(" #Inds | Pop " )
-        println(" --------------" )
-        popcounts = hcat([sum(x.samples.population .== i) for i in unique(x.samples.population)],unique(x.samples.population))
-        for eachpop in 1:length(popcounts)÷2
-            println(" ", popcounts[eachpop], "\t", " |", "\t", popcounts[eachpop,2])
-        end
+        count = [sum(x.samples.population .== i) for i in unique(x.samples.population)]
+        count_conv = Int32.(count)
+        popcounts = DataFrame(population = unique(x.samples.population) |> categorical,
+                              count = count_conv)
+    end
+end
+
+"""
+    population!(x::PopObj; rename::Dict)
+Rename the population ID's of `PopObj.population`.
+
+Uses a `Dict` of `[population] => replacement` to rename populations
+
+Example:
+
+potatopops = Dict(1 => "Idaho", 2 => "Russet")
+
+population!(potatoes, rename = potatopops)
+"""
+function population!(x::PopObj; rename::Dict)
+    for eachkey in keys(rename)
+        replace!(x.samples.population, eachkey => rename[eachkey])
+    end
+    population(x, listall = true)
+end
+
+"""
+    populations(x::PopObj; listall::Bool = false)
+View unique population ID's in a `PopObj`.
+
+`listall = true`, displays `ind` and their `population` instead (default = `false`).
+"""
+function populations(x::PopObj; listall::Bool = false)
+    if listall == true
+        DataFrame(name = x.samples.name, population = x.samples.population)
+    else
+        count = [sum(x.samples.population .== i) for i in unique(x.samples.population)]
+        count_conv = Int32.(count)
+        popcounts = DataFrame(population = unique(x.samples.population) |> categorical,
+                              count = count_conv)
     end
 end
 
@@ -173,9 +206,9 @@ Example:
 
 potatopops = Dict(1 => "Idaho", 2 => "Russet")
 
-population!(potatoes, rename = potatopops)
+populations!(potatoes, rename = potatopops)
 """
-function population!(x::PopObj; rename::Dict)
+function populations!(x::PopObj; rename::Dict)
     for eachkey in keys(rename)
         replace!(x.samples.population, eachkey => rename[eachkey])
     end
@@ -204,7 +237,7 @@ function Base.missing(x::PopObj)
         push!(nmissing, miss_idx |> length)
         push!(missing_array, String.(miss_idx))
     end
-    ind_df = DataFrame(ind = x.samples.name,
+    sample_df = DataFrame(name = x.samples.name,
                        population = x.samples.population,
                        nmissing = nmissing,
                        loci = missing_array
@@ -215,7 +248,7 @@ function Base.missing(x::PopObj)
     end
 
     loci_df = DataFrame(locus = string.(names(x.loci)), nmissing = f(x.loci))
-    return (by_ind = ind_df, by_loci = loci_df)
+    return (by_sample = sample_df, by_loci = loci_df)
 end
 
 ##### Removal #####
@@ -250,7 +283,7 @@ end
 
 
 """
-    remove_samples!(x::PopObj, inds::Union{Array{String,1}})
+    remove_samples!(x::PopObj, samp_id::Union{Array{String,1}})
 Removes selected samples from a `PopObj`.
 
 Examples:
@@ -259,14 +292,14 @@ Examples:
 
 `remove_samples!(nancycats, ["N100", "N102", "N211"])`
 """
-function remove_samples!(x::PopObj, inds::Union{String, Array{String,1}})
-    # get inds indices
-    if typeof(inds) == String
-        inds ∉ x.samples.name && error("ind \"$inds\" not found")
-        idx = findfirst(i -> i == inds, x.samples.name)
+function remove_samples!(x::PopObj, samp_id::Union{String, Array{String,1}})
+    # get samp_id indices
+    if typeof(samp_id) == String
+        samp_id ∉ x.samples.name && error("ind \"$samp_id\" not found")
+        idx = findfirst(i -> i == samp_id, x.samples.name)
     else
         idx = []
-        for ind in inds
+        for ind in samp_id
             if ind ∉ x.samples.name
                 println("NOTICE: ind \"$ind\" not found!")
                 continue

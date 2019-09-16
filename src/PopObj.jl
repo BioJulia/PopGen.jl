@@ -3,11 +3,12 @@
 - `samples` ::DataFrame individual/sample data with the columns:
     - `name` ::String the individual/sample names
     - `population` ::String population names/numbers
-    - `ploidy` ::Int64 ploidy in order of `ind`
+    - `ploidy` ::Int8 ploidy in order of `ind`
     - `longitude` ::Float64 longitude values
     - `latitude` ::Float64 latitude values
 - `loci` ::DataFrame loci and their genotypes
-    - genotypes are Tuples of integers, arraged in order if `.sample.name`
+    - columns are named by loci
+    - genotypes are Tuples of ::Int18, arraged in order of `.sample.name`
 """
 mutable struct PopObj
     samples::DataFrame
