@@ -1,4 +1,4 @@
-![PopGen.jl](logo.png)
+![docs/img/PopGen.jl](logo.png)
 
 Population Genetics functions in Julia.
 
