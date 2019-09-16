@@ -16,12 +16,21 @@ julia> sharks = gulfsharks() ;
 ### view individuals' names
 
 ```julia
+<<<<<<< HEAD
+sample_names(x::PopObj)
+```
+View individual/sample names in a `PopObj`. This is equivalent to `PopObj.samples.name`
+
+``` julia tab="indnames"
+sample_names(sharks)
+=======
 indnames(x::PopObj)
 ```
 View individual/sample names in a `PopObj`. This is equivalent to `PopObj.ind`
 
 ``` julia tab="indnames"
 indnames(sharks)
+>>>>>>> master
 ```
 
 ``` tab="output"
@@ -51,15 +60,26 @@ indnames(sharks)
 ### remove individuals
 
 ```julia
+<<<<<<< HEAD
+remove_samples!(x::PopObj, samp_id::Union{String, Array{String,1}})
+```
+
+Removes selected individuals from a `PopObj`. Input can be a single sample, or an array of samples. Will output entire `PopObj`, so it's better to use a semicolon to suppress the output. Use `summary` or `.name`  if you want to confirm that the samples were removed. This command will inform you if samples were not found in the data.
+=======
 remove_inds!(x::PopObj, inds::Union{Array{String,1}})
 ```
 
 Removes selected individuals from a `PopObj`. Input can be a single individual, or an array of individuals. Will output entire `PopObj`, so it's better to use a semicolon to suppress the output. Use `summary` or `.ind` if you want to confirm that the individuals were removed. This command will inform you if individuals were not found in the data.
+>>>>>>> master
 
 Examples:
 
 ``` julia tab="single individual"
+<<<<<<< HEAD
+julia> remove_samples!(sharks, "cc_001") ;
+=======
 julia> remove_inds!(sharks, "cc_001") ;
+>>>>>>> master
 
 julia> summary(sharks)
 ```
@@ -93,11 +113,19 @@ Number of populations: 7
 	 20	 |	6
 	 20	 |	7
 
+<<<<<<< HEAD
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
+```
+
+``` julia tab="multiple individuals"
+julia> remove_samples!(sharks, ["cc_001","cc_002", "cc_003"]) ; 
+=======
 Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 ```
 
 ``` julia tab="multiple individuals"
 julia> remove_inds!(sharks, ["cc_001","cc_002", "cc_003"]) ; 
+>>>>>>> master
 
 julia> summary(sharks)
 ```
@@ -133,15 +161,44 @@ Number of populations: 7
 	 20	 |	6
 	 20	 |	7
 
+<<<<<<< HEAD
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
+```
+
+!!! info "sample not found!"
+    If removing a single sample and it is not found in the PopObj, an error will be returned. However, if removing multiple samples, you will receive a notice above the PopObj summary indicating which individuals were not found, while removing the ones that were.
+=======
 Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 ```
 
 !!! info "ind not found!"
     If removing a single individual and it is not found in the PopObj, an error will be returned. However, if removing multiple individuals, you will receive a notice above the PopObj summary indicating which individuals were not found, while removing the ones that were.
+>>>>>>> master
 
 ## population ID's
 ### view population names
 ```julia
+<<<<<<< HEAD
+populations(x::PopObj; listall::Bool = false)
+```
+Just as you can view population ID's with `.population`, you can also view them with the `populations` command, which by default shows you a summary of the number of individuals in each population, much like you see when using `summary`.  
+
+``` julia tab="popid"
+julia> populations(sharks)
+```
+
+``` tab="output"
+│ Row │ population    │ count │
+│     │ Categorical…⍰ │ Int32 │
+├─────┼───────────────┼───────┤
+│ 1   │ 1             │ 21    │
+│ 2   │ 2             │ 30    │
+│ 3   │ 3             │ 28    │
+│ 4   │ 4             │ 65    │
+│ 5   │ 5             │ 28    │
+│ 6   │ 6             │ 20    │
+│ 7   │ 7             │ 20    │
+=======
 popid(x::PopObj; listall::Bool = false)
 ```
 Just as you can view population ID's with `.popid`, you can also view them with the `popid()` command, which by default shows you a summary of the number of individuals in each population, just like you see when using `summary`.  The `#Inds` means "number of individuals", and `Pop` refers to the population names.
@@ -160,12 +217,17 @@ julia> popid(sharks)
 	28	 |	5
 	20	 |	6
 	20	 |	7
+>>>>>>> master
 ```
 
 You can use the keyword `listall=true` to display each individual and their associated population as a DataFrame. You'll notice the DataFrame looks remarkably like the first two columns of the one from `locations`, and it sort of is. Unlike `locations`, this will not give you an error when location data is missing. 
 
 ``` julia tab="listall=true"
+<<<<<<< HEAD
+julia> populations(sharks, listall=true)
+=======
 julia> popid(sharks, listall=true)
+>>>>>>> master
 ```
 
 ``` tab="output"
@@ -191,7 +253,15 @@ julia> popid(sharks, listall=true)
 │ 212 │ seg_031 │ 7          │
 ```
 
+<<<<<<< HEAD
+!!! note "synonymous functions"
+    You can use the command `population` for the same functionality. We made the commands `population` and `populations` synonymous so you wouldn't have to memorize if the name was singular or plural-- it just works! This also applies to `populations!` and `population!`
+
 ### rename populations
+
+=======
+### rename populations
+>>>>>>> master
 ```julia
 popid!(x::PopObj; rename::Dict)
 ```
@@ -255,6 +325,19 @@ julia> popid!(sharks, rename = new_popnames)
 │ 212 │ seg_031 │ Southeast Gulf │
 ```
 
+<<<<<<< HEAD
+## display specific loci and/or samples
+### view loci
+
+```julia
+isolate_genotypes(x::PopObj; samples= nothing, loci= nothing)
+```
+
+Default shows all genotypes for all individuals. Returns a DataFrame.
+
+``` julia tab="all loci"
+julia> isolate_genotypes(sharks)
+=======
 ## genotypes per locus
 ### view loci
 
@@ -266,6 +349,7 @@ View the genotypes of all individuals for specific loci in a `PopObj`.  Default 
 
 ``` julia tab="all loci"
 julia> loci(sharks)
+>>>>>>> master
 ```
 
 ``` tab="output"
@@ -291,10 +375,17 @@ julia> loci(sharks)
 │ 212 │ seg_031 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
 ```
 
+<<<<<<< HEAD
+Add the argument  `loci=` specify a single locus (string) or multiple loci (array of strings) to display
+
+``` julia tab="single locus"
+julia> isolate_genotypes(sharks, loci = "contig_10001")
+=======
 Add a second argument (no keywords!) to specify a single locus (string) or multiple loci (array of strings) to display
 
 ``` julia tab="single locus"
 julia> loci(sharks, "contig_10001")
+>>>>>>> master
 ```
 
 ``` tab="single output"
@@ -321,7 +412,11 @@ julia> loci(sharks, "contig_10001")
 ```
 
 ``` julia tab="multiple loci"
+<<<<<<< HEAD
+julia> isolate_genotypes(sharks, loci = ["contig_10001", "contig_10028"])
+=======
 julia> loci(sharks, ["contig_10001", "contig_10028"])
+>>>>>>> master
 ```
 
 ``` tab="multiple output"
@@ -347,7 +442,56 @@ julia> loci(sharks, ["contig_10001", "contig_10028"])
 │ 212 │ seg_031 │ 7            │ (1, 1)       │ (1, 1)       │
 ```
 
+<<<<<<< HEAD
+
+
+### view samples
+
+Add the argument  `samples=` specify a single sample (string) or multiple samples (array of strings) to display
+
+```julia tab="single sample"
+julia> isolate_genotypes(sharks, samples = "cc_001")
+```
+
+``` tab="single output"
+1×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
+│ Row │ name   │ population    │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
+│     │ String │ Categorical…⍰ │ Any          │ Any          │ Any          │ Any          │
+├─────┼────────┼───────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
+│ 1   │ cc_001 │ 1             │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
+```
+
+```julia tab="multiple samples"
+2×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
+│ Row │ name    │ population    │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
+│     │ String  │ Categorical…⍰ │ Any          │ Any          │ Any          │ Any          │
+├─────┼─────────┼───────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
+│ 1   │ cc_001  │ 1             │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
+│ 2   │ seg_028 │ 7             │ (1, 1)       │ (1, 1)       │ (1, 2)       │ (2, 2)       │
+```
+
+It also means that you can combine the keywords `samples=` and `loci=` to further specify your output:
+
+```julia tab="both keywords"
+isolate_genotypes(sharks, samples= ["cc_001", "seg_028"], loci = "contig_10013")
+```
+
+``` tab="output"
+2×3 DataFrames.DataFrame
+│ Row │ name    │ population    │ contig_10013 │
+│     │ String  │ Categorical…⍰ │ Any          │
+├─────┼─────────┼───────────────┼──────────────┤
+│ 1   │ cc_001  │ 1             │ (1, 1)       │
+│ 2   │ seg_028 │ 7             │ (1, 1)       │
+```
+
+
+
+## remove loci
+
+=======
 ### remove loci
+>>>>>>> master
 ```julia
 remove_loci!(x::PopObj, loci::Union{String, Array{String,1}})
 ```
@@ -392,7 +536,11 @@ Number of populations: 7
      20  |  6
      20  |  7
 
+<<<<<<< HEAD
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
+=======
 Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+>>>>>>> master
 ```
 
 ``` julia tab="multiple loci"
@@ -432,12 +580,19 @@ Number of populations: 7
      20  |  6
      20  |  7
 
+<<<<<<< HEAD
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
+=======
 Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+>>>>>>> master
 ```
 
 !!! info "locus not found!"
     If removing a single locus and it is not found in the PopObj, an error will be returned. However, if removing multiple loci, you will receive a notice above the PopObj summary indicating which loci were not found, while removing the ones that were.
 
+<<<<<<< HEAD
+
+=======
 ## genotypes per individual
 ### view specific genotypes
 
@@ -505,6 +660,7 @@ julia> genotypes(sharks, inds = ["cc_008", "meg_015"])
 
 !!! info
     Since many of the outputs of these functions are in DataFrame format, you have the flexibility to use the tools in `DataFrames.jl` as well as `Query.jl` to filter and subset these data even further. 
+>>>>>>> master
 
 ## missing data
 ### view missing data
@@ -513,7 +669,11 @@ julia> genotypes(sharks, inds = ["cc_008", "meg_015"])
 missing(x::PopObj)
 ```
 
+<<<<<<< HEAD
+Used to show missingness information-- that is, loci missing allele information. This command outputs two DataFrames, the first being a count of number of missing loci per samples, the other being the number of times a locus is missing across samples. 
+=======
 Used to show missingness information-- that is, loci missing allele information. This command outputs two DataFrames, the first being a count of number of missing loci per individual, the other being the number of times a locus is missing across individuals. 
+>>>>>>> master
 
 ``` julia tab="missing"
 julia> missing(sharks)
@@ -521,7 +681,11 @@ julia> missing(sharks)
 
 ``` tab="output"
 by_ind = (212×4 DataFrames.DataFrame. Omitted printing of 1 columns
+<<<<<<< HEAD
+│ Row │ name    │ population │ nmissing │
+=======
 │ Row │ ind     │ population │ nmissing │
+>>>>>>> master
 │     │ String  │ String     │ Any      │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -564,16 +728,26 @@ by_ind = (212×4 DataFrames.DataFrame. Omitted printing of 1 columns
 `missing` outputs a named tuple of dataframes, which means there are two options for assignment:
 
 #### single assignment
+<<<<<<< HEAD
+The first DataFrame of the named tuple is named `by_sample` and the second named `by_loci`. If you assign a single variable to this tuple, it will inherit those names as accessors like so:
+=======
 The first DataFrame of the named tuple is named `by_ind` and the second named `by_loci`. If you assign a single variable to this tuple, it will inherit those names as accessors like so:
+>>>>>>> master
 
 ``` julia tab="single assignment"
 julia> miss = missing(sharks) ;
 ```
 
 ``` tab="by_ind"
+<<<<<<< HEAD
+julia> miss.by_sample
+212×4 DataFrame. Omitted printing of 1 columns
+│ Row │ name    │ population │ nmissing │
+=======
 julia> miss.by_ind
 212×4 DataFrame. Omitted printing of 1 columns
 │ Row │ ind     │ population │ nmissing │
+>>>>>>> master
 │     │ String  │ String     │ Int64    │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -615,7 +789,11 @@ julia> df1,df2 = missing(sharks) ;
 ``` tab="df1"
 julia> df1
 212×4 DataFrames.DataFrame. Omitted printing of 1 columns
+<<<<<<< HEAD
+│ Row │ name    │ population │ nmissing │
+=======
 │ Row │ ind     │ population │ nmissing │
+>>>>>>> master
 │     │ String  │ String     │ Any      │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -748,9 +926,15 @@ julia> locations(sharks)
 Location data can be added by directly accessing the fields `.longitude` and `.latitude` in your `PopObj`, such as this example:
 
 ```julia
+<<<<<<< HEAD
+julia> sharks.samples.longitude = rand(1:50, 212) ;   # creates 212 unique random numbers between 1 and 50
+
+julia> sharks.samples.latitdue = rand(20:30, 212) ;	# creates 212 unique random numbers between 20 and 30
+=======
 julia> sharks.longitude = rand(1:50, 212) ;   # creates 212 unique random numbers between 1 and 50
 
 julia> sharks.latitdue = rand(20:30, 212) ;	# creates 212 unique random numbers between 20 and 30
+>>>>>>> master
 ```
 
 However, if your data is in decimal minutes rather than decimal degrees, use the `locations!` function to add it to the fields. This function will do a conversion from decimal minutes to decimal degrees for you. To import those data into Julia, you'll likely want to use the wonderful `CSV.jl` package first.  

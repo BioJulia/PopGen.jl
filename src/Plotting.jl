@@ -5,10 +5,10 @@ Return an interactive plot of the number of missing loci in individuals of a
 custom color palette, use `color = [color1, color2, etc.]`
 """
 function plot_missing(x::PopObj; color = false)
-    by_ind,by_loci = missing(x);
-    ys = Array[subdf[!, :nmissing] for subdf in groupby(by_ind[!, 1:3], :population)]
-    texts = Array[subdf[!, :ind] for subdf in groupby(by_ind[!, 1:3], :population)]
-    popnum = length(by_ind[!, :population] |> unique)
+    by_sample,by_loci = missing(x);
+    ys = Array[subdf[!, :nmissing] for subdf in groupby(by_sample[!, 1:3], :population)]
+    texts = Array[subdf[!, :name] for subdf in groupby(by_sample[!, 1:3], :population)]
+    popnum = length(by_sample[!, :population] |> unique)
     if color == false
         colors = ["hsl($i, 50%, 50%)" for i in range(0, stop=300, length=popnum)]
     else
@@ -26,7 +26,7 @@ function plot_missing(x::PopObj; color = false)
             boxpoints = "all",
             marker=attr(line=attr(width=0.75)),
             )
-            for (y, mc, name, text) in zip(ys, colors, unique(by_ind[!, :population]), texts)]
+            for (y, mc, name, text) in zip(ys, colors, unique(by_sample[!, :population]), texts)]
 
     #=bylocus = bar(;x = by_loci[!, :1],
                   y = by_loci[!, :2],
@@ -38,6 +38,7 @@ function plot_missing(x::PopObj; color = false)
                           marker_color = "rgb(217, 217, 217)",
                           name = "",
                           text = "loci",
+                          xbins_size = 1,
                           showlegend = false)
 
     layout_ind = Layout(title = "Number of missing loci per population",
@@ -87,7 +88,7 @@ Example:\n
 "aitoff", "sinusoidal"
 """
 function plot_locations(x::PopObj; region::String = "world", projection::String = "orthographic")
-    length(x.longitude) == 0 && error("No location data present in your PopObj")
+    # test for missing?
     if projection ∉ ["equirectangular", "mercator", "orthographic", "natural earth",
                     "kavrayskiy7", "miller", "robinson", "eckert4",
                     "azimuthal equal area", "azimuthal equidistant",
@@ -95,18 +96,17 @@ function plot_locations(x::PopObj; region::String = "world", projection::String 
                     "gnomonic", "stereographic", "mollweide", "hammer",
                     "transverse mercator", "albers usa", "winkel tripel",
                     "aitoff", "sinusoidal"]
-        error("Projection not recognized. Please see the help doc for full list of projection options")
+        error("Projection not recognized. Please see the help doc for list of projection options")
     end
-    df = locations(x)
-    popnum = length(df[!, :population] |> unique)
+    popnum = length(x.samples.population |> unique)
     colors = ["hsl($i, 50%, 50%)" for i in range(0, stop=300, length=popnum)]
-    df_split = groupby(df, :population)
+    df_split = groupby(x.samples, :population)
     map_scatter = [scattergeo(lat=df_split[i][!, :latitude],
                        lon=df_split[i][!, :longitude],
                        marker_line_color="rgb(62,90,112)", marker_line_width=1,
                        marker_color = colors[i],
                        name = df_split[i][!, :population][1],
-                       text = df_split[i][!, :ind]
+                       text = df_split[i][!, :name]
                        ) for i in 1:popnum]
    if region == "world"
        geo = attr(scope = region,

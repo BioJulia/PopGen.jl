@@ -6,7 +6,11 @@ Files must follow standard Genepop formatting:
 - Loci are listed after first line as one-per-line without commas or in single comma-separated row
 - A line with a particular keyword must delimit populations
 - **Must** be the same word each time and not a unique population name
+<<<<<<< HEAD
+- File is tab or space delimited
+=======
 - File is tab or space delimted
+>>>>>>> master
 
 ### Formatting Examples
 
@@ -40,16 +44,27 @@ Newcomb_03,  254230 000000 090100
 Newcomb_04,  254230 564000 090120
 ```
 
+<<<<<<< HEAD
+## Import a genepop file as a `PopObj`
+=======
 ## Import a genepop file into Julia as a `PopObj`
+>>>>>>> master
 
 !!! warning "Windows users"
     make sure to change your backslashes "\" to forward slashes "/" 
 
 ```julia
+<<<<<<< HEAD
+genepop(infile; digits = 3, popsep = "POP", numpops)
+
+# Example
+julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP", numpops = 2)
+=======
 genepop(infile; ploidy = 2, popsep = "POP", numpops)
 
 # Example
 julia> b = genepop("/data/wasp_hive.gen", ploidy = 2, popsep = "POP", numpops = 2)
+>>>>>>> master
 ```
 
 ### Arguments
@@ -58,11 +73,15 @@ julia> b = genepop("/data/wasp_hive.gen", ploidy = 2, popsep = "POP", numpops = 
 
 ### Keyword Arguments
 
+<<<<<<< HEAD
+- `#!julila digits::Int64` : the number of digits used to denote an allele (default = 3)
+=======
 - `#!julila ploidy::Int64` : single integer of the ploidy of the samples in the file (default = 2)
     - haploid: `ploidy = 1`
     - diploid: `ploidy = 2`
     - triploid: `ploidy = 3`
     - etc.
+>>>>>>> master
 - `#!julila popsep::String` : word that separates populations in `infile` (default: "POP")
 - `#!julila numpops::Int64` : number of populations present in `infile` (used for early error checking)
 
