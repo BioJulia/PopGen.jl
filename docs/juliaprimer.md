@@ -1,6 +1,6 @@
-# Tips and hints for getting the most out of this documentation
+# A quick Julia primer for getting the most out of this documentation
 
-There is nothing inherently special about this documentation relative to other documentation, other than we really *really* want you to get the most out of what's written here. This means that we need to embrace the fact that both novice and experienced Julia users may be reading these docs and using this package. So let's cover some Julia basics that will really help in navigating this package before we even get into the complicated genetics stuff.
+There is nothing inherently special about this documentation relative to other documentation, other than we really *really* want you to get the most out of what's written here. This means that we need to embrace the fact that both novice and experienced Julia users may be reading these docs and using this package. So let's cover some Julia basics that will really help in navigating this package before we even get into the complicated genetics stuff. This primer is by no means "everything you need to get started in Julia", and is a poor substitute for actually learning the language. In general, we recommend [Think Julia: How to Think Like a Data Scientist](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html) by Ben Lauwens to establish some solid Julia foundations. It's free online!
 
 
 
@@ -24,7 +24,7 @@ julia> x
 12
 ```
 
-Julia will still process the command and assign `10 + 2 to `x`, but it won't show you the output in the terminal. We sometimes include a semicolon after commands in these docs to mimic what the REPL output would look like without spitting back out an array of over 200 values. **These semicolons are optional** 
+Julia will still process the command and assign `10 + 2` to `x`, but it won't show you the output in the terminal. We sometimes include a semicolon after commands in these docs to mimic what the REPL output would look like without spitting back out an array of over 200 values. **These semicolons are optional** 
 
 
 
@@ -126,13 +126,21 @@ This error is telling us "there is no such function called `add`, who's inputs a
 
 The functions within `PopGen` are almost always explicitly typed, so if you are getting the `MethodError: no method matching` error, then you are inputting the incorrect types into the function, or perhaps your inputs for the arguments are in the wrong order (see "Functions with and without keywords" below). 
 
-**So keep in mind**
-
-MethodError's can definitely get annoying, but they are usually the result of incorrect input from the user and not buggy programming by the developers. Please take that into consideration before assuming something is broken or bugged.
+!!! Note "keep in mind"
+    MethodError's can definitely get annoying, but they are usually the result of incorrect input from the user and not buggy programming by the developers. Please take that into consideration before assuming something is broken or bugged.
 
 
 
 ## Functions with and without keywords 
+
+!!! info "TL;DR"
+    Reading these docs, pay attention to semicolons in the function argument lists.
+    
+
+    -  arguments before a semicolon have no keyword and follow an explicit order
+    -  arguments after a semicolon have a keyword `argument = value` and their order doesn't matter
+    - `MethodError: no methods matching` is more likely an issue on your side and not on our side :smile:
+        - unless we accidentally forgot to export a function! :facepalm:
 
 Broadly speaking, there are two types of function declarations in Julia: ones with keywords and ones without keywords. The term "keywords" refers to an input argument that has the format `argument = value`. This format is present in many of the functions in this and other packages, however there are some specifics to understand when functions use keywords and when they don't. 
 
@@ -164,11 +172,3 @@ end
 
 In this format, everything that comes **before** the semicolon follows the strict rules from **Format 1**, and everything that comes **after** the semicolon is a keyword argument. Keyword arguments have the flexibility to not require any particular input order. However, you **must** use the keywords to declare those arguments, or you will receive another `MethodError: no method matching`, which is, as we've mentioned, annoying. 
 
-### TL;DR
-
-Reading these docs, pay attention to semicolons in the function argument lists.
-
-- arguments before a semicolon have no keyword and follow an explicit order
-- arguments after a semicolon have a keyword `argument = value` and their order doesn't matter
-- `MethodError: no methods matching` is likely an issue on your side and not on our side :)
-    - unless we accidentally forgot to export a function!

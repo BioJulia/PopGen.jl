@@ -1,4 +1,4 @@
-A little hands-on training will probably go a long way, so let's through some of the functions available in PopGen.jl with the included data. Inputs and outputs are included so you can be confident what you're seeing in your Julia session is exactly what's supposed to happen. Sometimes the outputs can be a little lengthy, so they will be arranged in code "tabs", where the left-most tab is the input named after what it's accomplishing, and the right tab is the output of running the command. 
+A little hands-on training will probably go a long way, so let's through some of the functions available in PopGen.jl with the included data. This tutorial will include both inputs and outputs so you can be confident what you're seeing in your Julia session is exactly what's supposed to happen. Sometimes the outputs can be a little lengthy, so they will be arranged in code "tabs", where the left-most tab is the input named after what it's accomplishing, and the right tab is the output of running the command. 
 
 
 
@@ -7,9 +7,7 @@ A little hands-on training will probably go a long way, so let's through some of
 Let's keep things simple by loading in the nancycats data and calling it `ncats`
 
 ``` julia tab="load nancycats"
-julia> ncats = nancycats() ;
-
-julia> summary(ncats)
+julia> ncats = nancycats() ; summary(ncats)
 ```
 
 ```  tab="output"
@@ -54,7 +52,7 @@ Note the last line of the output. These fields can be accessed by name using the
 
 ## Trying out the standard accessors
 
-With nancycats loaded in, we can use standard Julia accessor  conventions to view the elements within our PopObj.
+Now that we have nancycats loaded in, we can use standard Julia accessor  conventions to view the elements within our PopObj.
 
 ### .ind
 This will access the names of the individuals as they appeared in the data.
@@ -112,7 +110,7 @@ julia> ncats.ind
 This will access the names of the populations associated with each individual, in the same order as the  individuals.
 
 ``` julia tab=".popid"
-julia> ncats.popid
+julia> ncats.ind
 ```
 
 ``` tab="output"
@@ -166,7 +164,7 @@ These ID's aren't super informative. Later, we'll change them using the `popid!`
 This will access the names of the loci as they appeared in the data.
 
 ``` julia tab=".loci"
-julia> ncats.loci
+julia> ncats.ind
 ```
 
 ``` tab="output"
@@ -186,7 +184,7 @@ julia> ncats.loci
 This shows you the ploidy of the data, which is user-provided when loading in real data.
 
 ``` julia tab=".ploidy"
-julia> ncats.ploidy
+julia> ncats.ind
 ```
 
 ``` tab="output"
@@ -291,9 +289,8 @@ julia> ncats.longitude
 ```
 
 !!! info "Seeing some location info"
-    The nancycats data has some weird coordinate system for information, so those data were omitted. If you want a proof of concept for `.longitude` and `.latitude`, load in `gulfsharks` and try it out. We'll use `hcat` (horizontal concatenation) to horizontally bind the individual names, their latitude, and longitude. Later, you'll see that the `locations` command does this and a bit more
+    The nancycats data has some weird coordinate system for information, so those data were omitted. If you want a proof of concept for `.longitude` and `.latitude`, load in `gulfsharks` and try it out. We'll use `hcat` (horizontal concatination) to horizontally bind the individual names, their latitude, and longitude. Later, you'll see that the `locations` command does this and a bit more
     
-
     ``` julia tab="load gulfsharks"
     julia> sharks = gulfsharks() ;    # semicolon just supresses printing output
     
@@ -346,7 +343,8 @@ julia> ncats.longitude
     ```
 
 ## Slices
-You can likewise use slices to access parts of these data. If you're migrating from R or Python, it's the simple bracket accessor you're already familiar with to pull out a range of values. Julia calls them slices. 
+### general
+You can likewise use slices to access parts of these data. If you're migrating from R or Python, it's the simple bracket accessor you're already familiar with, used to pull out a range of values. Julia just calls them slices. 
 
 Let's look at a slice of `.ind`.
 
@@ -364,7 +362,7 @@ julia> ncats.ind[1:6]
  "N220"
 ```
 
-and we can do this for all the accessors, except `genotypes`, because it's a dictionary and has slightly different syntax, which we'll get to in a moment. Here's another example: 
+Here's another example: 
 
 ``` julia tab="slice .loci"
 julia> ncats.loci[3:end]
@@ -383,8 +381,28 @@ julia> ncats.loci[3:end]
 
 !!! info ":end"
      All things start at 1, so there is no need for a special word for it. On the other hand, objects can have unknown lengths or varied lengths as you work with them. In Julia, use the word `end` in a slice range to indicate you want it to go to the end,, regardless of length or known size. 
-     
+
+
+### genotypes
+We can do this for all the accessors, except `genotypes`, because it's a dictionary and has slightly different syntax. To use slices on `genotypes`, you will need to call the locus by name using the `Dict` syntax, then take a slice of that:
+
+``` julia tab="slice genotypes"
+julia> ncats.genotypes["fca8"][1:3]
+```
+
+``` tab="output"
+3-element Array{Any,1}:
+ (0, 0)    
+ (0, 0)    
+ (135, 143)
+```
+
+
+
+
+
 ## Operating on accessors
+
 These accessors follow the exact same format as the dot operator in Python, or the `$` operator in R, meaning these objects can be assigned to new variables, you can operate on them, iterate over them, etc. 
 
 Here's a simple example to display the unique population ID's in your PopObj
