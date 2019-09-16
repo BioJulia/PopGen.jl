@@ -295,13 +295,13 @@ Examples:
 function remove_samples!(x::PopObj, samp_id::Union{String, Array{String,1}})
     # get samp_id indices
     if typeof(samp_id) == String
-        samp_id ∉ x.samples.name && error("ind \"$samp_id\" not found")
+        samp_id ∉ x.samples.name && error("sample \"$samp_id\" not found")
         idx = findfirst(i -> i == samp_id, x.samples.name)
     else
         idx = []
         for ind in samp_id
             if ind ∉ x.samples.name
-                println("NOTICE: ind \"$ind\" not found!")
+                println("NOTICE: sample \"$ind\" not found!")
                 continue
             end
             push!(idx, findfirst(i -> i == ind, x.samples.name) )

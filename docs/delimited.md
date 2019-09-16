@@ -27,16 +27,16 @@ snbarb_03,2,-3.1,43.2,001002,001001,001001
 
 
 
-## Importing a CSV into Julia as a `PopObj`
+## Import a CSV/delimited file as a `PopObj`
 
 !!! warning "Windows users"
     make sure to change your backslashes "\" to forward slashes "/" 
     
 ```julia
-csv(infile; delim, ploidy = 2, location = false)
+csv(infile; delim, digits = 3, location = false)
 
 # Example
-julia> a = csv("/data/cali_poppy.csv", delim = ",", ploidy = 2)
+julia> a = csv("/data/cali_poppy.csv", delim = ",", digits = 3)
 ```
 
 ### Arguments
@@ -50,9 +50,5 @@ julia> a = csv("/data/cali_poppy.csv", delim = ",", ploidy = 2)
     - space: `delim = " "`
     - tab: `delim = "\t"`
     - etc.
-- `#!julia ploidy::Int64` : single integer of the ploidy of the samples in the file (default = 2)
-    - haploid: `ploidy = 1`
-    - diploid: `ploidy = 2`
-    - triploid: `ploidy = 3`
-    - etc.
+- `#!julia digits::Int64` : the number of digits used to denote an allele (default = 3)
 - `#!julia location::Bool = false` : true/false of whether location data is present in the file (default = false)

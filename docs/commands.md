@@ -16,12 +16,12 @@ julia> sharks = gulfsharks() ;
 ### view individuals' names
 
 ```julia
-indnames(x::PopObj)
+sample_names(x::PopObj)
 ```
-View individual/sample names in a `PopObj`. This is equivalent to `PopObj.ind`
+View individual/sample names in a `PopObj`. This is equivalent to `PopObj.samples.name`
 
 ``` julia tab="indnames"
-indnames(sharks)
+sample_names(sharks)
 ```
 
 ``` tab="output"
@@ -51,15 +51,15 @@ indnames(sharks)
 ### remove individuals
 
 ```julia
-remove_inds!(x::PopObj, inds::Union{Array{String,1}})
+remove_samples!(x::PopObj, samp_id::Union{String, Array{String,1}})
 ```
 
-Removes selected individuals from a `PopObj`. Input can be a single individual, or an array of individuals. Will output entire `PopObj`, so it's better to use a semicolon to suppress the output. Use `summary` or `.ind` if you want to confirm that the individuals were removed. This command will inform you if individuals were not found in the data.
+Removes selected individuals from a `PopObj`. Input can be a single sample, or an array of samples. Will output entire `PopObj`, so it's better to use a semicolon to suppress the output. Use `summary` or `.name`  if you want to confirm that the samples were removed. This command will inform you if samples were not found in the data.
 
 Examples:
 
 ``` julia tab="single individual"
-julia> remove_inds!(sharks, "cc_001") ;
+julia> remove_samples!(sharks, "cc_001") ;
 
 julia> summary(sharks)
 ```
@@ -97,7 +97,7 @@ Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 ```
 
 ``` julia tab="multiple individuals"
-julia> remove_inds!(sharks, ["cc_001","cc_002", "cc_003"]) ; 
+julia> remove_samples!(sharks, ["cc_001","cc_002", "cc_003"]) ; 
 
 julia> summary(sharks)
 ```
@@ -136,36 +136,37 @@ Number of populations: 7
 Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
 ```
 
-!!! info "ind not found!"
-    If removing a single individual and it is not found in the PopObj, an error will be returned. However, if removing multiple individuals, you will receive a notice above the PopObj summary indicating which individuals were not found, while removing the ones that were.
+!!! info "sample not found!"
+    If removing a single sample and it is not found in the PopObj, an error will be returned. However, if removing multiple samples, you will receive a notice above the PopObj summary indicating which individuals were not found, while removing the ones that were.
 
 ## population ID's
 ### view population names
 ```julia
-popid(x::PopObj; listall::Bool = false)
+populations(x::PopObj; listall::Bool = false)
 ```
-Just as you can view population ID's with `.popid`, you can also view them with the `popid()` command, which by default shows you a summary of the number of individuals in each population, just like you see when using `summary`.  The `#Inds` means "number of individuals", and `Pop` refers to the population names.
+Just as you can view population ID's with `.population`, you can also view them with the `populations` command, which by default shows you a summary of the number of individuals in each population, much like you see when using `summary`.  
 
 ``` julia tab="popid"
-julia> popid(sharks)
+julia> populations(sharks)
 ```
 
 ``` tab="output"
-    #Inds | Pop 
-   --------------
-	21	 |	1
-	30	 |	2
-	28	 |	3
-	65	 |	4
-	28	 |	5
-	20	 |	6
-	20	 |	7
+│ Row │ population    │ count │
+│     │ Categorical…⍰ │ Int32 │
+├─────┼───────────────┼───────┤
+│ 1   │ 1             │ 21    │
+│ 2   │ 2             │ 30    │
+│ 3   │ 3             │ 28    │
+│ 4   │ 4             │ 65    │
+│ 5   │ 5             │ 28    │
+│ 6   │ 6             │ 20    │
+│ 7   │ 7             │ 20    │
 ```
 
 You can use the keyword `listall=true` to display each individual and their associated population as a DataFrame. You'll notice the DataFrame looks remarkably like the first two columns of the one from `locations`, and it sort of is. Unlike `locations`, this will not give you an error when location data is missing. 
 
 ``` julia tab="listall=true"
-julia> popid(sharks, listall=true)
+julia> populations(sharks, listall=true)
 ```
 
 ``` tab="output"
@@ -191,7 +192,11 @@ julia> popid(sharks, listall=true)
 │ 212 │ seg_031 │ 7          │
 ```
 
+!!! note "synonymous functions"
+    You can use the command `population` for the same functionality. We made the commands `population` and `populations` synonymous so you wouldn't have to memorize if the name was singular or plural-- it just works! This also applies to `populations!` and `population!`
+
 ### rename populations
+
 ```julia
 popid!(x::PopObj; rename::Dict)
 ```
@@ -255,17 +260,17 @@ julia> popid!(sharks, rename = new_popnames)
 │ 212 │ seg_031 │ Southeast Gulf │
 ```
 
-## genotypes per locus
+## display specific loci and/or samples
 ### view loci
 
 ```julia
-loci(x::PopObj, loci = nothing)
+isolate_genotypes(x::PopObj; samples= nothing, loci= nothing)
 ```
 
-View the genotypes of all individuals for specific loci in a `PopObj`.  Default shows all genotypes for all individuals. Returns a DataFrame.
+Default shows all genotypes for all individuals. Returns a DataFrame.
 
 ``` julia tab="all loci"
-julia> loci(sharks)
+julia> isolate_genotypes(sharks)
 ```
 
 ``` tab="output"
@@ -291,10 +296,10 @@ julia> loci(sharks)
 │ 212 │ seg_031 │ 7            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
 ```
 
-Add a second argument (no keywords!) to specify a single locus (string) or multiple loci (array of strings) to display
+Add a second argument  `loci=` specify a single locus (string) or multiple loci (array of strings) to display
 
 ``` julia tab="single locus"
-julia> loci(sharks, "contig_10001")
+julia> isolate_genotypes(sharks, loci = "contig_10001")
 ```
 
 ``` tab="single output"
@@ -321,7 +326,7 @@ julia> loci(sharks, "contig_10001")
 ```
 
 ``` julia tab="multiple loci"
-julia> loci(sharks, ["contig_10001", "contig_10028"])
+julia> isolate_genotypes(sharks, loci = ["contig_10001", "contig_10028"])
 ```
 
 ``` tab="multiple output"
