@@ -44,7 +44,11 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
     if length(gpop[1]) == 1     # loci horizontally stacked
         locinames = strip.(split(gpop[1]|> join, ",") |> Array{String,1})
     else                        # loci vertically stacked
+<<<<<<< HEAD
         locinames = replace(gpop[1], "." => "_")
+=======
+        locinames = gpop[1]
+>>>>>>> master
     end
     d = Dict(string(i) => [] for i in locinames)
     popid = []
@@ -56,7 +60,11 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
             push!(indnames, split(strip(gpop[i][j]), r"\,|\t")[1])
             unphasedloci = split(strip(gpop[i][j]), r"\s|\t")[2:end] |> Array{String,1}
             for locus in unphasedloci
+<<<<<<< HEAD
                 phasedlocus = parse.(Int16,[join(i) for i in Iterators.partition(locus,digits)])  |> sort |> Tuple
+=======
+                phasedlocus = parse.(Int64,[join(i) for i in Iterators.partition(locus,digits)])  |> sort |> Tuple
+>>>>>>> master
                 push!(phasedloci, phasedlocus)
             end
             for (loc,geno) in zip(locinames, phasedloci)
@@ -65,6 +73,7 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
         end
     end
     ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
+<<<<<<< HEAD
     for (loc, ploid) in zip(locinames, ploidy)
         miss_geno = fill(0,ploid) |> Tuple
         replace!(d[loc], miss_geno => missing)
@@ -75,12 +84,19 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
                            longitude = fill(missing,length(indnames)),
                            latitude = fill(missing,length(indnames)))
     PopObj(samples_df, d |> DataFrame)
+=======
+    PopObj(indnames,popid,locinames,ploidy,d,[],[])
+>>>>>>> master
 end
 
 ### CSV parsing ###
 
 """
+<<<<<<< HEAD
     csv(infile::String; delim::Union{Char,String,Regex}, digits::Int64 = 3, location::Bool = false)
+=======
+    csv(infile::String; delim::Union{Char,String,Regex}, digits::Int64 = 2, location::Bool = false)
+>>>>>>> master
 Load a CSV-type file into memory as a PopObj object
 - `infile` : path to CSV file
 - `delim` values can be space (" "), comma (","), tab ("\\t"), etc.
@@ -116,9 +132,13 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
     open(infile) do file
         for ln in eachline(file)
             if linenum == 1
+<<<<<<< HEAD
                 loci_raw = split(ln, delim)
                 loci_safe = replace(loci_raw, "." => "_")
                 append!(locinames, loci_safe)
+=======
+                append!(locinames, split(ln, delim))
+>>>>>>> master
                 [d[string(i)] = [] for i in locinames]
                 linenum += 1
                 continue
@@ -128,10 +148,14 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
                 # phase genotypes by ploidy
                 phasedloci = []
                 for locus in tmp[3:end]
+<<<<<<< HEAD
                     phasedlocus = parse.(
                         Int16,
                         [join(i) for i in Iterators.partition(locus,digits)]
                         ) |> sort |> Tuple
+=======
+                    phasedlocus = parse.(Int64,[join(i) for i in Iterators.partition(locus,digits)])|> Tuple
+>>>>>>> master
                     push!(phasedloci, phasedlocus)
                 end
                 for (loc,geno) in zip(locinames, phasedloci)
@@ -139,15 +163,22 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
                 end
                 push!(indnames, tmp[1])
                 push!(popid, tmp[2])
+<<<<<<< HEAD
                 push!(locx, missing)
                 push!(locy, missing)
+=======
+>>>>>>> master
             else
                 tmp = split(ln, delim) |> Array{String,1}
                 phasedloci = []
                 for locus in tmp[5:end]
+<<<<<<< HEAD
                     phasedlocus = parse.(Int16,
                         [join(i) for i in Iterators.partition(locus, digits)]
                         ) |> sort |> Tuple
+=======
+                    phasedlocus = parse.(Int64,[join(i) for i in Iterators.partition(locus, digits)])|> sort |> Tuple
+>>>>>>> master
                     push!(phasedloci, phasedlocus)
                 end
                 for (loc,geno) in zip(locinames, phasedloci)
@@ -162,6 +193,7 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
         end
     end
     ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
+<<<<<<< HEAD
     for (loc, ploid) in zip(locinames, ploidy)
         miss_geno = fill(0,ploid) |> Tuple
         replace!(d[loc], miss_geno => missing)
@@ -218,4 +250,53 @@ function vcf(infile::String)
                            latitude = lat,
                            longitude = long)
     PopObj(samples_df, d |> DataFrame)
+=======
+    PopObj(indnames, popid, locinames, ploidy, d, locx, locy)
+>>>>>>> master
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### VCF parsing ###
+
+#gives you genotypes of a record
+
+
+for record in reader
+    alleles = [VCF.ref(record)]
+    if VCF.alt(record) != missing
+        append!(alleles, VCF.alt)
+    end
+    for each in VCF.genotype(record)
+        rawgeno = VCF.genotype(record, :, "GT")
+        replace(rawgeno, "." => "999") # code missing as 999
+        parse.(Int64, split(each[1], "/") |> Array{String,1}) |> Tuple
+    end
+    return
+end
+
+
+# check for alternative alleles
+for record in reader
+    aa = VCF.info(record)
+    idx = findfirst(i -> i.first =="NUMALT",  aa)
+    if aa[idx].second == "0"
+       alleles = [VCF.ref(record)]
+       println(alleles)
+   else
+       alleles = append!([VCF.ref(record)], VCF.alt(record))
+       println(alleles)
+   end
 end
