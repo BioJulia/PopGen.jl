@@ -196,9 +196,10 @@ function vcf(infile::String)
     d = Dict()
     # get genotypes
     for record in vcf_file
-        chr = replace(VCF.chrom(record), "." => "_")
+        chr_safe = replace(VCF.chrom(record), "." => "_")
+        chr_safer = replace(chr_safe, "|" => "_")
         pos = VCF.pos(record) |> string
-        push!(locinames, chr*"_"*pos)
+        push!(locinames, chr_safer*"_"*pos)
         geno_raw = [split(i, ('/', '|')) for i in VCF.genotype(record, :, "GT")] |> sort
         # change missing data "." to "-1"
         geno_corr_miss = [replace(i, "." => "-1") for i in geno_raw]
