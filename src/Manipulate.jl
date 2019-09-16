@@ -1,39 +1,5 @@
 """
-<<<<<<< HEAD
     sample_names(x::PopObj)
-=======
-    summary(x::PopObj)
-Print concise overview of data contained in a `PopObj`.
-"""
-function Base.summary(x::PopObj)
-    println("Object of type PopObj:")
-    if length(x.latitude) ==0 && length(x.longitude) == 0
-        println("No location data provided")
-    else
-        println("\nLongitude:")
-        println(string.(x.longitude[1:3]) , " \u2026 ", string.(x.longitude[end-2:end]), "\n")
-        println("Latitude:")
-        println(string.(x.latitude[1:3]) , " \u2026 ", string.(x.latitude[end-2:end]), "\n")
-    end
-    println("\nNumber of individuals: $(length(x.ind))")
-    println(x.ind[1:3] , " \u2026 ", x.ind[end-2:end], "\n")
-    println("Number of loci: $(length(x.loci))")
-    println(x.loci[1:3], " \u2026 " , x.loci[end-2:end], "\n" )
-    println("Ploidy:")
-    println(string.(x.ploidy[1:6]), " \u2026 ", string.(x.ploidy[end-7:end]), "\n")
-    println("Number of populations: $(length(x.popid |> unique))","\n")
-    println("#Inds | Pop","\n", "--------------")
-    popcounts = hcat([sum(x.popid .== i) for i in unique(x.popid)],unique(x.popid))
-    for eachpop in 1:length(popcounts)÷2
-        println(popcounts[eachpop], "\t", " |", "\t", popcounts[eachpop,2])
-    end
-    println("\nAvailable fields: ind, popid, loci, ploidy, genotypes, longitude, latitude")
-end
-
-
-"""
-    indnames(x::PopObj)
->>>>>>> master
 View individual/sample names in a `PopObj`
 
 Equivalent to `PopObj.samples.name`
@@ -121,22 +87,11 @@ View location data (`.longitude` and `.latitude`) in a `PopObj`
 Use `locations!` to add spatial data to a `PopObj`
 """
 function locations(x::PopObj)
-<<<<<<< HEAD
-    DataFrame(name = x.samples.name, population = x.samples.population, longitude = x.samples.longitude, latitude = x.samples.latitude)
-=======
-    if length(x.longitude) == 0 && length(x.latitude) == 0
-        @info "location data not provided"
-    elseif length(x.longitude) != length(x.latitude)
-        @warn "dimensions of longitude and latitude data not equal"
-        println("\t\tLengths:")
-        println("longitude: $(length(x.longitude)) | latitude: $(length(x.latitude))")
-    else
-        DataFrame(ind = x.ind,
-                  population = x.popid,
-                  longitude = x.longitude,
-                  latitude = x.latitude)
-    end
->>>>>>> master
+
+    DataFrame(name = x.samples.name,
+              population = x.samples.population,
+              longitude = x.samples.longitude,
+              latitude = x.samples.latitude)
 end
 
 """
@@ -186,18 +141,10 @@ function locations!(x::PopObj; lat::Array, long::Array)
                 push!(longConverted, decideg)
             end
         end
-<<<<<<< HEAD
         x.samples.longitude = latConverted
         x.samples.latitude = longConverted
         return x.samples
-=======
-        x.longitude = xlocConverted
-        x.latitude = ylocConverted
-        DataFrame(ind = x.ind,
-                  population = x.popid,
-                  longitude = x.longitude,
-                  latitude = x.latitude)
->>>>>>> master
+
     end
 end
 
@@ -211,19 +158,10 @@ function population(x::PopObj; listall::Bool = false)
     if listall == true
         DataFrame(name = x.samples.name, population = x.samples.population)
     else
-<<<<<<< HEAD
         count = [sum(x.samples.population .== i) for i in unique(x.samples.population)]
         count_conv = Int32.(count)
         popcounts = DataFrame(population = unique(x.samples.population) |> categorical,
                               count = count_conv)
-=======
-        println("   ", " #Inds | Pop " )
-        println("   ", "--------------" )
-        popcounts = hcat([sum(x.popid .== i) for i in unique(x.popid)],unique(x.popid))
-        for eachpop in 1:length(popcounts)÷2
-            println("\t", popcounts[eachpop], "\t", " |", "\t", popcounts[eachpop,2])
-        end
->>>>>>> master
     end
 end
 
@@ -304,7 +242,6 @@ function Base.missing(x::PopObj)
         push!(nmissing, miss_idx |> length)
         push!(missing_array, String.(miss_idx))
     end
-<<<<<<< HEAD
     sample_df = DataFrame(name = x.samples.name,
                        population = x.samples.population,
                        nmissing = nmissing,
@@ -317,20 +254,6 @@ function Base.missing(x::PopObj)
 
     loci_df = DataFrame(locus = string.(names(x.loci)), nmissing = f(x.loci))
     return (by_sample = sample_df, by_loci = loci_df)
-=======
-    ind_df = DataFrame(ind = x.ind,
-                       population = string.(x.popid),
-                       nmissing = Int.(nmissing),
-                       loci = missing_array
-                       )
-    #missing per locus
-
-    counts= [count(j->j==(0,0),x.genotypes[i]) for i in x.loci]
-
-    #convert to DF
-    loci_df = DataFrame(locus = x.loci, nmissing = counts)
-    return (by_ind = ind_df, by_loci = loci_df)
->>>>>>> master
 end
 
 ##### Removal #####
@@ -361,10 +284,6 @@ function remove_loci!(x::PopObj, loci::Union{String,Array{String,1}})
         end
         return select!(x.loci, Not(sym_loci))
     end
-<<<<<<< HEAD
-=======
-    return summary(x)
->>>>>>> master
 end
 
 
@@ -394,21 +313,7 @@ function remove_samples!(x::PopObj, samp_id::Union{String, Array{String,1}})
         end
         println()
     end
-<<<<<<< HEAD
     deleterows!(x.samples, idx)
     deleterows!(x.loci, idx)
     return x
-=======
-    deleteat!(x.ind, idx)  # remove name(s)
-    deleteat!(x.popid, idx)    # remove popid(s)
-    if length(x.longitude) != 0 && length(x.latitude) != 0
-        deleteat!(x.longitude, idx)    # remove xloc(s)
-        deleteat!(x.longitude, idx)    # remove yloc(s)
-    end
-    # remove inds from all loci genotypes
-    for each in x.loci
-        deleteat!(x.genotypes[each], idx)
-    end
-    return summary(x)
->>>>>>> master
 end

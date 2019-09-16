@@ -11,7 +11,6 @@ using DataFrames, PlotlyJS, Statistics, GeneticVariation
 
 export PopObj,
     summary,
-<<<<<<< HEAD
     nancycats,
     gulfsharks,
     csv,
@@ -25,19 +24,6 @@ export PopObj,
     populations,
     population!,
     populations!,
-=======
-    csv,
-    genepop,
-    nancycats,
-    gulfsharks,
-    indnames,
-    loci,
-    locations,
-    locations!,
-    popid,
-    popid!,
-    genotypes,
->>>>>>> master
     remove_inds!,
     remove_loci!,
     missing,
