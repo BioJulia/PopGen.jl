@@ -56,7 +56,7 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
             push!(indnames, split(strip(gpop[i][j]), r"\,|\t")[1])
             unphasedloci = split(strip(gpop[i][j]), r"\s|\t")[2:end] |> Array{String,1}
             for locus in unphasedloci
-                phasedlocus = parse.(Int64,[join(i) for i in Iterators.partition(locus,digits)])  |> sort |> Tuple
+                phasedlocus = parse.(Int16,[join(i) for i in Iterators.partition(locus,digits)])  |> sort |> Tuple
                 push!(phasedloci, phasedlocus)
             end
             for (loc,geno) in zip(locinames, phasedloci)
@@ -71,7 +71,7 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
     end
     samples_df = DataFrame(name = string.(indnames),
                            population = categorical(popid),
-                           ploidy = ploidy,
+                           ploidy = Int8.(ploidy),
                            longitude = fill(missing,length(indnames)),
                            latitude = fill(missing,length(indnames)))
     PopObj(samples_df, d |> DataFrame)
@@ -80,7 +80,7 @@ end
 ### CSV parsing ###
 
 """
-    csv(infile::String; delim::Union{Char,String,Regex}, digits::Int64 = 2, location::Bool = false)
+    csv(infile::String; delim::Union{Char,String,Regex}, digits::Int64 = 3, location::Bool = false)
 Load a CSV-type file into memory as a PopObj object
 - `infile` : path to CSV file
 - `delim` values can be space (" "), comma (","), tab ("\\t"), etc.
@@ -127,9 +127,9 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
                 phasedloci = []
                 for locus in tmp[3:end]
                     phasedlocus = parse.(
-                                        Int64,
-                                        [join(i) for i in Iterators.partition(locus,digits)]
-                                        ) |> sort |> Tuple
+                        Int16,
+                        [join(i) for i in Iterators.partition(locus,digits)]
+                        ) |> sort |> Tuple
                     push!(phasedloci, phasedlocus)
                 end
                 for (loc,geno) in zip(locinames, phasedloci)
@@ -143,9 +143,9 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
                 tmp = split(ln, delim) |> Array{String,1}
                 phasedloci = []
                 for locus in tmp[5:end]
-                    phasedlocus = parse.(Int64,
-                                        [join(i) for i in Iterators.partition(locus, digits)]
-                                        ) |> sort |> Tuple
+                    phasedlocus = parse.(Int16,
+                        [join(i) for i in Iterators.partition(locus, digits)]
+                        ) |> sort |> Tuple
                     push!(phasedloci, phasedlocus)
                 end
                 for (loc,geno) in zip(locinames, phasedloci)
@@ -166,44 +166,52 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
     end
     samples_df = DataFrame(name = string.(indnames),
                            population = categorical(popid),
-                           ploidy = ploidy,
+                           ploidy = Int8.(ploidy),
                            longitude = locx,
                            latitude = locy)
     PopObj(samples_df, d |> DataFrame)
 end
 
 
-
-
 ### VCF parsing ###
-
-#gives you genotypes of a record
-
-#=
-for record in reader
-    alleles = [VCF.ref(record)]
-    if VCF.alt(record) != missing
-        append!(alleles, VCF.alt)
+"""
+    vcf(infile::String)
+Load a VCF file into memory as a PopObj object. Population and [optional]
+location information need to be provided separately.
+- `infile` : path to VCF file
+"""
+function vcf(infile::String)
+    vcf_file = VCF.Reader(open(infile, "r"))
+    # get sample names from header
+    sample_names = header(vcf_file).sampleID
+    # fill in pop/lat/long with missing
+    population = fill(missing, length(sample_names))
+    lat = fill(missing, length(sample_names))
+    long = fill(missing, length(sample_names))
+    ## array of genotypes
+    # get loci names
+    locinames = []
+    d = Dict()
+    # get genotypes
+    for record in vcf_file
+        chr = VCF.chrom(record)
+        pos = VCF.pos(record) |> string
+        push!(locinames, chr*"_"*pos)
+        geno_raw = [split(i, ('/', '|')) for i in VCF.genotype(record, :, "GT")] |> sort
+        # change missing data "." to "-1"
+        geno_corr_miss = [replace(i, "." => "-1") for i in geno_raw]
+        # convert everything to an integer
+        geno_int = [parse.(Int8, i) for i in geno_corr_miss]
+        # add 1 to shift genos so 0 is 1 and -1 is 0
+        geno_shift = [i .+ Int8(1) for i in geno_int]
+        geno_final = [replace(i, 0 => missing) for i in geno_shift]
+        d[locinames[end]] = geno_final
     end
-    for each in VCF.genotype(record)
-        rawgeno = VCF.genotype(record, :, "GT")
-        replace(rawgeno, "." => "999") # code missing as 999
-        parse.(Int64, split(each[1], "/") |> Array{String,1}) |> Tuple
-    end
-    return
+    ploidy = length.(d[locinames[1]])
+    samples_df = DataFrame(name = sample_names,
+                           population = population,
+                           ploidy = Int8.(ploidy),
+                           latitude = lat,
+                           longitude = long)
+    PopObj(samples_df, d |> DataFrame)
 end
-
-
-# check for alternative alleles
-for record in reader
-    aa = VCF.info(record)
-    idx = findfirst(i -> i.first =="NUMALT",  aa)
-    if aa[idx].second == "0"
-       alleles = [VCF.ref(record)]
-       println(alleles)
-   else
-       alleles = append!([VCF.ref(record)], VCF.alt(record))
-       println(alleles)
-   end
-end
-=#

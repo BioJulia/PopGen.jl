@@ -7,7 +7,7 @@ module PopGen
 ##   O o       O o       O ############ o       O o       O o
 
 
-using DataFrames, PlotlyJS, Statistics
+using DataFrames, PlotlyJS, Statistics, GeneticVariation
 
 export PopObj,
     summary,
@@ -15,6 +15,7 @@ export PopObj,
     gulfsharks,
     csv,
     genepop,
+    vcf,
     genotypes,
     indnames,
     loci,
