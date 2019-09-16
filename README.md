@@ -1,4 +1,4 @@
-![docs/img/PopGen.jl](logo.png)
+![logo](docs/img/logo.png)
 
 Population Genetics functions in Julia.
 
@@ -19,4 +19,4 @@ add "https://github.com/pdimens/PopGen.jl"
 ```
 after the package is installed, load it with `using PopGen`
 
-Feel free to play around with the test data in `/test/testdata.gen`
+Feel free to play around with the test data in `/data/data` or with the commands `nancycats()` or `gulfsharks()`
