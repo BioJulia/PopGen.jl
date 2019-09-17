@@ -619,14 +619,18 @@ snbarb_03,2,-3.1,43.2,001002,001001,001001
 </ul>
 <h3 id="keyword-arguments">Keyword Arguments</h3>
 <ul>
-<li><code class="codehilite"><span class="n">delim</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Char</span><span class="p">,</span><span class="n">String</span><span class="p">,</span><span class="kt">Regex</span><span class="p">}</span></code> : delimiter of the file, can be a string, character, or regex<ul>
+<li>
+<p><code class="codehilite"><span class="n">delim</span><span class="o">::</span><span class="kt">Union</span><span class="p">{</span><span class="kt">Char</span><span class="p">,</span><span class="n">String</span><span class="p">,</span><span class="kt">Regex</span><span class="p">}</span></code> : delimiter of the file, can be a string, character, or regex</p>
+<ul>
 <li>comma: <code>delim = ","</code></li>
 <li>space: <code>delim = " "</code></li>
 <li>tab: <code>delim = "\t"</code></li>
 <li>etc.</li>
 </ul>
 </li>
-<li><code class="codehilite"><span class="n">digits</span><span class="o">::</span><span class="kt">Int64</span></code> : the number of digits used to denote an allele (default = 3)</li>
+<li>
+<p><code class="codehilite"><span class="n">digits</span><span class="o">::</span><span class="kt">Int64</span></code> : the number of digits used to denote an allele (default = 3)</p>
+</li>
 <li><code class="codehilite"><span class="n">location</span><span class="o">::</span><span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span></code> : true/false of whether location data is present in the file (default = false)</li>
 </ul>
                 
