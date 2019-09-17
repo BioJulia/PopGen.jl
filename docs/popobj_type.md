@@ -49,7 +49,6 @@ The individual/sample population ID's
 The ploidy of the samples
 
 ```julia
-<<<<<<< HEAD
 [2, 2, 2]
 ```
 
