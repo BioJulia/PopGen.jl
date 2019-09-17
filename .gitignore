@@ -1,14 +1,6 @@
 .DS_Store
 /Manifest.toml
-<<<<<<< HEAD
 /dev/
 /docs/build/
 /docs/site/
 /site/
-=======
-logo.png
-/dev/
-/docs/build/
-/docs/site/
-site
->>>>>>> master
