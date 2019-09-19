@@ -34,7 +34,7 @@ Newcomb_03,  254230 000000 090100 \n
 Newcomb_04,  254230 564000 090120 \n
 ---------------------
 """
-function genepop2(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops::Int64, marker = "SNP")
+function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops::Int64, marker = "SNP")
     println("\n", "Input File : ", abspath(infile))
     if lowercase(marker) == "snp"
         geno_type = Int8
