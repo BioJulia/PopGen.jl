@@ -186,7 +186,7 @@ snbarb_02,2,001001,001001,001001 \n
 snbarb_03,2,001002,001001,001001 \n
 ---------------------
 """
-function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int64 = 3, marker = "SNP" location::Bool = false)
+function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int64 = 3, marker = "SNP", location::Bool = false)
     println("\n", "Input File : ", abspath(infile))
     popid = []
     indnames = []
