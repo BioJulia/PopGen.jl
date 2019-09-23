@@ -186,7 +186,7 @@ snbarb_02,2,001001,001001,001001 \n
 snbarb_03,2,001002,001001,001001 \n
 ---------------------
 """
-function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int64 = 3, marker = "SNP", location::Bool = false)
+function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int = 3, marker = "snp", location::Bool = false)
     println("\n", "Input File : ", abspath(infile))
     popid = []
     indnames = []
@@ -215,8 +215,7 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int6
                 # phase genotypes by ploidy
                 phasedloci = []
                 for locus in tmp[3:end]
-                    phasedlocus = parse.(
-                        geno_type,
+                    phasedlocus = parse.(geno_type,
                         [join(i) for i in Iterators.partition(locus,digits)]
                         ) |> sort |> Tuple
                     push!(phasedloci, phasedlocus)
