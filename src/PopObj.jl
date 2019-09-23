@@ -14,7 +14,15 @@ and instead should use the provided genepop, csv, or vcf file importers.
     - columns are named by loci
     - genotypes are Tuples of ::Int16, arraged in order of `.samples.name`
 """
-mutable struct PopObj
+abstract type PopType end       # may be removed in the future
+
+mutable struct PopObj <: PopType
     samples::DataFrame
     loci::DataFrame
+end
+
+struct PopOpt <: PopType
+    samples::DataFrame
+    loci::DataFrame
+    PopOpt(x::PopObj) = new(x.samples, x.loci)
 end

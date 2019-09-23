@@ -98,9 +98,10 @@ function plot_locations(x::PopObj; region::String = "world", projection::String 
                     "aitoff", "sinusoidal"]
         error("Projection not recognized. Please see the help doc for list of projection options")
     end
-    popnum = length(x.samples.population |> unique)
+    y = PopOpt(x)
+    popnum = length(y.samples.population |> unique)
     colors = ["hsl($i, 50%, 50%)" for i in range(0, stop=300, length=popnum)]
-    df_split = groupby(x.samples, :population)
+    df_split = groupby(y.samples, :population)
     map_scatter = [scattergeo(lat=df_split[i][!, :latitude],
                        lon=df_split[i][!, :longitude],
                        marker_line_color="rgb(62,90,112)", marker_line_width=1,
