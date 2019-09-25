@@ -2,16 +2,19 @@
   count_alleles(x::PopObj)
 Returns an array of `Dicts` of allele counts per locus
 """
-function count_alleles(x::PopObj)
-    al_counts = []
-    for loci in collect(keys(x.genotypes))
-        d = Dict()
-        for locus in x.genotypes[loci]
-            for allele in locus
-                d[allele] = get!(d, allele, 0) + 1
+function allele_count_beta(x::PopObj)
+    y = PopOpt(x)
+    tmp = names(y.loci)[1]  # restrict to single locus
+    d = Dict()
+    for row in y.loci[!, tmp]
+        if row === missing
+            d[missing] = get!(d, missing, 0) +1
+            continue
+        else
+            for allele in row
+                d[allele] = get!(d, allele, 0) +1
             end
         end
-        push!(al_counts, d)
     end
-    return al_counts
+    return d
 end

@@ -11,23 +11,21 @@ sample_names(x::PopObj) = x.samples.name
 Prints a summary of the information contained in a PopObj
 """
 function Base.summary(x::PopObj)
-    println("Object of type PopObj:")
+    y = PopOpt(x)
+    println("Object of type $(typeof(x)):")
     println("\nLongitude:")
-    println("$(x.samples.longitude[1:6])" , " \u2026 ", "$(x.samples.longitude[end-5:end])", "\n")
+    println("$(y.samples.longitude[1:3])" , " \u2026 ", "$(y.samples.longitude[end-2:end])", "\n")
     println("Latitude:")
-    println("$(x.samples.latitude[1:6])" , " \u2026 ", "$(x.samples.latitude[end-5:end])", "\n")
-    println("Number of individuals: $(length(x.samples.name))")
-    println(x.samples.name[1:3] , " \u2026 ", x.samples.name[end-2:end], "\n")
-    println("Number of loci: $(size(x.loci,2))")
-    println(string.(names(x.loci))[1:3], " \u2026 " , string.(names(x.loci))[end-2:end], "\n" )
+    println("$(y.samples.latitude[1:3])" , " \u2026 ", "$(y.samples.latitude[end-2:end])", "\n")
+    println("Number of individuals: $(length(y.samples.name))")
+    println(y.samples.name[1:3] , " \u2026 ", y.samples.name[end-2:end], "\n")
+    println("Number of loci: $(size(y.loci,2))")
+    println(string.(names(y.loci))[1:3], " \u2026 " , string.(names(y.loci))[end-2:end], "\n" )
     println("Ploidy:")
-    println("$(x.samples.ploidy[1:3])", " \u2026 ", "$(x.samples.ploidy[end-2:end])")
-    println("Number of populations: $(length(x.samples.population |> unique))","\n")
-    println("#samp_id | Pop","\n", "--------------")
-    popcounts = hcat([sum(x.samples.population .== i) for i in unique(x.samples.population)],unique(x.samples.population))
-    for eachpop in 1:length(popcounts)÷2
-        println(popcounts[eachpop], " | ", popcounts[eachpop,2])
-    end
+    println("$(y.samples.ploidy[1:3])", " \u2026 ", "$(y.samples.ploidy[end-2:end])")
+    println("Number of populations: $(length(y.samples.population |> unique))","\n")
+    println("Population names and counts:")
+    print(populations(x), "\n")
     println("\nAvailable .samples fields: .name, .population, .ploidy, .longitude, .latitude")
 end
 
@@ -45,17 +43,18 @@ function isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= no
     if loci == nothing && samples == nothing
         @warn "please specify either loci= or samples=, otherwise use PopObj.loci"
     end
-    df = deepcopy(x.loci)
-    insertcols!(df, 1, :name => x.samples.name) ;
-    insertcols!(df, 2, :population => categorical(x.samples.population))
+    y = PopOpt(x)
+    df = deepcopy(y.loci)
+    insertcols!(df, 1, :name => y.samples.name) ;
+    insertcols!(df, 2, :population => categorical(y.samples.population))
     if samples != nothing
         if typeof(samples) == String
-            samples ∉ x.samples.name && error("individual $samples not found in PopObj")
+            samples ∉ y.samples.name && error("individual $samples not found in PopObj")
             tmp = df[df.name .== samples, :]
         else
             tmp = df[df.name .== samples[1], :]
             for ind in samples[2:end]
-                ind ∉ x.samples.name && println("NOTICE: individual \"$ind\" not found in PopObj!")
+                ind ∉ y.samples.name && println("NOTICE: individual \"$ind\" not found in PopObj!")
                 tmp = vcat(tmp, df[df.name .== ind, :])
             end
             println()
@@ -65,11 +64,11 @@ function isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= no
     end
     if loci != nothing
         if typeof(loci) == String
-            loci ∉ string.(names(x.loci)) && error("locus $loci not found in PopObj")
+            loci ∉ string.(names(y.loci)) && error("locus $loci not found in PopObj")
             return tmp[!, [:name, :population, Symbol(loci)]]
         else
             for locus in loci[2:end]
-                locus ∉ string.(names(x.loci)) && println("NOTICE: locus \"$locus\" not found in PopObj!")
+                locus ∉ string.(names(y.loci)) && println("NOTICE: locus \"$locus\" not found in PopObj!")
             end
             println()
             return tmp[!, append!([:name, :population], Symbol.(loci))]
@@ -87,11 +86,11 @@ View location data (`.longitude` and `.latitude`) in a `PopObj`
 Use `locations!` to add spatial data to a `PopObj`
 """
 function locations(x::PopObj)
-
-    DataFrame(name = x.samples.name,
-              population = x.samples.population,
-              longitude = x.samples.longitude,
-              latitude = x.samples.latitude)
+    y = PopOpt(x)
+    DataFrame(name = y.samples.name,
+              population = y.samples.population,
+              longitude = y.samples.longitude,
+              latitude = y.samples.latitude)
 end
 
 """
@@ -155,15 +154,17 @@ View unique population ID's in a `PopObj`.
 `listall = true`, displays `ind` and their `population` instead (default = `false`).
 """
 function population(x::PopObj; listall::Bool = false)
+    y = PopOpt(x)
     if listall == true
-        DataFrame(name = x.samples.name, population = x.samples.population)
+        DataFrame(name = y.samples.name, population = y.samples.population)
     else
-        count = [sum(x.samples.population .== i) for i in unique(x.samples.population)]
+        count = [sum(y.samples.population .== i) for i in unique(y.samples.population)]
         count_conv = Int32.(count)
-        popcounts = DataFrame(population = unique(x.samples.population) |> categorical,
+        popcounts = DataFrame(population = unique(y.samples.population) |> categorical,
                               count = count_conv)
     end
 end
+
 
 """
     population!(x::PopObj; rename::Dict)
@@ -191,12 +192,13 @@ View unique population ID's in a `PopObj`.
 `listall = true`, displays `ind` and their `population` instead (default = `false`).
 """
 function populations(x::PopObj; listall::Bool = false)
+    y = PopOpt(x)
     if listall == true
-        DataFrame(name = x.samples.name, population = x.samples.population)
+        DataFrame(name = y.samples.name, population = y.samples.population)
     else
-        count = [sum(x.samples.population .== i) for i in unique(x.samples.population)]
+        count = [sum(y.samples.population .== i) for i in unique(y.samples.population)]
         count_conv = Int32.(count)
-        popcounts = DataFrame(population = unique(x.samples.population) |> categorical,
+        popcounts = DataFrame(population = unique(y.samples.population) |> categorical,
                               count = count_conv)
     end
 end
@@ -232,8 +234,9 @@ Example:
 `missing_ind,missing_loc = missing(gulfsharks)`
 """
 function Base.missing(x::PopObj)
-    df = deepcopy(x.loci)
-    insertcols!(df, 1, :ind => x.samples.name)
+    y = PopOpt(x)
+    df = deepcopy(y.loci)
+    insertcols!(df, 1, :ind => y.samples.name)
     # missing per individual
     nmissing = []
     missing_array = []
@@ -252,9 +255,11 @@ function Base.missing(x::PopObj)
         count(i->i===missing, col)
     end
 
-    loci_df = DataFrame(locus = string.(names(x.loci)), nmissing = f(x.loci))
+    loci_df = DataFrame(locus = string.(names(y.loci)), nmissing = f(y.loci))
     return (by_sample = sample_df, by_loci = loci_df)
 end
+
+
 
 ##### Removal #####
 
@@ -269,15 +274,16 @@ Examples:
 `remove_loci!(tulips, ["fca8", "fca23"])`
 """
 function remove_loci!(x::PopObj, loci::Union{String,Array{String,1}})
+    y = PopOpt(x)
     # get individuals indices
     if typeof(loci) == String
         sym_loci = Symbol(loci)
-        sym_loci ∉ names(x.loci) && error("Locus \"$loci\" not found")
+        sym_loci ∉ names(y.loci) && error("Locus \"$loci\" not found")
         return select!(x.loci, Not(sym_loci))
     else
         sym_loci = Symbol.(loci)
         for each in sym_loci
-            if each ∉ names(x.loci)
+            if each ∉ names(y.loci)
                 println("NOTICE: locus \"$each\" not found")
                 continue
             end
@@ -298,18 +304,19 @@ Examples:
 `remove_samples!(nancycats, ["N100", "N102", "N211"])`
 """
 function remove_samples!(x::PopObj, samp_id::Union{String, Array{String,1}})
+    y = PopOpt(x)
     # get samp_id indices
     if typeof(samp_id) == String
-        samp_id ∉ x.samples.name && error("sample \"$samp_id\" not found")
-        idx = findfirst(i -> i == samp_id, x.samples.name)
+        samp_id ∉ y.samples.name && error("sample \"$samp_id\" not found")
+        idx = findfirst(i -> i == samp_id, y.samples.name)
     else
         idx = []
         for ind in samp_id
-            if ind ∉ x.samples.name
+            if ind ∉ y.samples.name
                 println("NOTICE: sample \"$ind\" not found!")
                 continue
             end
-            push!(idx, findfirst(i -> i == ind, x.samples.name) )
+            push!(idx, findfirst(i -> i == ind, y.samples.name) )
         end
         println()
     end

@@ -29,25 +29,28 @@ Ploidy:
 Int8[2, 2, 2] … Int8[2, 2, 2]
 Number of populations: 17
 
-#samp_id | Pop
---------------
-10 | 1
-22 | 2
-12 | 3
-23 | 4
-15 | 5
-11 | 6
-14 | 7
-10 | 8
-9 | 9
-11 | 10
-20 | 11
-14 | 12
-13 | 13
-17 | 14
-11 | 15
-12 | 16
-13 | 17
+Population names and counts:
+17×2 DataFrames.DataFrame
+│ Row │ population    │ count │
+│     │ Categorical…⍰ │ Int32 │
+├─────┼───────────────┼───────┤
+│ 1   │ "1"           │ 10    │
+│ 2   │ "2"           │ 22    │
+│ 3   │ "3"           │ 12    │
+│ 4   │ "4"           │ 23    │
+│ 5   │ "5"           │ 15    │
+│ 6   │ "6"           │ 11    │
+│ 7   │ "7"           │ 14    │
+│ 8   │ "8"           │ 10    │
+│ 9   │ "9"           │ 9     │
+│ 10  │ "10"          │ 11    │
+│ 11  │ "11"          │ 20    │
+│ 12  │ "12"          │ 14    │
+│ 13  │ "13"          │ 13    │
+│ 14  │ "14"          │ 17    │
+│ 15  │ "15"          │ 11    │
+│ 16  │ "16"          │ 12    │
+│ 17  │ "17"          │ 13    │
 
 Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```
@@ -534,8 +537,8 @@ julia> ncats.loci.fca8
 
 ``` tab="output"
 237-element Array{Any,1}:
- (0, 0)    
- (0, 0)    
+ missing    
+ missing    
  (135, 143)
  (135, 133)
  (135, 133)
@@ -674,8 +677,8 @@ julia> ncats.loci.fca8[1:3]
 
 ``` tab="output"
 3-element Array{Any,1}:
- (0, 0)    
- (0, 0)    
+ missing    
+ missing    
  (135, 143)
 ```
 

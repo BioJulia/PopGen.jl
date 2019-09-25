@@ -12,7 +12,7 @@ Example:
 """
 function nancycats()
     filename = normpath(joinpath(@__DIR__,"..","data", "data", "nancycats.csv"))
-    return csv(filename, location = false)
+    return csv(filename, marker = "msat", location = false)
 end
 
 
@@ -29,7 +29,6 @@ Example:
 function gulfsharks()
     filename = normpath(joinpath(@__DIR__,"..","data", "data", "gulfsharks.gen"))
     xloc = [-80.59928
-
             -80.59954
             -80.59958
             -80.42248
@@ -457,5 +456,15 @@ function gulfsharks()
             ]
     x = genepop(filename, numpops = 7)
     x.samples.latitude = yloc ; x.samples.longitude = xloc
+    renames = Dict(
+                1 => "Cape Canaveral",
+                2 => "Georgia",
+                3 => "South Carolina",
+                4 => "Florida Keys",
+                5 => "Mideast Gulf",
+                6 => "Northeast Gulf",
+                7 => "Southeast Gulf"
+                )
+    populations!(x, rename = renames);
     return x
 end

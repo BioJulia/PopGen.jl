@@ -6,7 +6,7 @@ custom color palette, use `color = [color1, color2, etc.]`
 """
 function plot_missing(x::PopObj; color = false)
     by_sample,by_loci = missing(x);
-    ys = Array[subdf[!, :nmissing] for subdf in groupby(by_sample[!, 1:3], :population)]
+    ys = Array[subdf[!, :missing] for subdf in groupby(by_sample[!, 1:3], :population)]
     texts = Array[subdf[!, :name] for subdf in groupby(by_sample[!, 1:3], :population)]
     popnum = length(by_sample[!, :population] |> unique)
     if color == false
@@ -34,7 +34,7 @@ function plot_missing(x::PopObj; color = false)
                   name = "# missing data",
                   )
     =#
-    loci_hist = histogram(x = by_loci[!, :nmissing],
+    loci_hist = histogram(x = by_loci[!, :missing],
                           marker_color = "rgb(217, 217, 217)",
                           name = "",
                           text = "loci",
@@ -98,9 +98,10 @@ function plot_locations(x::PopObj; region::String = "world", projection::String 
                     "aitoff", "sinusoidal"]
         error("Projection not recognized. Please see the help doc for list of projection options")
     end
-    popnum = length(x.samples.population |> unique)
+    y = PopOpt(x)
+    popnum = length(y.samples.population |> unique)
     colors = ["hsl($i, 50%, 50%)" for i in range(0, stop=300, length=popnum)]
-    df_split = groupby(x.samples, :population)
+    df_split = groupby(y.samples, :population)
     map_scatter = [scattergeo(lat=df_split[i][!, :latitude],
                        lon=df_split[i][!, :longitude],
                        marker_line_color="rgb(62,90,112)", marker_line_width=1,

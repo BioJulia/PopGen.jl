@@ -8,7 +8,7 @@ end
 ```
 
 !!! info "pronouncing "PopObj" "
-    If you haven't already guessed, `PopObj` is a combination of the words Population and Object. PopObj is pronounced "pop ob" with a silent j because it rolls of the tongue better, but writing it as PopOb looks weird. 
+    If you haven't already guessed, `PopObj` is a combination of the words PopGen and Object. PopObj is pronounced "pop ob" with a silent j because it rolls of the tongue better, but writing it as PopOb looks weird. 
     
     Yes, I have lost sleep over this detail.    
     - Pavel
@@ -65,6 +65,7 @@ latitude data of samples (decimal degrees)
 ### `samples.longitude`
 
 `::Array{Union{Int64,Float64},1}`
+
 longitude data of samples (decimal degrees)
 
 ```
@@ -108,15 +109,23 @@ Number of loci: 2213
 Ploidy: 2
 Number of populations: 7
 
-   #Inds | Pop
-   --------------
-     21  |  1
-     30  |  2
-     28  |  3
-     65  |  4
-     28  |  5
-     20  |  6
-     20  |  7
+Population names and counts:
+7×2 DataFrames.DataFrame
+│ Row │ population       │ count │
+│     │ Categorical…⍰    │ Int32 │
+├─────┼──────────────────┼───────┤
+│ 1   │ "Cape Canaveral" │ 21    │
+│ 2   │ "Georgia"        │ 30    │
+│ 3   │ "South Carolina" │ 28    │
+│ 4   │ "Florida Keys"   │ 65    │
+│ 5   │ "Mideast Gulf"   │ 28    │
+│ 6   │ "Northeast Gulf" │ 20    │
+│ 7   │ "Southeast Gulf" │ 20    │
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```
+
+
+
+!!! info "the secret "PopOpt" type"
+    There is a complementary type to the `PopObj` called the `PopOpt` ("PopGen Optimized"), which is not callable by end-users. This is a behind-the-scenes immutable version of a `PopObj` that exists to boost performance and efficiency. The first thing most PopGen.jl commands do is make a temporary `PopOpt` copy of you `PopObj` and use that for indexing, sorting, etc. Using this method allows us to speed up runtime 2x-10x, substantially reduce RAM usage for commands, and still give you the flexibility to augment your `PopObj` as needed. You don't need to know this bit of trivia to use PopGen.jl, but it will be useful if you plan on writing your own functions. 
