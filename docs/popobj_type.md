@@ -65,6 +65,7 @@ latitude data of samples (decimal degrees)
 ### `samples.longitude`
 
 `::Array{Union{Int64,Float64},1}`
+
 longitude data of samples (decimal degrees)
 
 ```
@@ -109,17 +110,17 @@ Ploidy: 2
 Number of populations: 7
 
 Population names and counts:
-7×2 DataFrame
-│ Row │ population    │ count │
-│     │ Categorical…⍰ │ Int16 │
-├─────┼───────────────┼───────┤
-│ 1   │ 1             │ 21    │
-│ 2   │ 2             │ 30    │
-│ 3   │ 3             │ 28    │
-│ 4   │ 4             │ 65    │
-│ 5   │ 5             │ 28    │
-│ 6   │ 6             │ 20    │
-│ 7   │ 7             │ 18    │
+7×2 DataFrames.DataFrame
+│ Row │ population       │ count │
+│     │ Categorical…⍰    │ Int32 │
+├─────┼──────────────────┼───────┤
+│ 1   │ "Cape Canaveral" │ 21    │
+│ 2   │ "Georgia"        │ 30    │
+│ 3   │ "South Carolina" │ 28    │
+│ 4   │ "Florida Keys"   │ 65    │
+│ 5   │ "Mideast Gulf"   │ 28    │
+│ 6   │ "Northeast Gulf" │ 20    │
+│ 7   │ "Southeast Gulf" │ 20    │
 
 Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```

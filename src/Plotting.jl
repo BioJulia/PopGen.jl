@@ -6,7 +6,7 @@ custom color palette, use `color = [color1, color2, etc.]`
 """
 function plot_missing(x::PopObj; color = false)
     by_sample,by_loci = missing(x);
-    ys = Array[subdf[!, :nmissing] for subdf in groupby(by_sample[!, 1:3], :population)]
+    ys = Array[subdf[!, :missing] for subdf in groupby(by_sample[!, 1:3], :population)]
     texts = Array[subdf[!, :name] for subdf in groupby(by_sample[!, 1:3], :population)]
     popnum = length(by_sample[!, :population] |> unique)
     if color == false
@@ -34,7 +34,7 @@ function plot_missing(x::PopObj; color = false)
                   name = "# missing data",
                   )
     =#
-    loci_hist = histogram(x = by_loci[!, :nmissing],
+    loci_hist = histogram(x = by_loci[!, :missing],
                           marker_color = "rgb(217, 217, 217)",
                           name = "",
                           text = "loci",

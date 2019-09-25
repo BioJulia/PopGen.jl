@@ -22,27 +22,30 @@ Number of loci: 9
 Ploidy: 2
 Number of populations: 17
 
-   #Inds | Pop
-   --------------
-     10  |  1
-     22  |  2
-     12  |  3
-     23  |  4
-     15  |  5
-     11  |  6
-     14  |  7
-     10  |  8
-     9   |  9
-     11  |  10
-     20  |  11
-     14  |  12
-     13  |  13
-     17  |  14
-     11  |  15
-     12  |  16
-     13  |  17
+Population names and counts:
+17×2 DataFrames.DataFrame
+│ Row │ population    │ count │
+│     │ Categorical…⍰ │ Int32 │
+├─────┼───────────────┼───────┤
+│ 1   │ "1"           │ 10    │
+│ 2   │ "2"           │ 22    │
+│ 3   │ "3"           │ 12    │
+│ 4   │ "4"           │ 23    │
+│ 5   │ "5"           │ 15    │
+│ 6   │ "6"           │ 11    │
+│ 7   │ "7"           │ 14    │
+│ 8   │ "8"           │ 10    │
+│ 9   │ "9"           │ 9     │
+│ 10  │ "10"          │ 11    │
+│ 11  │ "11"          │ 20    │
+│ 12  │ "12"          │ 14    │
+│ 13  │ "13"          │ 13    │
+│ 14  │ "14"          │ 17    │
+│ 15  │ "15"          │ 11    │
+│ 16  │ "16"          │ 12    │
+│ 17  │ "17"          │ 13    │
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```
 
 The spatial coordinates provided for the dataset in `adegenet` are completely unfamiliar to us (and some geospatial folks we spoke to), so they have been omitted.  If you recognize what coordinate system has 485.111 appear in Nancy, France, please let us know!
@@ -73,17 +76,19 @@ Number of loci: 2213
 Ploidy: 2
 Number of populations: 7
 
-   #Inds | Pop
-   --------------
-	 21	 |	1
-	 30	 |	2
-	 28	 |	3
-	 65	 |	4
-	 28	 |	5
-	 20	 |	6
-	 20	 |	7
+Population names and counts:
+7×2 DataFrames.DataFrame
+│ Row │ population       │ count │
+│     │ Categorical…⍰    │ Int32 │
+├─────┼──────────────────┼───────┤
+│ 1   │ "Cape Canaveral" │ 21    │
+│ 2   │ "Georgia"        │ 30    │
+│ 3   │ "South Carolina" │ 28    │
+│ 4   │ "Florida Keys"   │ 65    │
+│ 5   │ "Mideast Gulf"   │ 28    │
+│ 6   │ "Northeast Gulf" │ 20    │
+│ 7   │ "Southeast Gulf" │ 20    │
 
-Available fields: ind, popid, loci, ploidy, genotypes, longitude, latitude
-
+Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```
 

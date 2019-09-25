@@ -33,14 +33,14 @@ Julia will still process the command and assign `10 + 2` to `x`, but it won't sh
 If you see a semicolon in between two variable assignments, like so:
 
 ```julia
-x = [1,2] ; y = [3,4]
+julia> x = [1,2] ; y = [3,4]
 ```
 
 that's a Julia short-hand for making two short lines of code appear on a single line. It's the equivalent of doing:
 
 ```julia
-x = [1,2]
-y = [3,4]
+julia> x = [1,2] ;
+julia> y = [3,4]
 ```
 
 We sometimes choose this writing format for very quick  and small assignments hoping to save some visual space. Use whichever method is most comfortable and sensible for you!
@@ -50,17 +50,17 @@ We sometimes choose this writing format for very quick  and small assignments ho
 To enter `help` mode in the REPL, simply press the question mark key `?` (shift + key) and you will notice a different prompt `help?>` for you to type in a function.
 
 ```julia
-help?>popid
+help?>population
 ```
 
 ```
-search: popid popid! popfirst! popdisplay precompile __precompile__ CompositeException
+search: population populations population! populations!
 
-  popid(x::PopObj; listall::Bool = false)
+  population(x::PopObj; listall::Bool = false)
 
   View unique population ID's in a PopObj.
 
-  listall = true, displays ind and their popid instead (default = false).
+  listall = true, displays ind and their population instead (default = false).
 ```
 
 
@@ -69,14 +69,14 @@ search: popid popid! popfirst! popdisplay precompile __precompile__ CompositeExc
 
 Julia encourages strong typing of variables, and the functions in `PopGen` are no exception to this. However, to reduce the barrier of entry required to understand this documentation and the subsequent package, we have chosen to omit some of the `type` information from functions to reduce visual clutter for newer users. As experienced users already know, if you would like to see the explicit type information, you can look at the code on github, invoke the `help` system in the REPL (above), or search for a function in the Documentation pane in Juno. 
 
-You'll notice types follow a specific format, which is `object::type`. This format is a type assignment, so in the function `popid`, which looks like: `popid(x::PopObj; listall::Bool = false)`:
+You'll notice types follow a specific format, which is `object::type`. This format is a type assignment, so in the function `population`, which looks like: `population(x::PopObj; listall::Bool = false)`:
 
 - `x` is a variable of type `PopObj` 
 - `listall` is a variable of type `Bool` (boolean) meaning it only takes `true` or `false` without quotes
 
 ### Type Unions
 
-You might see the type `Union` appear occasionally throughout this documentation, and you can consider it a list of types. For example, if something was of type `::Union{String,Integer}`, that means that **either** a `String` or `Integer` works. These kinds of `Union` appear in a few places, like `remove_inds!` , where the input can be either a `String` (a single individual) or an `Array{String,1}` (one-dimensional list of names). For `remove_inds!`, the second argument type appears as `::Union{String, Array{String,1}}`. Also, the order in which types appear in `Union` types don't matter.
+You might see the type `Union` appear occasionally throughout this documentation, and you can consider it a list of types. For example, if something was of type `::Union{String,Integer}`, that means that **either** a `String` or `Integer` works. These kinds of `Union` appear in a few places, like `remove_samples!` , where the input can be either a `String` (a single individual) or an `Array{String,1}` (one-dimensional list of names). For `remove_inds!`, the second argument type appears as `::Union{String, Array{String,1}}`. Also, the order in which types appear in `Union` types don't matter.
 
 
 
