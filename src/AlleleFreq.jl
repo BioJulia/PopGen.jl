@@ -5,15 +5,17 @@ Calculate genotype frequencies of all loci in a `PopObj`
 function geno_freq_alpha(x::Array{Union{Missing, Tuple},1})
     d = Dict()
     for row in x
+        # sum up missing
         if row === missing
             d[missing] = get!(d, missing, 0) +1
             continue
         else
+        # sum up non-missing genotypes
             d[row] = get!(d, row, 0) +1
         end
     end
-    total = values(d) |> sum
-    [d[i] = d[i] / total for i in keys(d)]
+    total = values(d) |> sum    # sum of all non-missing genotypes
+    [d[i] = d[i] / total for i in keys(d)] # genotype count/total
     return d
 end
 
@@ -48,17 +50,19 @@ Calculate allele counts for a single locus of a `PopObj`
 function allele_freq_mini(x::Array{Union{Missing, Tuple},1})
     d = Dict()
     for row in x
+        # sum up missing
         if row === missing
             d[missing] = get!(d, missing, 0) +1
             continue
         else
+        # sum up alleles
             for allele in row
                 d[allele] = get!(d, allele, 0) +1
             end
         end
     end
-    total = values(d) |> sum
-    [d[i] = d[i] / total for i in keys(d)]
+    total = values(d) |> sum    # sum of all non-missing alleles
+    [d[i] = d[i] / total for i in keys(d)]  # allele count / sum
     return d
 end
 
@@ -75,8 +79,8 @@ function het_observed(x::PopObj)
         tmp = 0
         for geno in collect(keys(a))
             geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
-            if geno !== geno_hom        # test if geno isn't homozygous
-                tmp += a[geno]     # if true, add freq
+            if geno != geno_hom        # test if geno isn't homozygous
+                tmp += a[geno]     # if true, add freq to total in tmp
             end
         end
         push!(het_vals, tmp)
