@@ -27,7 +27,7 @@ export PopObj,
     remove_inds!,
     remove_loci!,
     missing,
-    het_expected,
+    heterozygosity,
     plot_missing,
     plot_locations
 
