@@ -110,35 +110,6 @@ function het_expected(x::PopObj, plot = false)
 end
 
 
-## het by exact 2pq
-#=
-function het_expected2(x::PopObj)
-    het_vals = []
-    for locus in eachcol(x.loci, false)
-        tmp = []
-        a = allele_freq_mini(locus) # get allele freqs at locus
-        delete!(a, missing)     # remove missing values
-        a = a |> values |> collect # isolate the freqs
-        al_count = length(a)
-        if al_count == 1        # conditional for single allele/haplotype
-            push!(het_vals, 0)
-            continue
-        end
-        for i in 1:al_count
-            if i != al_count
-                het_calc = (2 * a[i]) .* a[i+1:end]   # 2*a1*a2 broadcasted
-                append!(tmp, het_calc)
-            else
-                continue
-            end
-        end
-        push!(het_vals, sum(tmp))  # push the sum of 2pq's to the big array
-    end
-    locinames = String.(names(x.loci))
-    return DataFrame(locus = locinames, het_exp = Array{Float64,1}(het_vals))
-end
-=#
-
 """
     heterozygosity(x::PopObj)
 Calculate observed and expected heterozygosity of all loci in a `PopObj`
@@ -149,3 +120,6 @@ function heterozygosity(x::PopObj)
     locinames = String.(names(x.loci))
     return DataFrame(locus = locinames, het_obs = obs, het_exp = exp)
 end
+
+const het = heterozygosity
+const He = heterozygosity
