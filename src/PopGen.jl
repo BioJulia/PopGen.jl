@@ -7,7 +7,7 @@ module PopGen
 ##   O o       O o       O ############ o       O o       O o
 
 
-using DataFrames, PlotlyJS, Statistics, GeneticVariation
+using DataFrames, PlotlyJS, GeneticVariation
 
 export PopObj,
     summary,
@@ -27,6 +27,7 @@ export PopObj,
     remove_inds!,
     remove_loci!,
     missing,
+    heterozygosity,
     plot_missing,
     plot_locations
 

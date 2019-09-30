@@ -30,7 +30,6 @@ mutable struct PopObj <: PopType
         end
         size(x,1) != size(y,1) && error("length mismatch of dataframes. samples: $(size(x,1)) | loci: $(size(y, 1))")
         typeof(x.name) != Array{String,1} && @error ":name values must be of type String"
-        typeof(x.population) != Array{String,1} && @error ":population values must be of type String"
         new(x,y)
     end
 end

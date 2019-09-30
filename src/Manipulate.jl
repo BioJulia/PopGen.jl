@@ -22,8 +22,7 @@ function Base.summary(x::PopObj)
     println("Number of loci: $(size(y.loci,2))")
     println(string.(names(y.loci))[1:3], " \u2026 " , string.(names(y.loci))[end-2:end], "\n" )
     println("Ploidy:")
-    println("$(y.samples.ploidy[1:3])", " \u2026 ", "$(y.samples.ploidy[end-2:end])")
-    println("Number of populations: $(length(y.samples.population |> unique))","\n")
+    println("$(y.samples.ploidy[1:3])", " \u2026 ", "$(y.samples.ploidy[end-2:end])", "\n")
     println("Population names and counts:")
     print(populations(x), "\n")
     println("\nAvailable .samples fields: .name, .population, .ploidy, .longitude, .latitude")
@@ -148,44 +147,6 @@ function locations!(x::PopObj; lat::Array, long::Array)
 end
 
 """
-    population(x::PopObj; listall::Bool = false)
-View unique population ID's in a `PopObj`.
-
-`listall = true`, displays `ind` and their `population` instead (default = `false`).
-"""
-function population(x::PopObj; listall::Bool = false)
-    y = PopOpt(x)
-    if listall == true
-        DataFrame(name = y.samples.name, population = y.samples.population)
-    else
-        count = [sum(y.samples.population .== i) for i in unique(y.samples.population)]
-        count_conv = Int32.(count)
-        popcounts = DataFrame(population = unique(y.samples.population) |> categorical,
-                              count = count_conv)
-    end
-end
-
-
-"""
-    population!(x::PopObj; rename::Dict)
-Rename the population ID's of `PopObj.population`.
-
-Uses a `Dict` of `[population] => replacement` to rename populations
-
-Example:
-
-potatopops = Dict(1 => "Idaho", 2 => "Russet")
-
-population!(potatoes, rename = potatopops)
-"""
-function population!(x::PopObj; rename::Dict)
-    for eachkey in keys(rename)
-        replace!(x.samples.population, eachkey => rename[eachkey])
-    end
-    population(x, listall = true)
-end
-
-"""
     populations(x::PopObj; listall::Bool = false)
 View unique population ID's in a `PopObj`.
 
@@ -204,23 +165,57 @@ function populations(x::PopObj; listall::Bool = false)
 end
 
 """
-    populations!(x::PopObj; rename::Dict)
-Rename the population ID's of `PopObj.population`.
+    populations!(x::PopObj; rename::Dict, replace::Union{Tuple, NamedTuple})
+Assign population names to a `PopObj`. There are two modes of operation:
 
-Uses a `Dict` of `[population] => replacement` to rename populations
+## Rename
+
+Rename the population ID's of `PopObj.population` using a `Dict` of `[population] => replacement`
 
 Example:
 
-potatopops = Dict(1 => "Idaho", 2 => "Russet")
+`potatopops = Dict(1 => "Idaho", 2 => "Russet")`
 
-populations!(potatoes, rename = potatopops)
+`populations!(potatoes, rename = potatopops)`
+
+## Replace (overwrite)
+Completely replace the population names of a `PopObj`. Will generate an array of
+population names from a tuple of (counts, names) where `counts` is an array of the
+number of samples per population and `names` is an array of the names of the
+populations. Can also use a named tuple.
+
+Example assigning names for three populations in a `PopObj` named "Starlings":
+Assuming population sizes are 15, 32, 11 and we want to name them "North", "South", "East"
+
+`populations!(Starlings, replace = ([15,32,11], ["North","South", "East"])`
+`populations!(Starlings, replace = (counts = [15,32,11], names = ["North","South", "East"])`
+
+
 """
-function populations!(x::PopObj; rename::Dict)
-    for eachkey in keys(rename)
-        replace!(x.samples.population, eachkey => rename[eachkey])
+function populations!(x::PopObj; rename::Dict=Dict(), replace::Union{Tuple,NamedTuple}=(0,0))
+    if length(keys(rename)) != 0
+        for eachkey in keys(rename)
+            eachkey ∉ x.samples.population && @warn "$eachkey not found in PopObj"
+            replace!(x.samples.population, eachkey => rename[eachkey])
+        end
+        return populations(x,listall = true)
+    elseif replace != (0,0)
+        if typeof(replace) <: NamedTuple
+            popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
+        else typeof(replace) <: Tuple
+            popid_array = [fill(i, j) for (i,j) in zip(replace[2], replace[1])]
+        end
+        flat_popid = Iterators.flatten(popid_array) |> collect
+        length(flat_popid) != size(x.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(x.samples.name)))")
+        x.samples.population = flat_popid
+        return populations(x, listall = true)
+    else
+        error("specify rename = Dict() to rename populations, or replace=(counts,names) to replace all names")
     end
-    population(x, listall = true)
 end
+
+const population = populations
+const population! = populations!
 
 #### Find missing ####
 
@@ -258,7 +253,6 @@ function Base.missing(x::PopObj)
     loci_df = DataFrame(locus = string.(names(y.loci)), nmissing = f(y.loci))
     return (by_sample = sample_df, by_loci = loci_df)
 end
-
 
 
 ##### Removal #####

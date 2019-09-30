@@ -76,18 +76,21 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
         miss_geno = fill(0,ploid) |> Tuple
         replace!(d[loc], miss_geno => missing)
     end
+    # typesafe genotype DataFrame
+    loci_df = DataFrame([i = Array{Union{Tuple, Missing},1}(d[i]) for i in locinames])
+    names!(loci_df, Symbol.(locinames))
     samples_df = DataFrame(name = string.(indnames),
                            population = categorical(popid),
                            ploidy = Int8.(ploidy),
                            longitude = fill(missing,length(indnames)),
                            latitude = fill(missing,length(indnames)))
-    PopObj(samples_df, d |> DataFrame)
+    PopObj(samples_df, loci_df)
 end
 
 
 # Alternative line-by-line reader
 ## NOT EXPORTED
-
+#=
 function gpop2(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops::Int64)
     println("\n", "Input File : ", abspath(infile))
     popid = []
@@ -149,13 +152,16 @@ function gpop2(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops::
         miss_geno = fill(0,ploid) |> Tuple
         replace!(d[loc], miss_geno => missing)
     end
+    loci_df = DataFrame([i = Array{Union{Tuple, Missing},1}(d[i]) for i in locinames])
+    names!(loci_df, Symbol.(locinames))
     samples_df = DataFrame(name = string.(indnames),
                            population = categorical(popid),
                            ploidy = Int8.(ploidy),
                            longitude = fill(missing,length(indnames)),
                            latitude = fill(missing,length(indnames)))
-    PopObj(samples_df, d |> DataFrame)
+    PopObj(samples_df, loci_df)
 end
+=#
 
 ### CSV parsing ###
 
@@ -251,12 +257,15 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int 
         miss_geno = fill(0,ploid) |> Tuple
         replace!(d[loc], miss_geno => missing)
     end
+    # typesafe genotype DataFrame
+    loci_df = DataFrame([i = Array{Union{Tuple, Missing},1}(d[i]) for i in locinames])
+    names!(loci_df, Symbol.(locinames))
     samples_df = DataFrame(name = string.(indnames),
                            population = categorical(popid),
                            ploidy = Int8.(ploidy),
                            longitude = locx,
                            latitude = locy)
-    PopObj(samples_df, d |> DataFrame)
+    PopObj(samples_df, loci_df)
 end
 
 
@@ -298,10 +307,12 @@ function vcf(infile::String)
         d[locinames[end]] = geno_tuple
     end
     ploidy = length.(d[locinames[1]])
+    loci_df = DataFrame([i = Array{Union{Tuple, Missing},1}(d[i]) for i in locinames])
+    names!(loci_df, Symbol.(locinames))
     samples_df = DataFrame(name = sample_names,
                            population = population,
                            ploidy = Int8.(ploidy),
                            latitude = lat,
                            longitude = long)
-    PopObj(samples_df, d |> DataFrame)
+    PopObj(samples_df, loci_df)
 end
