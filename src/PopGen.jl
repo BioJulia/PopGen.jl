@@ -27,6 +27,7 @@ export PopObj,
     remove_inds!,
     remove_loci!,
     missing,
+    het_expected,
     plot_missing,
     plot_locations
 
