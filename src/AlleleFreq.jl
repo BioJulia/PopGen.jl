@@ -7,7 +7,6 @@ function geno_freq_alpha(x::Array{Union{Missing, Tuple},1})
     for row in x
         # sum up missing
         if row === missing
-            d[missing] = get!(d, missing, 0) +1
             continue
         else
         # sum up non-missing genotypes
@@ -15,7 +14,7 @@ function geno_freq_alpha(x::Array{Union{Missing, Tuple},1})
         end
     end
     total = values(d) |> sum    # sum of all non-missing genotypes
-    [d[i] = d[i] / total for i in keys(d)] # genotype count/total
+    [d[i] = d[i] / total for i in keys(d) != missing] # genotype count/total
     return d
 end
 
@@ -23,13 +22,12 @@ end
   allele_freq_beta(x::PopObj)
 Returns an array of `Dicts` of allele counts per locus
 """
-function allele_freq_alpha(x::PopObj)
+function allele_freq_alpha(x::PopObj, include_missing = false)
     y = PopOpt(x)
     tmp = names(y.loci)[1]  # restrict to single locus for testing
     d = Dict()
     for row in y.loci[!, tmp]
         if row === missing
-            d[missing] = get!(d, missing, 0) +1
             continue
         else
             for allele in row
@@ -52,7 +50,6 @@ function allele_freq_mini(x::Array{Union{Missing, Tuple},1})
     for row in x
         # sum up missing
         if row === missing
-            d[missing] = get!(d, missing, 0) +1
             continue
         else
         # sum up alleles
@@ -75,7 +72,7 @@ function het_observed(x::PopObj)
     het_vals = []
     for locus in eachcol(x.loci, false)
         a = geno_freq_alpha(locus)  # get genotype freqs at locus
-        delete!(a, missing)     # remove missing values
+        #delete!(a, missing)     # remove missing values
         tmp = 0
         for geno in collect(keys(a))
             geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
@@ -98,7 +95,7 @@ function het_expected(x::PopObj, plot = false)
     het_vals = []
     for locus in eachcol(x.loci, false)
         a = allele_freq_mini(locus) # get allele freqs at locus
-        delete!(a, missing)     # remove missing values
+        #delete!(a, missing)     # remove missing values
         a = a |> values |> collect # isolate the freqs
         homz = a .^2 |> sum
         hetz = 1 - homz
