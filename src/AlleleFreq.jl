@@ -14,7 +14,7 @@ function geno_freq_alpha(x::Array{Union{Missing, Tuple},1})
         end
     end
     total = values(d) |> sum    # sum of all non-missing genotypes
-    [d[i] = d[i] / total for i in keys(d) != missing] # genotype count/total
+    [d[i] = d[i] / total for i in keys(d)] # genotype count/total
     return d
 end
 
