@@ -18,6 +18,7 @@ function geno_freq_alpha(x::Array{Union{Missing, Tuple},1})
     return d
 end
 
+
 """
   allele_freq_beta(x::PopObj)
 Returns an array of `Dicts` of allele counts per locus
@@ -110,7 +111,7 @@ end
     het_sample(x::PopObj)
 Calculate the heterozygosity for each individual in a `PopObj`
 """
-function het_observed_sample(x::PopObj)
+function het_sample(x::PopObj)
     #transpose loci df to have samples as columns
     y = deepcopy(x.loci)
     insertcols!(y, 1, :name => x.samples.name)
@@ -118,7 +119,6 @@ function het_observed_sample(x::PopObj)
     tmp_stack = stack(y, names(y[!,3:end]))
     by_ind = unstack(tmp_stack, :variable, :id, :value)
     select!(by_ind, Not(:variable))
-    names!(by_ind, Symbol.(x.samples.name))
     # calculate observed heterozygosity like for loci
     het_vals = []
     for samp in eachcol(by_ind, false)
@@ -136,21 +136,48 @@ function het_observed_sample(x::PopObj)
     return DataFrame(name = x.samples.name, het = (het_vals |> Array{Float64,1}))
 end
 
+function het_population_obs(x::PopObj)
+    pop_het_vals = []
+    y = deepcopy(x)
+    insertcols!(y, 1, :population => x.samples.population)
+    y_subdf = groupby(y[!, :], :population)
+    for pop in y_subdf
+        for locus in eachcol(pop, false)
+            a = geno_freq_alpha(locus)  # get genotype freqs at locus
+            tmp = 0
+            for geno in collect(keys(a))
+                geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
+                if geno != geno_hom        # test if geno isn't homozygous
+                    tmp += a[geno]     # if true, add freq to total in tmp
+                end
+            end
+            push!(het_vals, tmp)
+        end
+    end
+    return (het_vals) |> Array{Float64,1}
+end
+
 """
     heterozygosity(x::PopObj)
-Calculate observed and expected heterozygosity of all loci in a `PopObj`
+Calculate observed and expected heterozygosity in a `PopObj`.
+
+### Modes
+- `"locus"` : heterozygosity per locus (default)
+- `"sample"` or `"ind"` : heterozygosity per individual
+- `"population"` or `"pop"` : heterozygosity per population (PopObj.samples.population)
 """
-function heterozygosity(x::PopObj)
-    obs = het_observed(x)
-    exp = het_expected(x)
-    locinames = String.(names(x.loci))
-    return DataFrame(locus = locinames, het_obs = obs, het_exp = exp)
+function heterozygosity(x::PopObj, mode = "locus")
+    if mode == "locus"
+        obs = het_observed(x)
+        exp = het_expected(x)
+        locinames = String.(names(x.loci))
+        return DataFrame(locus = locinames, het_obs = obs, het_exp = exp)
+    elseif mode == "sample" || "ind" || "individual"
+        return het_sample(x)
+    elseif mode == "pop" || "population"
+        return
+    end
 end
 
 const het = heterozygosity
 const He = heterozygosity
-
-d = Dict()
-for (geno,freq) in zip(zz,zx)
-    d[geno] = get!(d, geno, 0) + freq
-end
