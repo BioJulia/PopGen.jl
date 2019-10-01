@@ -91,7 +91,7 @@ end
     het_expected(x::PopObj)
 Calculate the expected heterozygosity for each locus in a `PopObj`
 """
-function het_expected(x::PopObj, plot = false)
+function het_expected(x::PopObj)
     het_vals = []
     for locus in eachcol(x.loci, false)
         a = allele_freq_mini(locus) # get allele freqs at locus
@@ -106,6 +106,35 @@ function het_expected(x::PopObj, plot = false)
     #return DataFrame(locus = locinames, het_exp = Array{Float64,1}(het_vals))
 end
 
+"""
+    het_sample(x::PopObj)
+Calculate the heterozygosity for each individual in a `PopObj`
+"""
+function het_observed_sample(x::PopObj)
+    #transpose loci df to have samples as columns
+    y = deepcopy(x.loci)
+    insertcols!(y, 1, :name => x.samples.name)
+    insertcols!(y, 2, :id => 1:length(y[!, 1]))
+    tmp_stack = stack(y, names(y[!,3:end]))
+    by_ind = unstack(tmp_stack, :variable, :id, :value)
+    select!(by_ind, Not(:variable))
+    names!(by_ind, Symbol.(x.samples.name))
+    # calculate observed heterozygosity like for loci
+    het_vals = []
+    for samp in eachcol(by_ind, false)
+        a = geno_freq_alpha(samp)  # get genotype freqs at sample
+        #delete!(a, missing)     # remove missing values
+        tmp = 0
+        for geno in collect(keys(a))
+            geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
+            if geno != geno_hom        # test if geno isn't homozygous
+                tmp += a[geno]     # if true, add freq to total in tmp
+            end
+        end
+        push!(het_vals, tmp)
+    end
+    return DataFrame(name = x.samples.name, het = (het_vals |> Array{Float64,1}))
+end
 
 """
     heterozygosity(x::PopObj)
@@ -120,3 +149,8 @@ end
 
 const het = heterozygosity
 const He = heterozygosity
+
+d = Dict()
+for (geno,freq) in zip(zz,zx)
+    d[geno] = get!(d, geno, 0) + freq
+end
