@@ -4,6 +4,26 @@ Calculate genotype frequencies of all loci in a `PopObj`
 """
 function geno_freq_alpha(x::Array{Union{Missing, Tuple},1})
     d = Dict()
+    # conditional testing if all genos are missing
+    ismissing.(x) |> unique == [true] && return missing
+    for row in x
+        # sum up missing
+        if row === missing
+            continue
+        else
+        # sum up non-missing genotypes
+            d[row] = get!(d, row, 0) +1
+        end
+    end
+    total = values(d) |> sum    # sum of all non-missing genotypes
+    [d[i] = d[i] / total for i in keys(d)] # genotype count/total
+    return d
+end
+
+function geno_freq_alpha(x::SubArray{Union{Missing, Tuple},1})
+    d = Dict()
+    # conditional testing if all genos are missing
+    ismissing.(x) |> unique == [true] && return missing
     for row in x
         # sum up missing
         if row === missing
@@ -23,7 +43,7 @@ end
   allele_freq_beta(x::PopObj)
 Returns an array of `Dicts` of allele counts per locus
 """
-function allele_freq_alpha(x::PopObj, include_missing = false)
+function allele_freq_alpha(x::PopObj)
     y = PopOpt(x)
     tmp = names(y.loci)[1]  # restrict to single locus for testing
     d = Dict()
@@ -137,13 +157,20 @@ function het_sample(x::PopObj)
 end
 
 function het_population_obs(x::PopObj)
-    pop_het_vals = []
-    y = deepcopy(x)
+    d = Dict()
+    popnames = []
+    y = deepcopy(x.loci)
     insertcols!(y, 1, :population => x.samples.population)
     y_subdf = groupby(y[!, :], :population)
     for pop in y_subdf
-        for locus in eachcol(pop, false)
+        pop_het_vals = []
+        for locus in eachcol(pop[!, :2:end], false)
             a = geno_freq_alpha(locus)  # get genotype freqs at locus
+            # add condition if the locus is missing from that subpop
+            if a === missing
+                push!(pop_het_vals, missing)
+                continue
+            end
             tmp = 0
             for geno in collect(keys(a))
                 geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
@@ -151,10 +178,17 @@ function het_population_obs(x::PopObj)
                     tmp += a[geno]     # if true, add freq to total in tmp
                 end
             end
-            push!(het_vals, tmp)
+            push!(pop_het_vals, tmp)
         end
+        # convert to include missing
+        pop_het_conv = pop_het_vals |> Array{Union{Missing, Float64},1}
+        # get the population name and remove whitespaces
+        popname = replace(pop.population[1], " " => "")
+        d[popname] = pop_het_conv
+        push!(popnames, popname)
     end
-    return (het_vals) |> Array{Float64,1}
+    #return_df = DataFrame(d)[!,Symbol.(popnames)]
+    insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
 end
 
 """
