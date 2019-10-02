@@ -4,6 +4,26 @@ Calculate genotype frequencies of all loci in a `PopObj`
 """
 function geno_freq_alpha(x::Array{Union{Missing,Tuple},1})
     d = Dict()
+    # conditional testing if all genos are missing
+    ismissing.(x) |> unique == [true] && return missing
+    for row in x
+        # sum up missing
+        if row === missing
+            continue
+        else
+        # sum up non-missing genotypes
+            d[row] = get!(d, row, 0) +1
+        end
+    end
+    total = values(d) |> sum    # sum of all non-missing genotypes
+    [d[i] = d[i] / total for i in keys(d)] # genotype count/total
+    return d
+end
+
+function geno_freq_alpha(x::SubArray{Union{Missing, Tuple},1})
+    d = Dict()
+    # conditional testing if all genos are missing
+    ismissing.(x) |> unique == [true] && return missing
     for row in x
         # sum up missing
         if row === missing
@@ -23,7 +43,7 @@ end
   allele_freq_beta(x::PopObj)
 Returns an array of `Dicts` of allele counts per locus
 """
-function allele_freq_alpha(x::PopObj, include_missing = false)
+function allele_freq_alpha(x::PopObj)
     y = PopOpt(x)
     tmp = names(y.loci)[1]  # restrict to single locus for testing
     d = Dict()
@@ -140,13 +160,20 @@ function het_sample(x::PopObj)
 end
 
 function het_population_obs(x::PopObj)
-    pop_het_vals = []
-    y = deepcopy(x)
+    d = Dict()
+    popnames = []
+    y = deepcopy(x.loci)
     insertcols!(y, 1, :population => x.samples.population)
     y_subdf = groupby(y[!, :], :population)
     for pop in y_subdf
-        for locus in eachcol(pop, false)
+        pop_het_vals = []
+        for locus in eachcol(pop[!, :2:end], false)
             a = geno_freq_alpha(locus)  # get genotype freqs at locus
+            # add condition if the locus is missing from that subpop
+            if a === missing
+                push!(pop_het_vals, missing)
+                continue
+            end
             tmp = 0
             for geno in collect(keys(a))
                 geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
@@ -154,10 +181,17 @@ function het_population_obs(x::PopObj)
                     tmp += a[geno]     # if true, add freq to total in tmp
                 end
             end
-            push!(het_vals, tmp)
+            push!(pop_het_vals, tmp)
         end
+        # convert to include missing
+        pop_het_conv = pop_het_vals |> Array{Union{Missing, Float64},1}
+        # get the population name and remove whitespaces
+        popname = replace(pop.population[1], " " => "")
+        d[popname] = pop_het_conv
+        push!(popnames, popname)
     end
-    return (het_vals) |> Array{Float64,1}
+    #return_df = DataFrame(d)[!,Symbol.(popnames)]
+    insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
 end
 
 """
@@ -184,3 +218,73 @@ end
 
 const het = heterozygosity
 const He = heterozygosity
+
+"""
+    locus_chi_sq(locus::Array{Union{Missing, Tuple},1})
+Calculate the chi square statistic and p-value for a locus
+Returns a dataframe row with chi-square statistic, degrees of freedom, and p-value
+"""
+function locus_chi_sq(locus::Array{Union{Missing, Tuple},1})
+    #Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
+    number_ind = count(i->i!==missing, locus)
+
+    ## Get expected number of genotypes in a locus
+    the_allele_dict = allele_freq_mini(locus)
+    p = the_allele_dict |> values |> collect
+
+    #Calculate Expected Genotype numbers
+    expected_genotype_freq = p * transpose(p) .* number_ind
+    expected_genotype_freq = vec(expected_genotype_freq)
+
+    alleles = ["$i" for i in the_allele_dict |> keys |> collect]
+    alleles = (alleles .* ",") .* permutedims(alleles)
+    alleles = Array{String}.(sort.(split.(alleles, ",")))
+    alleles = [parse.(Int16,i) |> Tuple for i in alleles]
+    alleles = vec(alleles)
+
+    expected = Dict()
+    for (geno,freq) in zip(alleles,expected_genotype_freq)
+        expected[geno] = get!(expected, geno, 0) + freq
+    end
+
+    ## Get observed number of genotypes in a locus
+    observed = geno_freq_alpha(locus)
+    for j in keys(observed)
+        observed[j] = observed[j] * number_ind
+    end
+
+    chisq_stat = expected
+    for genotype in keys(expected)
+        o = get(observed, genotype, 0)
+        e = get(expected, genotype, 0)
+
+        chisq_stat[genotype] = (o - e) ^ 2 / e
+    end
+    chisq_stat = values(chisq_stat) |> sum
+    df = (length(alleles) - length(the_allele_dict)) / 2
+
+    if df > 0
+        chi_sq_dist = Distributions.Chisq(df)
+        p_val = 1 - cdf(chi_sq_dist, chisq_stat)
+    else
+        p_val = missing
+    end
+    return DataFrame(ChiSq = chisq_stat, DF = df, P = p_val)
+end
+
+"""
+    chisq_hwe(x::PopObj)
+Calculate chi-squared test of HWE for each locus and returns
+observed and exected heterozygosity with chi-squared, degrees of freedom and p-values for each locus
+"""
+function chisq_hwe(x::PopObj)
+    output = DataFrame(ChiSq = Float64[], DF = Int64[], P = Any[])
+    for locus in eachcol(x.loci, false)
+        tmp = locus_chi_sq(locus)
+        append!(output, tmp)
+    end
+    output.locus = String.(names(x.loci))
+    het = heterozygosity(x)
+
+    return join(het, output, on = :locus)
+end

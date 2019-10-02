@@ -80,7 +80,7 @@ function genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops
     loci_df = DataFrame([i = Array{Union{Tuple, Missing},1}(d[i]) for i in locinames])
     names!(loci_df, Symbol.(locinames))
     samples_df = DataFrame(name = string.(indnames),
-                           population = categorical(popid),
+                           population = string.(popid),
                            ploidy = Int8.(ploidy),
                            longitude = fill(missing,length(indnames)),
                            latitude = fill(missing,length(indnames)))
@@ -155,7 +155,7 @@ function gpop2(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops::
     loci_df = DataFrame([i = Array{Union{Tuple, Missing},1}(d[i]) for i in locinames])
     names!(loci_df, Symbol.(locinames))
     samples_df = DataFrame(name = string.(indnames),
-                           population = categorical(popid),
+                           population = popid,
                            ploidy = Int8.(ploidy),
                            longitude = fill(missing,length(indnames)),
                            latitude = fill(missing,length(indnames)))
@@ -261,7 +261,7 @@ function csv(infile::String; delim::Union{Char,String,Regex} = ",", digits::Int 
     loci_df = DataFrame([i = Array{Union{Tuple, Missing},1}(d[i]) for i in locinames])
     names!(loci_df, Symbol.(locinames))
     samples_df = DataFrame(name = string.(indnames),
-                           population = categorical(popid),
+                           population = string.(popid),
                            ploidy = Int8.(ploidy),
                            longitude = locx,
                            latitude = locy)
