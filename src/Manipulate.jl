@@ -220,7 +220,7 @@ const population! = populations!
 #### Find missing ####
 
 """
-    Base.missing(x::PopObj)
+    missing(x::PopObj)
 Identify and count missing loci in each sample of a `PopObj`. Returns a tuple
 of `DataFrames`: loci per sample, number per loci.
 
