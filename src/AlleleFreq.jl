@@ -2,7 +2,7 @@
     geno_freq_alpha(x::Array{Union{Missing, Tuple},1})
 Calculate genotype frequencies of all loci in a `PopObj`
 """
-function geno_freq_alpha(x::Array{Union{Missing, Tuple},1})
+function geno_freq_alpha(x::Array{Union{Missing,Tuple},1})
     d = Dict()
     for row in x
         # sum up missing
@@ -10,7 +10,7 @@ function geno_freq_alpha(x::Array{Union{Missing, Tuple},1})
             continue
         else
         # sum up non-missing genotypes
-            d[row] = get!(d, row, 0) +1
+            d[row] = get!(d, row, 0) + 1
         end
     end
     total = values(d) |> sum    # sum of all non-missing genotypes
@@ -32,7 +32,7 @@ function allele_freq_alpha(x::PopObj, include_missing = false)
             continue
         else
             for allele in row
-                d[allele] = get!(d, allele, 0) +1
+                d[allele] = get!(d, allele, 0) + 1
             end
         end
     end
@@ -46,7 +46,7 @@ end
     allele_freq_mini(x::Array{Union{Missing, Tuple},1})
 Calculate allele counts for a single locus of a `PopObj`
 """
-function allele_freq_mini(x::Array{Union{Missing, Tuple},1})
+function allele_freq_mini(x::Array{Union{Missing,Tuple},1})
     d = Dict()
     for row in x
         # sum up missing
@@ -55,7 +55,7 @@ function allele_freq_mini(x::Array{Union{Missing, Tuple},1})
         else
         # sum up alleles
             for allele in row
-                d[allele] = get!(d, allele, 0) +1
+                d[allele] = get!(d, allele, 0) + 1
             end
         end
     end
@@ -98,7 +98,7 @@ function het_expected(x::PopObj)
         a = allele_freq_mini(locus) # get allele freqs at locus
         #delete!(a, missing)     # remove missing values
         a = a |> values |> collect # isolate the freqs
-        homz = a .^2 |> sum
+        homz = a .^ 2 |> sum
         hetz = 1 - homz
         push!(het_vals, hetz)  # push the sum of hetz to the output array
     end
@@ -116,7 +116,7 @@ function het_sample(x::PopObj)
     y = deepcopy(x.loci)
     insertcols!(y, 1, :name => x.samples.name)
     insertcols!(y, 2, :id => 1:length(y[!, 1]))
-    tmp_stack = stack(y, names(y[!,3:end]))
+    tmp_stack = stack(y, names(y[!, 3:end]))
     by_ind = unstack(tmp_stack, :variable, :id, :value)
     select!(by_ind, Not(:variable))
     # calculate observed heterozygosity like for loci
@@ -133,7 +133,10 @@ function het_sample(x::PopObj)
         end
         push!(het_vals, tmp)
     end
-    return DataFrame(name = x.samples.name, het = (het_vals |> Array{Float64,1}))
+    return DataFrame(
+        name = x.samples.name,
+        het = (het_vals |> Array{Float64,1}),
+    )
 end
 
 function het_population_obs(x::PopObj)
