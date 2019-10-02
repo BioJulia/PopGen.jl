@@ -318,7 +318,7 @@ function hwe_test(x::PopObj; correction = "none")
         # make a dict of all possible tests and their respective functions
         d = Dict(
             "bonferroni" => Bonferroni(),
-            "holm" => Holm,
+            "holm" => Holm(),
             "benjamini" => Benjamini(),
             "hochberg" => Hochberg(),
             "bh" => BenjaminiHochberg(),
