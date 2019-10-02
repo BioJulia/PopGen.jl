@@ -272,11 +272,10 @@ end
 """
     chisq_hwe(x::PopObj)
 Calculate chi-squared test of HWE for each locus and returns
-observed and exected heterozygosity with chi-squared, degrees of freedom and p-values for each locus 
+observed and exected heterozygosity with chi-squared, degrees of freedom and p-values for each locus
 """
 function chisq_hwe(x::PopObj)
     output = DataFrame(ChiSq = Float64[], DF = Int64[], P = Any[])
-    #output = DataFrame(l1 = Int64[], l2 = Int64[])
     for locus in eachcol(x.loci, false)
         tmp = locus_chi_sq(locus)
         append!(output, tmp)
