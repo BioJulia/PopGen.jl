@@ -7,7 +7,7 @@ module PopGen
 ##   O o       O o       O ############ o       O o       O o
 
 
-using DataFrames, PlotlyJS, GeneticVariation, Distributions
+using DataFrames, PlotlyJS, GeneticVariation, Distributions, MultipleTesting
 
 export PopObj,
     summary,

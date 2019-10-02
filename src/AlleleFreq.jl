@@ -272,6 +272,7 @@ function locus_chi_sq(locus::Array{Union{Missing,Tuple},1})
     return (chisq_stat, df, p_val)
 end
 
+
 """
     hwe_test(x::PopObj, correction = "none")
 Calculate chi-squared test of HWE for each locus and returns observed and
@@ -341,6 +342,7 @@ function hwe_test(x::PopObj; correction = "none")
         for i in miss_idx
             insert!(correct, i, missing)
         end
+
         # add the adjusted p-vals back to the dataframe and return
         insertcols!(het, 7, Pcorr = correct |> Array{Union{Missing,Float64},1})
     end
