@@ -105,6 +105,37 @@ function het_population_obs(x::PopObj)
     insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
 end
 
+
+"""
+    het_population_exp(x::PopObj)
+Return the expected heterozygosity per population for each locus in a `PopObj`
+"""
+function het_population_exp(x::PopObj)
+    d = Dict()
+    popnames = []
+    y = deepcopy(x.loci)
+    insertcols!(y, 1, :population => x.samples.population)
+    y_subdf = groupby(y[!, :], :population)
+    for pop in y_subdf
+        pop_het_vals = []
+        for locus in eachcol(pop[!, :2:end], false)
+            a = allele_freq_mini(locus) # get allele freqs at locus
+            a = a |> values |> collect # isolate the freqs
+            homz = a .^ 2 |> sum
+            hetz = 1 - homz
+            push!(pop_het_vals, hetz)  # push the sum of hetz to the output array
+        end
+        #het_vals |> Array{Float64,1}
+        # get the population name and remove whitespaces
+        popname = replace(pop.population[1], " " => "")
+        d[popname] = pop_het_vals
+        push!(popnames, popname)
+    end
+    #return_df = DataFrame(d)[!,Symbol.(popnames)]
+    insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
+end
+
+
 """
     heterozygosity(x::PopObj, mode = "locus")
 Calculate observed and expected heterozygosity in a `PopObj`
