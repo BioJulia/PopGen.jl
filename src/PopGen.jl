@@ -24,6 +24,7 @@ export PopObj,
     remove_loci!,
     missing,
     heterozygosity, het, He,
+    hwe_test,
     plot_missing,
     plot_locations
 
@@ -40,6 +41,7 @@ include("Read.jl")
 include("Manipulate.jl")
 include("Plotting.jl")
 include("Datasets.jl")
-
+include("AlleleFreq.jl")
+include("HardyWeinberg.jl")
 
 end # module PopGen
