@@ -197,11 +197,11 @@ Load a CSV-type file into memory as a PopObj object
 
 ### Formatting example:
 Locus1,Locus2,Locus3   \n
-sierra_01,1,001001,002002,001001   \n
-sierra_02,1,001001,001001,001002   \n
-snbarb_03,2,001001,001001,001002 \n
-snbarb_02,2,001001,001001,001001 \n
-snbarb_03,2,001002,001001,001001 \n
+sierra_01,mountain,001001,002002,001001   \n
+sierra_02,mountain,001001,001001,001002   \n
+snbarb_03,coast,001001,001001,001002 \n
+snbarb_02,coast,001001,001001,001001 \n
+snbarb_03,coast,001002,001001,001001 \n
 """
 function csv(
     infile::String;
