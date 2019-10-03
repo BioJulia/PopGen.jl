@@ -6,15 +6,9 @@ Population Genetics in Julia.This is a fork of `PopGen.jl` in `BioJulia` with th
 [![alt text](https://img.shields.io/badge/slack-join%20PopGen.jl-ff69b4?style=for-the-badge&logo=slack)](https://pdimens.github.io/PopGen.jl/community/)
 
 ### Want to test out what's available so far?
-Invoke the package manager with `]` in the REPL and use
-```julia
-add "https://github.com/pdimens/PopGen.jl"
-```
-if using Jupyter:
-```julia
-using Pkg
-Pkg.add("https://github.com/pdimens/PopGen.jl")
-```
+#### Install instructions:
+![install_instructions](docs/img/install_carbon.png)
+
 
 After the package is installed, load it with `using PopGen`
 
