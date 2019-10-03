@@ -7,7 +7,7 @@ module PopGen
 ##   O o       O o       O ############ o       O o       O o
 
 
-using DataFrames, PlotlyJS, GeneticVariation
+using DataFrames, PlotlyJS, GeneticVariation, Distributions, MultipleTesting
 
 export PopObj,
     summary,
@@ -18,16 +18,13 @@ export PopObj,
     vcf,
     sample_names,
     isolate_genotypes,
-    locations,
-    locations!,
-    population,
-    populations,
-    population!,
-    populations!,
+    locations, locations!,
+    population, populations, population!, populations!,
     remove_inds!,
     remove_loci!,
     missing,
-    heterozygosity,
+    heterozygosity, het, He,
+    hwe_test,
     plot_missing,
     plot_locations
 
@@ -44,6 +41,7 @@ include("Read.jl")
 include("Manipulate.jl")
 include("Plotting.jl")
 include("Datasets.jl")
-
+include("AlleleFreq.jl")
+include("HardyWeinberg.jl")
 
 end # module PopGen
