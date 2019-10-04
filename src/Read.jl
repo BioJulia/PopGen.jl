@@ -90,8 +90,7 @@ function genepop(
         replace!(d[loc], msat_miss_geno => missing)
     end
     # typesafe genotype DataFrame
-    loci_df = DataFrame([i = Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
-    names!(loci_df, Symbol.(locinames))
+    loci_df = DataFrame([Symbol(i) => Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
     samples_df = DataFrame(
         name = string.(indnames),
         population = string.(popid),

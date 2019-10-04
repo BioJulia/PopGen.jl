@@ -71,15 +71,21 @@ end
 Return the observed heterozygosity per population for each locus in a `PopObj`
 """
 function het_population_obs(x::PopObj)
+    # get population order and store in its own dict key
+    popid = unique(x.samples.population |> collect)
+    fixed_popid = [replace(i, " " => "") for i in popid]
     d = Dict()
-    popnames = []
+    d["pops_obs"] = fixed_popid
+
     y = deepcopy(x.loci)
     insertcols!(y, 1, :population => x.samples.population)
     y_subdf = groupby(y[!, :], :population)
     for pop in y_subdf
         pop_het_vals = []
         for locus in eachcol(pop[!, :2:end], false)
-            a = geno_freq(locus)  # get genotype freqs at locus
+            # get genotype freqs at locus
+            a = geno_freq(locus)
+
             # add condition if the locus is missing from that subpop
             if a === missing
                 push!(pop_het_vals, missing)
@@ -87,22 +93,21 @@ function het_population_obs(x::PopObj)
             end
             tmp = 0
             for geno in collect(keys(a))
-                geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
-                if geno != geno_hom        # test if geno isn't homozygous
+                # create hom geno
+                geno_hom = fill(geno[1], length(geno)) |> Tuple
+                if geno != geno_hom    # test if geno isn't homozygous
                     tmp += a[geno]     # if true, add freq to total in tmp
                 end
             end
             push!(pop_het_vals, tmp)
         end
-        # convert to include missing
-        pop_het_conv = pop_het_vals |> Array{Union{Missing,Float64},1}
-        # get the population name and remove whitespaces
-        popname = replace(pop.population[1], " " => "")
-        d[popname] = pop_het_conv
-        push!(popnames, popname)
+
+        # add "_obs" for distinction vs "_exp"
+        popname = replace(pop.population[1], " " => "")*"_obs"
+        d[popname] = pop_het_vals |> Array{Union{Missing,Float64},1}
     end
-    #return_df = DataFrame(d)[!,Symbol.(popnames)]
-    insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
+    return d
+    #insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
 end
 
 
@@ -111,8 +116,12 @@ end
 Return the expected heterozygosity per population for each locus in a `PopObj`
 """
 function het_population_exp(x::PopObj)
+    # get population order and store in its own dict key
+    popid = unique(x.samples.population |> collect)
+    fixed_popid = [replace(i, " " => "") for i in popid]
     d = Dict()
-    popnames = []
+    d["pops_exp"] = fixed_popid
+
     y = deepcopy(x.loci)
     insertcols!(y, 1, :population => x.samples.population)
     y_subdf = groupby(y[!, :], :population)
@@ -125,14 +134,13 @@ function het_population_exp(x::PopObj)
             hetz = 1 - homz
             push!(pop_het_vals, hetz)  # push the sum of hetz to the output array
         end
-        #het_vals |> Array{Float64,1}
-        # get the population name and remove whitespaces
-        popname = replace(pop.population[1], " " => "")
-        d[popname] = pop_het_vals
-        push!(popnames, popname)
+
+        # add "_obs" for distinction vs "_exp"
+        popname = replace(pop.population[1], " " => "")*"_exp"
+        d[popname] = pop_het_vals |> Array{Union{Missing,Float64},1}
     end
-    #return_df = DataFrame(d)[!,Symbol.(popnames)]
-    insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
+        return d
+        #insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
 end
 
 
@@ -156,8 +164,23 @@ function heterozygosity(x::PopObj, mode = "locus")
     elseif lowercase(mode) == "sample" || lowercase(mode) == "ind" || lowercase(mode) == "individual"
         return het_sample(x)
     elseif lowercase(mode) == "pop" || lowercase(mode) == "population"
-        return het_population_obs(x)
+        obs = het_population_obs(x)
+        exp = het_population_exp(x)
+        merged_het = merge(obs, exp)
+        locinames = String.(names(x.loci))
+
+        # remake obs/exp distinction
+        obs_pops = obs["pops_obs"] .* "_obs"
+        exp_pops = exp["pops_exp"] .* "_exp"
+
+        # interleave pop_obs/exp for column names
+        col_names = Iterators.flatten(zip(obs_pops, exp_pops)) |> collect
+        df = DataFrame(locus = locinames)
+        for pop_het in col_names
+            insertcols!(df, size(df,2)+1, Symbol(pop_het) => merged_het[pop_het])
+        end
     end
+    return df
 end
 
 const het = heterozygosity
@@ -230,7 +253,6 @@ for multiple testing.
 ### `correction` methods (case insensitive)
 - `"bonferroni"` : Bonferroni adjustment
 - `"holm"` : Holm adjustment
-- `"benjamini"` : Benjamini adjustment
 - `"hochberg"` : Hochberg adjustment
 - `"bh"` or `"b-h"` : Benjamini-Hochberg adjustment
 - `"by"` or `"b-y"`: Benjamini-Yekutieli adjustment
@@ -255,39 +277,65 @@ function hwe_test(x::PopObj; correction = "none")
     if correction == "none"
         return het
     else
-        # make seperate array for non-missing P vals
-        p_no_miss = skipmissing(het.P) |> collect
-        # get indices of where original missing are
-        miss_idx = findall(i -> i === missing, het.P)
-
-        # make a dict of all possible tests and their respective functions
-        d = Dict(
-            "bonferroni" => Bonferroni(),
-            "holm" => Holm(),
-            "benjamini" => Benjamini(),
-            "hochberg" => Hochberg(),
-            "bh" => BenjaminiHochberg(),
-            "b-h" => BenjaminiHochberg(),
-            "by" => BenjaminiYekutieli(),
-            "b-y" => BenjaminiYekutieli(),
-            "bl" => BenjaminiLiu(),
-            "b-l" => BenjaminiLiu(),
-            "hommel" => Hommel(),
-            "sidak" => Sidak(),
-            "forward stop" => ForwardStop(),
-            "fs" => ForwardStop(),
-            "bc" => BarberCandes(),
-            "b-c" => BarberCandes(),
-        )
-
-        correct = adjust(p_no_miss, d[lowercase(correction)]) |> Array{Any,1}
-
-        # re-add missing to original positions
-        for i in miss_idx
-            insert!(correct, i, missing)
-        end
+        corrected_P = multitest_missing(het.P, correction)
 
         # add the adjusted p-vals back to the dataframe and return
-        insertcols!(het, 7, Pcorr = correct |> Array{Union{Missing,Float64},1})
+        insertcols!(het, 7, Pcorr = corrected_P )
     end
+end
+
+
+"""
+    multitest_missing(x::Array{Float64,1}, correction::String)
+Modification to `MultipleTesting.adjust` to include `missing` values. Missing
+values are first removed from the array, the appropriate correction made, then
+missing values are re-added to the array at their original positions. See
+MultipleTesting.jl docs for full more detailed information.
+#### example
+`multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
+
+### `correction` methods (case insensitive)
+- `"bonferroni"` : Bonferroni adjustment
+- `"holm"` : Holm adjustment
+- `"hochberg"` : Hochberg adjustment
+- `"bh"` or `"b-h"` : Benjamini-Hochberg adjustment
+- `"by"` or `"b-y"`: Benjamini-Yekutieli adjustment
+- `"bl"` or `"b-l"` : Benjamini-Liu adjustment
+- `"hommel"` : Hommel adjustment
+- `"sidak"` : Šidák adjustment
+- `"forward stop"` or `"fs"` : Forward-Stop adjustment
+- `"bc"` or `"b-c"` : Barber-Candès adjustment
+"""
+function multitest_missing(x::Array{Union{Missing, Float64},1}, correction::String)
+    # make seperate array for non-missing P vals
+    p_no_miss = skipmissing(x) |> collect
+    # get indices of where original missing are
+    miss_idx = findall(i -> i === missing, x)
+
+    # make a dict of all possible tests and their respective functions
+    d = Dict(
+        "bonferroni" => Bonferroni(),
+        "holm" => Holm(),
+        "hochberg" => Hochberg(),
+        "bh" => BenjaminiHochberg(),
+        "b-h" => BenjaminiHochberg(),
+        "by" => BenjaminiYekutieli(),
+        "b-y" => BenjaminiYekutieli(),
+        "bl" => BenjaminiLiu(),
+        "b-l" => BenjaminiLiu(),
+        "hommel" => Hommel(),
+        "sidak" => Sidak(),
+        "forward stop" => ForwardStop(),
+        "fs" => ForwardStop(),
+        "bc" => BarberCandes(),
+        "b-c" => BarberCandes(),
+    )
+
+    correct = adjust(p_no_miss, d[lowercase(correction)]) |> Array{Union{Missing, Float64},1}
+
+    # re-add missing to original positions
+    for i in miss_idx
+        insert!(correct, i, missing)
+    end
+    return correct
 end
