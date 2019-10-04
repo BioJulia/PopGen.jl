@@ -13,7 +13,7 @@ Calculate chi-squared test of HWE for each locus and returns observed and expect
 - `x` : the input `PopObj`
 - `correction =`  : a string specifying a P-value adjustment type
 
-### `correction` methods:
+### `correction` methods
 
 - `"bonferroni"` : Bonferroni adjustment
 - `"holm"` : Holm adjustment

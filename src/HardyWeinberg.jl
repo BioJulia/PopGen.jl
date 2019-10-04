@@ -1,6 +1,7 @@
 """
     het_observed(x::PopObj)
-Calculate the observed heterozygosity for each locus in a `PopObj`
+Calculate the observed heterozygosity for each locus in a `PopObj`. Returns an
+array of heterozygosity values.
 """
 function het_observed(x::PopObj)
     het_vals = []
@@ -20,7 +21,8 @@ end
 
 """
     het_expected(x::PopObj)
-Calculate the expected heterozygosity for each locus in a `PopObj`
+Calculate the expected heterozygosity for each locus in a `PopObj`. Returns an
+array of heterozygosity values.
 """
 function het_expected(x::PopObj)
     het_vals = []
@@ -36,7 +38,8 @@ end
 
 """
     het_sample(x::PopObj)
-Calculate the observed heterozygosity for each individual in a `PopObj`
+Calculate the observed heterozygosity for each individual in a `PopObj`. Returns
+an array of heterozygosity values.
 """
 function het_sample(x::PopObj)
     #transpose loci df to have samples as columns
@@ -68,7 +71,8 @@ end
 
 """
     het_population_obs(x::PopObj)
-Return the observed heterozygosity per population for each locus in a `PopObj`
+Return a Dict of the observed heterozygosity per population for each locus in
+a `PopObj`
 """
 function het_population_obs(x::PopObj)
     # get population order and store in its own dict key
@@ -112,7 +116,8 @@ end
 
 """
     het_population_exp(x::PopObj)
-Return the expected heterozygosity per population for each locus in a `PopObj`
+Return a `Dict` of the expected heterozygosity per population for each locus in
+a `PopObj`
 """
 function het_population_exp(x::PopObj)
     # get population order and store in its own dict key
@@ -286,7 +291,7 @@ end
 
 
 """
-    multitest_missing(x::Array{Float64,1}, correction::String)
+    multitest_missing(pvals::Array{Float64,1}, correction::String)
 Modification to `MultipleTesting.adjust` to include `missing` values. Missing
 values are first removed from the array, the appropriate correction made, then
 missing values are re-added to the array at their original positions. See
@@ -306,11 +311,11 @@ MultipleTesting.jl docs for full more detailed information.
 - `"forward stop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` or `"b-c"` : Barber-Candès adjustment
 """
-function multitest_missing(x::Array{Union{Missing, Float64},1}, correction::String)
+function multitest_missing(pvals::Array{Union{Missing, Float64},1}, correction::String)
     # make seperate array for non-missing P vals
-    p_no_miss = skipmissing(x) |> collect
+    p_no_miss = skipmissing(pvals) |> collect
     # get indices of where original missing are
-    miss_idx = findall(i -> i === missing, x)
+    miss_idx = findall(i -> i === missing, pvals)
 
     # make a dict of all possible tests and their respective functions
     d = Dict(

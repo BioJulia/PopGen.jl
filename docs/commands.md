@@ -11,7 +11,7 @@ julia> sharks = gulfsharks() ;
 
 
 
-## individuals 
+## Individuals 
 
 ### view individuals' names
 
@@ -139,7 +139,7 @@ Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 !!! info "sample not found!"
     If removing a single sample and it is not found in the PopObj, an error will be returned. However, if removing multiple samples, you will receive a notice above the PopObj summary indicating which individuals were not found, while removing the ones that were.
 
-## population ID's
+## Population ID's
 ### view population names
 ```julia
 populations(x::PopObj; listall::Bool = false)
@@ -260,7 +260,7 @@ julia> popid!(sharks, rename = new_popnames)
 │ 212 │ seg_031 │ Southeast Gulf │
 ```
 
-## display specific loci and/or samples
+## Display Specific Loci and/or Samples
 ### view loci
 
 ```julia
@@ -394,7 +394,7 @@ isolate_genotypes(sharks, samples= ["cc_001", "seg_028"], loci = "contig_10013")
 
 
 
-## remove loci
+## Remove Loci
 
 ```julia
 remove_loci!(x::PopObj, loci::Union{String, Array{String,1}})
@@ -486,7 +486,7 @@ Available .samples fields: .name, .population, .ploidy, .longitude,
 !!! info "locus not found!"
     If removing a single locus and it is not found in the PopObj, an error will be returned. However, if removing multiple loci, you will receive a notice above the PopObj summary indicating which loci were not found, while removing the ones that were.
 
-## missing data
+## Missing Data
 ### view missing data
 
 ```julia
@@ -687,7 +687,7 @@ julia> plot_missing(sharks)
     - use a third argument `:embed` to make the plots fully viewable offline. The output files are much larger (relatively) because it embeds the Plotly javeascript into the file. For context, the`gulfsharks` plot file is ~3.5mb when using `:embed`
 
 
-## location data
+## Location Data
 ### view location data
 ```julia
 locations(x::PopObj)

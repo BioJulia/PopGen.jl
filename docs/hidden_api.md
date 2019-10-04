@@ -1,38 +1,136 @@
-## Format
-
-Variant Call Format (or *VCF*) files already follow a format standard, and while there is some wiggle-room for optional values, PopGen.jl only requires the core/mandatory components of a VCF, meaning problems should hopefully not arise regardless of which variant caller you are using (although we use `Freebayes` ourselves). Please open an issue if they do, or reach out to us on the community Slack.
-
-!!! failure "filter VCF files beforehand"
-    Keep in mind, VCF files need to be filtered **before** importing them into PopGen.jl. There is no and will be no VCF-filtering functionality to this package, as it is outside of the purpose of PopGen.jl. Refer to `vcftools` and `vcflib` to filter your sequence data. 
+Like most Julia packages, there are a lot of functions in PopGen.jl, but only a number of them are `exported`, which are the ones you the user can casually use after calling `using PopGen`. You'll often see other Julia packages refer to these as API's, or "Application Programming Interface". If you want to contribute to PopGen.jl, then it will be super useful to know what API's are already available and save you the trouble of reinventing the wheel.
 
 
 
-## Import a VCF file as a `PopObj`
+## Allele Frequencies
 
-PopGen.jl provides a simple command `vcf` to import a VCF file as a `PopObj`, which requires only the name of the file and nothing else.
+These are found in `AlleleFreq.jl`
 
-
+### allele_freq_mini
 
 ```julia
-potato = vcf("/home/data/russet_potatoes.vcf")
+allele_freq_mini(x::Array{Union{Missing, Tuple},1})
 ```
 
+Calculate allele counts for a single locus of a `PopObj`. Returns a `Dict` of allele's and their frequencies.
 
+```julia
+allele_freq_mini(x::Array{Union{Missing, Tuple},1})
+```
 
-## What VCF files lack
-
-Due to the nature of the file format, importing VCF files will provide:
-
-- sample names
-- ploidy of each sample
-- locus names
-- genotypes
-
-but they will **not** provide:
-
-- population information
-- latitude or longitude
+Calculate allele counts for a single locus of a `PopObj` split by population using `group()`. Returns a `Dict` of allele's and their frequencies.
 
 
 
-This means you will need to add that information separately afterwards. Location data (which is optional!) can be added to the `PopObj` directly with `.samples.latitude` or `.samples.longitude` or with the `locations!` command. Population names (mandatory!) can be added by overwriting `.samples.population` with an array of population names. 
+## Genotype Frequencies
+
+These are found in `AlleleFreq.jl`
+
+### geno_freq
+
+```julia
+geno_freq(x::Array{Union{Missing, Tuple},1})
+```
+
+Calculate genotype frequencies of all loci in a `PopObj`. Returns a `Dict` of genotypes and their frequencies. 
+
+```julia
+geno_freq(x::SubArray{Union{Missing, Tuple},1})
+```
+
+Calculate genotype frequencies of all loci in `PopObj` split by population using `group()`. Returns a `Dict` of genotypes and their frequencies.
+
+
+
+## Observed Heterozygosity
+
+These are found in `HardyWeinberg.jl`
+
+### het_observed
+
+```julia
+het_observed(x::PopObj)
+```
+
+Calculate the observed heterozygosity for each locus in a `PopObj`. Returns an array of heterozygosity values.
+
+### het_population_obs
+
+```julia
+het_population_obs(x::PopObj)
+```
+
+Return a `Dict` of the observed heterozygosity per population for each locus in a `PopObj`
+
+### het_sample
+
+```julia
+het_sample(x::PopObj)
+```
+
+Calculate the observed heterozygosity for each individual in a `PopObj`. Returns an array of heterozygosity values.
+
+
+
+## Expected Heterozygosity
+
+These are found in `HardyWeinberg.jl`
+
+### het_expected
+
+```julia
+het_expected(x::PopObj)
+```
+
+Calculate the expected heterozygosity for each locus in a `PopObj`. Returns an array of heterozygosity values.
+
+### het_population_exp
+
+```julia
+het_population_exp(x::PopObj)
+```
+
+Return a `Dict` of the expected heterozygosity per population for each locus in a `PopObj`.
+
+
+
+## Chi Squared
+
+Found in `HardyWeinberg.jl`
+
+### locus_chi_sq
+
+```julia
+locus_chi_sq(locus::Array{Union{Missing, Tuple},1})
+```
+
+Calculate the chi square statistic and p-value for a locus. Returns a tuple with chi-square statistic, degrees of freedom, and p-value.
+
+## Multiple Testing
+
+Found in `HardyWeinberg.jl`
+
+### multitest_missing
+
+```julia
+multitest_missing(pvals::Array{Float64,1}, correction::String)
+```
+
+Modification to `MultipleTesting.adjust` to include `missing` values. Missing values are first removed from the array, the appropriate correction made, then missing values are re-added to the array at their original positions. See MultipleTesting.jl docs for full more detailed information.
+
+Example:
+
+`multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
+
+`correction` methods (case insensitive):
+
+- `"bonferroni"` : Bonferroni adjustment
+- `"holm"` : Holm adjustment
+- `"hochberg"` : Hochberg adjustment
+- `"bh"` or `"b-h"` : Benjamini-Hochberg adjustment
+- `"by"` or `"b-y"`: Benjamini-Yekutieli adjustment
+- `"bl"` or `"b-l"` : Benjamini-Liu adjustment
+- `"hommel"` : Hommel adjustment
+- `"sidak"` : Šidák adjustment
+- `"forward stop"` or `"fs"` : Forward-Stop adjustment
+- `"bc"` or `"b-c"` : Barber-Candès adjustment
