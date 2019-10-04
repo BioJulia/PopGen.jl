@@ -140,7 +140,6 @@ function het_population_exp(x::PopObj)
         d[popname] = pop_het_vals |> Array{Union{Missing,Float64},1}
     end
         return d
-        #insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
 end
 
 
@@ -148,11 +147,11 @@ end
     heterozygosity(x::PopObj, mode = "locus")
 Calculate observed and expected heterozygosity in a `PopObj`
 ## Example
-heterozygosity(nancycats, "population" )
+heterozygosity(nancycats(), "population" )
 
 ### Modes
 - `"locus"` : heterozygosity per locus (default)
-- `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual
+- `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
 - `"population"` or `"pop"` : heterozygosity per population (PopObj.samples.population)
 """
 function heterozygosity(x::PopObj, mode = "locus")
@@ -161,8 +160,10 @@ function heterozygosity(x::PopObj, mode = "locus")
         exp = het_expected(x)
         locinames = String.(names(x.loci))
         return DataFrame(locus = locinames, het_obs = obs, het_exp = exp)
+
     elseif lowercase(mode) == "sample" || lowercase(mode) == "ind" || lowercase(mode) == "individual"
         return het_sample(x)
+
     elseif lowercase(mode) == "pop" || lowercase(mode) == "population"
         obs = het_population_obs(x)
         exp = het_population_exp(x)
