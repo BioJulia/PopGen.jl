@@ -243,7 +243,7 @@ end
 """
     hwe_test(x::PopObj; correction = "none")
 Calculate chi-squared test of HWE for each locus and returns observed and
-exected heterozygosity with chi-squared, degrees of freedom and p-values
+expected heterozygosity with chi-squared, degrees of freedom and p-values
 for each locus.  Use `correction =` to specify a P-value correction method
 for multiple testing.
 
