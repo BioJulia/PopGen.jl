@@ -33,7 +33,7 @@ snbarb_03,2,-3.1,43.2,001002,001001,001001
     
 
 ```julia
-csv(infile; delim, digits = 3, location = false)
+csv(infile; delim, digits = 3, location = false, marker = "snp")
 
 # Example
 julia> a = csv("/data/cali_poppy.csv", delim = ",", digits = 3)
@@ -50,6 +50,6 @@ julia> a = csv("/data/cali_poppy.csv", delim = ",", digits = 3)
     - space: `delim = " "`
     - tab: `delim = "\t"`
     - etc.
-
 - `#!julia digits::Int64` : the number of digits used to denote an allele (default = 3)
 - `#!julia location::Bool = false` : true/false of whether location data is present in the file (default = false)
+- `#!julila marker::String`  : "snp" (default) or "msat" for microsatellites

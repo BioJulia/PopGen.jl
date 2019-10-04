@@ -1,4 +1,4 @@
-Like most Julia packages, there are a lot of functions in PopGen.jl, but only a number of them are `exported`, which are the ones you the user can casually use after calling `using PopGen`. You'll often see other Julia packages refer to these as API's, or "Application Programming Interface". If you want to contribute to PopGen.jl, then it will be super useful to know what API's are already available and save you the trouble of reinventing the wheel.
+Like most Julia packages, there are a lot of functions in PopGen.jl, but only a number of them are `exported`, which are the ones you the user can casually use after calling `using PopGen`. You'll often see other Julia packages refer to these as API's, or "Application Programming Interface". If you want to contribute to PopGen.jl, then it will be super useful to know what API's are already available and save you the trouble of reinventing the wheel. If you would like to use any of these functions by themselves (outside the scope of development), then you will need to use the `Package.function()` syntax, which looks like `PopGen.het_sample` in practice. 
 
 
 

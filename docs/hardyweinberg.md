@@ -1,4 +1,6 @@
-Testing for Hardy-Weinberg Equilibrium (often abbreviated to "HW" or "HWE") is a fairly common practice in population genetics. Testing for deviation from HWE is usually done with a Chi-Squared test, where one compares the observed genotype frequencies to the expected genotype frequencies given the observed allele frequencies at a locus. 
+Testing for Hardy-Weinberg Equilibrium (often abbreviated to "HW" or "HWE") is a fairly common practice in population genetics. In a two-allele system (alleles *p* and *q*), the HWE equation is defined as *p^2^ + 2pq + q^2^ = 1*. 
+
+Testing for deviation from HWE is usually done with a Chi-Squared test, where one compares the observed genotype frequencies to the expected genotype frequencies given the observed allele frequencies at a locus. 
 
 ## Test for Hardy-Weinberg equilibrium
 

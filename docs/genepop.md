@@ -8,7 +8,7 @@ Files must follow standard Genepop formatting:
 - **Must** be the same word each time and not a unique population name
 - File is tab or space delimited
 
-### Formatting Examples
+### formatting examples
 
 ```tab="loci stacked vertically"
 Wasp populations in New York
@@ -46,21 +46,22 @@ Newcomb_04,  254230 564000 090120
     make sure to change your backslashes "\" to forward slashes "/" 
 
 ```julia
-genepop(infile; digits = 3, popsep = "POP", numpops)
+genepop(infile; digits = 3, popsep = "POP", numpops, marker = "snp")
 
 # Example
 julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP", numpops = 2)
 ```
 
-### Arguments
+### arguments
 
 - `#!julila infile::String` : path to genepop file, in quotes
 
-### Keyword Arguments
+### keyword Arguments
 
 - `#!julila digits::Int64` : the number of digits used to denote an allele (default = 3)
 - `#!julila popsep::String` : word that separates populations in `infile` (default: "POP")
 - `#!julila numpops::Int64` : number of populations present in `infile` (used for early error checking)
+- `#!julila marker::String` : "snp" (default) or "msat" for microsatellites
 
 !!! info "Default population names"
     By default, the file reader will assign numbers as population ID's in order of appearance in the genepop file. Use the `popid!` function to rename these with your own population ID's.

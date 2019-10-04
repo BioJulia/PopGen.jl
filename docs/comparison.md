@@ -1,6 +1,6 @@
 # Comparison to `adegenet` / `pegas`
 
-There's a reason we started investing so many hours and so many new grey hairs into writing PopGen.jl when there was an existing ecosystem in R to perform these same tasks. Like we explain in the home page of these docs, we want a platform that is 
+There's a reason we started investing so many hours and so many new grey hairs into writing PopGen.jl when there was an existing ecosystem in R to perform these same tasks. Like we explain in the home page of these docs, we want a platform that is:
 
 1. fast(er)
 2. written in a single language
@@ -24,7 +24,7 @@ library(microbenchmark)
 using BenchmarkTools, PopGen
 ```
 
-As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux system on a nothing-special Huawei Matebook D with 8gigs of RAM and a 4-core AMD Ryzen5 mobile processor. **Note:** none of the Julia benchmarks, unless explicitly stated, are using parallel or GPU processing. 
+As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux system on a nothing-special Huawei Matebook D with 8gigs of RAM and a 4-core AMD Ryzen5 mobile processor. **Note:** all of the Julia benchmarks, unless explicitly stated, are performed single-threaded (i.e. not parallel, distributed, or GPU). 
 
 
 
@@ -37,7 +37,7 @@ julia> @btime x = gulfsharks() ; # hide the output
   2.098 s (14175767 allocations: 707.58 MiB)
 ```
 
-This R benchmark with take a few minutes. Consider going to the kitchen to make some tea while you wait.
+This R benchmark will take a few minutes. Consider  making some tea while you wait.
 
 ```r tab="R"
 > microbenchmark(read.genepop(file = "/home/pdimens/gulfsharks.gen", ncode = 3L, quiet = TRUE))
@@ -55,7 +55,7 @@ Julia  :rocket:   |    R  :snail:
 
 ### `PopObj` vs `genind` size
 
-It was pretty tricky to come up with a sensible/efficient/convenient data structure for PopGen.jl, and the original attempt was a Julian variant to a `genind`, which itself is something known as an `S4 class object`. While two dataframes design might not seem like it took a lot of effort, we ultimately decided that the column-major style and available tools, combined with careful genotype Typing was a decent "middle-ground" of ease-of-use vs performance. Plus, we are suckers for consistent syntax, which `genind`'s don't have compared to standard R syntax (looking at you too, Tidyverse/ggplot!). *Anyway*, it's important to understand how much space your data will take up in memory (your RAM) when you load it in, especially since data's only getting bigger! Keep in mind that `gulfsharks()` in PopGen.jl also provides lat/long data, which _should_ inflate the size of the object somewhat compared to the `genind`, which we won't add any location data to.
+It was pretty tricky to come up with a sensible/efficient/convenient data structure for PopGen.jl, and the original attempt was a Julian variant to a `genind`, which itself is something known as an `S4 class object`. While the two-dataframes design might not seem like it took a lot of effort, we ultimately decided that the column-major style and available tools, combined with careful genotype Typing was a decent "middle-ground" of ease-of-use vs performance. Plus, we are suckers for consistent syntax, which `genind`'s don't have compared to standard R syntax (looking at you too, Tidyverse/ggplot!). *Anyway*, it's important to understand how much space your data will take up in memory (your RAM) when you load it in, especially since data's only getting bigger! Keep in mind that `gulfsharks()` in PopGen.jl also provides lat/long data, which _should_ inflate the size of the object somewhat compared to the `genind`, which we won't add any location data to.
 
 ```julia tab="Julia"
 julia> Base.summarysize(x)
@@ -73,7 +73,7 @@ vs
 
 How is that possible?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles).
 
-The data takes up ~`4.9mb` in memory as a `PopObj` versus the ~`5.3mb` of a `genind`, about 18% smaller.
+The data takes up ~`4.9mb` in memory as a `PopObj` versus the ~`5.3mb` of a `genind`, about 7% smaller. It's not a ton of difference, but remember that the `PopObj` also contains more data.
 
 Julia  :house_with_garden: ​   |    R  :european_castle:
 
