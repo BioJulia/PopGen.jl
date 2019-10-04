@@ -107,7 +107,6 @@ function het_population_obs(x::PopObj)
         d[popname] = pop_het_vals |> Array{Union{Missing,Float64},1}
     end
     return d
-    #insertcols!(DataFrame(d), 1, :locus => string.(x.loci |> names))
 end
 
 
@@ -271,9 +270,9 @@ function hwe_test(x::PopObj; correction = "none")
     end
     #output = map(locus_chi_sq, eachcol(x.loci, false)) |> DataFrame
     het = heterozygosity(x)
-    insertcols!(het, 4, ChiSq = output[1] |> Array{Union{Missing,Float64},1})
-    insertcols!(het, 5, DF = output[2] |> Array{Union{Missing,Float64},1})
-    insertcols!(het, 6, P = output[3] |> Array{Union{Missing,Float64},1})
+    insertcols!(het, size(het,2)+1, χ² = output[1] |> Array{Union{Missing,Float64},1})
+    insertcols!(het, size(het,2)+1, DF = output[2] |> Array{Union{Missing,Float64},1})
+    insertcols!(het, size(het,2)+1, P = output[3] |> Array{Union{Missing,Float64},1})
     ## corrections
     if correction == "none"
         return het
