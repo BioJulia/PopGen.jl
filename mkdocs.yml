@@ -31,6 +31,7 @@ nav:
 - Community: community.md
 - Development:
     Under the hood functions: hidden_api.md
+- Frequently Asked Questions: faq.md
 
 
 markdown_extensions:
