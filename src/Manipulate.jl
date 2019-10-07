@@ -242,7 +242,7 @@ function Base.missing(x::PopObj)
     end
     sample_df = DataFrame(name = x.samples.name,
                        population = x.samples.population,
-                       nmissing = nmissing,
+                       missing = nmissing,
                        loci = missing_array
                        )
     # missing per locus
@@ -250,7 +250,7 @@ function Base.missing(x::PopObj)
         count(i->i===missing, col)
     end
 
-    loci_df = DataFrame(locus = string.(names(y.loci)), nmissing = f(y.loci))
+    loci_df = DataFrame(locus = string.(names(y.loci)), missing = f(y.loci))
     return (by_sample = sample_df, by_loci = loci_df)
 end
 

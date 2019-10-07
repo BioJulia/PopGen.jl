@@ -69,6 +69,7 @@ function genepop(
             push!(indnames, split(strip(gpop[i][j]), r"\,|\t")[1])
             unphasedloci = split(strip(gpop[i][j]), r"\s|\t")[2:end] |>
                            Array{String,1}
+            replace!(unphasedloci, "-9" => "0"^digits) #just in case -9 = missing
             for locus in unphasedloci
                 phasedlocus = parse.(
                     geno_type,
@@ -84,11 +85,12 @@ function genepop(
     ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
     for (loc, ploid) in zip(locinames, ploidy)
         miss_geno = fill(0, ploid) |> Tuple
+        msat_miss_geno = ("0")
         replace!(d[loc], miss_geno => missing)
+        replace!(d[loc], msat_miss_geno => missing)
     end
     # typesafe genotype DataFrame
-    loci_df = DataFrame([i = Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
-    names!(loci_df, Symbol.(locinames))
+    loci_df = DataFrame([Symbol(i) => Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
     samples_df = DataFrame(
         name = string.(indnames),
         population = string.(popid),
@@ -253,6 +255,7 @@ function csv(
                 push!(locy, missing)
             else
                 tmp = split(ln, delim) |> Array{String,1}
+                replace!(tmp, "-9" => "0"^digits) #just in case -9 = missing
                 phasedloci = []
                 for locus in tmp[5:end]
                     phasedlocus = parse.(
@@ -274,11 +277,13 @@ function csv(
     ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
     for (loc, ploid) in zip(locinames, ploidy)
         miss_geno = fill(0, ploid) |> Tuple
+        msat_miss_geno = ("0")
         replace!(d[loc], miss_geno => missing)
+        replace!(d[loc], msat_miss_geno => missing)
     end
     # typesafe genotype DataFrame
-    loci_df = DataFrame([i = Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
-    names!(loci_df, Symbol.(locinames))
+    loci_df = DataFrame([Symbol(i) => Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
+    #names!(loci_df, Symbol.(locinames))
     samples_df = DataFrame(
         name = string.(indnames),
         population = string.(popid),

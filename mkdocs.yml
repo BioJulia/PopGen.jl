@@ -14,6 +14,7 @@ repo_url: https://github.com/pdimens/PopGen.jl
 nav:
 - Home: index.md
 - Getting started: juliaprimer.md
+- Comparison vs R: comparison.md
 - Installing: install.md
 - The PopObj type:
     - What's a PopObj: popobj_type.md
@@ -25,7 +26,12 @@ nav:
     - VCF: vcf.md
 - View/edit PopObj: commands.md
 - Example data: examples.md
+- Population Genetics Tests:
+    - Hardy-Weinberg Equilibrium: hardyweinberg.md
 - Community: community.md
+- Development:
+    Under the hood functions: hidden_api.md
+- Frequently Asked Questions: faq.md
 
 
 markdown_extensions:
