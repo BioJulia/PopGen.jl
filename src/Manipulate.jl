@@ -77,6 +77,18 @@ function isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= no
     end
 end
 
+"""
+    get_genotype(x::PopObj; sample::String, locus::String)
+View the genotypes of a specific sample for specific locus in a `PopObj`.
+
+`get_genotype(nancycats, sample = "N115" , locus = "fca8")`
+
+"""
+function get_genotype(x::PopObj; sample::String, locus::String)
+    idx = findfirst(i -> i == sample, x.samples.name)
+    return getindex(x.loci[!, Symbol(locus)], idx)
+end
+
 
 """
     locations(x::PopObj)
