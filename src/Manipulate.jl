@@ -30,15 +30,16 @@ end
 
 
 """
-    isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}, loci::Union{String, Array, Nothing})
-View the genotypes of specific samples for specific loci in a `PopObj`.
-Default shows all genotypes for all individuals.
+    view_genotypes(x::PopObj; samples::Union{String, Array, Nothing}, loci::Union{String, Array, Nothing})
+Returns a dataframe of samples, population, genotypes. View the genotypes of
+specific samples for specific loci in a `PopObj`. Default shows all genotypes
+for all individuals.
 
-`isolate_genotypes(nancycats, loci = "fca8")`
+`view_genotypes(nancycats, loci = "fca8")`
 
-`isolate_genotypes(nancycats, samples = "N226", loci = ["fca8", "fca23"])`
+`view_genotypes(nancycats, samples = "N226", loci = ["fca8", "fca23"])`
 """
-function isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= nothing, loci::Union{String, Array, Nothing}= nothing)
+function view_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= nothing, loci::Union{String, Array, Nothing}= nothing)
     if loci == nothing && samples == nothing
         @warn "please specify either loci= or samples=, otherwise use PopObj.loci"
     end
@@ -77,9 +78,12 @@ function isolate_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= no
     end
 end
 
+
 """
     get_genotype(x::PopObj; sample::String, locus::String)
-View the genotypes of a specific sample for specific locus in a `PopObj`.
+Return the genotype of a specific sample for specific locus in a `PopObj`.
+This is a barebones variant to `isolate_genotypes` that is ~1000x faster and
+suitable for development.
 
 `get_genotype(nancycats, sample = "N115" , locus = "fca8")`
 

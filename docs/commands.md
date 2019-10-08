@@ -264,13 +264,13 @@ julia> popid!(sharks, rename = new_popnames)
 ### view loci
 
 ```julia
-isolate_genotypes(x::PopObj; samples= nothing, loci= nothing)
+view_genotypes(x::PopObj; samples= nothing, loci= nothing)
 ```
 
 Default shows all genotypes for all individuals. Returns a DataFrame.
 
 ``` julia tab="all loci"
-julia> isolate_genotypes(sharks)
+julia> view_genotypes(sharks)
 ```
 
 ``` tab="output"
@@ -299,7 +299,7 @@ julia> isolate_genotypes(sharks)
 Add the argument  `loci=` specify a single locus (string) or multiple loci (array of strings) to display
 
 ``` julia tab="single locus"
-julia> isolate_genotypes(sharks, loci = "contig_10001")
+julia> view_genotypes(sharks, loci = "contig_10001")
 ```
 
 ``` tab="single output"
@@ -326,7 +326,7 @@ julia> isolate_genotypes(sharks, loci = "contig_10001")
 ```
 
 ``` julia tab="multiple loci"
-julia> isolate_genotypes(sharks, loci = ["contig_10001", "contig_10028"])
+julia> view_genotypes(sharks, loci = ["contig_10001", "contig_10028"])
 ```
 
 ``` tab="multiple output"
@@ -357,7 +357,7 @@ julia> isolate_genotypes(sharks, loci = ["contig_10001", "contig_10028"])
 Add the argument  `samples=` specify a single sample (string) or multiple samples (array of strings) to display
 
 ```julia tab="single sample"
-julia> isolate_genotypes(sharks, samples = "cc_001")
+julia> view_genotypes(sharks, samples = "cc_001")
 ```
 
 ``` tab="single output"
@@ -380,7 +380,7 @@ julia> isolate_genotypes(sharks, samples = "cc_001")
 It also means that you can combine the keywords `samples=` and `loci=` to further specify your output:
 
 ```julia tab="both keywords"
-isolate_genotypes(sharks, samples= ["cc_001", "seg_028"], loci = "contig_10013")
+view_genotypes(sharks, samples= ["cc_001", "seg_028"], loci = "contig_10013")
 ```
 
 ``` tab="output"
