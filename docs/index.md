@@ -53,9 +53,3 @@ Which, let's be honest, is such a delight to use. Installing PopGen.jl should be
 [![alt text](img/orcid.png)](https://orcid.org/0000-0003-3823-0373) [![alt text](img/twitter.png)](https://twitter.com/PVDimens) Pavel Dimens, PhD Student @ U. Southern Mississippi
 
 [![alt text](img/orcid.png)](http://orcid.org/0000-0002-9100-217X) [![alt text](img/twitter.png)](https://twitter.com/JasonSelwyn) Jason Selwyn, PhD Candidate @ Texas A&M University - Corpus Christi 
-
-
-
-###### What is that logo?
-
-It's the Stepping Stone model of migration and population structure... arrange to kinda look like a double helix. Sorta looks like a fish, but that was unintentional.

@@ -1,6 +1,8 @@
 site_name: PopGen.jl
 site_description: Population genetics in Julia
 site_author: Pavel Dimens and Jason Selwyn
+copyright: 2019 Pavel Dimens and Jason Selwyn
+
 theme:
   name: 'material'
   logo: img/favicon.ico
@@ -10,6 +12,7 @@ theme:
     secondary: blue
     
 repo_url: https://github.com/pdimens/PopGen.jl
+repo_name: PopGen.jl
 
 nav:
 - Home: index.md
