@@ -10,41 +10,53 @@ cat2=PopGen.get_genotype(cats, sample = "N100", locus = "fca78")
 allele_freq = PopGen.allele_freq_mini(cats.loci.fca78)
 
 function pr_l_s(x, y, allele_freq)
-    ## Calculate Pr(Li | Sj)
+    # Calculate Pr(Li | Sj)
+    # If the allele identity falls into this class (L1-L9), generate the
+    # probabilities of it belonging to each of the different classes and
+    # return that array of 9 distinct probabilities
 
-    if x[1] == x[2] == y[1] == y[2] ##l1 - AiAi AiAi
+    ## class L1 -  AᵢAᵢ AᵢAᵢ ##
+    if x[1] == x[2] == y[1] == y[2] ##l1 -
         p = allele_freq[x[1]]
         [p, p^2, p^2, p^3, p^2, p^3, p^2, p^3, p^4]
 
-    elseif (x[1] == x[2]) & (y[1] == y[2]) & (x[1] != y[1]) #L2 - AiAi AjAj
+    ## class L2 - AᵢAᵢ AⱼAⱼ ##
+    elseif (x[1] == x[2]) & (y[1] == y[2]) & (x[1] != y[1])
         p = (allele_freq[x[1]], allele_freq[y[1]])
         [0, prod(p), 0, prod(p) * p[2], 0, prod(p) * p[1], 0, 0, prod(p.^2)]
 
-    elseif (x[1] == x[2] == y[1]) & (x[1] != y[2]) #L3 - AiAi AiAj
+    ## class L3 - AᵢAᵢ AᵢAⱼ ##
+    elseif (x[1] == x[2] == y[1]) & (x[1] != y[2])
         p = (allele_freq[x[1]], allele_freq[y[2]])
         [0, 0, prod(p), 2 * prod(p) * p[1], 0, 0, 0, prod(p) * p[1], 2 * prod(p) * p[1]^2]
 
-    elseif (x[1] == x[2]) & (y[1] != y[2]) & (x[1] != y[1]) & (x[1] != y[2]) #L4 - AiAi AjAk
+    ## class L4 - AᵢAᵢ AⱼAₖ ##
+    elseif (x[1] == x[2]) & (y[1] != y[2]) & (x[1] != y[1]) & (x[1] != y[2])
         p = (allele_freq[x[1]], allele_freq[y[1]], allele_freq[y[2]])
         [0, 0, 0, 2 * prod(p), 0, 0, 0, 0, 2 * prod(p) * p[1]]
 
-    elseif (x[1] == y[1] == y[2]) & (x[1] != x[2]) #L5 - AiAj AiAi
+    ## L5 - AiAj AiAi ##
+    elseif (x[1] == y[1] == y[2]) & (x[1] != x[2])
         p = (allele_freq[x[1]], allele_freq[x[2]])
         [0, 0, 0, 0, prod(p), 2 * prod(p) * p[1], 0, prod(p) *p[1], 2 * prod(p) * p[1]^2]
 
-    elseif (x[1] != x[2]) & (y[1] == y[2]) & (x[1] != y[1]) & (x[2] != y[1]) #L6 - AjAk AiAi
+    ## L6 - AjAk AiAi ##
+    elseif (x[1] != x[2]) & (y[1] == y[2]) & (x[1] != y[1]) & (x[2] != y[1])
         p = (allele_freq[y[1]], allele_freq[x[1]], allele_freq[x[2]])
         [0, 0, 0, 0, 0, 2 * prod(p), 0, 0, 2 * prod(p) * p[1]]
 
-    elseif (x[1] == y[1]) & (x[2] == y[2]) & (x[1] != x[2]) #L7 - AiAj AiAj
+    ## L7 - AiAj AiAj ##
+    elseif (x[1] == y[1]) & (x[2] == y[2]) & (x[1] != x[2])
         p = (allele_freq[x[1]], allele_freq[x[2]])
         [0, 0, 0, 0, 0, 0, 2 * prod(p), prod(p) * sum(p), 4 * prod(p.^2)]
 
-    elseif (x[1] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[2] != y[2]) #L8 - AiAj AiAk
+    ## L8 - AiAj AiAk ##
+    elseif (x[1] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[2] != y[2])
         p = (allele_freq[x[1]], allele_freq[x[2]], allele_freq[y[2]])
         [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
 
-    elseif (x[1] != x[2]) & (x[1] != y[1]) & (x[1] != y[2]) & (x[2] != y[1]) & (x[2] != y[2]) & (y[1] != x[2]) #L9 - AiAj AkAl
+    ## L9 - AiAj AkAl ##
+    elseif (x[1] != x[2]) & (x[1] != y[1]) & (x[1] != y[2]) & (x[2] != y[1]) & (x[2] != y[2]) & (y[1] != x[2])
         p = (allele_freq[x[1]], allele_freq[x[2]], allele_freq[y[1]], allele_freq[y[2]])
         [0, 0, 0, 0, 0, 0, 0, 0, 4 * prod(p)]
     else
