@@ -244,6 +244,59 @@ function locus_chi_sq(locus::Array{Union{Missing,Tuple},1})
     return (chisq_stat, df, p_val)
 end
 
+"""
+    locus_chi_sq(locus::SubArray{Union{Missing, Tuple},1})
+Calculate the chi square statistic and p-value for a locus of a `PopObj` split by
+population using `groupby()`. Returns a tuple with chi-square statistic, degrees
+of freedom, and p-value.
+"""
+function locus_chi_sq(locus::SubArray{Union{Missing,Tuple},1})
+    #Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
+    number_ind = count(i -> i !== missing, locus)
+
+    ## Get expected number of genotypes in a locus
+    the_allele_dict = allele_freq_mini(locus)
+    p = the_allele_dict |> values |> collect
+
+    #Calculate Expected Genotype numbers
+    expected_genotype_freq = p * transpose(p) .* number_ind
+    expected_genotype_freq = vec(expected_genotype_freq)
+
+    alleles = ["$i" for i in the_allele_dict |> keys |> collect]
+    alleles = (alleles .* ",") .* permutedims(alleles)
+    alleles = Array{String}.(sort.(split.(alleles, ",")))
+    alleles = [parse.(Int16, i) |> Tuple for i in alleles]
+    alleles = vec(alleles)
+
+    expected = Dict()
+    for (geno, freq) in zip(alleles, expected_genotype_freq)
+        expected[geno] = get!(expected, geno, 0) + freq
+    end
+
+    ## Get observed number of genotypes in a locus
+    observed = geno_freq(locus)
+    for j in keys(observed)
+        observed[j] = observed[j] * number_ind
+    end
+
+    chisq_stat = expected
+    for genotype in keys(expected)
+        o = get(observed, genotype, 0)
+        e = get(expected, genotype, 0)
+
+        chisq_stat[genotype] = (o - e)^2 / e
+    end
+    chisq_stat = values(chisq_stat) |> sum
+    df = (length(alleles) - length(the_allele_dict)) / 2
+
+    if df > 0
+        chi_sq_dist = Distributions.Chisq(df)
+        p_val = 1 - cdf(chi_sq_dist, chisq_stat)
+    else
+        p_val = missing
+    end
+    return (chisq_stat, df, p_val)
+end
 
 """
     hwe_test(x::PopObj; correction = "none")
