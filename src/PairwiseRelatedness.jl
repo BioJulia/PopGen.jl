@@ -1,10 +1,18 @@
 ## Milligan 2002 dyadic relatedness - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1462494/pdf/12663552.pdf
 
+#= Steps to finish:
+    Calculate all loci pr_l_s
+
+    Calcuate Δ coefficients given all of the available alleles
+
+    Iterate over all pairs of individuals
+=#
+
 cats=nancycats()
 
 cats.samples
 
-cat1=PopGen.get_genotype(cats, sample = "N128", locus = "fca23")
+cat1=PopGen.get_genotype(cats, sample = "N95", locus = "fca23")
 cat2=PopGen.get_genotype(cats, sample = "N100", locus = "fca23")
 
 allele_freq = PopGen.allele_freq_mini(cats.loci.fca23)
@@ -80,7 +88,6 @@ function Δ_likelihood(Pr_L_S::Vector{Float64})
     #Δ is what needs to be optimized
     #consist of 9 values between 0 and 1 which must also sum to 1
     #is then used to calculate relatedness
-    #push!(Δ, 1 - sum(Δ))
 
     model = Model(with_optimizer(GLPK.Optimizer))
     @variable(model, 0 <= Δ[1:8] <= 1)
@@ -94,7 +101,6 @@ function Δ_likelihood(Pr_L_S::Vector{Float64})
 end
 
 Δ = Δ_likelihood(tst)
-
 
 
 
