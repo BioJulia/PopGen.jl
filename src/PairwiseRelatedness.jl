@@ -4,16 +4,22 @@ cats=nancycats()
 
 cats.samples
 
-cat1=PopGen.get_genotype(cats, sample = "N111", locus = "fca78")
-cat2=PopGen.get_genotype(cats, sample = "N100", locus = "fca78")
+cat1=PopGen.get_genotype(cats, sample = "N128", locus = "fca23")
+cat2=PopGen.get_genotype(cats, sample = "N100", locus = "fca23")
 
-allele_freq = PopGen.allele_freq_mini(cats.loci.fca78)
+allele_freq = PopGen.allele_freq_mini(cats.loci.fca23)
 
 function pr_l_s(x, y, allele_freq)
-    # Calculate Pr(Li | Sj)
-    # If the allele identity falls into this class (L1-L9), generate the
-    # probabilities of it belonging to each of the different classes and
-    # return that array of 9 distinct probabilities
+    #= Current Bugs
+    1) For the genotypes 138|146 & 136|146 it is not properly sorted into the correct class (L8) because of the order of the alleles
+
+    =#
+
+    #= Calculate Pr(Li | Sj)
+    If the allele identity falls into this class (L1-L9), generate the
+    probabilities of it belonging to each of the different classes and
+    return that array of 9 distinct probabilities
+    =#
 
     ## class L1 -  AᵢAᵢ AᵢAᵢ ##
     if x[1] == x[2] == y[1] == y[2] ##l1 -
@@ -75,12 +81,6 @@ function dyad_likelihood(Δ::Vector{Float64}, Pr_L_S::Vector{Float64})
     -1 * sum(Pr_L_S .* Δ)
 end
 
-#Need to either maximize this sum or use it as the likelihood in a bayesian model and sample from the posterior.
-
-
-#Need to condition on each of the 9 delta coefficients to maximize the likelihood and then calculate the relatedness
-
-using Optim
 
 lower = [0.0, 0, 0, 0, 0, 0, 0, 0, 0]
 upper = [1.0, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -89,8 +89,50 @@ dirichlet_distr = Dirichlet(9, 1)
 dyad_likelihood(rand(dirichlet_distr), tst)
 
 optimized_Δ = optimize(Δ -> dyad_likelihood(Δ, tst), lower, upper, rand(dirichlet_distr), Fminbox(NelderMead()))
+
+using JuMP
+using GLPK
+##### 8 and the 9th is 1-sum - here it is
+function Δ_likelihood(Pr_L_S::Vector{Float64})
+    #Δ is what needs to be optimized
+    #consist of 9 values between 0 and 1 which must also sum to 1
+    #is then used to calculate relatedness
+    #push!(Δ, 1 - sum(Δ))
+
+    model = Model(with_optimizer(GLPK.Optimizer))
+    @variable(model, 0 <= Δ[1:8] <= 1)
+    @objective(model, Max, sum(tst[1:8] .* Δ) + ((1 - sum(Δ)) * tst[9]))
+    @constraint(model, con, 0 <= (1 - sum(Δ)) <= 1)
+    optimize!(model)
+
+    out = value.(Δ)
+    push!(out, 1 - sum(out))
+
+end
+
+Δ_likelihood(tst)
+
+#Need to either maximize this sum or use it as the likelihood in a bayesian model and sample from the posterior.
+
+
+#Need to condition on each of the 9 delta coefficients to maximize the likelihood and then calculate the relatedness
+
+lower = [0.0, 0, 0, 0, 0, 0, 0, 0, 0]
+upper = [1.0, 1, 1, 1, 1, 1, 1, 1, 1]
+
+dirichlet_distr = Dirichlet(9, 1)
+dyad_likelihood(rand(dirichlet_distr), tst)
+
+
+Δ[7] = 1.00
+Δ[8] = 1.00
+
+
+optimized_Δ = optimize(Δ -> Δ_likelihood(Δ, tst), lower, upper, rand(dirichlet_distr), Fminbox(NelderMead()))
 ## Not currently adhering to requirement that ΣΔ == 1
-optimized_Δ.minimizer |> sum
+optimized_Δ.minimizer
+optimized_Δ.iterations
+optimized_Δ.initial_x
 
 
 ## Calculate theta and r
@@ -99,4 +141,4 @@ function relatedness_calc(Δ)
     2 * θ
 end
 
-relatedness_calc(optimized_Δ.minimizer)
+relatedness_calc(optimized_Δ.minimizer/sum(optimized_Δ.minimizer))
