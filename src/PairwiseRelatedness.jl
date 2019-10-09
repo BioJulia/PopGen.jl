@@ -63,7 +63,6 @@ function dyad_likelihood(Δ::Vector{Float64}, Pr_L_S::Vector{Float64})
     -1 * sum(Pr_L_S .* Δ)
 end
 
-dyad_likelihood(tst, rand(dirichlet_prior))
 #Need to either maximize this sum or use it as the likelihood in a bayesian model and sample from the posterior.
 
 
