@@ -73,12 +73,12 @@ using Optim
 lower = [0.0, 0, 0, 0, 0, 0, 0, 0, 0]
 upper = [1.0, 1, 1, 1, 1, 1, 1, 1, 1]
 
-dirichlet_init = Dirichlet(9, 1)
+dirichlet_distr = Dirichlet(9, 1)
+dyad_likelihood(rand(dirichlet_distr), tst)
 
-optimize(Δ -> dyad_likelihood(Δ, tst), lower, upper, rand(dirichlet_prior), Fminbox(NelderMead()))
+optimized_Δ = optimize(Δ -> dyad_likelihood(Δ, tst), lower, upper, rand(dirichlet_distr), Fminbox(NelderMead()))
 ## Not currently adhering to requirement that ΣΔ == 1
-
-
+optimized_Δ.minimizer |> sum
 
 
 ## Calculate theta and r
