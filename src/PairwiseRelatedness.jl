@@ -86,3 +86,5 @@ function relatedness_calc(Δ)
     θ = Δ[1] + 0.5 * (Δ[3] + Δ[5] + Δ[7]) + 0.25 * Δ[8]
     2 * θ
 end
+
+relatedness_calc(optimized_Δ.minimizer)
