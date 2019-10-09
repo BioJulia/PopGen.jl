@@ -72,27 +72,10 @@ end
 tst = pr_l_s(cat1, cat2, allele_freq)
 
 ## Calculate Δ coefficients
-
-function dyad_likelihood(Δ::Vector{Float64}, Pr_L_S::Vector{Float64})
-    #Δ is what needs to be optimized
-    #consist of 9 values between 0 and 1 which must also sum to 1
-    #is then used to calculate relatedness
-
-    -1 * sum(Pr_L_S .* Δ)
-end
-
-
-lower = [0.0, 0, 0, 0, 0, 0, 0, 0, 0]
-upper = [1.0, 1, 1, 1, 1, 1, 1, 1, 1]
-
-dirichlet_distr = Dirichlet(9, 1)
-dyad_likelihood(rand(dirichlet_distr), tst)
-
-optimized_Δ = optimize(Δ -> dyad_likelihood(Δ, tst), lower, upper, rand(dirichlet_distr), Fminbox(NelderMead()))
-
 using JuMP
 using GLPK
-##### 8 and the 9th is 1-sum - here it is
+#Need to either maximize this sum or use it as the likelihood in a bayesian model and sample from the posterior.
+#currently only maximum likelihood optimization
 function Δ_likelihood(Pr_L_S::Vector{Float64})
     #Δ is what needs to be optimized
     #consist of 9 values between 0 and 1 which must also sum to 1
@@ -110,29 +93,9 @@ function Δ_likelihood(Pr_L_S::Vector{Float64})
 
 end
 
-Δ_likelihood(tst)
-
-#Need to either maximize this sum or use it as the likelihood in a bayesian model and sample from the posterior.
+Δ = Δ_likelihood(tst)
 
 
-#Need to condition on each of the 9 delta coefficients to maximize the likelihood and then calculate the relatedness
-
-lower = [0.0, 0, 0, 0, 0, 0, 0, 0, 0]
-upper = [1.0, 1, 1, 1, 1, 1, 1, 1, 1]
-
-dirichlet_distr = Dirichlet(9, 1)
-dyad_likelihood(rand(dirichlet_distr), tst)
-
-
-Δ[7] = 1.00
-Δ[8] = 1.00
-
-
-optimized_Δ = optimize(Δ -> Δ_likelihood(Δ, tst), lower, upper, rand(dirichlet_distr), Fminbox(NelderMead()))
-## Not currently adhering to requirement that ΣΔ == 1
-optimized_Δ.minimizer
-optimized_Δ.iterations
-optimized_Δ.initial_x
 
 
 ## Calculate theta and r
@@ -141,4 +104,4 @@ function relatedness_calc(Δ)
     2 * θ
 end
 
-relatedness_calc(optimized_Δ.minimizer/sum(optimized_Δ.minimizer))
+relatedness_calc(Δ)
