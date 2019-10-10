@@ -35,52 +35,50 @@ ind2 = "N111"
 # Calculate Δ coefficients
 # Calculate r value from Δ
 
-#=
-Attempts to efficiently make a dictionary of allele frequencies
-for locus in eachcol(data.loci, false)
-    allele_freq_mini(locus)
-end
 
-allele_freqs = Dict{String,Dict}("fca23" => allele_freq_mini(cats.loci.fca23))
-
-allele_freqs = [allele_freq_mini(locus) for locus in eachcol(data.loci, false)]
-
-Dict([String(locus) for locus in names(data.loci)] => [allele_freq_mini(locus) for locus in eachcol(data.loci, false)])
-
-Dict(string(j) => allele_freq_mini(locus) for (i, locus) in )
-=#
-locus = "fca8"
-
-ncol(data.loci)
-
-#Initialize a 9 x nLoci array to store Pr_L_S results
-Pr_L_S = [r * c for r in 1:9.0, c in 1:ncol(data.loci)]
-
+allele_frequencies = Dict()
 for locus in names(data.loci)
-    #Extract the pair of interest's genotypes
-    gen1 = get_genotype(data, sample = ind1, locus = String(locus))
-    gen2 = get_genotype(data, sample = ind2, locus = String(locus))
-
-    allele_freq = allele_freq_mini(data.loci[:, locus]) #This is likely a good candidate to remove and calculate outside of the loop of dyads and just grab what is needed
-
-    pr_l_s(gen1, gen2, allele_freq)
-
+    allele_frequencies[String(locus)] = allele_freq_mini(data.loci[:, locus])
 end
 
 
-#### Need to make either a dictionary or an array to store the Pr_L_S in to the use in the optimization step
 
-Pr_L_S = Dict(string(locus) => for locus in names(data.loci) )
+function dyadic_ML(data, allele_freqs)
+
+    Pr_L_S = Dict()
+    for locus in names(data.loci)
+        #Extract the pair of interest's genotypes
+        gen1 = get_genotype(data, sample = ind1, locus = String(locus))
+        gen2 = get_genotype(data, sample = ind2, locus = String(locus))
+
+        Pr_L_S[String(locus)] = pr_l_s(gen1, gen2, allele_freqs[String(locus)])
+    end
+
+    return(Pr_L_S)
+end
+
+
+tmp = dyadic_ML(data, allele_frequencies)
 
 
 
-
-cat1=PopGen.get_genotype(cats, sample = "N100", locus = "fca23")
-cat2=PopGen.get_genotype(cats, sample = "N111", locus = "fca23")
-
-allele_freq = PopGen.allele_freq_mini(cats.loci.fca23)
-
+"""
+    pr_l_s(x, y, allele_freq)
+Calculate the probability of observing the particular allele state given each of the 9 Jacquard Identity States
+Creates Table 1 from Milligan 2002
+"""
 function pr_l_s(x, y, allele_freq)
+    #= Example
+    cats = nancycats()
+    cat1=PopGen.get_genotype(cats, sample = "N100", locus = "fca23")
+    cat2=PopGen.get_genotype(cats, sample = "N111", locus = "fca23")
+    allele_freq = PopGen.allele_freq_mini(cats.loci.fca23)
+    pr_l_s(cat1, cat2, allele_freq)
+
+
+    =#
+
+
     #= Current Bugs
 
     =#
@@ -142,21 +140,21 @@ function pr_l_s(x, y, allele_freq)
         [-9, -9, -9, -9, -9, -9, -9, -9, -9]
     end
 end
-tst = pr_l_s(cat1, cat2, allele_freq)
+
 
 ## Calculate Δ coefficients
 using JuMP
 using GLPK
 #Need to either maximize this sum or use it as the likelihood in a bayesian model and sample from the posterior.
 #currently only maximum likelihood optimization
-function Δ_likelihood(Pr_L_S::Vector{Float64})
+function Δ_optim(Pr_L_S::Vector{Float64})
     #Δ is what needs to be optimized
     #consist of 9 values between 0 and 1 which must also sum to 1
     #is then used to calculate relatedness
 
     model = Model(with_optimizer(GLPK.Optimizer))
     @variable(model, 0 <= Δ[1:8] <= 1)
-    @objective(model, Max, sum(tst[1:8] .* Δ) + ((1 - sum(Δ)) * tst[9]))
+    @objective(model, Max, sum(Pr_L_S[1:8] .* Δ) + ((1 - sum(Δ)) * Pr_L_S[9]))
     @constraint(model, con, 0 <= (1 - sum(Δ)) <= 1)
     optimize!(model)
 
@@ -165,7 +163,40 @@ function Δ_likelihood(Pr_L_S::Vector{Float64})
     #Should probably include some output that confirms that it did in fact converge and/or use multiple random starts to confirm not a local maxima
 end
 
-Δ = Δ_likelihood(tst)
+Δ = Δ_optim(tmp["fca77"])
+
+
+#First attempt at optimizing multiple loci
+function Δ_optim(Pr_L_S)
+    #Δ is what needs to be optimized
+    #consist of 9 values between 0 and 1 which must also sum to 1
+    #is then used to calculate relatedness
+
+    model = Model(with_optimizer(Ipopt.Optimizer))
+    @variable(model, 0 <= Δ[1:8] <= 1)
+    @objective(model, Max, log_likelihood_Δ(Pr_L_S, Δ))
+    @constraint(model, con, 0 <= (1 - sum(Δ)) <= 1)
+    optimize!(model)
+
+    out = value.(Δ)
+    push!(out, 1 - sum(out))
+    #Should probably include some output that confirms that it did in fact converge and/or use multiple random starts to confirm not a local maxima
+end
+
+Δ = Δ_optim(tmp)
+
+keys(tmp)
+
+tmp["fca23"][1:8]
+
+function log_likelihood_Δ(Pr_L_S, Δ)
+    out = 1
+    for locus in keys(Pr_L_S)
+        out = out + log(sum(Pr_L_S[locus][1:8] .* Δ) + ((1 - sum(Δ)) * Pr_L_S[locus][9]))
+    end
+end
+
+
 
 
 
