@@ -306,9 +306,10 @@ end
 """
     hwe_test(x::PopObj; by_pop::Bool = false; correction = "none")
 Calculate chi-squared test of HWE for each locus and returns observed and
-expected heterozygosity with chi-squared, degrees of freedom and p-values
-for each locus. Use `by_pop = true` to perform this separately for each
-population (default: by_pop = false). Use `correction =` to specify a P-value
+expected heterozygosity with chi-squared, degrees of freedom and p-values for
+each locus. Use `by_pop = true` to perform this separately for each population
+(default: by_pop = false) and return a NamedTuple of DataFrames with the names
+corresponding to the population names. Use `correction =` to specify a P-value
 correction method for multiple testing.
 
 #### example
@@ -401,6 +402,7 @@ function hwe_test(x::PopObj; by_pop::Bool = false, correction::String = "none")
     end
 end
 
+const hwe = hwe_test
 
 """
     multitest_missing(pvals::Array{Float64,1}, correction::String)
