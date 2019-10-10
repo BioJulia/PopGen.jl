@@ -179,13 +179,18 @@ function heterozygosity(x::PopObj, mode = "locus")
         exp_pops = exp["pops_exp"] .* "_exp"
 
         # interleave pop_obs/exp for column names
-        col_names = Iterators.flatten(zip(obs_pops, exp_pops)) |> collect
+        #col_names = Iterators.flatten(zip(obs_pops, exp_pops)) |> collect
         df = DataFrame(locus = locinames)
-        for pop_het in col_names
-            insertcols!(df, size(df,2)+1, Symbol(pop_het) => merged_het[pop_het])
+        out_df = []
+        for (i,j) in zip(obs_pops, exp_pops)
+            tmp = DataFrame(locus = locinames, het_obs = merged_het[i], het_exp = merged_het[j])
+            push!(out_df, tmp)
         end
+        #for pop_het in col_names
+        #    insertcols!(df, size(df,2)+1, Symbol(pop_het) => merged_het[pop_het])
+        #end
     end
-    return df
+    return Tuple(out_df)
 end
 
 const het = heterozygosity
@@ -299,14 +304,17 @@ function locus_chi_sq(locus::SubArray{Union{Missing,Tuple},1})
 end
 
 """
-    hwe_test(x::PopObj; correction = "none")
+    hwe_test(x::PopObj; by_pop::Bool = false; correction = "none")
 Calculate chi-squared test of HWE for each locus and returns observed and
 expected heterozygosity with chi-squared, degrees of freedom and p-values
-for each locus.  Use `correction =` to specify a P-value correction method
-for multiple testing.
+for each locus. Use `by_pop = true` to perform this separately for each
+population (default: by_pop = false). Use `correction =` to specify a P-value
+correction method for multiple testing.
 
 #### example
-`hwe_test(gulfsharks(), correction = "bh")`
+`hwe_test(gulfsharks(), correction = "bh")` \n
+`hwe_test(gulfsharks(), by_pop = true, correction = "bh")` \n
+
 
 ### `correction` methods (case insensitive)
 - `"bonferroni"` : Bonferroni adjustment
@@ -320,35 +328,78 @@ for multiple testing.
 - `"forward stop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` or `"b-c"` : Barber-Candès adjustment
 """
-function hwe_test(x::PopObj; correction = "none")
-    output = [[], [], []]
-    for locus in eachcol(x.loci, false)
-        chisq, df, pval = locus_chi_sq(locus)
-        push!.(output, [chisq, df, pval])
-    end
-    #output = map(locus_chi_sq, eachcol(x.loci, false)) |> DataFrame
-    het = heterozygosity(x)
-    insertcols!(het, size(het,2)+1, χ² = output[1] |> Array{Union{Missing,Float64},1})
-    insertcols!(het, size(het,2)+1, DF = output[2] |> Array{Union{Missing,Float64},1})
-    insertcols!(het, size(het,2)+1, P = output[3] |> Array{Union{Missing,Float64},1})
-    ## corrections
-    if correction == "none"
-        return het
-    else
-        corrected_P = multitest_missing(het.P, correction)
+function hwe_test(x::PopObj; by_pop::Bool = false, correction::String = "none")
+    if by_pop == false
+        output = [[], [], []]
+        for locus in eachcol(x.loci, false)
+            chisq, df, pval = locus_chi_sq(locus)
+            push!.(output, [chisq, df, pval])
+        end
+        #output = map(locus_chi_sq, eachcol(x.loci, false)) |> DataFrame
+        het = heterozygosity(x)
+        insertcols!(het, size(het,2)+1, χ² = output[1] |> Array{Union{Missing,Float64},1})
+        insertcols!(het, size(het,2)+1, DF = output[2] |> Array{Union{Missing,Float64},1})
+        insertcols!(het, size(het,2)+1, P = output[3] |> Array{Union{Missing,Float64},1})
+        ## corrections
+        if correction == "none"
+            return het
+        else
+            corrected_P = multitest_missing(het.P, correction)
 
-        # add the adjusted p-vals back to the dataframe and return
-        insertcols!(het, 7, Pcorr = corrected_P )
+            # add the adjusted p-vals back to the dataframe and return
+            insertcols!(het, 7, Pcorr = corrected_P )
+        end
+    else
+        out_array = []
+        # get population order and store in its own dict key
+        popid = unique(x.samples.population |> collect)
+
+        y = deepcopy(x.loci)
+        insertcols!(y, 1, :population => x.samples.population)
+        y_subdf = groupby(y[!, :], :population) |> collect
+        het = heterozygosity(x, "pop")
+        for (eachpop, het_pop) in zip(y_subdf, het)
+            output = [[], [], []]
+            for locus in eachcol(eachpop, false)[2:end]
+                chisq, df, pval = locus_chi_sq(locus)
+                push!.(output, [chisq, df, pval])
+            end
+            insertcols!(het_pop, size(het_pop,2)+1, χ² = output[1] |> Array{Union{Missing,Float64},1})
+            insertcols!(het_pop, size(het_pop,2)+1, DF = output[2] |> Array{Union{Missing,Float64},1})
+            insertcols!(het_pop, size(het_pop,2)+1, P = output[3] |> Array{Union{Missing,Float64},1})
+            push!(out_array, het_pop)
+        end
+
+        ## corrections
+        if correction == "none"
+            d = Dict([Symbol(i) => j  for (i,j) in zip(popid, out_array)])
+            return NamedTuple{Tuple(Symbol.(popid))}(values(d))
+        else
+            # find the total number of non-missing P-values
+            total_n = 0
+            for each in out_array
+               total_n += count(i -> i !== missing, each.P)
+            end
+
+            for each_pop in out_array
+                # correct P values with modified adjustment, scaled to total # tests
+                corrected_P = multitest_missing(each_pop.P, total_n, correction)
+                # add the adjusted p-vals back to the dataframe
+                insertcols!(each_pop, 7, Pcorr = corrected_P )
+            end
+            d = Dict([Symbol(i) => j  for (i,j) in zip(popid, out_array)])
+            return NamedTuple{Tuple(Symbol.(popid))}(values(d))
+        end
     end
 end
 
 
 """
     multitest_missing(pvals::Array{Float64,1}, correction::String)
-Modification to `MultipleTesting.adjust` to include `missing` values. Missing
-values are first removed from the array, the appropriate correction made, then
-missing values are re-added to the array at their original positions. See
-MultipleTesting.jl docs for full more detailed information.
+Modification to `MultipleTesting.adjust` to include `missing` values in the
+returned array. Missing values are first removed from the array, the appropriate
+correction made, then missing values are re-added to the array at their original
+positions. See MultipleTesting.jl docs for full more detailed information.
 #### example
 `multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
 
@@ -390,6 +441,64 @@ function multitest_missing(pvals::Array{Union{Missing, Float64},1}, correction::
     )
 
     correct = adjust(p_no_miss, d[lowercase(correction)]) |> Array{Union{Missing, Float64},1}
+
+    # re-add missing to original positions
+    for i in miss_idx
+        insert!(correct, i, missing)
+    end
+    return correct
+end
+
+
+"""
+    multitest_missing(pvals::Array{Float64,1}, n::Int64, correction::String)
+Modification to `MultipleTesting.adjust` to include `missing` values in the
+returned array, along with scaling to the total number of test when performing
+corrections on population-by-population. Missing values are first removed from
+the array, the appropriate correction made, then missing values are re-added to
+the array at their original positions. See MultipleTesting.jl docs for full more
+detailed information.
+#### example
+`multitest_missing([0.1, 0.01, 0.005, 0.3], 6, "bh")`
+
+### `correction` methods (case insensitive)
+- `"bonferroni"` : Bonferroni adjustment
+- `"holm"` : Holm adjustment
+- `"hochberg"` : Hochberg adjustment
+- `"bh"` or `"b-h"` : Benjamini-Hochberg adjustment
+- `"by"` or `"b-y"`: Benjamini-Yekutieli adjustment
+- `"bl"` or `"b-l"` : Benjamini-Liu adjustment
+- `"hommel"` : Hommel adjustment
+- `"sidak"` : Šidák adjustment
+- `"forward stop"` or `"fs"` : Forward-Stop adjustment
+- `"bc"` or `"b-c"` : Barber-Candès adjustment
+"""
+function multitest_missing(pvals::Array{Union{Missing, Float64},1}, n::Int, correction::String)
+    # make seperate array for non-missing P vals
+    p_no_miss = skipmissing(pvals) |> collect
+    # get indices of where original missing are
+    miss_idx = findall(i -> i === missing, pvals)
+
+    # make a dict of all possible tests and their respective functions
+    d = Dict(
+        "bonferroni" => Bonferroni(),
+        "holm" => Holm(),
+        "hochberg" => Hochberg(),
+        "bh" => BenjaminiHochberg(),
+        "b-h" => BenjaminiHochberg(),
+        "by" => BenjaminiYekutieli(),
+        "b-y" => BenjaminiYekutieli(),
+        "bl" => BenjaminiLiu(),
+        "b-l" => BenjaminiLiu(),
+        "hommel" => Hommel(),
+        "sidak" => Sidak(),
+        "forward stop" => ForwardStop(),
+        "fs" => ForwardStop(),
+        "bc" => BarberCandes(),
+        "b-c" => BarberCandes(),
+    )
+
+    correct = adjust(p_no_miss, n, d[lowercase(correction)]) |> Array{Union{Missing, Float64},1}
 
     # re-add missing to original positions
     for i in miss_idx
