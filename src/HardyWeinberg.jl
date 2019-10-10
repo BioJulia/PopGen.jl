@@ -27,7 +27,7 @@ array of heterozygosity values.
 function het_expected(x::PopObj)
     het_vals = []
     for locus in eachcol(x.loci, false)
-        a = allele_freq_mini(locus) # get allele freqs at locus
+        a = allele_freq(locus) # get allele freqs at locus
         a = a |> values |> collect # isolate the freqs
         homz = a .^ 2 |> sum
         hetz = 1 - homz
@@ -132,7 +132,7 @@ function het_population_exp(x::PopObj)
     for pop in y_subdf
         pop_het_vals = []
         for locus in eachcol(pop[!, :2:end], false)
-            a = allele_freq_mini(locus) # get allele freqs at locus
+            a = allele_freq(locus) # get allele freqs at locus
             a = a |> values |> collect # isolate the freqs
             homz = a .^ 2 |> sum
             hetz = 1 - homz
@@ -206,7 +206,7 @@ function locus_chi_sq(locus::Array{Union{Missing,Tuple},1})
     number_ind = count(i -> i !== missing, locus)
 
     ## Get expected number of genotypes in a locus
-    the_allele_dict = allele_freq_mini(locus)
+    the_allele_dict = allele_freq(locus)
     p = the_allele_dict |> values |> collect
 
     #Calculate Expected Genotype numbers
@@ -260,7 +260,7 @@ function locus_chi_sq(locus::SubArray{Union{Missing,Tuple},1})
     number_ind = count(i -> i !== missing, locus)
 
     ## Get expected number of genotypes in a locus
-    the_allele_dict = allele_freq_mini(locus)
+    the_allele_dict = allele_freq(locus)
     p = the_allele_dict |> values |> collect
 
     #Calculate Expected Genotype numbers
