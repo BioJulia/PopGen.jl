@@ -1,10 +1,15 @@
 #= Steps to finish:
 
     Iterate over all pairs of individuals
-    Implement alternative relatedness metrics
     Solve dyadic optimization issues - set max higher?
     Solve dyadic inbreeding issues
     output in sensible manner
+
+=#
+
+#= Would be good to include
+
+    Implement alternative relatedness metrics
 
 =#
 
