@@ -24,16 +24,16 @@ get_genotype(nancycats, sample = "N115" , locus = "fca8")`
 
 These are found in `AlleleFreq.jl`
 
-### allele_freq_mini
+### allele_freq
 
 ```julia
-allele_freq_mini(x::Array{Union{Missing, Tuple},1})
+allele_freq(x::Array{Union{Missing, Tuple},1})
 ```
 
 Calculate allele counts for a single locus of a `PopObj`. Returns a `Dict` of allele's and their frequencies.
 
 ```julia
-allele_freq_mini(x::SubArray{Union{Missing, Tuple},1})
+allele_freq(x::SubArray{Union{Missing, Tuple},1})
 ```
 
 Calculate allele counts for a single locus of a `PopObj` split by population using `group()`. Returns a `Dict` of allele's and their frequencies.

@@ -32,7 +32,7 @@ Can then go through all the various Δ coefficients and calculate relatedness en
 
 
 get_genotype = PopGen.get_genotype
-allele_freq_mini = PopGen.allele_freq_mini
+allele_freq = PopGen.allele_freq
 
 data = nancycats()
 
@@ -61,7 +61,7 @@ ind2 = "N183"
 
 allele_frequencies = Dict()
 for locus in names(data.loci)
-    allele_frequencies[String(locus)] = allele_freq_mini(data.loci[:, locus])
+    allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
 end
 allele_frequencies
 
@@ -77,7 +77,7 @@ function pr_l_s(x, y, allele_freq)
     cats = nancycats()
     cat1=PopGen.get_genotype(cats, sample = "N100", locus = "fca23")
     cat2=PopGen.get_genotype(cats, sample = "N111", locus = "fca23")
-    allele_freq = PopGen.allele_freq_mini(cats.loci.fca23)
+    allele_freq = PopGen.allele_freq(cats.loci.fca23)
     pr_l_s(cat1, cat2, allele_freq)
 
 
