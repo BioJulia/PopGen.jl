@@ -1,6 +1,10 @@
 #= Steps to finish:
 
     Iterate over all pairs of individuals
+    Implement alternative relatedness metrics
+    Solve dyadic optimization issues - set max higher?
+    Solve dyadic inbreeding issues
+    output in sensible manner
 
 =#
 
@@ -13,15 +17,6 @@
 # Create for loop through all pairs of individuals and calculate relatedness
 #         -One possibility here is to use some type of outer function where the function evaluated in each cell is the relatedness calculation
 
-
-#= To look into once this is functional
-
-Output pairwise Pr_L_S arrays for each dyad
-Then find the optimal Δ using the NL model parameter
-may be faster due to less time spent compiling the model itself and more time just solving it
-
-Can then go through all the various Δ coefficients and calculate relatedness en masse
-=#
 using Convex
 using ECOS
 
@@ -43,18 +38,6 @@ remove_loci!(data, "fca96")
 
 #ind1 = "N182"
 #ind2 = "N183"
-
-
-# Inside Relatedness function - DyadML
-# loop through all loci and extract the genotype of both individuals
-# If neither individual is missing data at that locus then calculate Pr_L_S
-# Store as array all of the Pr_L_S values (9 x nloci)
-# End Loop
-# Calculate Δ coefficients
-# Calculate r value from Δ
-
-
-
 
 
 """
@@ -286,3 +269,4 @@ for ind1 in data.samples.name
 end
 #Sort out issues with suboptimal and failed convergence
 #Sort out storage as dataframe with ind1, ind2, relatedness, Δ
+#look into alternative solvers
