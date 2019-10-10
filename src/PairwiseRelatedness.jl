@@ -190,7 +190,7 @@ keys(tmp)
 tmp["fca23"][1:8]
 
 function log_likelihood_Δ(Pr_L_S, Δ)
-    out = 1
+    out = 0
     for locus in keys(Pr_L_S)
         out = out + log(sum(Pr_L_S[locus][1:8] .* Δ) + ((1 - sum(Δ)) * Pr_L_S[locus][9]))
     end
