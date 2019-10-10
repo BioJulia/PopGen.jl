@@ -40,7 +40,7 @@ function genepop(
     numpops::Int64,
     marker = "snp",
 )
-    println("\n", "Input File : ", abspath(infile))
+    @info "\n Input File : $(abspath(infile)) \n Marker Type : $marker"
     if lowercase(marker) == "snp"
         geno_type = Int8
     else
@@ -212,7 +212,7 @@ function csv(
     marker = "snp",
     location::Bool = false,
 )
-    println("\n", "Input File : ", abspath(infile))
+    @info "\n Input File : $(abspath(infile)) \n Marker Type : $marker"
     popid = []
     indnames = []
     locx = []

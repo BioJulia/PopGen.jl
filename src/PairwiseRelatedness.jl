@@ -45,16 +45,17 @@ end
 
 function dyadic_ML(data, allele_freqs)
 
-    Pr_L_S = Dict()
+    Pr_L_S = []
     for locus in names(data.loci)
         #Extract the pair of interest's genotypes
         gen1 = get_genotype(data, sample = ind1, locus = String(locus))
         gen2 = get_genotype(data, sample = ind2, locus = String(locus))
 
-        Pr_L_S[String(locus)] = pr_l_s(gen1, gen2, allele_freqs[String(locus)])
+        tmp = pr_l_s(gen1, gen2, allele_freqs[String(locus)])
+        push!(Pr_L_S, tmp)
     end
 
-    return(Pr_L_S)
+    return hcat(Pr_L_S...)
 end
 
 
