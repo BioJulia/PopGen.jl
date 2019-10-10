@@ -20,12 +20,35 @@
 # Create for loop through all pairs of individuals and calculate relatedness
 #         -One possibility here is to use some type of outer function where the function evaluated in each cell is the relatedness calculation
 
+
+#= To look into once this is functional
+
+Output pairwise Pr_L_S arrays for each dyad
+Then find the optimal Δ using the NL model parameter
+may be faster due to less time spent compiling the model itself and more time just solving it
+
+Can then go through all the various Δ coefficients and calculate relatedness en masse
+=#
+
+
 get_genotype = PopGen.get_genotype
 allele_freq_mini = PopGen.allele_freq_mini
 
 data = nancycats()
-ind1 = "N100"
-ind2 = "N111"
+
+#=
+remove_loci!(data, "fca8")
+remove_loci!(data, "fca23")
+remove_loci!(data, "fca37")
+remove_loci!(data, "fca43")
+remove_loci!(data, "fca45")
+remove_loci!(data, "fca77")
+remove_loci!(data, "fca78")
+remove_loci!(data, "fca96")
+=#
+
+ind1 = "N182"
+ind2 = "N183"
 
 # Inside Relatedness function - DyadML
 # loop through all loci and extract the genotype of both individuals
@@ -40,26 +63,7 @@ allele_frequencies = Dict()
 for locus in names(data.loci)
     allele_frequencies[String(locus)] = allele_freq_mini(data.loci[:, locus])
 end
-
-
-
-function dyadic_ML(data, allele_freqs)
-
-    Pr_L_S = []
-    for locus in names(data.loci)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = String(locus))
-        gen2 = get_genotype(data, sample = ind2, locus = String(locus))
-
-        tmp = pr_l_s(gen1, gen2, allele_freqs[String(locus)])
-        push!(Pr_L_S, tmp)
-    end
-
-    return hcat(Pr_L_S...)
-end
-
-
-tmp = dyadic_ML(data, allele_frequencies)
+allele_frequencies
 
 
 
@@ -98,11 +102,16 @@ function pr_l_s(x, y, allele_freq)
     ## class L2 - AᵢAᵢ AⱼAⱼ ##
     elseif (x[1] == x[2]) & (y[1] == y[2]) & (x[1] != y[1])
         p = (allele_freq[x[1]], allele_freq[y[1]])
-        [0, prod(p), 0, prod(p) * p[2], 0, prod(p) * p[1], 0, 0, prod(p.^2)]
+        [0, prod(p), 0, prod(p) * p[2], 0, prod(p) * p[1], 0, 0, prod(p) * prod(p)]
 
-    ## class L3 - AᵢAᵢ AᵢAⱼ & AᵢAᵢ AⱼAᵢ ## - has issues because of allele order
-    elseif ((x[1] == x[2] == y[1]) & (x[1] != y[2])) | ((x[1] == x[2] == y[2]) & (x[1] != y[1]))
+    ## class L3a - AᵢAᵢ AᵢAⱼ ## - has issues because of allele order
+    elseif ((x[1] == x[2] == y[1]) & (x[1] != y[2]))
         p = (allele_freq[x[1]], allele_freq[y[2]])
+        [0, 0, prod(p), 2 * prod(p) * p[1], 0, 0, 0, prod(p) * p[1], 2 * prod(p) * p[1]^2]
+
+    ## class L3b - AᵢAᵢ AⱼAᵢ ## - has issues because of allele order
+    elseif ((x[1] == x[2] == y[2]) & (x[1] != y[1]))
+        p = (allele_freq[x[1]], allele_freq[y[1]])
         [0, 0, prod(p), 2 * prod(p) * p[1], 0, 0, 0, prod(p) * p[1], 2 * prod(p) * p[1]^2]
 
     ## class L4 - AᵢAᵢ AⱼAₖ ##
@@ -110,9 +119,14 @@ function pr_l_s(x, y, allele_freq)
         p = (allele_freq[x[1]], allele_freq[y[1]], allele_freq[y[2]])
         [0, 0, 0, 2 * prod(p), 0, 0, 0, 0, 2 * prod(p) * p[1]]
 
-    ## L5 - AiAj AiAi & AjAi AiAi ## - has issues because of allele order
-    elseif ((x[1] == y[1] == y[2]) & (x[1] != x[2])) | (x[2] == y[1] == y[2] * (x[1] != x[2]))
+    ## L5a - AiAj AiAi ## - has issues because of allele order
+    elseif ((x[1] == y[1] == y[2]) & (x[1] != x[2]))
         p = (allele_freq[x[1]], allele_freq[x[2]])
+        [0, 0, 0, 0, prod(p), 2 * prod(p) * p[1], 0, prod(p) *p[1], 2 * prod(p) * p[1]^2]
+
+    ## L5b - AjAi AiAi ## - has issues because of allele order
+    elseif (x[2] == y[1] == y[2] * (x[1] != x[2]))
+        p = (allele_freq[x[2]], allele_freq[x[1]])
         [0, 0, 0, 0, prod(p), 2 * prod(p) * p[1], 0, prod(p) *p[1], 2 * prod(p) * p[1]^2]
 
     ## L6 - AjAk AiAi ##
@@ -123,14 +137,26 @@ function pr_l_s(x, y, allele_freq)
     ## L7 - AiAj AiAj ##
     elseif (x[1] == y[1]) & (x[2] == y[2]) & (x[1] != x[2])
         p = (allele_freq[x[1]], allele_freq[x[2]])
-        [0, 0, 0, 0, 0, 0, 2 * prod(p), prod(p) * sum(p), 4 * prod(p.^2)]
+        [0, 0, 0, 0, 0, 0, 2 * prod(p), prod(p) * sum(p), 4 * prod(p) * prod(p)]
 
-    ## L8 - AiAj AiAk & AjAi AkAi & AjAi AiAk & AiAj AkAi ##  - has issues because of allele order
-    elseif ((x[1] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[2] != y[2])) |
-            ((x[2] == y[2]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[1])) |
-            ((x[2] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[2])) |
-            ((x[1] == y[2]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[1]))
+    ## L8a - AiAj AiAk ##  - has issues because of allele order
+    elseif ((x[1] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[2] != y[2]))
         p = (allele_freq[x[1]], allele_freq[x[2]], allele_freq[y[2]])
+        [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
+
+    ## L8b - AjAi AkAi ##  - has issues because of allele order
+    elseif ((x[2] == y[2]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[1]))
+        p = (allele_freq[x[2]], allele_freq[x[1]], allele_freq[y[1]])
+        [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
+
+    ## L8c - AjAi AiAk ##  - has issues because of allele order
+    elseif ((x[2] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[2]))
+        p = (allele_freq[x[2]], allele_freq[x[1]], allele_freq[y[2]])
+        [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
+
+    ## L8d - AiAj AkAi ##  - has issues because of allele order
+    elseif ((x[1] == y[2]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[1]))
+        p = (allele_freq[x[1]], allele_freq[x[2]], allele_freq[y[1]])
         [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
 
     ## L9 - AiAj AkAl ##
@@ -142,64 +168,62 @@ function pr_l_s(x, y, allele_freq)
     end
 end
 
+locus = :fca8
+function dyadic_ML(data, allele_freqs)
+    #Need to skip loci where one or both individuals have missing data
+    Pr_L_S = []
+    for locus in names(data.loci)
+        #Extract the pair of interest's genotypes
+        gen1 = get_genotype(data, sample = ind1, locus = String(locus))
+        gen2 = get_genotype(data, sample = ind2, locus = String(locus))
 
-## Calculate Δ coefficients
-using JuMP
-using GLPK
-#Need to either maximize this sum or use it as the likelihood in a bayesian model and sample from the posterior.
-#currently only maximum likelihood optimization
-function Δ_optim(Pr_L_S::Vector{Float64})
-    #Δ is what needs to be optimized
-    #consist of 9 values between 0 and 1 which must also sum to 1
-    #is then used to calculate relatedness
-
-    model = Model(with_optimizer(GLPK.Optimizer))
-    @variable(model, 0 <= Δ[1:8] <= 1)
-    @objective(model, Max, sum(Pr_L_S[1:8] .* Δ) + ((1 - sum(Δ)) * Pr_L_S[9]))
-    @constraint(model, con, 0 <= (1 - sum(Δ)) <= 1)
-    optimize!(model)
-
-    out = value.(Δ)
-    push!(out, 1 - sum(out))
-    #Should probably include some output that confirms that it did in fact converge and/or use multiple random starts to confirm not a local maxima
+        if gen1 !== missing && gen2 !== missing
+            tmp = pr_l_s(gen1, gen2, allele_freqs[String(locus)])
+            push!(Pr_L_S, tmp)
+        end
+    end
+    return transpose(hcat(Pr_L_S...))
 end
 
-Δ = Δ_optim(tmp["fca77"])
+
+Pr_L_S_inbreeding = dyadic_ML(data, allele_frequencies)
 
 
-#First attempt at optimizing multiple loci
+function no_inbreeding(x)
+    for i in 1:6
+        x[:,i] = 0 .* x[:,i]
+    end
+    return x
+end
+
+Pr_L_S_noinbreeding = dyadic_ML(data, allele_frequencies) |> no_inbreeding
+
+
+## Calculate Δ coefficients
+#Need to either maximize this sum or use it as the likelihood in a bayesian model and sample from the posterior.
+#currently only maximum likelihood optimization
+using Convex
+using ECOS
+
 function Δ_optim(Pr_L_S)
     #Δ is what needs to be optimized
     #consist of 9 values between 0 and 1 which must also sum to 1
     #is then used to calculate relatedness
 
-    model = Model(with_optimizer(Ipopt.Optimizer))
-    @variable(model, 0 <= Δ[1:8] <= 1)
-    @objective(model, Max, log_likelihood_Δ(Pr_L_S, Δ))
-    @constraint(model, con, 0 <= (1 - sum(Δ)) <= 1)
-    optimize!(model)
+    Δ = Variable(9)
+    problem = maximize(sum(log(Pr_L_S * Δ)))
+    problem.constraints += Δ[9] == 1 - sum(Δ[1:8])
+    problem.constraints += sum(Δ) == 1
+    problem.constraints += 0 <= Δ[1:9]
+    problem.constraints += Δ[1:9] <= 1
+    Convex.solve!(problem, ECOSSolver(maxit=10000))
 
-    out = value.(Δ)
-    push!(out, 1 - sum(out))
+    Δ.value
     #Should probably include some output that confirms that it did in fact converge and/or use multiple random starts to confirm not a local maxima
 end
 
-Δ = Δ_optim(tmp)
-
-keys(tmp)
-
-tmp["fca23"][1:8]
-
-function log_likelihood_Δ(Pr_L_S, Δ)
-    out = 0
-    for locus in keys(Pr_L_S)
-        out = out + log(sum(Pr_L_S[locus][1:8] .* Δ) + ((1 - sum(Δ)) * Pr_L_S[locus][9]))
-    end
-end
-
-
-
-
+Δ_inbreeding = Δ_optim(Pr_L_S_inbreeding)
+Δ_noinbreeding = Δ_optim(Pr_L_S_noinbreeding)
 
 ## Calculate theta and r
 function relatedness_calc(Δ)
@@ -207,4 +231,7 @@ function relatedness_calc(Δ)
     2 * θ
 end
 
-relatedness_calc(Δ)
+relatedness_calc(Δ_inbreeding)
+relatedness_calc(Δ_noinbreeding)
+#Relatedness R package appears to have a bug. When allow.inbreeding = TRUE the relatedness value is the same as when I assume no inbreeding
+#when you set allow.inbreeding = FALSE then the relatedness calculated is the same as when I assume there is inbreeding
