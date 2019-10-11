@@ -194,7 +194,7 @@ end
 Takes the probability of a the allelic state given the identity by descent from all available loci (either allowing for inbreeding or not)
 and calculated the maximum likelihood Δ coefficients
 """
-function Δ_optim(Pr_L_S, verbose = 3)
+function Δ_optim(Pr_L_S, verbose = true)
     #Δ is what needs to be optimized
     #consist of 9 values between 0 and 1 which must also sum to 1
     #is then used to calculate relatedness
@@ -205,9 +205,9 @@ function Δ_optim(Pr_L_S, verbose = 3)
     problem.constraints += sum(Δ) == 1
     problem.constraints += 0 <= Δ[1:9]
     problem.constraints += Δ[1:9] <= 1
-    Convex.solve!(problem, ECOSSolver(maxit=10000, verbose = verbose))
+    Convex.solve!(problem, ECOSSolver(maxit=100000, verbose = verbose, feastol=1e-7), verbose = verbose)
 
-    Δ.value
+    Δ.value, problem.status
     #Should probably include some output that confirms that it did in fact converge and/or use multiple random starts to confirm not a local maxima
 end
 
@@ -239,7 +239,7 @@ Inbreeding can either be assumed not to occur (inbreeding = false) or be include
 Verbose controls the verbosity of the optimization process to find the Maximum likelihood Δ coefficents
 
 """
-function dyadicML_relatedness(ind1, ind2; data, alleles, inbreeding = true, verbose = 3)
+function dyadicML_relatedness(ind1, ind2; data, alleles, inbreeding = true, verbose = true)
 
     Pr_L_S = all_loci_Pr_L_S(ind1, ind2, data, alleles)
 
@@ -247,10 +247,9 @@ function dyadicML_relatedness(ind1, ind2; data, alleles, inbreeding = true, verb
         no_inbreeding(Pr_L_S)
     end
 
-    Δ = Δ_optim(Pr_L_S, verbose)
+    Δ,convergence = Δ_optim(Pr_L_S, verbose)
 
-    return relatedness_from_Δ(Δ)
-
+    return relatedness_from_Δ(Δ), Δ, convergence
 end
 
 
@@ -261,17 +260,30 @@ for locus in names(data.loci)
     allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
 end
 
-for [i,j]
 
-dyadicML_relatedness("N100", "N104", data = data, alleles = allele_frequencies, inbreeding = false, verbose = 0)
+tst = dyadicML_relatedness("N100", "N104", data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
 
+tst[1]
+
+output = [[], [], [], [], []]
 for ind1 in data.samples.name
     for ind2 in data.samples.name
         if ind1 < ind2
-            dyadicML_relatedness(ind1, ind2, data = data, alleles = allele_frequencies, inbreeding = false, verbose = 0)
+            ind_out = dyadicML_relatedness(ind1, ind2, data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
+            push!(output, [ind1, ind2, ind_out[1]]) #, ind_out[2], ind_out[3]
         end
     end
 end
+
+dyads = DataFrame(ind1 = output[1], ind2 = output[2], relatedness = output[3])
+
 #Sort out issues with suboptimal and failed convergence
 #Sort out storage as dataframe with ind1, ind2, relatedness, Δ
 #look into alternative solvers
+
+#Combined backtracking failed....
+
+
+dyadicML_relatedness(dyads.ind1[29], dyads.ind2[29], data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
+
+#inaccurate N100, N118
