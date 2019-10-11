@@ -203,7 +203,7 @@ function Δ_optim(Pr_L_S, verbose = true)
     problem.constraints += sum(Δ) == 1
     problem.constraints += 0 <= Δ[1:9]
     problem.constraints += Δ[1:9] <= 1
-    Convex.solve!(problem, ECOSSolver(maxit=100, verbose = verbose, feastol=1e-7), verbose = verbose)
+    Convex.solve!(problem, ECOSSolver(maxit=10000, verbose = verbose, feastol=1e-7), verbose = verbose)
 
     Δ.value, problem.status
     # Should probably include some output that confirms that it did in fact
@@ -264,17 +264,24 @@ tst = dyadicML_relatedness("N100", "N104", data = data, alleles = allele_frequen
 
 tst[1]
 
-output = [[], [], [], []]
+output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
 for ind1 in data.samples.name
     for ind2 in data.samples.name
         if ind1 < ind2
             ind_out = dyadicML_relatedness(ind1, ind2, data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
-            push!(output, [ind1, ind2, ind_out[1], ind_out[3]]) #, ind_out[2], ind_out[3]
+            #push!(output, [ind1, ind2, ind_out[1], ind_out[3]]) #, ind_out[2], ind_out[3]
+            append!(output,DataFrame(ind1 = ind1, ind2 = ind2, relatedness = ind_out[1], convergence = ind_out[3]))
         end
     end
 end
 
-dyads = DataFrame(ind1 = output[1], ind2 = output[2], relatedness = output[3])
+output
+
+∈
+
+test = filter(row -> row.convergence != :Optimal, output)
+test2 = filter(row -> row.convergence != :Suboptimal, test)
+test3 = filter(row -> row.convergence != :UserLimit, test2)
 
 #Sort out issues with suboptimal and failed convergence
 #Sort out storage as dataframe with ind1, ind2, relatedness, Δ
