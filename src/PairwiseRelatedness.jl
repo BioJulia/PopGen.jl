@@ -181,8 +181,6 @@ function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = t
     # converge and/or use multiple random starts to confirm not a local maxima
 end
 
-dyadicML_relatedness(nancycats(), "N100", "N111", alleles = allele_frequencies, inbreeding = true, verbose = true)
-
 ## Calculate theta and r
 """
     relatedness_dyadicML(Δ::Array{Float64,2})
