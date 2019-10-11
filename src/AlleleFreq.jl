@@ -1,4 +1,21 @@
 """
+    allele_freq(genotype::Union{Missing,Tuple})
+Calculate allele frequency for a single locus of a single sample. Returns a
+`Dict` of alleles and their frequencies.
+"""
+function allele_freq(genotype::Union{Missing,Tuple})
+    x === missing && return missing
+    d = Dict()
+    for allele in genotype
+        # sum up alleles
+        d[allele] = get!(d, allele, 0) + 1
+    end
+    total = values(d) |> sum    # sum of all non-missing alleles
+    [d[i] = d[i] / total for i in keys(d)]  # allele count / sum
+    return d
+end
+
+"""
     allele_freq(x::Array{Union{Missing, Tuple},1})
 Calculate allele counts for a single locus of a `PopObj`. Returns a `Dict` of
 allele's and their frequencies.
