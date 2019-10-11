@@ -16,12 +16,12 @@ julia> sharks = gulfsharks() ;
 ### view individuals' names
 
 ```julia
-sample_names(x::PopObj)
+samples(x::PopObj)
 ```
 View individual/sample names in a `PopObj`. This is equivalent to `PopObj.samples.name`
 
 ``` julia tab="indnames"
-sample_names(sharks)
+samples(sharks)
 ```
 
 ``` tab="output"
@@ -152,7 +152,7 @@ julia> populations(sharks)
 
 ``` tab="output"
 │ Row │ population    │ count │
-│     │ Categorical…⍰ │ Int32 │
+│     │ String        │ Int32 │
 ├─────┼───────────────┼───────┤
 │ 1   │ 1             │ 21    │
 │ 2   │ 2             │ 30    │
@@ -261,6 +261,42 @@ julia> popid!(sharks, rename = new_popnames)
 ```
 
 ## Display Specific Loci and/or Samples
+### get loci names
+
+```
+loci(x::PopObj)
+```
+
+Returns an array of strings of the loci names in a `PopObj`
+
+```julia tab="example"
+julia> loci(sharks)
+```
+
+``` tab="output"
+2213-element Array{String,1}:
+ "contig_35208"
+ "contig_23109"
+ "contig_4493" 
+ "contig_10742"
+ "contig_14898"
+ "contig_8483" 
+ "contig_8065" 
+ "contig_14708"
+ "contig_2307" 
+ ⋮             
+ "contig_24711"
+ "contig_18959"
+ "contig_43517"
+ "contig_27356"
+ "contig_475"  
+ "contig_19384"
+ "contig_22368"
+ "contig_2784" 
+```
+
+
+
 ### view loci
 
 ```julia
@@ -276,7 +312,7 @@ julia> view_genotypes(sharks)
 ``` tab="output"
 212×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
 │ Row │ ind     │ population   │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
-│     │ String  │ Categorical… │ Any          │ Any          │ Any          │ Any          │
+│     │ String  │ String       │ Any          │ Any          │ Any          │ Any          │
 ├─────┼─────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
 │ 1   │ cc_001  │ 1            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
 │ 2   │ cc_002  │ 1            │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
@@ -305,7 +341,7 @@ julia> view_genotypes(sharks, loci = "contig_10001")
 ``` tab="single output"
 212×3 DataFrames.DataFrame
 │ Row │ ind     │ population   │ contig_10001 │
-│     │ String  │ Categorical… │ Any          │
+│     │ String  │ String       │ Any          │
 ├─────┼─────────┼──────────────┼──────────────┤
 │ 1   │ cc_001  │ 1            │ (1, 1)       │
 │ 2   │ cc_002  │ 1            │ (1, 1)       │
@@ -332,7 +368,7 @@ julia> view_genotypes(sharks, loci = ["contig_10001", "contig_10028"])
 ``` tab="multiple output"
 212×4 DataFrames.DataFrame
 │ Row │ ind     │ population   │ contig_10001 │ contig_10028 │
-│     │ String  │ Categorical… │ Any          │ Any          │
+│     │ String  │ String       │ Any          │ Any          │
 ├─────┼─────────┼──────────────┼──────────────┼──────────────┤
 │ 1   │ cc_001  │ 1            │ (1, 1)       │ (1, 1)       │
 │ 2   │ cc_002  │ 1            │ (1, 1)       │ (1, 1)       │
@@ -363,7 +399,7 @@ julia> view_genotypes(sharks, samples = "cc_001")
 ``` tab="single output"
 1×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
 │ Row │ name   │ population    │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
-│     │ String │ Categorical…⍰ │ Any          │ Any          │ Any          │ Any          │
+│     │ String │ String        │ Any          │ Any          │ Any          │ Any          │
 ├─────┼────────┼───────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
 │ 1   │ cc_001 │ 1             │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
 ```
@@ -371,7 +407,7 @@ julia> view_genotypes(sharks, samples = "cc_001")
 ```julia tab="multiple samples"
 2×2215 DataFrames.DataFrame. Omitted printing of 2209 columns
 │ Row │ name    │ population    │ contig_10001 │ contig_10013 │ contig_10028 │ contig_10035 │
-│     │ String  │ Categorical…⍰ │ Any          │ Any          │ Any          │ Any          │
+│     │ String  │ String        │ Any          │ Any          │ Any          │ Any          │
 ├─────┼─────────┼───────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
 │ 1   │ cc_001  │ 1             │ (1, 1)       │ (1, 1)       │ (1, 1)       │ (1, 1)       │
 │ 2   │ seg_028 │ 7             │ (1, 1)       │ (1, 1)       │ (1, 2)       │ (2, 2)       │
@@ -386,7 +422,7 @@ view_genotypes(sharks, samples= ["cc_001", "seg_028"], loci = "contig_10013")
 ``` tab="output"
 2×3 DataFrames.DataFrame
 │ Row │ name    │ population    │ contig_10013 │
-│     │ String  │ Categorical…⍰ │ Any          │
+│     │ String  │ String        │ Any          │
 ├─────┼─────────┼───────────────┼──────────────┤
 │ 1   │ cc_001  │ 1             │ (1, 1)       │
 │ 2   │ seg_028 │ 7             │ (1, 1)       │
@@ -501,7 +537,7 @@ julia> missing(sharks)
 
 ``` tab="output"
 by_ind = (212×4 DataFrames.DataFrame. Omitted printing of 1 columns
-│ Row │ name    │ population │ nmissing │
+│ Row │ name    │ population │ missing │
 │     │ String  │ String     │ Any      │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -520,7 +556,7 @@ by_ind = (212×4 DataFrames.DataFrame. Omitted printing of 1 columns
 │ 210 │ seg_029 │ 7          │ 0        │
 │ 211 │ seg_030 │ 7          │ 1        │
 │ 212 │ seg_031 │ 7          │ 1        │, by_loci = 2213×2 DataFrames.DataFrame
-│ Row  │ locus        │ nmissing │
+│ Row  │ locus        │ missing │
 │      │ String       │ Any      │
 ├──────┼──────────────┼──────────┤
 │ 1    │ contig_35208 │ 0        │
@@ -553,7 +589,7 @@ julia> miss = missing(sharks) ;
 ``` tab="by_ind"
 julia> miss.by_sample
 212×4 DataFrame. Omitted printing of 1 columns
-│ Row │ name    │ population │ nmissing │
+│ Row │ name    │ population │ missing │
 │     │ String  │ String     │ Int64    │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -571,7 +607,7 @@ julia> miss.by_sample
 ``` tab="by_loci"
 julia> miss.by_loci
 2213×2 DataFrame
-│ Row  │ locus        │ nmissing │
+│ Row  │ locus        │ missing │
 │      │ String       │ Int64    │
 ├──────┼──────────────┼──────────┤
 │ 1    │ contig_35208 │ 0        │
@@ -595,7 +631,7 @@ julia> df1,df2 = missing(sharks) ;
 ``` tab="df1"
 julia> df1
 212×4 DataFrames.DataFrame. Omitted printing of 1 columns
-│ Row │ name    │ population │ nmissing │
+│ Row │ name    │ population │ missing │
 │     │ String  │ String     │ Any      │
 ├─────┼─────────┼────────────┼──────────┤
 │ 1   │ cc_001  │ 1          │ 124      │
@@ -645,8 +681,9 @@ julia> df2
     ``` julia 
     a,b,c,d = (1,2,3,[4,5,6,7])
     ```
-    where 
-    
+​    where 
+​    
+
     a = 1
     
     b = 2
@@ -680,7 +717,9 @@ julia> plot_missing(sharks)
     ```julia
     #example
     julia> using PlotlyJS ;
+    ```
     
+    ```
     julia> PlotlyJS.savehtml(plot_missing(sharks), "/home/pdimens/missingness.html")
     ```
     

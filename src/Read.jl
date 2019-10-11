@@ -1,3 +1,122 @@
+
+### CSV parsing ###
+
+"""
+    csv(infile::String; delim::Union{Char,String,Regex}, digits::Int64 = 3, location::Bool = false)
+Load a CSV-type file into memory as a PopObj object
+### Arguments
+- `infile` : path to CSV file
+- `delim` : delimiter characters. default is comma (","), can be space (" "), tab ("\\t"), etc.
+- `digits` : number of digits denoting each allele
+- `marker` : "snp" (default) or "msat"
+- `location` : decimal degrees longitude/latitude provided as values 3/4
+### File formatting:
+- Loci names must be first row
+- Individuals names must be first value in row
+- Population ID's must be second value in row
+- [Optional] longitude (x) values third value in row, latitude (y) fourth
+
+## Example
+`lizardsCA = Read.csv("CA_lizards.csv", delim = ",", digits = 3);`
+
+### Formatting example:
+Locus1,Locus2,Locus3   \n
+sierra_01,mountain,001001,002002,001001   \n
+sierra_02,mountain,001001,001001,001002   \n
+snbarb_03,coast,001001,001001,001002 \n
+snbarb_02,coast,001001,001001,001001 \n
+snbarb_03,coast,001002,001001,001001 \n
+"""
+function csv(
+    infile::String;
+    delim::Union{Char,String,Regex} = ",",
+    digits::Int = 3,
+    marker = "snp",
+    location::Bool = false,
+)
+    @info "\n Input File : $(abspath(infile)) \n Marker Type : $marker"
+    popid = []
+    indnames = []
+    locx = []
+    locy = []
+    locinames = []
+    d = Dict()
+    linenum = 1
+    if lowercase(marker) == "snp"
+        geno_type = Int8
+    else
+        geno_type = Int16
+    end
+    file = open(infile, "r") #do file
+        for ln in eachline(file)
+            if linenum == 1
+                loci_raw = split(ln, delim)
+                loci_safe = replace(loci_raw, "." => "_")
+                append!(locinames, loci_safe)
+                [d[string(i)] = [] for i in locinames]
+                linenum += 1
+                continue
+            end
+            if location == false
+                tmp = split(ln, delim) |> Array{String,1}
+                # phase genotypes by ploidy
+                phasedloci = []
+                for locus in tmp[3:end]
+                    phasedlocus = parse.(
+                        geno_type,
+                        [join(i) for i in Iterators.partition(locus, digits)],
+                    ) |> sort |> Tuple
+                    push!(phasedloci, phasedlocus)
+                end
+                for (loc, geno) in zip(locinames, phasedloci)
+                    push!(d[loc], geno)
+                end
+                push!(indnames, tmp[1])
+                push!(popid, tmp[2])
+                push!(locx, missing)
+                push!(locy, missing)
+            else
+                tmp = split(ln, delim) |> Array{String,1}
+                replace!(tmp, "-9" => "0"^digits) #just in case -9 = missing
+                phasedloci = []
+                for locus in tmp[5:end]
+                    phasedlocus = parse.(
+                        Int16,
+                        [join(i) for i in Iterators.partition(locus, digits)],
+                    ) |> sort |> Tuple
+                    push!(phasedloci, phasedlocus)
+                end
+                for (loc, geno) in zip(locinames, phasedloci)
+                    push!(d[loc], geno)
+                end
+                push!(indnames, tmp[1])
+                push!(popid, tmp[2])
+                push!(locx, parse.(Float64, tmp[3]))
+                push!(locy, parse.(Float64, tmp[4]))
+            end
+        end
+    close(file)
+    ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
+    for (loc, ploid) in zip(locinames, ploidy)
+        miss_geno = fill(0, ploid) |> Tuple
+        msat_miss_geno = ("0")
+        replace!(d[loc], miss_geno => missing)
+        replace!(d[loc], msat_miss_geno => missing)
+    end
+    # typesafe genotype DataFrame
+    loci_df = DataFrame([Symbol(i) => Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
+    #names!(loci_df, Symbol.(locinames))
+    samples_df = DataFrame(
+        name = string.(indnames),
+        population = string.(popid),
+        ploidy = Int8.(ploidy),
+        longitude = locx,
+        latitude = locy,
+    )
+    PopObj(samples_df, loci_df)
+end
+
+
 ### GenePop parsing ###
 """
     genepop(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops::Int64)
@@ -176,123 +295,6 @@ function gpop2(infile::String; digits::Int64 = 3, popsep::Any = "POP", numpops::
     PopObj(samples_df, loci_df)
 end
 =#
-
-### CSV parsing ###
-
-"""
-    csv(infile::String; delim::Union{Char,String,Regex}, digits::Int64 = 3, location::Bool = false)
-Load a CSV-type file into memory as a PopObj object
-### Arguments
-- `infile` : path to CSV file
-- `delim` : delimiter characters. default is comma (","), can be space (" "), tab ("\\t"), etc.
-- `digits` : number of digits denoting each allele
-- `marker` : "snp" (default) or "msat"
-- `location` : decimal degrees longitude/latitude provided as values 3/4
-### File formatting:
-- Loci names must be first row
-- Individuals names must be first value in row
-- Population ID's must be second value in row
-- [Optional] longitude (x) values third value in row, latitude (y) fourth
-
-## Example
-`lizardsCA = Read.csv("CA_lizards.csv", delim = ",", digits = 3);`
-
-### Formatting example:
-Locus1,Locus2,Locus3   \n
-sierra_01,mountain,001001,002002,001001   \n
-sierra_02,mountain,001001,001001,001002   \n
-snbarb_03,coast,001001,001001,001002 \n
-snbarb_02,coast,001001,001001,001001 \n
-snbarb_03,coast,001002,001001,001001 \n
-"""
-function csv(
-    infile::String;
-    delim::Union{Char,String,Regex} = ",",
-    digits::Int = 3,
-    marker = "snp",
-    location::Bool = false,
-)
-    @info "\n Input File : $(abspath(infile)) \n Marker Type : $marker"
-    popid = []
-    indnames = []
-    locx = []
-    locy = []
-    locinames = []
-    d = Dict()
-    linenum = 1
-    if lowercase(marker) == "snp"
-        geno_type = Int8
-    else
-        geno_type = Int16
-    end
-    file = open(infile, "r") #do file
-        for ln in eachline(file)
-            if linenum == 1
-                loci_raw = split(ln, delim)
-                loci_safe = replace(loci_raw, "." => "_")
-                append!(locinames, loci_safe)
-                [d[string(i)] = [] for i in locinames]
-                linenum += 1
-                continue
-            end
-            if location == false
-                tmp = split(ln, delim) |> Array{String,1}
-                # phase genotypes by ploidy
-                phasedloci = []
-                for locus in tmp[3:end]
-                    phasedlocus = parse.(
-                        geno_type,
-                        [join(i) for i in Iterators.partition(locus, digits)],
-                    ) |> sort |> Tuple
-                    push!(phasedloci, phasedlocus)
-                end
-                for (loc, geno) in zip(locinames, phasedloci)
-                    push!(d[loc], geno)
-                end
-                push!(indnames, tmp[1])
-                push!(popid, tmp[2])
-                push!(locx, missing)
-                push!(locy, missing)
-            else
-                tmp = split(ln, delim) |> Array{String,1}
-                replace!(tmp, "-9" => "0"^digits) #just in case -9 = missing
-                phasedloci = []
-                for locus in tmp[5:end]
-                    phasedlocus = parse.(
-                        Int16,
-                        [join(i) for i in Iterators.partition(locus, digits)],
-                    ) |> sort |> Tuple
-                    push!(phasedloci, phasedlocus)
-                end
-                for (loc, geno) in zip(locinames, phasedloci)
-                    push!(d[loc], geno)
-                end
-                push!(indnames, tmp[1])
-                push!(popid, tmp[2])
-                push!(locx, parse.(Float64, tmp[3]))
-                push!(locy, parse.(Float64, tmp[4]))
-            end
-        end
-    close(file)
-    ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
-    for (loc, ploid) in zip(locinames, ploidy)
-        miss_geno = fill(0, ploid) |> Tuple
-        msat_miss_geno = ("0")
-        replace!(d[loc], miss_geno => missing)
-        replace!(d[loc], msat_miss_geno => missing)
-    end
-    # typesafe genotype DataFrame
-    loci_df = DataFrame([Symbol(i) => Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
-    #names!(loci_df, Symbol.(locinames))
-    samples_df = DataFrame(
-        name = string.(indnames),
-        population = string.(popid),
-        ploidy = Int8.(ploidy),
-        longitude = locx,
-        latitude = locy,
-    )
-    PopObj(samples_df, loci_df)
-end
 
 
 ### VCF parsing ###

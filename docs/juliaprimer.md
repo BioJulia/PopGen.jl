@@ -16,7 +16,7 @@ julia> @time using PopGen
 
 ## Semicolons
 
-Semicolons will come up a lot in Julia, probably more than you would expect if you are migrating from another language.  They mean different thing depending on where they are.
+Semicolons will come up a lot in Julia, probably more than you would expect if you are migrating from another language.  They mean different things depending on where they are.
 
 ### At the end of a command
 
@@ -82,7 +82,7 @@ Julia encourages strong typing of variables, and the functions in `PopGen` are n
 You'll notice types follow a specific format, which is `object::type`. This format is a type assignment, so in the function `population`, which looks like: `population(x::PopObj; listall::Bool = false)`:
 
 - `x` is a variable of type `PopObj` 
-- `listall` is a variable of type `Bool` (boolean) meaning it only takes `true` or `false` without quotes
+- `listall` is a variable of type `Bool` (boolean) meaning it only takes `true` or `false` without quotes, and the default value is set to `false`.
 
 ### Type Unions
 
@@ -142,6 +142,8 @@ The functions within `PopGen` are almost always explicitly typed, so if you are 
 
 
 ## Functions with and without keywords 
+
+Let's talk about semicolons some more.
 
 !!! info "TL;DR"
     Reading these docs, pay attention to semicolons in the function argument lists.
