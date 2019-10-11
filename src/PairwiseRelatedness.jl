@@ -1,10 +1,10 @@
 #= Steps to finish:
 
-    Solve dyadic optimization issues - set max higher?
+    Solve dyadic optimization issues
         combined backtracking failure - need to isolate and find cause
             #N111 N83
             #N63 N64
-        Relax tolerance?
+        ~1/3 - 1/5 not with optimal solution in cats dataset
     Solve dyadic inbreeding issues
     Output Δ coefficents
 
@@ -281,7 +281,7 @@ test3 = filter(row -> row.convergence != :UserLimit, test2)
 
 ## SCSSolver defaults
 # - takes much longer than ECOSSolver defaults
-# - 
+# -
 
 6133/27966
 76-106
