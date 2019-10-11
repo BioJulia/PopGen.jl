@@ -282,6 +282,3 @@ test3 = filter(row -> row.convergence != :UserLimit, test2)
 ## SCSSolver defaults
 # - takes much longer than ECOSSolver defaults
 # -
-
-6133/27966
-76-106
