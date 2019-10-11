@@ -12,6 +12,7 @@ using DataFrames,
       GeneticVariation,
       Distributions,
       MultipleTesting,
+      LinearAlgebra
       Convex,
       ECOS
 

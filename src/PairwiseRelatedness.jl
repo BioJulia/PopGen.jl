@@ -279,7 +279,8 @@ test3 = filter(row -> row.convergence != :UserLimit, test2)
 #maxit = 100 feastol = 5e-6 - 21.9% non-optimal; 49 total hit user limit 0 infeasable - 7 failed backtracking
 
 ## SCSSolver defaults
-
+# - takes much longer than ECOSSolver defaults
+# - 
 
 6133/27966
 76-106
