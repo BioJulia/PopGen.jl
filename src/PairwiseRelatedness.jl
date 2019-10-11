@@ -22,12 +22,6 @@
 # Create for loop through all pairs of individuals and calculate relatedness
 #         -One possibility here is to use some type of outer function where the function evaluated in each cell is the relatedness calculation
 
-using Convex
-using ECOS
-
-get_genotype = PopGen.get_genotype
-allele_freq = PopGen.allele_freq
-
 
 #the_data = nancycats()
 #=
@@ -203,7 +197,7 @@ function Δ_optim(Pr_L_S, verbose = true)
     problem.constraints += sum(Δ) == 1
     problem.constraints += 0 <= Δ[1:9]
     problem.constraints += Δ[1:9] <= 1
-    Convex.solve!(problem, ECOSSolver(maxit=10000, verbose = verbose, feastol=1e-7), verbose = verbose)
+    Convex.solve!(problem, ECOSSolver(maxit=100, verbose = verbose, feastol=1e-7), verbose = verbose)
 
     Δ.value, problem.status
     # Should probably include some output that confirms that it did in fact
@@ -240,7 +234,7 @@ verbosity of the optimization process to find the Maximum likelihood Δ coeffice
 """
 function dyadicML_relatedness(ind1, ind2; data, alleles, inbreeding = true, verbose = true)
 
-    Pr_L_S = all_loci_Pr_L_S(ind1, ind2, data, alleles)
+    Pr_L_S = all_loci_Pr_L_S(data, ind1, ind2, alleles)
 
     if !inbreeding
         no_inbreeding(Pr_L_S)
@@ -260,9 +254,9 @@ for locus in names(data.loci)
 end
 
 
-tst = dyadicML_relatedness("N100", "N104", data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
+tst = dyadicML_relatedness("N100", "N104", data = data, alleles = allele_frequencies, inbreeding = true, verbose = true)
 
-tst[1]
+
 
 output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
 for ind1 in data.samples.name
@@ -271,13 +265,29 @@ for ind1 in data.samples.name
             ind_out = dyadicML_relatedness(ind1, ind2, data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
             #push!(output, [ind1, ind2, ind_out[1], ind_out[3]]) #, ind_out[2], ind_out[3]
             append!(output,DataFrame(ind1 = ind1, ind2 = ind2, relatedness = ind_out[1], convergence = ind_out[3]))
+            println(ind1, ind2)
         end
     end
 end
 
-output
 
+output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
+for (i,ind1) in enumerate(data.samples.name)
+    i == length(data.samples.name) && break
+    for ind2 in i+1:length(data.samples.name)
+        ind_out = dyadicML_relatedness(ind1, data.samples.name[ind2], data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
+        #push!(output, [ind1, ind2, ind_out[1], ind_out[3]]) #, ind_out[2], ind_out[3]
+        append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = ind_out[1], convergence = ind_out[3]))
+        println(ind1, ind2)
+    end
+end
+
+output
+#pairs with Combined backtracking failed error
+#N111 N83
+#N63 N64
 ∈
+data.samples.name[204]
 
 test = filter(row -> row.convergence != :Optimal, output)
 test2 = filter(row -> row.convergence != :Suboptimal, test)
@@ -288,6 +298,12 @@ test3 = filter(row -> row.convergence != :UserLimit, test2)
 #look into alternative solvers
 
 #Combined backtracking failed....
+
+store = deepcopy(output)
+
+
+
+
 
 
 dyadicML_relatedness(dyads.ind1[29], dyads.ind2[29], data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
