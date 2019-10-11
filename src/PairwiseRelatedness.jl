@@ -172,9 +172,9 @@ function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = t
     problem.constraints += sum(Δ) == 1
     problem.constraints += 0 <= Δ[1:9]
     problem.constraints += Δ[1:9] <= 1
-    #Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=1e-7), verbose = verbose)
+    Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=1e-7), verbose = verbose)
     #Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=5e-6), verbose = verbose)
-    Convex.solve!(problem, SCSSolver(verbose = verbose), verbose = verbose)
+    #Convex.solve!(problem, SCSSolver(verbose = verbose), verbose = verbose)
 
     Δ.value, problem.status
     # Should probably include some output that confirms that it did in fact
