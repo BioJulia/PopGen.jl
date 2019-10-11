@@ -205,7 +205,7 @@ function Δ_optim(Pr_L_S, verbose = true)
     problem.constraints += sum(Δ) == 1
     problem.constraints += 0 <= Δ[1:9]
     problem.constraints += Δ[1:9] <= 1
-    Convex.solve!(problem, ECOSSolver(maxit=100000, verbose = verbose, feastol=1e-7), verbose = verbose)
+    Convex.solve!(problem, ECOSSolver(maxit=100, verbose = verbose, feastol=1e-7), verbose = verbose)
 
     Δ.value, problem.status
     #Should probably include some output that confirms that it did in fact converge and/or use multiple random starts to confirm not a local maxima
@@ -265,12 +265,12 @@ tst = dyadicML_relatedness("N100", "N104", data = data, alleles = allele_frequen
 
 tst[1]
 
-output = [[], [], [], [], []]
+output = [[], [], [], []]
 for ind1 in data.samples.name
     for ind2 in data.samples.name
         if ind1 < ind2
             ind_out = dyadicML_relatedness(ind1, ind2, data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
-            push!(output, [ind1, ind2, ind_out[1]]) #, ind_out[2], ind_out[3]
+            push!(output, [ind1, ind2, ind_out[1], ind_out[3]]) #, ind_out[2], ind_out[3]
         end
     end
 end
