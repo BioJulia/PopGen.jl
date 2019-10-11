@@ -206,7 +206,8 @@ function Δ_optim(Pr_L_S, verbose = true)
     Convex.solve!(problem, ECOSSolver(maxit=100, verbose = verbose, feastol=1e-7), verbose = verbose)
 
     Δ.value, problem.status
-    #Should probably include some output that confirms that it did in fact converge and/or use multiple random starts to confirm not a local maxima
+    # Should probably include some output that confirms that it did in fact
+    # converge and/or use multiple random starts to confirm not a local maxima
 end
 
 #Δ_inbreeding = Δ_optim(Pr_L_S_inbreeding)
@@ -233,9 +234,9 @@ end
 Calculates the dyadic maximum likelihood relatedness using all available loci following
 Milligan 2002 dyadic relatedness - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1462494/pdf/12663552.pdf
 
-Inbreeding can either be assumed not to occur (inbreeding = false) or be included in the calculation of the relatedness coefficient
-Verbose controls the verbosity of the optimization process to find the Maximum likelihood Δ coefficents
-
+Inbreeding can either be assumed not to occur (inbreeding = false) or be
+included in the calculation of the relatedness coefficient Verbose controls the
+verbosity of the optimization process to find the Maximum likelihood Δ coefficents
 """
 function dyadicML_relatedness(ind1, ind2; data, alleles, inbreeding = true, verbose = true)
 

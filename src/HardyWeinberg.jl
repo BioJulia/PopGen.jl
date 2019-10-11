@@ -330,7 +330,7 @@ correction method for multiple testing.
 - `"bc"` or `"b-c"` : Barber-Candès adjustment
 """
 function hwe_test(x::PopObj; by_pop::Bool = false, correction::String = "none")
-    if by_pop == false
+    if !by_pop
         output = [[], [], []]
         for locus in eachcol(x.loci, false)
             chisq, df, pval = locus_chi_sq(locus)
