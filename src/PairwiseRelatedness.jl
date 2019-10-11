@@ -47,8 +47,9 @@ remove_loci!(data, "fca96")
 
 """
     pr_l_s(x, y, allele_freq)
-Calculate the probability of observing the particular allele state given each of the 9 Jacquard Identity States for a single locus
-Creates Table 1 from Milligan 2002
+Calculate the probability of observing the particular allele state given each of
+the 9 Jacquard Identity States for a single locus to create Table 1 from
+Milligan 2002.
 """
 function pr_l_s(x, y, alleles)
     #= Example
@@ -57,16 +58,9 @@ function pr_l_s(x, y, alleles)
     cat2=PopGen.get_genotype(cats, sample = "N111", locus = "fca23")
     allele_freq = PopGen.allele_freq(cats.loci.fca23)
     pr_l_s(cat1, cat2, allele_freq)
-
-
     =#
-
-
-    #= Current Bugs
-
-    =#
-
-    #= Calculate Pr(Li | Sj)
+    #=
+    Calculate Pr(Li | Sj)
     If the allele identity falls into this class (L1-L9), generate the
     probabilities of it belonging to each of the different classes and
     return that array of 9 distinct probabilities
@@ -146,21 +140,23 @@ function pr_l_s(x, y, alleles)
     end
 end
 
+#TODO
+# alleles argument need to have a Type
 """
     all_loci_Pr_L_S(ind1, ind2, data, alleles)
-Calculate the probability of observing the particular allele state given each of the 9 Jacquard Identity States for all loci
-Creates Table 1 from Milligan 2002
+Calculate the probability of observing the particular allele state given each of
+the 9 Jacquard Identity States for all loci Creates Table 1 from Milligan 2002
 """
-function all_loci_Pr_L_S(ind1, ind2, data, alleles)
+function all_loci_Pr_L_S(data::PopObj, ind1::String, ind2::String, alleles)
     #Need to skip loci where one or both individuals have missing data
     Pr_L_S = []
-    for locus in names(data.loci)
+    for locus in String.(names(data.loci))
         #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = String(locus))
-        gen2 = get_genotype(data, sample = ind2, locus = String(locus))
+        gen1 = get_genotype(data, sample = ind1, locus = locus)
+        gen2 = get_genotype(data, sample = ind2, locus = locus)
 
         if gen1 !== missing && gen2 !== missing
-            tmp = pr_l_s(gen1, gen2, alleles[String(locus)])
+            tmp = pr_l_s(gen1, gen2, alleles[locus])
             push!(Pr_L_S, tmp)
         end
     end
@@ -169,7 +165,8 @@ end
 
 #Pr_L_S_inbreeding = all_loci_Pr_L_S(ind1, ind2, data, allele_frequencies)
 
-
+#TODO
+# Add Type to prob_state_given_ibd argument in function definition
 """
     no_inbreeding(prob_state_given_ibd)
 Remove Jacquard States which can only be the result of inbreeding
@@ -191,8 +188,9 @@ end
 
 """
     Δ_optim(Pr_L_S)
-Takes the probability of a the allelic state given the identity by descent from all available loci (either allowing for inbreeding or not)
-and calculated the maximum likelihood Δ coefficients
+Takes the probability of the allelic state given the identity by descent from
+all available loci (either allowing for inbreeding or not) and calculated the
+maximum likelihood Δ coefficients
 """
 function Δ_optim(Pr_L_S, verbose = 3)
     #Δ is what needs to be optimized
