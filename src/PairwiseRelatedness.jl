@@ -40,18 +40,18 @@ remove_loci!(data, "fca96")
 
 
 """
-    pr_l_s(x, y, allele_freq)
+    pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
 Calculate the probability of observing the particular allele state given each of
 the 9 Jacquard Identity States for a single locus to create Table 1 from
 Milligan 2002.
 """
-function pr_l_s(x, y, alleles)
+function pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
     #= Example
     cats = nancycats()
-    cat1=PopGen.get_genotype(cats, sample = "N100", locus = "fca23")
-    cat2=PopGen.get_genotype(cats, sample = "N111", locus = "fca23")
-    allele_freq = PopGen.allele_freq(cats.loci.fca23)
-    pr_l_s(cat1, cat2, allele_freq)
+    cat1=get_genotype(cats, sample = "N100", locus = "fca23")
+    cat2=get_genotype(cats, sample = "N111", locus = "fca23")
+    allele = allele_freq(cats.loci.fca23)
+    pr_l_s(cat1, cat2, allele)
     =#
     #=
     Calculate Pr(Li | Sj)
@@ -134,14 +134,13 @@ function pr_l_s(x, y, alleles)
     end
 end
 
-#TODO
-# alleles argument need to have a Type
+
 """
-    all_loci_Pr_L_S(ind1, ind2, data, alleles)
+    all_loci_Pr_L_S(data::PopObj, ind1::String, ind2::String, alleles::Dict)
 Calculate the probability of observing the particular allele state given each of
 the 9 Jacquard Identity States for all loci Creates Table 1 from Milligan 2002
 """
-function all_loci_Pr_L_S(data::PopObj, ind1::String, ind2::String, alleles)
+function all_loci_Pr_L_S(data::PopObj, ind1::String, ind2::String, alleles::Dict)
     #Need to skip loci where one or both individuals have missing data
     Pr_L_S = []
     for locus in String.(names(data.loci))
@@ -159,17 +158,16 @@ end
 
 #Pr_L_S_inbreeding = all_loci_Pr_L_S(ind1, ind2, data, allele_frequencies)
 
-#TODO
-# Add Type to prob_state_given_ibd argument in function definition
+
 """
-    no_inbreeding(prob_state_given_ibd)
+    no_inbreeding(Pr_L_S::LinearAlgebra.Transpose{Float64,Array{Float64,2}})
 Remove Jacquard States which can only be the result of inbreeding
 """
-function no_inbreeding(prob_state_given_ibd)
+function no_inbreeding(Pr_L_S::Transpose{Float64,Array{Float64,2}})
     for i in 1:6
-        prob_state_given_ibd[:,i] = 0 .* prob_state_given_ibd[:,i]
+        Pr_L_S[:,i] = 0 .* Pr_L_S[:,i]
     end
-    return prob_state_given_ibd
+    return Pr_L_S
 end
 
 #Pr_L_S_noinbreeding = dyadic_ML(data, allele_frequencies) |> no_inbreeding
@@ -181,12 +179,12 @@ end
 
 
 """
-    Δ_optim(Pr_L_S)
+    Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool)
 Takes the probability of the allelic state given the identity by descent from
 all available loci (either allowing for inbreeding or not) and calculated the
 maximum likelihood Δ coefficients
 """
-function Δ_optim(Pr_L_S, verbose = true)
+function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = true)
     #Δ is what needs to be optimized
     #consist of 9 values between 0 and 1 which must also sum to 1
     #is then used to calculate relatedness
@@ -211,7 +209,7 @@ end
     relatedness_dyadicML(Δ)
 Takes the Δ coefficents (with or without inbreeding allowed) and calculates the coefficient of relatedness
 """
-function relatedness_from_Δ(Δ)
+function relatedness_from_Δ(Δ::Array{Float64,2})
     θ = Δ[1] + 0.5 * (Δ[3] + Δ[5] + Δ[7]) + 0.25 * Δ[8]
     2 * θ
 end
@@ -231,7 +229,7 @@ Inbreeding can either be assumed not to occur (inbreeding = false) or be include
 Verbose controls the verbosity of the optimization process to find the Maximum likelihood Δ coefficents
 
 """
-function dyadicML_relatedness(ind1, ind2; data, alleles, inbreeding = true, verbose = true)
+function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, inbreeding::Bool = true, verbose::Bool = true)
 
     Pr_L_S = all_loci_Pr_L_S(data, ind1, ind2, alleles)
 
@@ -253,7 +251,7 @@ for locus in names(data.loci)
 end
 
 
-tst = dyadicML_relatedness("N100", "N104", data = data, alleles = allele_frequencies, inbreeding = true, verbose = true)
+tst = dyadicML_relatedness(data, "N100", "N104", alleles = allele_frequencies, inbreeding = true, verbose = true)
 
 
 
