@@ -1,9 +1,12 @@
 #= Steps to finish:
 
-    Iterate over all pairs of individuals
     Solve dyadic optimization issues - set max higher?
+        combined backtracking failure - need to isolate and find cause
+            #N111 N83
+            #N63 N64
+        Relax tolerance?
     Solve dyadic inbreeding issues
-    output in sensible manner
+    Output Δ coefficents
 
 =#
 
@@ -12,32 +15,6 @@
     Implement alternative relatedness metrics
 
 =#
-
-# Outside main function:
-# Pass in pop.object
-# Pass in sting saying method of relatedness to Calculate
-
-# Inside main function
-# Calculate allele frequencies for all loci to be accessed within next ability
-# Create for loop through all pairs of individuals and calculate relatedness
-#         -One possibility here is to use some type of outer function where the function evaluated in each cell is the relatedness calculation
-
-
-#the_data = nancycats()
-#=
-remove_loci!(data, "fca8")
-remove_loci!(data, "fca23")
-remove_loci!(data, "fca37")
-remove_loci!(data, "fca43")
-remove_loci!(data, "fca45")
-remove_loci!(data, "fca77")
-remove_loci!(data, "fca78")
-remove_loci!(data, "fca96")
-=#
-
-#ind1 = "N182"
-#ind2 = "N183"
-
 
 """
     pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
@@ -195,18 +172,19 @@ function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = t
     problem.constraints += sum(Δ) == 1
     problem.constraints += 0 <= Δ[1:9]
     problem.constraints += Δ[1:9] <= 1
-    Convex.solve!(problem, ECOSSolver(maxit=100, verbose = verbose, feastol=1e-7), verbose = verbose)
+    #Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=1e-7), verbose = verbose)
+    #Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=5e-6), verbose = verbose)
+    Convex.solve!(problem, SCSSolver(verbose = verbose), verbose = verbose)
 
     Δ.value, problem.status
     #Should probably include some output that confirms that it did in fact converge and/or use multiple random starts to confirm not a local maxima
 end
 
-#Δ_inbreeding = Δ_optim(Pr_L_S_inbreeding)
-#Δ_noinbreeding = Δ_optim(Pr_L_S_noinbreeding)
+dyadicML_relatedness(nancycats(), "N100", "N111", alleles = allele_frequencies, inbreeding = true, verbose = true)
 
 ## Calculate theta and r
 """
-    relatedness_dyadicML(Δ)
+    relatedness_dyadicML(Δ::Array{Float64,2})
 Takes the Δ coefficents (with or without inbreeding allowed) and calculates the coefficient of relatedness
 """
 function relatedness_from_Δ(Δ::Array{Float64,2})
@@ -221,7 +199,7 @@ end
 
 
 """
-    dyadicML_relatedness(ind1, ind2; data, alleles, inbreeding = true, verbose = 3)
+    dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, inbreeding::Bool = true, verbose::Bool = true)
 Calculates the dyadic maximum likelihood relatedness using all available loci following
 Milligan 2002 dyadic relatedness - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1462494/pdf/12663552.pdf
 
@@ -243,66 +221,65 @@ function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles:
 end
 
 
-data = nancycats()
-
-allele_frequencies = Dict()
-for locus in names(data.loci)
-    allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
-end
-
-
-tst = dyadicML_relatedness(data, "N100", "N104", alleles = allele_frequencies, inbreeding = true, verbose = true)
 
 
 
-output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
-for ind1 in data.samples.name
-    for ind2 in data.samples.name
-        if ind1 < ind2
-            ind_out = dyadicML_relatedness(ind1, ind2, data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
-            #push!(output, [ind1, ind2, ind_out[1], ind_out[3]]) #, ind_out[2], ind_out[3]
-            append!(output,DataFrame(ind1 = ind1, ind2 = ind2, relatedness = ind_out[1], convergence = ind_out[3]))
-            println(ind1, ind2)
+"""
+    pairwise_relatedness(data::PopObj, method::String, inbreeding::Bool = true, verbose::Bool = true)
+Calculates various pairwise relatedness measures between all pairs of individuals based on the entire sample population
+allele frequency
+
+If the method is able to account for inbreeding in it's calculation then that option may be used
+
+Currently only the Milligan 2002 Dyadic Maximum Likelihood relatedness estimator is implemented
+
+"""
+function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
+    allele_frequencies = Dict()
+    for locus in names(data.loci)
+        allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
+    end
+
+    #Add switch to slightly change output depending on relatednes metric (e.g. convergence doesn't make sense for Moments Estimators)
+    output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
+    for (i,ind1) in enumerate(data.samples.name)
+        i == length(data.samples.name) && break
+        for ind2 in i+1:length(data.samples.name)
+
+            #In here add switch for which relatedness metric to calculate
+            dyad_out = dyadicML_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
+            append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = dyad_out[1], convergence = dyad_out[3]))
+        end
+        if verbose
+            println("All pairs with ", ind1, " finished")
         end
     end
+
+    return output
 end
 
 
-output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
-for (i,ind1) in enumerate(data.samples.name)
-    i == length(data.samples.name) && break
-    for ind2 in i+1:length(data.samples.name)
-        ind_out = dyadicML_relatedness(ind1, data.samples.name[ind2], data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
-        #push!(output, [ind1, ind2, ind_out[1], ind_out[3]]) #, ind_out[2], ind_out[3]
-        append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = ind_out[1], convergence = ind_out[3]))
-        println(ind1, ind2)
-    end
-end
 
-output
-#pairs with Combined backtracking failed error
-#N111 N83
-#N63 N64
-∈
-data.samples.name[204]
 
-test = filter(row -> row.convergence != :Optimal, output)
+cat_rel = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
+
+
+test = filter(row -> row.convergence != :Optimal, cat_rel)
 test2 = filter(row -> row.convergence != :Suboptimal, test)
 test3 = filter(row -> row.convergence != :UserLimit, test2)
 
-#Sort out issues with suboptimal and failed convergence
-#Sort out storage as dataframe with ind1, ind2, relatedness, Δ
-#look into alternative solvers
+#maxit = 100 feastol = 1e-7 - 37.4% non-optimal; 49 total hit user limit
+#maxit = 1000 feastol = 1e-7 - 26% non-optimal;  21 total hit user limit - more backtracking issues
+#maxit = 100 feastol = 1e-6 - 30.7% non-optimal; 30 total hit user limit 76 infeasable
+#maxit = 100 feastol = 1e-5 - 23.2% non-optimal; 0 total hit user limit  5728 infeasable - way fewer backtracking issues (only 2)
+#maxit = 100 feastol = 5e-6 - 23.1% non-optimal; 0 total hit user limit 1570 infeasable - 7 failed backtracking
+#maxit = 100 feastol = 1e-4 - % non-optimal;  total hit user limit  infeasable -  failed backtracking
 
-#Combined backtracking failed....
+## Introduce whacky fun if is infeasable to drop the feastol to 1e-8
+#maxit = 100 feastol = 5e-6 - 21.9% non-optimal; 49 total hit user limit 0 infeasable - 7 failed backtracking
 
-store = deepcopy(output)
-
-
-
+## SCSSolver defaults
 
 
-
-dyadicML_relatedness(dyads.ind1[29], dyads.ind2[29], data = data, alleles = allele_frequencies, inbreeding = true, verbose = false)
-
-#inaccurate N100, N118
+6133/27966
+76-106
