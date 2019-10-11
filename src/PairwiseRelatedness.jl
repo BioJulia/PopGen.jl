@@ -282,6 +282,7 @@ for (i,ind1) in enumerate(data.samples.name)
 end
 
 output
+#pairs with Combined backtracking failed error
 #N111 N83
 #N63 N64
 ∈
