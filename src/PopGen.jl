@@ -14,7 +14,9 @@ using DataFrames,
       MultipleTesting,
       LinearAlgebra,
       Convex,
-      ECOS
+      ECOS,
+      ProgressMeter
+
 
 export PopObj,
     summary,

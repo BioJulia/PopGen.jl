@@ -5,8 +5,9 @@
             #N111 N83
             #N63 N64
         ~1/3 - 1/5 not with optimal solution in cats dataset
-    Solve dyadic inbreeding issues
+    Solve dyadic inbreeding/no_inbreeding being exactly flipped from the estimates from the related R package
     Output Δ coefficents
+    Multithread
 
 =#
 
@@ -166,17 +167,22 @@ function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = t
     #consist of 9 values between 0 and 1 which must also sum to 1
     #is then used to calculate relatedness
 
-    Δ = Variable(9)
-    problem = maximize(sum(log(Pr_L_S * Δ)))
-    problem.constraints += Δ[9] == 1 - sum(Δ[1:8])
-    problem.constraints += sum(Δ) == 1
-    problem.constraints += 0 <= Δ[1:9]
-    problem.constraints += Δ[1:9] <= 1
-    Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=1e-7), verbose = verbose)
-    #Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=5e-6), verbose = verbose)
-    #Convex.solve!(problem, SCSSolver(verbose = verbose), verbose = verbose)
+    Δ = Variable(8)
+    problem = maximize(sum(log(Pr_L_S * vcat(1 - sum(Δ), Δ))))
+    problem.constraints += 0 <= 1 - sum(Δ)
+    problem.constraints += 1 - sum(Δ) <= 1
+    problem.constraints += 0 <= Δ[1:8]
+    problem.constraints += Δ[1:8] <= 1
 
-    Δ.value, problem.status
+    #shifted from actual relatedness calculations because the 1 - sum(Δ) goes at beginning
+    problem.constraints += 2 * ((1 - sum(Δ)) + 0.5 * (Δ[2] + Δ[4] + Δ[6]) + 0.25 * Δ[7]) <= 1
+    problem.constraints += 0 <= 2 * ((1 - sum(Δ)) + 0.5 * (Δ[2] + Δ[4] + Δ[6]) + 0.25 * Δ[7])
+
+    Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit = 100), verbose = verbose) #maxit=100,
+    #Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=5e-6, reltol = 1e-3, reltol_inacc = 5e-2), verbose = verbose)
+    #Convex.solve!(problem, SCSSolver(verbose = verbose, max_iters = 100), verbose = verbose)
+
+    vcat(1-sum(Δ.value), Δ.value), problem.status
     # Should probably include some output that confirms that it did in fact
     # converge and/or use multiple random starts to confirm not a local maxima
 end
@@ -220,9 +226,6 @@ function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles:
 end
 
 
-
-
-
 """
     pairwise_relatedness(data::PopObj, method::String, inbreeding::Bool = true, verbose::Bool = true)
 Calculates various pairwise relatedness measures between all pairs of individuals based on the entire sample population
@@ -239,6 +242,11 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
         allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
     end
 
+
+    n = size(data.samples)[1]
+    n = n*(n-1) ÷ 2
+    prog = Progress(n, 1)
+
     #Add switch to slightly change output depending on relatednes metric (e.g. convergence doesn't make sense for Moments Estimators)
     output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
     for (i,ind1) in enumerate(data.samples.name)
@@ -248,6 +256,7 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
             #In here add switch for which relatedness metric to calculate
             dyad_out = dyadicML_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
             append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = dyad_out[1], convergence = dyad_out[3]))
+            next!(prog)
         end
         if verbose
             println("All pairs with ", ind1, " finished")
@@ -258,9 +267,12 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
 end
 
 
-
-
 cat_rel = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
+
+
+test = filter(row -> row.relatedness < 0, cat_rel)
+
+test = filter(row -> row.relatedness > 1, cat_rel)
 
 
 test = filter(row -> row.convergence != :Optimal, cat_rel)
