@@ -1,3 +1,50 @@
+
+"""
+    heterozygosity(x::PopObj, mode = "locus")
+Calculate observed and expected heterozygosity in a `PopObj`
+## Example
+heterozygosity(nancycats(), "population" )
+### Modes
+- `"locus"` : heterozygosity per locus (default)
+- `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
+- `"population"` or `"pop"` : heterozygosity per population (PopObj.samples.population)
+"""
+function heterozygosity(x::PopObj, mode = "locus")
+    if mode == "locus"
+        obs = het_observed(x)
+        exp = het_expected(x)
+        locinames = String.(names(x.loci))
+        return DataFrame(locus = locinames, het_obs = obs, het_exp = exp)
+
+    elseif lowercase(mode) == "sample" || lowercase(mode) == "ind" || lowercase(mode) == "individual"
+        return het_sample(x)
+
+    elseif lowercase(mode) == "pop" || lowercase(mode) == "population"
+        obs = het_population_obs(x)
+        exp = het_population_exp(x)
+        merged_het = merge(obs, exp)
+        locinames = String.(names(x.loci))
+
+        # remake obs/exp distinction
+        obs_pops = obs["pops_obs"] .* "_obs"
+        exp_pops = exp["pops_exp"] .* "_exp"
+
+        # interleave pop_obs/exp for column names
+        #col_names = Iterators.flatten(zip(obs_pops, exp_pops)) |> collect
+        df = DataFrame(locus = locinames)
+        out_df = []
+        for (i,j) in zip(obs_pops, exp_pops)
+            tmp = DataFrame(locus = locinames, het_obs = merged_het[i], het_exp = merged_het[j])
+            push!(out_df, tmp)
+        end
+    end
+    return Tuple(out_df)
+end
+
+const het = heterozygosity
+const He = heterozygosity
+
+
 """
     het_expected(x::PopObj)
 Calculate the expected heterozygosity for each locus in a `PopObj`. Returns an
@@ -148,6 +195,25 @@ function het_sample(x::PopObj)
     )
 end
 
+"""
+    het_sample(x::Array)
+Calculate the observed heterozygosity for each individual in a `PopObj`. Returns
+an array of heterozygosity values.
+"""
+function het_sample(individual::Array{Union{Missing,Tuple},1})
+    # calculate observed heterozygosity
+    het_vals = []
+    a = geno_freq(individual)  # get genotype freqs at sample
+    tmp = 0
+    for geno in collect(keys(a))
+        geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
+        if geno != geno_hom        # test if geno isn't homozygous
+            tmp += a[geno]     # if true, add freq to total in tmp
+        end
+    end
+    push!(het_vals, tmp)
+    het = het_vals |> Array{Float64,1}
+end
 
 """
     hwe_test(x::PopObj; by_pop::Bool = false; correction = "none")
