@@ -254,6 +254,7 @@ function hwe_test(x::PopObj; by_pop::Bool = false, correction::String = "none")
         insertcols!(het, size(het,2)+1, DF = output[2] |> Array{Union{Missing,Float64},1})
         insertcols!(het, size(het,2)+1, P = output[3] |> Array{Union{Missing,Float64},1})
         ## corrections
+        @info "Χ² test for conformation to Hardy-Weinberg Equilibrium"
         if correction == "none"
             return het
         else
@@ -282,6 +283,7 @@ function hwe_test(x::PopObj; by_pop::Bool = false, correction::String = "none")
             insertcols!(het_pop, size(het_pop,2)+1, P = output[3] |> Array{Union{Missing,Float64},1})
             push!(out_array, het_pop)
         end
+        @info "Χ² test for conformation to Hardy-Weinberg Equilibrium by Population"
 
         ## corrections
         if correction == "none"

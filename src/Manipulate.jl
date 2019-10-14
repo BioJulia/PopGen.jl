@@ -28,6 +28,7 @@ function locations!(x::PopObj; lat::Array, long::Array)
         x.samples.longitude = lat ;
         x.samples.latitude = long ;
     else
+        @info "Converting decimal minutes to decimal degrees"
         # make sure decimal minutes are Strings
         if typeof(lat) != Array{String,1}
             lat = string.(lat)
@@ -118,6 +119,7 @@ function Base.missing(x::PopObj)
     end
 
     loci_df = DataFrame(locus = string.(names(y.loci)), missing = f(y.loci))
+    @info "\nDataFrame 1: missing by sample \nDataFrame 2: missing by locus"
     return (by_sample = sample_df, by_loci = loci_df)
 end
 
@@ -171,6 +173,7 @@ function populations!(x::PopObj; rename::Dict=Dict(), replace::Union{Tuple,Named
             eachkey ∉ x.samples.population && @warn "$eachkey not found in PopObj"
             replace!(x.samples.population, eachkey => rename[eachkey])
         end
+        @info "renaming populations"
         return populations(x,listall = true)
     elseif replace != (0,0)
         if typeof(replace) <: NamedTuple
@@ -181,6 +184,7 @@ function populations!(x::PopObj; rename::Dict=Dict(), replace::Union{Tuple,Named
         flat_popid = Iterators.flatten(popid_array) |> collect
         length(flat_popid) != size(x.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(x.samples.name)))")
         x.samples.population = flat_popid
+        @info "overwriting all population names"
         return populations(x, listall = true)
     else
         error("specify rename = Dict() to rename populations, or replace=(counts,names) to replace all names")
@@ -272,6 +276,12 @@ Prints a summary of the information contained in a PopObj
 function Base.summary(x::PopObj)
     y = PopOpt(x)
     println("Object of type $(typeof(x)):")
+    if typeof(x.loci[!, :1][1][1]) == Int16
+        marker = "Microsatellite"
+    else
+        marker = "SNP"
+    end
+    println("Marker type: $marker")
     println("\nLongitude:")
     println("$(y.samples.longitude[1:3])" , " \u2026 ", "$(y.samples.longitude[end-2:end])", "\n")
     println("Latitude:")
