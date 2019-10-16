@@ -1,4 +1,18 @@
 """
+    allele_avg(x::PopObj)
+Returns a NamedTuple of the average number of alleles ('avg') and standard
+deviation (`stdev`) of a `PopObj`. 
+"""
+function allele_avg(x::PopObj)
+    all_dicts = map(allele_freq, eachcol(x.loci))
+    just_alleles = map(i -> keys(i) |> collect, all_dicts)
+    num_alleles = map(length, just_alleles)
+    avg = mean(num_alleles)
+    sd = std(num_alleles)
+    return (avg = avg, stdev = sd)
+end
+
+"""
     allele_freq(genotype::Union{Missing,Tuple})
 Calculate allele frequency for a single locus of a single sample. Returns a
 `Dict` of alleles and their frequencies.
