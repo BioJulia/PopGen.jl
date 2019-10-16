@@ -1,15 +1,19 @@
 """
-    allele_avg(x::PopObj)
+    allele_avg(x::PopObj, round::Bool = true)
 Returns a NamedTuple of the average number of alleles ('avg') and standard
-deviation (`stdev`) of a `PopObj`. 
+deviation (`stdev`) of a `PopObj`.
 """
-function allele_avg(x::PopObj)
+function allele_avg(x::PopObj, rounding::Bool = true)
     all_dicts = map(allele_freq, eachcol(x.loci))
     just_alleles = map(i -> keys(i) |> collect, all_dicts)
     num_alleles = map(length, just_alleles)
     avg = mean(num_alleles)
     sd = std(num_alleles)
-    return (avg = avg, stdev = sd)
+    if rounding == true
+        return (avg = round(avg, digits = 4), stdev = round(sd, digits = 4))
+    else
+        return (avg = avg, stdev = sd)
+    end
 end
 
 """
