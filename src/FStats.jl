@@ -94,3 +94,10 @@ function Fstats(x::PopObj, mode::String = "global")
         error("please specify \"global\", \"loci\", or \"sample\" as the second argument")
     end
 end
+
+
+
+#======= FST_alpha =======#
+hets = He(x, "pop")
+H_s = map(i -> mean(i.het_exp), hets)
+#H_i = map(i -> mean(i.het_obs), hets)

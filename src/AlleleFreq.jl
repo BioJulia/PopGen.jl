@@ -1,4 +1,23 @@
 """
+    allele_avg(x::PopObj, rounding::Bool = true)
+Returns a NamedTuple of the average number of alleles ('avg') and standard
+deviation (`stdev`) of a `PopObj`. Use `false` as second argument (no keyword)
+to not round results. Default (`true`) rounds to 4 digits. 
+"""
+function allele_avg(x::PopObj, rounding::Bool = true)
+    all_dicts = map(allele_freq, eachcol(x.loci))
+    just_alleles = map(i -> keys(i) |> collect, all_dicts)
+    num_alleles = map(length, just_alleles)
+    avg = mean(num_alleles)
+    sd = std(num_alleles)
+    if rounding == true
+        return (avg = round(avg, digits = 4), stdev = round(sd, digits = 4))
+    else
+        return (avg = avg, stdev = sd)
+    end
+end
+
+"""
     allele_freq(genotype::Union{Missing,Tuple})
 Calculate allele frequency for a single locus of a single sample. Returns a
 `Dict` of alleles and their frequencies.
