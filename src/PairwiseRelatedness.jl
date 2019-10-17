@@ -267,8 +267,8 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
 end
 
 
-cat_rel = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
-
+cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
+cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
 
 test = filter(row -> row.relatedness < 0, cat_rel)
 
