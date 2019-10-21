@@ -2,7 +2,7 @@
     allele_avg(x::PopObj, rounding::Bool = true)
 Returns a NamedTuple of the average number of alleles ('avg') and standard
 deviation (`stdev`) of a `PopObj`. Use `false` as second argument (no keyword)
-to not round results. Default (`true`) rounds to 4 digits. 
+to not round results. Default (`true`) rounds to 4 digits.
 """
 function allele_avg(x::PopObj, rounding::Bool = true)
     all_dicts = map(allele_freq, eachcol(x.loci))

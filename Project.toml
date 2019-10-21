@@ -1,7 +1,7 @@
 name = "PopGen"
 uuid = "af524d12-c74b-11e9-22a8-3b091653023f"
 authors = ["Pavel Dimens", "Jason Selwyn"]
-version = "0.1.0"
+version = "0.0.4"
 
 [deps]
 Convex = "f65535da-76fb-5f13-bab9-19810c17039a"

@@ -42,6 +42,16 @@ relatedness(data::PopObj, arg::Type, arg::Type, arg::Type)
 
 See [Development](hidden_api.md) for all of the APIs associated with `relatedness()` 
 
+
+
+## Speed
+
+Depending on the number samples and loci in your data, the maximum-likelihood approach to relatedness can be quite time consuming. We include a progress bar thanks to [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl) to provide some indication of how long it will take. As a point of reference, it takes approximately 13 hours to perform this relatedness calculation on the `gulfsharks` data (212 samples x 2213 loci). 
+
+Currently, relatedness calculations run single-threaded, and we hope to parallelize it with the stable release of Julia 1.3  to make it even faster. Many hands make light work!
+
+
+
 ## Credits
 
 Both [Convex.jl](https://github.com/JuliaOpt/Convex.jl) and [ECOS.jl](https://github.com/JuliaOpt/ECOS.jl) are pivotal for these calculations, and we thank the authors for their time developing and maintaining them, along with the members of the Julia Slack channel for pointing us towards those packages.
