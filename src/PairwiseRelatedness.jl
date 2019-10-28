@@ -69,7 +69,7 @@ function pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
         [0, 0, 0, 0, prod(p), 2 * prod(p) * p[1], 0, prod(p) *p[1], 2 * prod(p) * p[1]^2]
 
     ## L5b - AjAi AiAi ## - has issues because of allele order
-    elseif (x[2] == y[1] == y[2] * (x[1] != x[2]))
+    elseif (x[2] == y[1] == y[2] & (x[1] != x[2]))
         p = (alleles[x[2]], alleles[x[1]])
         [0, 0, 0, 0, prod(p), 2 * prod(p) * p[1], 0, prod(p) *p[1], 2 * prod(p) * p[1]^2]
 
@@ -292,3 +292,4 @@ test3 = filter(row -> row.convergence != :UserLimit, test2)
 ## SCSSolver defaults
 # - takes much longer than ECOSSolver defaults
 # -
+shark_rel_Inbreeding = pairwise_relatedness(gulfsharks(), method = "dyadml", inbreeding = true, verbose = false)
