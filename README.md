@@ -11,10 +11,15 @@ Population Genetics in Julia.This is a fork of `PopGen.jl` in `BioJulia` with th
 #### Install instructions:
 ![install_instructions](docs/img/install_carbon.png)
 
-
 After the package is installed, load it with `using PopGen`
 
+:grey_exclamation: Arch Linux users:
+
+- if Julia was compiled from source: install `julia-arpack` from the AUR and make sure to delete `~/.julia/packages/Arpack` if it exists.
+
 Feel free to play around with the test data `nancycats` and `gulfsharks`!
+
+
 
 ---------
 
