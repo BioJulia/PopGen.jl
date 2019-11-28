@@ -35,7 +35,7 @@ Newcomb_04,  254230 564000 090120 \n
 """
 function genepop(
     infile::String;
-    digits::Int64 = 3,
+    ndigits::Int64 = 3,
     popsep::Any = "POP",
     numpops::Int64,
     marker = "snp",
@@ -47,6 +47,7 @@ function genepop(
         geno_type = Int16
     end
     gpop = split(open(readlines, infile)[2:end], popsep)
+    gpop = split(open(readlines, "C:/Users/pdime/Desktop/PopGen.jl/data/data/gulfsharks.gen")[2:end], "POP")
     if length(gpop) - 1 != numpops
         error("incorrect number of populations detected, see docstring for formatting
             expected : $numpops
@@ -58,7 +59,7 @@ function genepop(
     else                        # loci vertically stacked
         locinames = replace(gpop[1], "." => "_")
     end
-    d = Dict(string(i) => [] for i in locinames)
+    d = Dict(Symbol(i) => [] for i in locinames)
     popid = []
     indnames = []
     for i = 2:length(gpop)
@@ -69,19 +70,21 @@ function genepop(
             push!(indnames, split(strip(gpop[i][j]), r"\,|\t")[1])
             unphasedloci = split(strip(gpop[i][j]), r"\s|\t")[2:end] |>
                            Array{String,1}
-            replace!(unphasedloci, "-9" => "0"^digits) #just in case -9 = missing
+            replace!(unphasedloci, "-9" => "0"^ndigits) #just in case -9 = missing
             for locus in unphasedloci
                 phasedlocus = parse.(
                     geno_type,
-                    [join(i) for i in Iterators.partition(locus, digits)],
+                    [join(i) for i in Iterators.partition(locus, ndigits)],
                 ) |> sort |> Tuple
                 push!(phasedloci, phasedlocus)
             end
-            for (loc, geno) in zip(locinames, phasedloci)
+            for (loc, geno) in zip(Symbol.(locinames), phasedloci)
                 push!(d[loc], geno)
             end
         end
     end
+#TODO
+    genos = (; zip(loc2, Array{Union{Tuple,Missing},1}(d[i]) for i in loc2)...) # convert to a giant named tuple
     ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
     for (loc, ploid) in zip(locinames, ploidy)
         miss_geno = fill(0, ploid) |> Tuple
@@ -90,8 +93,16 @@ function genepop(
         replace!(d[loc], msat_miss_geno => missing)
     end
     # typesafe genotype DataFrame
-    loci_df = DataFrame([Symbol(i) => Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
+    #loci_df = DataFrame([Symbol(i) => Array{Union{Tuple,Missing},1}(d[i]) for i in locinames])
+    loci_table = JuliaDB.table([Array{Union{Tuple,Missing},1}(d[i]) for i in locinames], names = Symbol.(locinames))
     samples_df = DataFrame(
+        name = string.(indnames),
+        population = string.(popid),
+        ploidy = Int8.(ploidy),
+        longitude = fill(missing, length(indnames)),
+        latitude = fill(missing, length(indnames)),
+    )
+    samples_table = JuliaDB.table(
         name = string.(indnames),
         population = string.(popid),
         ploidy = Int8.(ploidy),
