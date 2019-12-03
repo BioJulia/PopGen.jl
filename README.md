@@ -12,9 +12,10 @@ Population Genetics in Julia.This is a fork of `PopGen.jl` in `BioJulia` with th
 Invoke the package manager by presseing `]` and `add` this repo
 ![install_instructions](docs/img/install.gif)
 - if Jupyter is your thing: `using Pkg; Pkg.add("https://github.com/pdimens/PopGen.jl")`
+
 After the package is installed, load it with `using PopGen`
 
-:grey_exclamation: Arch Linux users:
+##### Arch Linux users:
 
 - if Julia was compiled from source: install `julia-arpack` from the AUR and make sure to delete `~/.julia/packages/Arpack` if it exists.
 
