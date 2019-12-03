@@ -9,8 +9,9 @@ Population Genetics in Julia.This is a fork of `PopGen.jl` in `BioJulia` with th
 ### Want to test out what's available so far?
 
 #### Install instructions:
-![install_instructions](docs/img/install_carbon.png)
-
+Invoke the package manager by presseing `]` and `add` this repo
+![install_instructions](docs/img/install.gif)
+- if Jupyter is your thing: `using Pkg; Pkg.add("https://github.com/pdimens/PopGen.jl")`
 After the package is installed, load it with `using PopGen`
 
 :grey_exclamation: Arch Linux users:
