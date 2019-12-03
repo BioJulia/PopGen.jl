@@ -1,101 +1,99 @@
-struct PopSample
-    name::String
-    population::Union{String, Integer}
-    ploidy::Integer
-    longitude::Union{Missing,Float64}
-    latitude::Union{Missing,Float64}
-    genotypes::Vector{Union{Missing,Tuple}}
+using NamedTupleTools, JuliaDB
+
+geno_type = Int8
+ndigits = 3
+function phase(loc::String, type::DataType, digit::Int)
+    phasedlocus = parse.(type,
+        [join(i) for i in Iterators.partition(loc, digit)]) |> sort |> Tuple
 end
 
-
-function phase_loci(indiv::String, locnames::Vector{String} ndigits::Integer, gtype::DataType)
-   phasedloci = []
-   row = split(strip(indiv), r"\,|\s|\t") |>Array{String,1}
-   indname = row[1]
-   unphasedloci = row[3:end]
-   replace!(unphasedloci, "-9" => "0") #just in case -9 = missing
-      for locus in unphasedloci
-        phasedlocus = parse.(gtype,
-            [join(i) for i in Iterators.partition(locus, ndigits)],) |> sort |> Tuple
-         miss_geno = fill(0, length(phasedlocus)) |> Tuple
-         if phasedlocus == miss_geno
-            phasedlocus = missing
-         end
-         replace!(phasedloci, "0" => missing)
-         push!(phasedloci, phasedlocus)
-      end
-      ploidy = mode(length.(phasedloci[1:end÷5] |> skipmissing))
-      return (indname, ploidy, Array{Union{Missing,Tuple}}(phasedloci))
-end
-
-
-
-    geno_type = Int16
-    ndigits = 3
-    popid = []
-    indnames = []
-    loci = []
-#    gpop = split(open(readlines, infile)[2:end], popsep)
-#    gpop = split(open(readlines, "C:/Users/pdime/Desktop/PopGen.jl/data/data/gulfsharks.gen")[2:end], "POP")
-    gpop = split(open(readlines, "/home/pdimens/PopGen.jl/data/data/gulfsharks.gen")[2:end], "POP")
-#    if length(gpop) - 1 != numpops
-#        error("incorrect number of populations detected, see docstring for formatting
-#            expected : $numpops
-#            detected : $(length(gpop)-1) ")
-#    end
-    if length(gpop[1]) == 1     # loci horizontally stacked
-        locinames = strip.(split(gpop[1] |> join, ",") |> Array{String,1})
-        replace!(locinames, "." => "_")
-        locinames = Symbol.(locinames)
-    else                        # loci vertically stacked
-        locinames = Symbol.(replace(gpop[1], "." => "_"))
+function genepop(
+    infile::String;
+    ndigits::Int = 3,
+    popsep::Any = "POP",
+    marker::String = "snp",
+)
+    println("\n", "Input File : ", abspath(infile))
+    if lowercase(marker) == "snp"
+        geno_type = Int8
+    else
+        geno_type = Int16
     end
-
+    gpop = split(open(readlines, infile)[2:end], popsep)
+    #gpop = split(open(readlines, "C:/Users/pdime/Desktop/PopGen.jl/data/data/gulfsharks.gen")[2:end], "POP")
+    gpop = split(open(readlines, "/home/pdimens/PopGen.jl/data/data/gulfsharks.gen")[2:end], "POP")
+    @info "\n$(abspath(infile)) \n$(length(gpop)-1) populations detected using \"$popsep\" seperator \n$(length(gpop[1])) loci detected \n$(sum(length.(gpop[2:end]))) samples detected"
+    if length(gpop[1]) == 1     # loci horizontally stacked.
+        locinames = strip.(split(gpop[1] |> join, ",") |> Vector{String})
+        replace!(locinames, "." => "_")
+    else                        # loci vertically stacked
+        locinames = replace(gpop[1], "." => "_")
+    end
+    table_fields = append!(
+                        ["name",
+                        "population",
+                        "ploidy",
+                        "longitude",
+                        "latitude"],
+                        locinames
+                        )
+    sample_meta = [Vector{String}(),
+                   Vector{Int}(),
+                   Vector{Int8}(),
+                   Vector{Union{Missing,Float32}}(),
+                   Vector{Union{Missing, Float32}}()]
+    table_types = append!(sample_meta, fill(Vector{Union{Missing, Tuple}}(), length(locinames)))
+    d = namedtuple(table_fields, table_types)
+    #d = Dict(Symbol(i) => Vector{Union{Missing, Tuple}}() for i in locinames)
+    #popid = Vector{Int}()
+    #indnames = Vector{String}()
+    #ploidy = Vector{Int8}()
     for i = 2:length(gpop)
-        #append!(popid, fill(i - 1, length(gpop[i])))
-        for j in gpop[i]
-            ind, ploidy, loc = phase_loci(j, ndigits,geno_type)
-            popsample = PopSample(ind, i-1, ploidy,missing, missing,loc)
-            #push!(indnames, ind)
-            #push!(loci, loc)
+        append!(d.population, fill(i - 1, length(gpop[i])))
+        for j = 1:length(gpop[i])
+            #println(Base.Threads.threadid()) ########
+            #phasedloci = Vector{Union{Missing, Tuple}}()
+            samplerow = split(strip(gpop[i][j]), r"\,\s|\s|\t") |>Vector{String}
+            push!(d.name, popfirst!(samplerow))
+            # just in case -9 = missing
+            replace!(samplerow, "-9" => "0"^ndigits)
+            # phase the loci into tuples
+            for (locname, locus) in zip(locinames,samplerow)
+                phasedlocus = parse.(
+                                geno_type,
+                                [join(i) for i in Iterators.partition(locus, ndigits)]) |> sort |> Tuple
+                push!(d[Symbol(locname)], phasedlocus)
+            end
+
+            #=phasedloci = map(x -> phase(x, geno_type, ndigits), samplerow)
+            return
         end
     end
+    #= infer ploidy by taking the mode of # alleles per locus per indiv for
+       the first 20% of loci =#
+       #map(length., [d[i] for i in locinames[1:end÷5]])
+    #ploidy = mode(length.(phasedloci[1:end÷5] |> skipmissing))
 #TODO
-    # infer ploidy by taking the mode of # alleles per locus per indiv for
-    # the first 20% of loci
+    loc2 = Symbol.(locinames)
+    #genos = (; zip(loc2, Vector{Union{Tuple,Missing}}(d[i]) for i in loc2)...) # convert to a giant named tuple
+    ploidy = length.(d[locinames[1]])   # lazy finding of ploidy from single locus
+    for (loc, ploid) in zip(locinames, ploidy)
+        miss_geno = fill(0, ploid) |> Tuple
+        msat_miss_geno = ("0")
+        replace!(d[loc], miss_geno => missing)
+        replace!(d[loc], msat_miss_geno => missing)
+    end
+    sampleinfo = (name = indnames,
+                population = string.(popid),
+    #ploidy = Int8.(ploidy),
+                longitude = fill(missing, length(indnames)) |> Vector{Union{Missing, T} where T <: Real},
+                latitude = fill(missing, length(indnames)) |> Vector{Union{Missing, T} where T <: Real},
+    )
+    JDB_table = table(sampleinfo)
 
+ length(indnames)) |> Vector{Union{Missing, T} where T <: Real},
+        (i = d[i] for i in locinames)
+    ))
+    #PopObj(samples_df, loci_df)
 
-    out_tbl = [(name = indnames,
-               population = popid,
-               ploidy = ploidy,
-               longitude = fill(missing, length(indnames)),
-               latitude = fill(missing, length(indnames))
-               )]
-
-    out_out = [(name = i, population = j, ploidy = k) for (i,j,k) in zip(indnames, popid, ploidy)]
-
-genotest = Dict(i => [] for i in names(x.loci))
-
-for (i,j) in zip(names(x.loci),eachcol(x.loci))
-    genotest[i] = j
 end
-
-typedgeno = Dict()
-for (k,v) in genotest
-    typedgeno[k] = Vector{Union{Missing, Tuple}}(v)
-end
-
-tb = (; typedgeno...) |> table ;
-tb
-
-
-
-
-
-### MAKE TABLE AND THEN MAKE IT A TABLE.TABLE
-tbl = [(a = 3, b = 2)]
-push!(tbl, (a = 2, b = 3))
-
-
-
-map(x -> mode(length.(x[1:end÷2] |> skipmissing)), loci)
