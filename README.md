@@ -7,7 +7,7 @@ This is a fork of `PopGen.jl` in `BioJulia` with the goal of merging with it.
 
 ### Want to test out what's available so far?
 
-#### Install instructions:
+#### How to install:
 Invoke the package manager by pressing `]` on an empty line and `add` this repo
 ![install_instructions](docs/img/install.gif)
 - if Jupyter is your thing: `using Pkg; Pkg.add("https://github.com/pdimens/PopGen.jl")`
