@@ -4,7 +4,7 @@ Population Genetics in Julia.This is a fork of `PopGen.jl` in `BioJulia` with th
 
 [![alt text](https://img.shields.io/badge/docs-stable-informational?style=for-the-badge&logo=Read%20The%20Docs)](https://pdimens.github.io/PopGen.jl/stable) [![alt text](https://img.shields.io/badge/docs-latest-75ae6c?style=for-the-badge&logo=Read%20The%20Docs)](https://pdimens.github.io/PopGen.jl/latest) [![alt text](https://img.shields.io/badge/slack-join%20PopGen.jl-9d72b1?style=for-the-badge&logo=slack)](https://pdimens.github.io/PopGen.jl/community/)
 
-
+:warning: **there is a big rewrite occuring in the `JuliaDB` branch to reformat the `PopObj` as a single `IndexedTable` via `JuliaDB.jl`. It's being a real pain, and if you are interested in lending a hand to help make that functional, do have a look at that branch!**
 
 ### Want to test out what's available so far?
 
