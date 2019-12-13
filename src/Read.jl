@@ -105,7 +105,10 @@ function csv(
     end
     close(file)
 
-    @info "\n$(abspath(infile)) \n$(length(indnames)) samples detected \n$(length(unique(popid))) populations detected \n$(length(locinames)) loci detected"
+    @info "\n$(abspath(infile))
+$(length(indnames)) samples detected
+$(length(unique(popid))) populations detected
+$(length(locinames)) loci detected"
 
     # convert the entire thing into a matrix
     geno_matrix = hcat(sample_geno_array...)
@@ -181,7 +184,10 @@ function genepop(
 
     gpop = split(open(readlines, infile)[2:end], popsep)
 
-    @info "\n$(abspath(infile)) \n$(sum(length.(gpop[2:end]))) samples detected \n$(length(gpop)-1) populations detected using \"$popsep\" seperator \n$(length(gpop[1])) loci detected"
+    @info "\n$(abspath(infile))
+$(sum(length.(gpop[2:end]))) samples detected
+$(length(gpop)-1) populations detected using \"$popsep\" seperator
+$(length(gpop[1])) loci detected"
 
     if length(gpop[1]) == 1     # loci horizontally stacked.
         locinames = strip.(split(gpop[1] |> join, ",") |> Vector{String})
@@ -252,20 +258,20 @@ function vcf(infile::String)
     sample_names = header(vcf_file).sampleID
 
     # fill in pop/lat/long with missing
-    population = fill(missing, length(sample_names))
-    lat = fill(missing, length(sample_names))
-    long = fill(missing, length(sample_names))
+    population = fill("missing", length(sample_names))
+    loc_xy = Vector{Union{Missing, Float32}}()
+    append!(loc_xy, fill(missing, length(sample_names)))
 
     # get loci names
     locinames = Vector{String}()
 
     ## array of genotypes
-    locus_array = Vector{Vector{Union{Missing, Tuple}}}()
+    locus_array = Vector{Vector{Union{Missing, Tuple{Vararg}}}}()
 
     # get genotypes
     for record in vcf_file
         # fix locus names to be syntax-safe
-        chr_safe = replace(VCF.chrom(record), "." => "_")
+        chr_safe = replace(VCF.chrom(record), r"\.|\-|\=|\/" => "_")
         chr_safer = replace(chr_safe, "|" => "_")
         pos = VCF.pos(record) |> string
         push!(locinames, chr_safer*"_"*pos)
@@ -285,6 +291,7 @@ function vcf(infile::String)
         geno_tuple = [Tuple(i) for i in geno_final]
         push!(locus_array, geno_tuple)
     end
+    close(vcf_file)
 
     # intelligently scan for ploidy
     ploidy = Vector{Int8}()
@@ -297,7 +304,10 @@ function vcf(infile::String)
         end
     end
 
-    @info "\n$(abspath(infile)) \n$(length(sample_names)) samples detected \n$(length(locinames)) loci detected"
+    @info "\n$(abspath(infile))
+$(length(sample_names)) samples detected
+population info must be added <---
+$(length(locinames)) loci detected"
 
     # create loci dataframe
     loci_df = DataFrame([j => k for (j,k) in zip(Symbol.(locinames), locus_array)])
@@ -307,8 +317,8 @@ function vcf(infile::String)
         name = sample_names,
         population = population,
         ploidy = ploidy,
-        latitude = lat,
-        longitude = long
+        latitude = loc_xy,
+        longitude = loc_xy
     )
     PopObj(samples_df, loci_df)
 end

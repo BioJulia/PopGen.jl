@@ -140,6 +140,10 @@ function populations(data::PopObj; listall::Bool = false)
     if listall == true
         @view data.samples[!, [:name, :population]]
     else
+        if ismissing.(data.samples.population) |> unique == [true]
+            @info "no population data present in PopObj"
+            return @view data.samples[!, [:name, :population]]
+        end
         popcounts = [count(i -> i == j, data.samples.population) for j in unique(data.samples.population)]
         popcounts = DataFrame(
             population = unique(data.samples.population),
