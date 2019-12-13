@@ -1,15 +1,15 @@
 """
-    locations(x::PopObj)
+    locations(data::PopObj)
 View location data (`.longitude` and `.latitude`) in a `PopObj`
 
 Use `locations!` to add spatial data to a `PopObj`
 """
 function locations(data::PopObj)
-    y = PopOpt(data)
-    DataFrame(name = y.samples.name,
-              population = y.samples.population,
-              longitude = y.samples.longitude,
-              latitude = y.samples.latitude)
+    DataFrame(name = data.samples.name,
+        population = data.samples.population,
+        longitude = data.samples.longitude,
+        latitude = data.samples.latitude
+    )
 end
 
 """
@@ -36,20 +36,24 @@ function locations!(data::PopObj; lat::Array, long::Array)
         if typeof(long) != Array{String,1}
             long = string.(long)
         end
+
         # convert lat to decimal degrees
-        latConverted = []
+        latConverted = Vector{Float32}()
         for value in lat
             tmp = split(value, " ")
-            if parse(Float64,tmp[1]) < 0   # if negative, subtract
-                decideg = parse(Float64, tmp[1]) - round((parse(Float64,tmp[2])/60), digits = 3)
+            if parse(Float64,tmp[1]) < 0
+                # if negative, subtract
+                decideg = parse(Float32, tmp[1]) - round((parse(Float32,tmp[2])/60), digits = 3)
                 push!(latConverted, decideg)
-            else                           # if positive, add
-                decideg = parse(Float64, tmp[1]) + round((parse(Float64,tmp[2])/60), digits = 3)
+            else
+                # if positive, add
+                decideg = parse(Float32, tmp[1]) + round((parse(Float32,tmp[2])/60), digits = 3)
                 push!(latConverted, decideg)
             end
         end
+
         # convert long to decimal degrees
-        longConverted = []
+        longConverted = Vector{Float32}()
         for value in long
             tmp = split(value, " ")
             if parse(Float64,tmp[1]) < 0
@@ -62,33 +66,31 @@ function locations!(data::PopObj; lat::Array, long::Array)
         end
         data.samples.longitude = latConverted
         data.samples.latitude = longConverted
-        return data.samples
-
     end
 end
 
 """
-    loci(x::PopObj)
+    loci(data::PopObj)
 Returns an array of strings of the loci names in a `PopObj`
 """
-function loci(x::PopObj)
-    String.(names(x.loci))
+function loci(data::PopObj)
+    String.(names(data.loci))
 end
 
 """
-    loci(x::DataFrame)
+    loci(data::DataFrame)
 Convenience wrapper to return an array of column names as string in the `.loci`
 DataFrame of a `PopObj`
 """
-function loci(x::DataFrame)
-    String.(names(x))
+function loci(data::DataFrame)
+    String.(names(data))
 end
 
 
 #### Find missing ####
 
 """
-    missing(x::PopObj)
+    missing(data::PopObj)
 Identify and count missing loci in each sample of a `PopObj`. Returns a tuple
 of `DataFrames`: loci per sample, number per loci.
 
@@ -96,48 +98,48 @@ Example:
 
 `missing_ind,missing_loc = missing(gulfsharks)`
 """
-function Base.missing(x::PopObj)
-    y = PopOpt(x)
-    df = deepcopy(y.loci)
-    insertcols!(df, 1, :ind => y.samples.name)
+function Base.missing(data::PopObj)
+    df = deepcopy(data.loci)
+    insertcols!(df, 1, :ind => data.samples.name)
     # missing per individual
-    nmissing = []
-    missing_array = []
+    nmissing = Vector{Int}()
+    missing_array = Vector{String}()
     for each in 1:length(df[:,1])
         miss_idx = findall(i -> i === missing, df[each,:])
         push!(nmissing, miss_idx |> length)
         push!(missing_array, String.(miss_idx))
     end
-    sample_df = DataFrame(name = x.samples.name,
-                       population = x.samples.population,
-                       missing = nmissing,
-                       loci = missing_array
-                       )
+    sample_df = DataFrame(
+        name = data.samples.name,
+        population = data.samples.population,
+        missing = nmissing,
+        loci = missing_array
+    )
     # missing per locus
-    f(x) = map(eachcol(x)) do col
+    f(data) = map(eachcol(data)) do col
         count(i->i===missing, col)
     end
 
-    loci_df = DataFrame(locus = string.(names(y.loci)), missing = f(y.loci))
+    loci_df = DataFrame(locus = string.(names(data.loci)), missing = f(data.loci))
     @info "\nDataFrame 1: missing by sample \nDataFrame 2: missing by locus"
     return (by_sample = sample_df, by_loci = loci_df)
 end
 
 """
-    populations(x::PopObj; listall::Bool = false)
+    populations(data::PopObj; listall::Bool = false)
 View unique population ID's in a `PopObj`.
 
 `listall = true`, displays `ind` and their `population` instead (default = `false`).
 """
 function populations(data::PopObj; listall::Bool = false)
-    y = PopOpt(data)
     if listall == true
-        DataFrame(name = y.samples.name, population = y.samples.population)
+        DataFrame(name = data.samples.name, population = data.samples.population)
     else
-        count = [sum(y.samples.population .== i) for i in unique(y.samples.population)]
-        count_conv = Int32.(count)
-        popcounts = DataFrame(population = unique(y.samples.population) |> categorical,
-                              count = count_conv)
+        popcounts = [count(i -> i == j, data.samples.population) for j in unique(data.samples.population)]
+        popcounts = DataFrame(
+            population = unique(data.samples.population),
+            count = popcounts
+        )
     end
 end
 
@@ -174,7 +176,7 @@ function populations!(data::PopObj; rename::Dict=Dict(), replace::Union{Tuple,Na
             replace!(data.samples.population, eachkey => rename[eachkey])
         end
         @info "renaming populations"
-        return populations(x,listall = true)
+        return populations(data,listall = true)
     elseif replace != (0,0)
         if typeof(replace) <: NamedTuple
             popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
@@ -182,10 +184,10 @@ function populations!(data::PopObj; rename::Dict=Dict(), replace::Union{Tuple,Na
             popid_array = [fill(i, j) for (i,j) in zip(replace[2], replace[1])]
         end
         flat_popid = Iterators.flatten(popid_array) |> collect
-        length(flat_popid) != size(x.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(x.samples.name)))")
-        x.samples.population = flat_popid
+        length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
+        data.samples.population = flat_popid
         @info "overwriting all population names"
-        return populations(x, listall = true)
+        return populations(data, listall = true)
     else
         error("specify rename = Dict() to rename populations, or replace=(counts,names) to replace all names")
     end
@@ -208,16 +210,16 @@ Examples:
 `remove_loci!(nancycats, ["fca8", "fca23"])`
 """
 function remove_loci!(data::PopObj, loci::Union{String,Array{String,1}})
-    y = PopOpt(data)
+
     # get individuals indices
     if typeof(loci) == String
         sym_loci = Symbol(loci)
-        sym_loci ∉ names(y.loci) && error("Locus \"$loci\" not found")
+        sym_loci ∉ names(data.loci) && error("Locus \"$loci\" not found")
         return select!(data.loci, Not(sym_loci))
     else
         sym_loci = Symbol.(loci)
         for each in sym_loci
-            if each ∉ names(y.loci)
+            if each ∉ names(data.loci)
                 println("NOTICE: locus \"$each\" not found")
                 continue
             end
@@ -238,19 +240,18 @@ Examples:
 `remove_samples!(nancycats, ["N100", "N102", "N211"])`
 """
 function remove_samples!(data::PopObj, samp_id::Union{String, Array{String,1}})
-    y = PopOpt(data)
     # get samp_id indices
     if typeof(samp_id) == String
-        samp_id ∉ y.samples.name && error("sample \"$samp_id\" not found")
-        idx = findfirst(i -> i == samp_id, y.samples.name)
+        samp_id ∉ data.samples.name && error("sample \"$samp_id\" not found")
+        idx = findfirst(i -> i == samp_id, data.samples.name)
     else
         idx = []
         for ind in samp_id
-            if ind ∉ y.samples.name
+            if ind ∉ data.samples.name
                 println("NOTICE: sample \"$ind\" not found!")
                 continue
             end
-            push!(idx, findfirst(i -> i == ind, y.samples.name) )
+            push!(idx, findfirst(i -> i == ind, data.samples.name) )
         end
         println()
     end
@@ -260,46 +261,46 @@ function remove_samples!(data::PopObj, samp_id::Union{String, Array{String,1}})
 end
 
 """
-    samples(x::PopObj)
+    samples(data::PopObj)
 View individual/sample names in a `PopObj`
 
 Equivalent to `PopObj.samples.name`
 """
-function samples(x::PopObj)
-    x.samples.name
+function samples(data::PopObj)
+    data.samples.name
 end
 
 """
-    summary(x::PopObj)
+    summary(data::PopObj)
 Prints a summary of the information contained in a PopObj
 """
-function Base.summary(x::PopObj)
-    y = PopOpt(x)
-    println("Object of type $(typeof(x)):")
-    if typeof(x.loci[!, :1][1][1]) == Int16
+function Base.summary(data::PopObj)
+
+    println("Object of type $(typeof(data)):")
+    if typeof(data.loci[!, :1][1][1]) == Int16
         marker = "Microsatellite"
     else
         marker = "SNP"
     end
     println("Marker type: $marker")
     println("\nLongitude:")
-    println("$(y.samples.longitude[1:3])" , " \u2026 ", "$(y.samples.longitude[end-2:end])", "\n")
+    println("$(data.samples.longitude[1:3])" , " \u2026 ", "$(data.samples.longitude[end-2:end])", "\n")
     println("Latitude:")
-    println("$(y.samples.latitude[1:3])" , " \u2026 ", "$(y.samples.latitude[end-2:end])", "\n")
-    println("Number of individuals: $(length(y.samples.name))")
-    println(y.samples.name[1:3] , " \u2026 ", y.samples.name[end-2:end], "\n")
-    println("Number of loci: $(size(y.loci,2))")
-    println(string.(names(y.loci))[1:3], " \u2026 " , string.(names(y.loci))[end-2:end], "\n" )
+    println("$(data.samples.latitude[1:3])" , " \u2026 ", "$(data.samples.latitude[end-2:end])", "\n")
+    println("Number of individuals: $(length(data.samples.name))")
+    println(data.samples.name[1:3] , " \u2026 ", data.samples.name[end-2:end], "\n")
+    println("Number of loci: $(size(data.loci,2))")
+    println(string.(names(data.loci))[1:3], " \u2026 " , string.(names(data.loci))[end-2:end], "\n" )
     println("Ploidy:")
-    println("$(y.samples.ploidy[1:3])", " \u2026 ", "$(y.samples.ploidy[end-2:end])", "\n")
+    println("$(data.samples.ploidy[1:3])", " \u2026 ", "$(data.samples.ploidy[end-2:end])", "\n")
     println("Population names and counts:")
-    print(populations(x), "\n")
+    print(populations(data), "\n")
     println("\nAvailable .samples fields: .name, .population, .ploidy, .longitude, .latitude")
 end
 
 
 """
-    view_genotypes(x::PopObj; samples::Union{String, Array, Nothing}, loci::Union{String, Array, Nothing})
+    view_genotypes(data::PopObj; samples::Union{String, Array, Nothing}, loci::Union{String, Array, Nothing})
 Returns a dataframe of samples, population, genotypes. View the genotypes of
 specific samples for specific loci in a `PopObj`. Default shows all genotypes
 for all individuals.
@@ -308,22 +309,22 @@ for all individuals.
 
 `view_genotypes(nancycats, samples = "N226", loci = ["fca8", "fca23"])`
 """
-function view_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= nothing, loci::Union{String, Array, Nothing}= nothing)
+function view_genotypes(data::PopObj; samples::Union{String, Array, Nothing}= nothing, loci::Union{String, Array, Nothing}= nothing)
     if loci == nothing && samples == nothing
         @warn "please specify either loci= or samples=, otherwise use PopObj.loci"
     end
-    y = PopOpt(x)
-    df = deepcopy(y.loci)
-    insertcols!(df, 1, :name => y.samples.name) ;
-    insertcols!(df, 2, :population => categorical(y.samples.population))
+
+    df = deepcopy(data.loci)
+    insertcols!(df, 1, :name => data.samples.name) ;
+    insertcols!(df, 2, :population => categorical(data.samples.population))
     if samples != nothing
         if typeof(samples) == String
-            samples ∉ y.samples.name && error("individual $samples not found in PopObj")
+            samples ∉ data.samples.name && error("individual $samples not found in PopObj")
             tmp = df[df.name .== samples, :]
         else
             tmp = df[df.name .== samples[1], :]
             for ind in samples[2:end]
-                ind ∉ y.samples.name && println("NOTICE: individual \"$ind\" not found in PopObj!")
+                ind ∉ data.samples.name && println("NOTICE: individual \"$ind\" not found in PopObj!")
                 tmp = vcat(tmp, df[df.name .== ind, :])
             end
             println()
@@ -333,11 +334,11 @@ function view_genotypes(x::PopObj; samples::Union{String, Array, Nothing}= nothi
     end
     if loci != nothing
         if typeof(loci) == String
-            loci ∉ string.(names(y.loci)) && error("locus $loci not found in PopObj")
+            loci ∉ string.(names(data.loci)) && error("locus $loci not found in PopObj")
             return tmp[!, [:name, :population, Symbol(loci)]]
         else
             for locus in loci[2:end]
-                locus ∉ string.(names(y.loci)) && println("NOTICE: locus \"$locus\" not found in PopObj!")
+                locus ∉ string.(names(data.loci)) && println("NOTICE: locus \"$locus\" not found in PopObj!")
             end
             println()
             return tmp[!, append!([:name, :population], Symbol.(loci))]
