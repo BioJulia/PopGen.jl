@@ -10,7 +10,7 @@ function richness(data::PopObj)
         unique_genos = unique(locus)
         unique_genos = collect(skipmissing(unique_genos))
 
-        unique_alleles = vec(reduce(hcat, getindex.(unique_genos,i) for i in eachindex(x[1]))) |> unique
+        unique_alleles = vec(reduce(hcat, getindex.(unique_genos,i) for i in eachindex(unique_genos[1]))) |> unique
 
         rich_locus = length(unique_alleles)
         push!(rich, rich_locus)
@@ -18,4 +18,4 @@ function richness(data::PopObj)
     return rich
 end
 
-# gulfsharks() |> richness
+nancycats() |> richness
