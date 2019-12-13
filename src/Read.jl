@@ -19,109 +19,6 @@ function phase(loc::String, type::DataType, digit::Int)
     return tupled
 end
 
-### GenePop parsing ###
-"""
-    genepop(infile::String; digits::Int = 3, popsep::String = "POP", marker::String = "snp")
-Load a Genepop format file into memory as a PopObj object.
-### Arguments
-- `infile` : path to Genepop file
-- `digits` : number of digits denoting each allele
-- `popsep` : word that separates populations in `infile` (default: "POP")
-- `marker` : "snp" (default) or "msat"
-### File must follow standard Genepop formatting:
-- First line is a comment (and skipped)
-- Loci are listed after first line as one-per-line without commas or in single comma-separated row
-- A line with a particular keyword (default "POP") must delimit populations
-- Sample name is followed by a comma and space or tab (", ")
-- File is tab or space delimted
-
-## Example
-
- `waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "POP")`
-
-### Genepop file example:
-Wasp populations in New York \n
-Locus1\n
-Locus2\n
-Locus3\n
-POP\n
-Oneida_01,  250230 564568 110100\n
-Oneida_02,  252238 568558 100120\n
-Oneida_03,  254230 564558 090100\n
-POP\n
-Newcomb_01,  254230 564558 080100\n
-Newcomb_02,  000230 564558 090080\n
-Newcomb_03,  254230 000000 090100\n
-Newcomb_04,  254230 564000 090120\n
-"""
-function genepop(
-    infile::String;
-    digits::Int = 3,
-    popsep::String = "POP",
-    marker::String = "snp",
-)
-    if lowercase(marker) == "snp"
-        geno_type = Int8
-    else
-        geno_type = Int16
-    end
-
-    gpop = split(open(readlines, infile)[2:end], popsep)
-
-    @info "\n$(abspath(infile)) \n$(sum(length.(gpop[2:end]))) samples detected \n$(length(gpop)-1) populations detected using \"$popsep\" seperator \n$(length(gpop[1])) loci detected"
-
-    if length(gpop[1]) == 1     # loci horizontally stacked.
-        locinames = strip.(split(gpop[1] |> join, ",") |> Vector{String})
-        replace!(locinames, "." => "_")
-    else                        # loci vertically stacked
-        locinames = replace(gpop[1], "." => "_")
-    end
-
-    sample_meta_names = [:name, :population, :ploidy, :latitude, :longitude]
-    sample_meta_array = [
-        Vector{String}(),
-        Vector{Int}(),
-        Vector{Int8}(),
-        Vector{Union{Missing,Float32}}(),
-        Vector{Union{Missing, Float32}}()
-    ]
-
-    for i = 2:length(gpop)
-        for j in gpop[i]
-            samplerow = map(join, split(strip(j), r"\,\t|\,\s|\s|\t"))
-
-            # just in case missing genotypes are coded as -9 (msats)
-            replace!(samplerow, "-9" => "0"^ndigits)
-
-            # sample name and population
-            push!(sample_meta_array[1], popfirst!(samplerow))
-            push!(sample_meta_array[2], i-1)
-
-            # phase the loci into tuples
-            converted_row = map(k -> phase(k, geno_type, digits), samplerow)
-            push!(sample_geno_array, converted_row)
-
-            # get the ploidy via # of alleles in the first non-missing locus
-            push!(sample_meta_array[3], length((skipmissing(converted_row) |> collect)[1]))
-
-            # long and lat
-            push!(sample_meta_array[4], missing) ; push!(sample_meta_array[5], missing)
-        end
-    end
-
-    # convert the entire thing into a matrix
-    geno_matrix = hcat(sample_geno_array...)
-
-    # convert back into an array of arrays of loci instead of samples
-    loci_array = collect.(eachrow(geno_matrix))
-
-    # create the two dataframes necessary for a PopObj
-    samples = DataFrame([j => k for (j,k) in zip(sample_meta_names, sample_meta_array)])
-    loci = DataFrame([j => k for (j,k) in zip(Symbol.(locinames), loci_array)])
-
-    return PopObj(samples, loci)
-end
-
 ### CSV parsing ###
 
 """
@@ -235,6 +132,110 @@ function csv(
     return PopObj(samples_df, loci_df)
 end
 
+### GenePop parsing ###
+"""
+    genepop(infile::String; digits::Int = 3, popsep::String = "POP", marker::String = "snp")
+Load a Genepop format file into memory as a PopObj object.
+### Arguments
+- `infile` : path to Genepop file
+- `digits` : number of digits denoting each allele
+- `popsep` : word that separates populations in `infile` (default: "POP")
+- `marker` : "snp" (default) or "msat"
+### File must follow standard Genepop formatting:
+- First line is a comment (and skipped)
+- Loci are listed after first line as one-per-line without commas or in single comma-separated row
+- A line with a particular keyword (default "POP") must delimit populations
+- Sample name is followed by a comma and space or tab (", ")
+- File is tab or space delimted
+
+## Example
+
+ `waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "POP")`
+
+### Genepop file example:
+Wasp populations in New York \n
+Locus1\n
+Locus2\n
+Locus3\n
+POP\n
+Oneida_01,  250230 564568 110100\n
+Oneida_02,  252238 568558 100120\n
+Oneida_03,  254230 564558 090100\n
+POP\n
+Newcomb_01,  254230 564558 080100\n
+Newcomb_02,  000230 564558 090080\n
+Newcomb_03,  254230 000000 090100\n
+Newcomb_04,  254230 564000 090120\n
+"""
+function genepop(
+    infile::String;
+    digits::Int = 3,
+    popsep::String = "POP",
+    marker::String = "snp",
+)
+    if lowercase(marker) == "snp"
+        geno_type = Int8
+    else
+        geno_type = Int16
+    end
+
+    gpop = split(open(readlines, infile)[2:end], popsep)
+
+    @info "\n$(abspath(infile)) \n$(sum(length.(gpop[2:end]))) samples detected \n$(length(gpop)-1) populations detected using \"$popsep\" seperator \n$(length(gpop[1])) loci detected"
+
+    if length(gpop[1]) == 1     # loci horizontally stacked.
+        locinames = strip.(split(gpop[1] |> join, ",") |> Vector{String})
+        replace!(locinames, "." => "_")
+    else                        # loci vertically stacked
+        locinames = replace(gpop[1], "." => "_")
+    end
+
+    sample_meta_names = [:name, :population, :ploidy, :latitude, :longitude]
+    sample_meta_array = [
+        Vector{String}(),
+        Vector{Union{String,Int}}(),
+        Vector{Int8}(),
+        Vector{Union{Missing,Float32}}(),
+        Vector{Union{Missing, Float32}}()
+    ]
+
+    sample_geno_array = Vector{Vector{Union{Missing, Tuple}}}()
+
+    for i = 2:length(gpop)
+        for j in gpop[i]
+            samplerow = map(join, split(strip(j), r"\,\t|\,\s|\s|\t"))
+
+            # just in case missing genotypes are coded as -9 (msats)
+            replace!(samplerow, "-9" => "0"^digits)
+
+            # sample name and population
+            push!(sample_meta_array[1], popfirst!(samplerow))
+            push!(sample_meta_array[2], i-1)
+
+            # phase the loci into tuples
+            converted_row = map(k -> phase(k, geno_type, digits), samplerow)
+            push!(sample_geno_array, converted_row)
+
+            # get the ploidy via # of alleles in the first non-missing locus
+            push!(sample_meta_array[3], length((skipmissing(converted_row) |> collect)[1]))
+
+            # long and lat
+            push!(sample_meta_array[4], missing) ; push!(sample_meta_array[5], missing)
+        end
+    end
+
+    # convert the entire thing into a matrix
+    geno_matrix = hcat(sample_geno_array...)
+
+    # convert back into an array of arrays of loci instead of samples
+    loci_array = collect.(eachrow(geno_matrix))
+
+    # create the two dataframes necessary for a PopObj
+    samples = DataFrame([j => k for (j,k) in zip(sample_meta_names, sample_meta_array)])
+    loci = DataFrame([j => k for (j,k) in zip(Symbol.(locinames), loci_array)])
+
+    return PopObj(samples, loci)
+end
 
 ### VCF parsing ###
 

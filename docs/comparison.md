@@ -34,7 +34,7 @@ Since `gulfsharks` is shamelessly provided in PopGen.jl, we simply invoke the `g
 
 ```julia tab="Julia"
 julia> @btime x = gulfsharks() ; # hide the output
-  2.098 s (14175767 allocations: 707.58 MiB)
+  2.223 s (12697454 allocations: 673.02 MiB)
 ```
 
 This R benchmark will take a few minutes. Consider  making some tea while you wait.
@@ -59,7 +59,7 @@ It was pretty tricky to come up with a sensible/efficient/convenient data struct
 
 ```julia tab="Julia"
 julia> Base.summarysize(x)
-4899793
+1612428
 ```
 
 vs
@@ -73,7 +73,7 @@ vs
 
 How is that possible?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles).
 
-The data takes up ~`4.9mb` in memory as a `PopObj` versus the ~`5.3mb` of a `genind`, about 7% smaller. It's not a ton of difference, but remember that the `PopObj` also contains more data.
+These data take up ~`1.6mb` in memory as a `PopObj` versus the ~`5.3mb` of a `genind`, about 3.3x smaller. That's quite a big difference!
 
 Julia  :house_with_garden: ​   |    R  :european_castle:
 
