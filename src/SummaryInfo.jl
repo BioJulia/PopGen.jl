@@ -6,17 +6,6 @@ either rarefied or not.
 
 """
 function richness(data::PopObj)
-    rich = Vector{Integer}()
-    @inbounds for locus in eachcol(data.loci, false)
-        unique_genos = unique(locus |> skipmissing)
-        #unique_genos = collect(skipmissing(unique_genos))
-
-        unique_alleles = vec(reduce(hcat, getindex.(unique_genos,i) for i in eachindex(unique_genos[1]))) |> unique
-
-        rich_locus = length(unique_alleles)
-        push!(rich, rich_locus)
-    end
-    return rich
+    rich = map(i -> Iterators.flatten(i |> skipmissing) |> collect |> unique |> length, eachcol(data.loci, false))
+    return DataFrame(locus = names(data.loci), richness = rich)
 end
-
-nancycats() |> richness
