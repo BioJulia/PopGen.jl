@@ -1,10 +1,4 @@
 """
-    abstract type PopType
-Supertype for types used in PopGen.jl
-"""
-abstract type PopType end       # may be removed in the future
-
-"""
     PopObj(samples::DataFrame, loci::DataFrame)
 The data struct used for the PopGen population genetics ecosystem. You are
 STRONGLY discouraged from manually creating dataframes to pass into a PopObj,
@@ -20,7 +14,7 @@ and instead should use the provided genepop, csv, or vcf file importers.
     - columns are named by loci
     - genotypes are Tuples of Int16 or Int16, arraged in order of `.samples.name`
 """
-mutable struct PopObj <: PopType
+mutable struct PopObj
     samples::DataFrame
     loci::DataFrame
     function PopObj(x::DataFrame, y::DataFrame)
@@ -38,7 +32,7 @@ end
     PopOpt(samples::DataFrame, loci::DataFrame)
 An immutable version of a `PopObj`, used for under-the-hood processes in PopGen.jl.
 """
-struct PopOpt <: PopType
+struct PopOpt
     samples::DataFrame
     loci::DataFrame
     PopOpt(x::PopObj) = new(x.samples, x.loci)
