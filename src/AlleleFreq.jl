@@ -35,13 +35,13 @@ function allele_freq(genotype::Union{Missing,Tuple})
 end
 
 """
-    allele_freq(locus::Vector{Union{Missing, Tuple}})
+    allele_freq(locus::Vector{Union{Missing, Tuple{T,T} where T}})
 Calculate allele counts for a single locus of a `PopObj`. Returns a `Dict` of
 allele's and their frequencies.
 """
-function allele_freq(locus::Array{Union{Missing,Tuple},1})
+function allele_freq(locus::Vector{Union{Missing,Tuple{T,T}} where T <: Int16})
     d = Dict()
-    for geno in locus
+    for genotype in locus
         genotype === missing && continue
         # sum up alleles
         for allele in genotype

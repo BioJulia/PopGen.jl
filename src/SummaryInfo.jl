@@ -6,6 +6,7 @@ either rarefied or not.
 
 """
 function richness(data::PopObj)
+    # collapse genotypes into array of alleles |> count number of unique alleles
     rich = map(i -> Iterators.flatten(i |> skipmissing) |> collect |> unique |> length, eachcol(data.loci, false))
     return DataFrame(locus = names(data.loci), richness = rich)
 end
