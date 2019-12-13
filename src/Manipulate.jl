@@ -1,15 +1,13 @@
 """
     locations(data::PopObj)
-View location data (`.longitude` and `.latitude`) in a `PopObj`
+View location data (`.longitude` and `.latitude`) in a `PopObj`. Returns a view
+of the PopObj, not a new DataFrame, therefor *manual editing of the output will
+alter the source PopObj*.
 
 Use `locations!` to add spatial data to a `PopObj`
 """
 function locations(data::PopObj)
-    DataFrame(name = data.samples.name,
-        population = data.samples.population,
-        longitude = data.samples.longitude,
-        latitude = data.samples.latitude
-    )
+    @view data.samples[!, [:name, :population, :longitude, :latitude]]
 end
 
 """
@@ -30,10 +28,10 @@ function locations!(data::PopObj; lat::Array, long::Array)
     else
         @info "Converting decimal minutes to decimal degrees"
         # make sure decimal minutes are Strings
-        if typeof(lat) != Array{String,1}
+        if typeof(lat) != Vector{String}
             lat = string.(lat)
         end
-        if typeof(long) != Array{String,1}
+        if typeof(long) != Vector{String}
             long = string.(long)
         end
 
@@ -99,30 +97,37 @@ Example:
 `missing_ind,missing_loc = missing(gulfsharks)`
 """
 function Base.missing(data::PopObj)
-    df = deepcopy(data.loci)
-    insertcols!(df, 1, :ind => data.samples.name)
-    # missing per individual
-    nmissing = Vector{Int}()
-    missing_array = Vector{String}()
-    for each in 1:length(df[:,1])
-        miss_idx = findall(i -> i === missing, df[each,:])
-        push!(nmissing, miss_idx |> length)
-        push!(missing_array, String.(miss_idx))
+    # missing per sample
+    ind_geno = map(i -> get_sample_genotypes(data, i), data.samples.name)
+    count_miss_ind = map(ind_geno) do ind
+        count(i -> i === missing, ind)
     end
-    sample_df = DataFrame(
-        name = data.samples.name,
-        population = data.samples.population,
-        missing = nmissing,
-        loci = missing_array
-    )
+
+    # which loci are missing per sample
+    loci_names = loci(data)
+    miss_loci = map(ind_geno) do ind
+        [loci_names[i] for i in findall(j -> j === missing, ind)]
+    end
+
     # missing per locus
-    f(data) = map(eachcol(data)) do col
+    miss_per_loci = map(eachcol(data.loci)) do col
         count(i->i===missing, col)
     end
 
-    loci_df = DataFrame(locus = string.(names(data.loci)), missing = f(data.loci))
-    @info "\nDataFrame 1: missing by sample \nDataFrame 2: missing by locus"
-    return (by_sample = sample_df, by_loci = loci_df)
+    # create DataFrames of the two
+    by_sample_df = DataFrame(
+        name = data.samples.name,
+        population = data.samples.population,
+        missing = count_miss_ind,
+        loci = miss_loci |> Vector{Vector{String}}
+    )
+
+    by_locus_df = DataFrame(
+        locus = loci_names,
+        missing = miss_per_loci
+    )
+
+    return by_sample_df, by_locus_df
 end
 
 """
@@ -133,7 +138,7 @@ View unique population ID's in a `PopObj`.
 """
 function populations(data::PopObj; listall::Bool = false)
     if listall == true
-        DataFrame(name = data.samples.name, population = data.samples.population)
+        @view data.samples[!, [:name, :population]]
     else
         popcounts = [count(i -> i == j, data.samples.population) for j in unique(data.samples.population)]
         popcounts = DataFrame(
@@ -200,7 +205,7 @@ const population! = populations!
 ##### Removal #####
 
 """
-    remove_loci!(data::PopObj, loci::Union{String, Array{String,1}})
+    remove_loci!(data::PopObj, loci::Union{String, Vector{String}})
 Removes selected loci from a `PopObj`.
 
 Examples:
@@ -209,7 +214,7 @@ Examples:
 
 `remove_loci!(nancycats, ["fca8", "fca23"])`
 """
-function remove_loci!(data::PopObj, loci::Union{String,Array{String,1}})
+function remove_loci!(data::PopObj, loci::Union{String,Vector{String}})
 
     # get individuals indices
     if typeof(loci) == String
@@ -230,7 +235,7 @@ end
 
 
 """
-    remove_samples!(data::PopObj, samp_id::Union{Array{String,1}})
+    remove_samples!(data::PopObj, samp_id::Union{Vector{String}})
 Removes selected samples from a `PopObj`.
 
 Examples:
@@ -239,7 +244,7 @@ Examples:
 
 `remove_samples!(nancycats, ["N100", "N102", "N211"])`
 """
-function remove_samples!(data::PopObj, samp_id::Union{String, Array{String,1}})
+function remove_samples!(data::PopObj, samp_id::Union{String, Vector{String}})
     # get samp_id indices
     if typeof(samp_id) == String
         samp_id ∉ data.samples.name && error("sample \"$samp_id\" not found")

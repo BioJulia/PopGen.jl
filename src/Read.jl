@@ -312,3 +312,68 @@ function vcf(infile::String)
     )
     PopObj(samples_df, loci_df)
 end
+
+
+"""
+    PopGen.read(infile::String; kwargs...)
+Wraps `csv()`, `genepop()`, and `vcf()` to read a file in as a `PopObj`. File type is
+inferred from the file extension:
+- delimited: .csv | .tsv | .txt
+- genepop: .gen | .genepop
+- variant call format: .vcf
+This function uses the same keyword arguments (and defaults) as the file importing
+functions it wraps, so please see their respective docstrings in the Julia help console.
+(e.g. `?genepop`) for specific usage details.
+
+## Examples
+`read("cavernous_assfish.gen", markers = "msat", digits = 3)`
+
+`read("bos_tauros.csv")`
+
+`read("juglans_nigra.vcf")`
+"""
+function Base.read(infile::String; kwargs...)
+    kwargs = Dict(kwargs)
+    ext = split(infile, ".")[end]
+    if ext == "gen" || ext == "genepop"
+        if haskey(kwargs, :digits)
+            digits = kwargs[:digits]
+        else
+            digits = 3
+        end
+        if haskey(kwargs, :popsep)
+            popsep = kwargs[:popsep]
+        else
+            popsep = "POP"
+        end
+        if haskey(kwargs, :marker)
+            marker = kwargs[:marker]
+        else
+            marker = "snp"
+        end
+        return genepop(infile, digits = digits, popsep = popsep, marker = marker)
+
+    elseif ext == "csv" || ext == "txt" || ext == "tsv"
+        if haskey(kwargs, :delim)
+            delim = kwargs[:delim]
+        else
+            delim = r"\,|\s|\t"
+        end
+        if haskey(kwargs, :digits)
+            digits = kwargs[:digits]
+        else
+            digits = 3
+        end
+        if haskey(kwargs, :marker)
+            marker = kwargs[:marker]
+        else
+            marker = "snp"
+        end
+        return csv(infile, delim = delim, digits = digits, marker = marker)
+
+        elseif ext == "vcf"
+            return vcf(infile)
+    else
+        @error "file type not recognized by filename extension \n delimited: .csv | .tsv | .txt \n genepop: .gen | .genepop \n variant call formant: .vcf"
+    end
+end
