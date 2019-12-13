@@ -5,9 +5,7 @@ deviation (`stdev`) of a `PopObj`. Use `false` as second argument (no keyword)
 to not round results. Default (`true`) rounds to 4 digits.
 """
 function allele_avg(data::PopObj, rounding::Bool = true)
-    all_dicts = map(allele_freq, eachcol(data.loci))
-    just_alleles = map(i -> keys(i) |> collect, all_dicts)
-    num_alleles = map(length, just_alleles)
+    num_alleles = map(i -> Iterators.flatten(i |> skipmissing) |> collect |> unique |> length, eachcol(data.loci, false))
     avg = mean(num_alleles)
     sd = std(num_alleles)
     if rounding == true
@@ -18,11 +16,11 @@ function allele_avg(data::PopObj, rounding::Bool = true)
 end
 
 """
-    allele_freq(genotype::Union{Missing,Tuple})
+    allele_freq(genotype::Union{Missing, NTuple{N,<:Integer}}) where N
 Calculate allele frequency for a single locus of a single sample. Returns a
 `Dict` of alleles and their frequencies.
 """
-function allele_freq(genotype::Union{Missing,Tuple})
+function allele_freq(genotype::Union{Missing, NTuple{N,<:Integer}}) where N
     x === missing && return missing
     d = Dict()
     for allele in genotype
@@ -35,14 +33,13 @@ function allele_freq(genotype::Union{Missing,Tuple})
 end
 
 """
-    allele_freq(locus::Vector{Union{Missing, Tuple{T,T} where T}})
+    allele_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
 Calculate allele counts for a single locus of a `PopObj`. Returns a `Dict` of
 allele's and their frequencies.
 """
-function allele_freq(locus::Vector{Union{Missing,Tuple{T,T}} where T <: Int16})
+function allele_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
     d = Dict()
-    for genotype in locus
-        genotype === missing && continue
+    for genotype in skipmissing(locus)
         # sum up alleles
         for allele in genotype
             d[allele] = get!(d, allele, 0) + 1
@@ -55,11 +52,11 @@ end
 
 
 """
-    allele_freq(locus::SubArray{Union{Missing, Tuple},1})
+    allele_freq(locus::SubArray{<:Union{Missing,NTuple{N,<:Integer}}}) where N
 Calculate allele counts for a single locus of a `PopObj` split by population
 using `group()`. Returns a `Dict` of allele's and their frequencies.
 """
-function allele_freq(locus::SubArray{Union{Missing,Tuple},1})
+function allele_freq(locus::SubArray{<:Union{Missing,NTuple{N,<:Integer}}}) where N
     d = Dict()
     for genotype in locus
         genotype === missing && continue
@@ -75,20 +72,17 @@ end
 
 
 """
-    geno_freq(locus::Vector{Union{Missing, Tuple}})
+    geno_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
 Calculate genotype frequencies of all loci in a `PopObj`. Returns a `Dict` of
 genotypes and their frequencies.
 """
-function geno_freq(locus::Vector{Union{Missing,Tuple}})
+function geno_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
     d = Dict()
     # conditional testing if all genos are missing
     ismissing.(locus) |> unique == [true] && return missing
-    for genotype in locus
-        genotype === missing && continue
-
+    for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
-        end
     end
     total = values(d) |> sum    # sum of all non-missing genotypes
     [d[i] = d[i] / total for i in keys(d)] # genotype count/total
@@ -96,20 +90,17 @@ function geno_freq(locus::Vector{Union{Missing,Tuple}})
 end
 
 """
-    geno_freq(locus::SubArray{Union{Missing, Tuple},1})
+    geno_freq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}}}) where N
 Calculate genotype frequencies of all loci in `PopObj` split
 by population using `group()`. Returns a `Dict` of genotypes and their frequencies.
 """
-function geno_freq(locus::SubArray{Union{Missing,Tuple},1})
+function geno_freq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}}}) where N
     d = Dict()
     # conditional testing if all genos are missing
     ismissing.(locus) |> unique == [true] && return missing
-    for genotype in locus
-        genotype === missing && continue
-
+    for genotype in skipmimssing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
-        end
     end
     total = values(d) |> sum    # sum of all non-missing genotypes
     [d[i] = d[i] / total for i in keys(d)] # genotype count/total

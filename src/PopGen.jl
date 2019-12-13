@@ -8,6 +8,7 @@ module PopGen
 
 
 using DataFrames,
+      Statistics,
       PlotlyJS,
       GeneticVariation,
       Distributions,
