@@ -42,8 +42,7 @@ This R benchmark will take a few minutes. Consider  making some tea while you wa
 ```r tab="R"
 > microbenchmark(read.genepop(file = "/home/pdimens/gulfsharks.gen", ncode = 3L, quiet = TRUE))
 Unit: seconds
-                                                                                expr
- read.genepop(file = "/home/pdimens/gulfsharks.gen", ncode = 3L,      quiet = FALSE)
+ read.genepop(file = "/home/pdimens/gulfsharks.gen", ncode = 3L, quiet = FALSE)
       min       lq     mean   median       uq      max neval
  5.670637 6.218719 6.745065 6.387936 7.019667 9.173005   100
 ```
@@ -65,7 +64,7 @@ julia> Base.summarysize(x)
 #bytes
 ```
 
-vs
+versus
 
 ```r tab="R"
 > object.size(gen)
@@ -74,9 +73,9 @@ vs
 
 ![clutches pearls](img/clutches pearls cactus.png)
 
-How is that possible?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles). And the PopObj is also something called an _Immutable Struct_, which is a special class of performant objects.
+**What the eff??** How is that possible?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles). An `Int8` is a signed integer that occupies 8bits of memory, whereas an `Int16` occupies 16bits (as compared to a standard `Int64`).
 
-The original file is `3.2mb`. These data take up ~`1.6mb` in memory as a `PopObj` versus the ~`5.3mb` of a `genind`, about 3.3x smaller. That's quite a big difference!
+The original file is `3.2mb`, and our `PopObj`takes up ~`1.6mb` in memory (half as big as the source file!) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file and ~3.3x larger than our `PopObj`. That's quite a big difference!
 
 Julia  :house_with_garden: ​   |    R  :european_castle:
 
@@ -101,6 +100,6 @@ Unit: seconds
 
 Comparing averages, PopGen.jl clocks in at `486ms` versus adegenet's `6.3s`, so ~13x faster.
 
-Julia  :rocket: |  R  :snail:
+Julia  :rocket:  |   R  :snail:
 
  

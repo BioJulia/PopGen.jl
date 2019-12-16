@@ -1,3 +1,28 @@
+## Import a genepop file as a `PopObj`
+
+!!! warning "Windows users"
+    make sure to change your backslashes "\" to forward slashes "/" 
+
+```julia
+genepop(infile; digits = 3, popsep = "POP", marker = "snp")
+
+# Example
+julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
+```
+
+### arguments
+
+- `#!julila infile::String` : path to genepop file, in quotes
+
+### keyword Arguments
+
+- `#!julila digits::Int64` : the number of digits used to denote an allele (default = 3)
+- `#!julila popsep::String` : word that separates populations in `infile` (default: "POP")
+- `#!julila marker::String` : "snp" (default) or "msat" for microsatellites
+
+!!! info "Default population names"
+    By default, the file reader will assign numbers as population ID's in order of appearance in the genepop file. Use the `populations!` function to rename these with your own population ID's.
+
 ## Format
 
 Files must follow standard Genepop formatting:
@@ -39,29 +64,3 @@ Newcomb_02,  000230 564558 090080
 Newcomb_03,  254230 000000 090100
 Newcomb_04,  254230 564000 090120
 ```
-
-## Import a genepop file as a `PopObj`
-
-!!! warning "Windows users"
-    make sure to change your backslashes "\" to forward slashes "/" 
-
-```julia
-genepop(infile; digits = 3, popsep = "POP", numpops, marker = "snp")
-
-# Example
-julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP", numpops = 2)
-```
-
-### arguments
-
-- `#!julila infile::String` : path to genepop file, in quotes
-
-### keyword Arguments
-
-- `#!julila digits::Int64` : the number of digits used to denote an allele (default = 3)
-- `#!julila popsep::String` : word that separates populations in `infile` (default: "POP")
-- `#!julila numpops::Int64` : number of populations present in `infile` (used for early error checking)
-- `#!julila marker::String` : "snp" (default) or "msat" for microsatellites
-
-!!! info "Default population names"
-    By default, the file reader will assign numbers as population ID's in order of appearance in the genepop file. Use the `popid!` function to rename these with your own population ID's.
