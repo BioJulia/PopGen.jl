@@ -13,10 +13,6 @@ Invoke the package manager by pressing `]` on an empty line and `add` this repo
 
 After the package is installed, load it with `using PopGen`
 
-##### Arch Linux users:
-
-- recommended to install official Julia binaries from the AUR (`julia-bin`), which includes a correctly bundled `Arpack`
-- if Julia was compiled from source: install `julia-arpack` from the AUR and make sure to delete `~/.julia/packages/Arpack` if it exists. That *should* fix things, but sometimes it still acts up.
 
 Feel free to play around with the test data `nancycats` and `gulfsharks`!
 
