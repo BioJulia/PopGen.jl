@@ -10,42 +10,38 @@ To use those data, simply invoke `nancycats()` without any arguments.
 
 ```
 julia> ncats = nancycats() ; summary(ncats)
-Object of type PopObj:
-No location data provided
+ Object of type PopObj
+ Marker type: Microsatellite
+ Ploidy: 2
 
-Number of individuals: 237
-["N215", "N216", "N217"] … ["N281", "N289", "N290"]
+ Number of individuals: 237
+ Number of loci: 9
+ Longitude: none provided
+ Latitude: none provided
 
-Number of loci: 9
-["fca8", "fca23", "fca43"] … ["fca90", "fca96", "fca37"]
+ Population names and counts:
+17×2 DataFrame
+│ Row │ population │ count │
+│     │ Union…     │ Int64 │
+├─────┼────────────┼───────┤
+│ 1   │ P01        │ 10    │
+│ 2   │ P02        │ 22    │
+│ 3   │ P03        │ 12    │
+│ 4   │ P04        │ 23    │
+│ 5   │ P05        │ 15    │
+│ 6   │ P06        │ 11    │
+│ 7   │ P07        │ 14    │
+│ 8   │ P08        │ 10    │
+│ 9   │ P09        │ 9     │
+│ 10  │ P10        │ 11    │
+│ 11  │ P11        │ 20    │
+│ 12  │ P12        │ 14    │
+│ 13  │ P13        │ 13    │
+│ 14  │ P14        │ 17    │
+│ 15  │ P15        │ 11    │
+│ 16  │ P16        │ 12    │
+│ 17  │ P17        │ 13    │
 
-Ploidy: 2
-Number of populations: 17
-
-Population names and counts:
-17×2 DataFrames.DataFrame
-│ Row │ population    │ count │
-│     │ Categorical…⍰ │ Int32 │
-├─────┼───────────────┼───────┤
-│ 1   │ "1"           │ 10    │
-│ 2   │ "2"           │ 22    │
-│ 3   │ "3"           │ 12    │
-│ 4   │ "4"           │ 23    │
-│ 5   │ "5"           │ 15    │
-│ 6   │ "6"           │ 11    │
-│ 7   │ "7"           │ 14    │
-│ 8   │ "8"           │ 10    │
-│ 9   │ "9"           │ 9     │
-│ 10  │ "10"          │ 11    │
-│ 11  │ "11"          │ 20    │
-│ 12  │ "12"          │ 14    │
-│ 13  │ "13"          │ 13    │
-│ 14  │ "14"          │ 17    │
-│ 15  │ "15"          │ 11    │
-│ 16  │ "16"          │ 12    │
-│ 17  │ "17"          │ 13    │
-
-Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ```
 
 The spatial coordinates provided for the dataset in `adegenet` are completely unfamiliar to us (and some geospatial folks we spoke to), so they have been omitted.  If you recognize what coordinate system has 485.111 appear in Nancy, France, please let us know!
@@ -58,37 +54,26 @@ To use those data, simply invoke `gulfsharks()` without any arguments.
 
 ```jullia
 julia> sharks = gulfsharks() ; summary(sharks)
-Object of type PopObj:
+ Object of type PopObj
+ Marker type: SNP
+ Ploidy: 2
 
-Longitude:
-["-80.59928", "-80.59954", "-80.59958"] … ["-87.36617", "-85.71432", "-85.71432"]
+ Number of individuals: 212
+ Number of loci: 2213
+ Longitude: present with 0 missing
+ Latitude: present with 0 missing
 
-Latitude:
-["28.30624", "28.30787", "28.30234"] … ["30.05217", "29.82344", "29.82344"]
-
-
-Number of individuals: 212
-["cc_001", "cc_002", "cc_003"] … ["seg_029", "seg_030", "seg_031"]
-
-Number of loci: 2213
-["contig_35208", "contig_23109", "contig_4493"] … ["contig_19384", "contig_22368", "contig_2784"]
-
-Ploidy: 2
-Number of populations: 7
-
-Population names and counts:
-7×2 DataFrames.DataFrame
-│ Row │ population       │ count │
-│     │ Categorical…⍰    │ Int32 │
-├─────┼──────────────────┼───────┤
-│ 1   │ "Cape Canaveral" │ 21    │
-│ 2   │ "Georgia"        │ 30    │
-│ 3   │ "South Carolina" │ 28    │
-│ 4   │ "Florida Keys"   │ 65    │
-│ 5   │ "Mideast Gulf"   │ 28    │
-│ 6   │ "Northeast Gulf" │ 20    │
-│ 7   │ "Southeast Gulf" │ 20    │
-
-Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
+ Population names and counts:
+7×2 DataFrame
+│ Row │ population     │ count │
+│     │ Union…         │ Int64 │
+├─────┼────────────────┼───────┤
+│ 1   │ Cape Canaveral │ 21    │
+│ 2   │ Georgia        │ 30    │
+│ 3   │ South Carolina │ 28    │
+│ 4   │ Florida Keys   │ 65    │
+│ 5   │ Mideast Gulf   │ 28    │
+│ 6   │ Northeast Gulf │ 20    │
+│ 7   │ Southeast Gulf │ 20    │
 ```
 

@@ -24,7 +24,8 @@ nav:
     - Accessing: PopObj_accessing.md
     - Location data: popobj_location.md
 - Importing Data:
-    - CSV and delimited: delimited.md
+    - Reading in Data: file_import.md
+    - Delimited: delimited.md
     - Genepop: genepop.md
     - VCF: vcf.md
 - View/edit PopObj: commands.md
