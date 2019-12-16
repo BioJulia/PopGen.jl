@@ -9,14 +9,23 @@ If you haven't guessed already, it's the beloved Punnett Square! Nothing screams
 While this is completely unrelated to anything important about population genetics or Julia, I (Pavel) want you all to understand the logo-development process that led us to our logo so you can _feel_ my struggle. The process is as follows:
 
 1. Jason and Pavel spitball ideas
-2. Pavel procrastinates real work and opens up Inkscape to draft some ideas
-3. Pavel composes 1-3 versions of an idea and sends it to Jason
-4. if Jason != veto
-   - for i in 1:5
-     - Jason critiques and suggests changes
-     - Pavel makes the changes
 
+2. Pavel procrastinates real work and opens up Inkscape to draft some ideas
+
+3. Pavel composes 1-3 versions of an idea and sends it to Jason
+
+4. 
+   ```
+   if Jason != veto
+   	for i in 1:5
+		Jason critiques and suggests changes
+   		Pavel makes the changes
+   	end
+   end	
+   ```
+   
 5. Pavel and Jason finalize the idea!
+
 6. Weeks pass and Pavel isn't quite satisfied and we start at 1 again
 
 

@@ -90,7 +90,7 @@ The genotypes of the `loci` are an array of tuples, with each value correspondin
 !!! important
     We use the tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using `PopGen.jl`, your data should already be filtered and screened. Hand-editing of genotype values is **strongly** discouraged, so we outlawed it outright.
 
-## Viewing a PopObj
+## viewing a PopObj
 
 Given the volume of information that can be present in a `PopObj`, we recommend `summary()` to summarize/overview the data rather than regurgitate everything on the screen. 
 
@@ -120,3 +120,7 @@ julia> summary(a)
 │ 6   │ Northeast Gulf │ 20    │
 │ 7   │ Southeast Gulf │ 20    │
 ```
+
+## location data
+
+Location data is optional for a `PopObj`. There are functions that use location information (e.g. `locations`and `plot_locations`), but most don't, so it's not a dealbreaker.

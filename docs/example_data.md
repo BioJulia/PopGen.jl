@@ -16,8 +16,8 @@ julia> ncats = nancycats() ; summary(ncats)
 
  Number of individuals: 237
  Number of loci: 9
- Longitude: none provided
- Latitude: none provided
+ Longitude: absent
+ Latitude: absent
 
  Population names and counts:
 17×2 DataFrame

@@ -16,27 +16,27 @@ repo_name: PopGen.jl
 
 nav:
 - Home: index.md
-- Getting started: juliaprimer.md
-- Comparison vs R: comparison.md
-- Installing: install.md
-- The PopObj type:
-    - What's a PopObj: popobj_type.md
-    - Accessing: PopObj_accessing.md
-    - Location data: popobj_location.md
+- Getting started: 
+    A Julia primer: juliaprimer.md
+    Benchmarks: comparison.md
+    How to Install: install.md
+    The PopGen 'PopObj':
+        What's a PopObj: popobj_type.md
+        Accessing parts of a PopObj: PopObj_accessing.md
 - Importing Data:
+    - Example Data: example_data.md
     - Reading in Data: file_import.md
     - Delimited: delimited.md
     - Genepop: genepop.md
     - VCF: vcf.md
-- View/edit PopObj: commands.md
-- Example data: examples.md
-- Population Genetics Tests:
+- Manipulating a PopObj: commands.md
+- Types of Analyses:
     - Hardy-Weinberg Equilibrium: hardyweinberg.md
     - Relatedness: relatedness.md
-- Community: community.md
-- Development:
-    Under the hood functions: hidden_api.md
-- Misc:
+- Other:
+    Community: community.md
+    Development:
+        Under the hood functions: hidden_api.md
     Logo Graveyard: logo_graveyard.md
 
 

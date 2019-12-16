@@ -27,3 +27,39 @@ function richness(data::PopObj)
     rich = map(i -> Iterators.flatten(i |> skipmissing) |> collect |> unique |> length, eachcol(data.loci, false))
     return DataFrame(locus = names(data.loci), richness = rich)
 end
+
+
+"""
+    summary(data::PopObj)
+Prints a summary of the information contained in a PopObj
+"""
+function Base.summary(data::PopObj)
+
+    println(" Object of type PopObj")
+    if typeof(skipmissing(data.loci[!, :1])[1][1]) == Int16
+        marker = "Microsatellite"
+    else
+        marker = "SNP"
+    end
+    println(" Marker type: ", marker)
+    ploidy = unique(data.samples.ploidy) |> sort
+    length(ploidy) == 1 && println(" Ploidy: ", ploidy |> join)
+    if length(ploidy) != 1
+        print(" Ploidy (varies): ")
+        print(ploidy[1]), [print(", $i") for i in ploidy[2:end]]
+    end
+    println("\n Number of individuals: ", length(data.samples.name))
+    println(" Number of loci: ", size(data.loci,2))
+    if ismissing.(data.samples.longitude) |> unique == [true]
+        println(" Longitude: absent")
+    else
+        println(" Longitude: present with ", count(i -> i === missing, data.samples.longitude), " missing")
+    end
+    if ismissing.(data.samples.longitude) |> unique == [true]
+        println(" Latitude: absent")
+    else
+        println(" Latitude: present with ", count(i -> i === missing, data.samples.latitude), " missing")
+    end
+    println("\n Population names and counts:")
+    print(populations(data), "\n")
+end

@@ -1,4 +1,4 @@
-These are the included PopObj viewing and manipulating commands. Using standard Julia conventions, only commands ending with a bang `!` are mutable, meaning they alter the input data. So, commands like `popid` will show you population ID's, whereas `popid!` will change them in your `PopObj`. The mutable commands here alter the data in your `PopObj`, but not the source data (i.e. the files used to create the `PopObj`).
+These are the included PopObj viewing and manipulating commands. Using standard Julia conventions, only commands ending with a bang `!` are mutable, meaning they alter the input data. So, commands like `populations` will show you population ID's, whereas `populations!` will change them in your `PopObj`. The mutable commands here alter the data in your `PopObj`, but not the source data (i.e. the files used to create the `PopObj`). Read over [Accessing parts of a PopObj](PopObj_accessing.md) to become familiar with the components of a `PopObj`. 
 
 
 To follow along like a tutorial,  use the `gulfsharks` data. Load the data in if you haven't already:
@@ -128,7 +128,7 @@ populations(data::PopObj; listall::Bool = false)
 ```
 Just as you can view population ID's with `.population`, you can also view them with the `populations` command, which by default shows you a summary of the number of individuals in each population, much like you see when using `summary`.  
 
-``` julia tab="popid"
+``` julia tab="populations"
 julia> populations(sharks)
 ```
 
@@ -260,6 +260,8 @@ julia> populations!(sharks, replace = (counts = counts, names = popnames))   # N
 
 
 ## Display Specific Loci and/or Samples
+
+These are the "public" functions to retrieve sample genotype information in an easy-on-the-eyes format, whereas calculations in other parts of PopGen.jl use much more barebones functions [under the hood](hidden_api.md) suitable for high-throughput programming.
 
 ### get loci names
 
@@ -445,9 +447,7 @@ Removes selected loci from a `PopObj`. Input can be a single locus, or an array 
 Examples:
 
 ``` julia tab="single locus"
-julia> remove_loci!(sharks, "contig_35208") ;
-
-julia> summary(sharks)
+julia> remove_loci!(sharks, "contig_35208") ; summary(sharks)
 ```
 
 ``` tab="single output"
@@ -475,9 +475,7 @@ julia> summary(sharks)
 ```
 
 ``` julia tab="multiple loci"
-julia> remove_loci!(sharks, ["contig_35208", "contig_23109", "contig_4493"]) ;
-
-julia> summary(sharks)
+julia> remove_loci!(sharks, ["contig_35208", "contig_23109", "contig_4493"]) ; summary(sharks)
 ```
 
 ``` tab="multiple output"
