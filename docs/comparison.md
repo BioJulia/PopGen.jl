@@ -6,7 +6,7 @@ There's a reason we started investing so many hours and so many new grey hairs i
 2. written in a single language
 3. easy to use
 
-So, we'd like to prove that Julia and PopGen.jl actually achieves that by showing a few benchmarks comparing PopGen.jl to `adegenet` and `pegas`, which along with `ape` are arguably the most commonly used and robust population genetic packages available. It's worth mentioning that we ourselves use and have published with these packages, and are tremendously grateful for the work invested in those packages. We love you guys and respect the hell out of you! Here are links to [adegenet](https://github.com/thibautjombart/adegenet), [pegas](https://academic.oup.com/bioinformatics/article/26/3/419/215731/), and [ape](https://cran.r-project.org/package=ape).  
+So, we'd like to prove that Julia and PopGen.jl actually achieves that by showing a few benchmarks comparing PopGen.jl to `adegenet` and `pegas`, which along with `ape` are arguably the most commonly used and robust population genetic packages available. It's worth mentioning that we ourselves use and have published with these packages, and are tremendously grateful for the work invested in those packages. We love those folks and have tremendous respect and envy for the work they continue to do! Here are links to [adegenet](https://github.com/thibautjombart/adegenet), [pegas](https://academic.oup.com/bioinformatics/article/26/3/419/215731/), and [ape](https://cran.r-project.org/package=ape).  
 
 
 
@@ -24,7 +24,7 @@ library(microbenchmark)
 using BenchmarkTools, PopGen
 ```
 
-As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux system on a nothing-special Huawei Matebook D with 8gigs of RAM and a 4-core AMD Ryzen5 mobile processor. **Note:** all of the Julia benchmarks, unless explicitly stated, are performed single-threaded (i.e. not parallel, distributed, or GPU). 
+As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux system on a nothing-specia lLenovo Thinkbook 14S  with 8gigs of RAM and a 8th gen Intel i5 mobile processor. **Note:** all of the Julia benchmarks, unless explicitly stated, are performed single-threaded (i.e. not parallel, distributed, or GPU). 
 
 
 
@@ -55,11 +55,14 @@ Julia  :rocket:   |    R  :snail:
 
 ### `PopObj` vs `genind` size
 
-It was pretty tricky to come up with a sensible/efficient/convenient data structure for PopGen.jl, and the original attempt was a Julian variant to a `genind`, which itself is something known as an `S4 class object`. While the two-dataframes design might not seem like it took a lot of effort, we ultimately decided that the column-major style and available tools, combined with careful genotype Typing was a decent "middle-ground" of ease-of-use vs performance. Plus, we are suckers for consistent syntax, which `genind`'s don't have compared to standard R syntax (looking at you too, Tidyverse/ggplot!). *Anyway*, it's important to understand how much space your data will take up in memory (your RAM) when you load it in, especially since data's only getting bigger! Keep in mind that `gulfsharks()` in PopGen.jl also provides lat/long data, which _should_ inflate the size of the object somewhat compared to the `genind`, which we won't add any location data to.
+It was pretty tricky to come up with a sensible/efficient/convenient data structure for PopGen.jl, and the original attempt was a Julian variant to a `genind`, which itself is something known as an `S4 class object`. While the two-dataframes design might not seem like it took a lot of effort, we ultimately decided that the column-major style and available tools, combined with careful genotype Typing was a decent "middle-ground" of ease-of-use vs performance. We may one day change this when IndexedTables facilitates so many columns. Plus, we are suckers for consistent syntax, which `genind`'s don't have compared to standard R syntax (looking at you too, Tidyverse/ggplot!). 
+
+*Anyway*, it's important to understand how much space your data will take up in memory (your RAM) when you load it in, especially since data's only getting bigger! Keep in mind that `gulfsharks()` in PopGen.jl also provides lat/long data, which _should_ inflate the size of the object somewhat compared to the `genind`, which we won't add any location data to.
 
 ```julia tab="Julia"
 julia> Base.summarysize(x)
 1612428
+#bytes
 ```
 
 vs
@@ -71,9 +74,9 @@ vs
 
 ![clutches pearls](img/clutches pearls cactus.png)
 
-How is that possible?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles).
+How is that possible?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles). And the PopObj is also something called an _Immutable Struct_, which is a special class of performant objects.
 
-These data take up ~`1.6mb` in memory as a `PopObj` versus the ~`5.3mb` of a `genind`, about 3.3x smaller. That's quite a big difference!
+The original file is `3.2mb`. These data take up ~`1.6mb` in memory as a `PopObj` versus the ~`5.3mb` of a `genind`, about 3.3x smaller. That's quite a big difference!
 
 Julia  :house_with_garden: ​   |    R  :european_castle:
 
@@ -84,7 +87,7 @@ This is a classic popgen test and a relatively simple one.
 
 ```julia tab="Julia"
 julia> @btime hwe_test(x, correction = "bh") ;
-  479.550 ms (1954042 allocations: 74.12 MiB)
+  486.001 ms (2695797 allocations: 80.71 MiB)
 ```
 
 The R benchmark will take a while again, so if you're following along, this would be a good time to reconnect with an old friend.
@@ -96,7 +99,7 @@ Unit: seconds
  hw.test(gen, B = 0) 5.100298 5.564807 6.265948 5.878842 6.917006 8.815179   100
 ```
 
-Comparing averages, PopGen.jl clocks in at `480ms` versus adegenet's `6.3s`, so ~13x faster.
+Comparing averages, PopGen.jl clocks in at `486ms` versus adegenet's `6.3s`, so ~13x faster.
 
 Julia  :rocket: |  R  :snail:
 

@@ -218,25 +218,26 @@ Examples:
 
 `remove_loci!(nancycats, ["fca8", "fca23"])`
 """
-function remove_loci!(data::PopObj, loci::Union{String,Vector{String}})
-
-    # get individuals indices
-    if typeof(loci) == String
-        sym_loci = Symbol(loci)
-        sym_loci ∉ names(data.loci) && error("Locus \"$loci\" not found")
-        return select!(data.loci, Not(sym_loci))
-    else
-        sym_loci = Symbol.(loci)
-        for each in sym_loci
-            if each ∉ names(data.loci)
-                println("NOTICE: locus \"$each\" not found")
-                continue
-            end
-        end
-        return select!(data.loci, Not(sym_loci))
-    end
+function remove_loci!(data::PopObj, loci::String)
+    sym_loci = Symbol(loci)
+    sym_loci ∉ names(data.loci) && error("Locus \"$loci\" not found")
+    return select!(data.loci, Not(sym_loci))
 end
 
+function remove_loci!(data::PopObj, loci::Vector{String})
+    present_loci = Vector{Symbol}()
+    sym_loci = Symbol.(loci)
+    for each in sym_loci
+        if each ∉ names(data.loci)
+            println("NOTICE: locus \"$each\" not found")
+            continue
+        else
+            push!(present_loci, each)
+        end
+    end
+    length(present_loci) == 0 && error("None of those loci were found in the data")
+    return select!(data.loci, Not(present_loci))
+end
 
 """
     remove_samples!(data::PopObj, samp_id::Union{Vector{String}})
@@ -331,8 +332,8 @@ function view_genotypes(data::PopObj; samples::Union{String, Array, Nothing}= no
     end
 
     df = deepcopy(data.loci)
-    insertcols!(df, 1, :name => data.samples.name) ;
-    insertcols!(df, 2, :population => categorical(data.samples.population))
+    insertcols!(df, 1, :name => data.samples.name)
+    insertcols!(df, 2, :population => data.samples.population)
     if samples != nothing
         if typeof(samples) == String
             samples ∉ data.samples.name && error("individual $samples not found in PopObj")

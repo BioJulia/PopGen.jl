@@ -1,8 +1,4 @@
-![logo](img/logo_card.png)
-
-
-
-This is the documentation for the PopGen.jl package. If you're here, you're likely interested in doing some kind of population genetics analyses. Please read through the docs and try the functions out with the test data to get a feel for what PopGen.jl can do. 
+![logo](img/logo_banner.png)This is the documentation for the PopGen.jl package. If you're here, you're likely interested in doing some kind of population genetics analyses. Please read through the docs and try the functions out with the test data to get a feel for what PopGen.jl can do. 
 
 ## About
 

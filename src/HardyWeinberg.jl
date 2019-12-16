@@ -243,16 +243,16 @@ correction method for multiple testing.
 """
 function hwe_test(x::PopObj; by_pop::Bool = false, correction::String = "none")
     if !by_pop
-        output = [[], [], []]
+        output = [Vector{Union{Missing,Float64}}(), Vector{Union{Missing,Int32}}(), Vector{Union{Missing,Float64}}()]
         for locus in eachcol(x.loci, false)
             chisq, df, pval = locus_chi_sq(locus)
             push!.(output, [chisq, df, pval])
         end
-        #output = map(locus_chi_sq, eachcol(x.loci, false)) |> DataFrame
+        #output = locus_chi_sq.(eachcol(x.loci, false)) |> DataFrame
         het = heterozygosity(x)
-        insertcols!(het, size(het,2)+1, χ² = output[1] |> Array{Union{Missing,Float64},1})
-        insertcols!(het, size(het,2)+1, DF = output[2] |> Array{Union{Missing,Float64},1})
-        insertcols!(het, size(het,2)+1, P = output[3] |> Array{Union{Missing,Float64},1})
+        insertcols!(het, size(het,2)+1, χ² = output[1]) #|> Array{Union{Missing,Float64},1})
+        insertcols!(het, size(het,2)+1, DF = output[2])# |> Array{Union{Missing,Float64},1})
+        insertcols!(het, size(het,2)+1, P = output[3])#|> Array{Union{Missing,Float64},1})
         ## corrections
         @info "Χ² test for conformation to Hardy-Weinberg Equilibrium"
         if correction == "none"
@@ -320,11 +320,11 @@ const hwe = hwe_test
 
 
 """
-    locus_chi_sq(locus::Array{Union{Missing, Tuple},1})
+    locus_chi_sq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
 Calculate the chi square statistic and p-value for a locus
 Returns a tuple with chi-square statistic, degrees of freedom, and p-value
 """
-function locus_chi_sq(locus::Array{Union{Missing,Tuple},1})
+function locus_chi_sq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
     #Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
     number_ind = count(i -> i !== missing, locus)
 
@@ -334,13 +334,13 @@ function locus_chi_sq(locus::Array{Union{Missing,Tuple},1})
 
     #Calculate Expected Genotype numbers
     expected_genotype_freq = p * transpose(p) .* number_ind
-    expected_genotype_freq = vec(expected_genotype_freq)
+    expected_genotype_freq = [expected_genotype_freq]
 
     alleles = ["$i" for i in the_allele_dict |> keys |> collect]
     alleles = (alleles .* ",") .* permutedims(alleles)
     alleles = Array{String}.(sort.(split.(alleles, ",")))
     alleles = [parse.(Int16, i) |> Tuple for i in alleles]
-    alleles = vec(alleles)
+    alleles = [alleles]
 
     expected = Dict()
     for (geno, freq) in zip(alleles, expected_genotype_freq)
@@ -373,12 +373,12 @@ function locus_chi_sq(locus::Array{Union{Missing,Tuple},1})
 end
 
 """
-    locus_chi_sq(locus::SubArray{Union{Missing, Tuple},1})
+    locus_chi_sq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}},1}) where N
 Calculate the chi square statistic and p-value for a locus of a `PopObj` split by
 population using `groupby()`. Returns a tuple with chi-square statistic, degrees
 of freedom, and p-value.
 """
-function locus_chi_sq(locus::SubArray{Union{Missing,Tuple},1})
+function locus_chi_sq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}},1}) where N
     #Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
     number_ind = count(i -> i !== missing, locus)
 
@@ -447,7 +447,7 @@ positions. See MultipleTesting.jl docs for full more detailed information.
 - `"forward stop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` or `"b-c"` : Barber-Candès adjustment
 """
-function multitest_missing(pvals::Array{Union{Missing, Float64},1}, correction::String)
+function multitest_missing(pvals::Array{<:Union{Missing, <:AbstractFloat},1}, correction::String)
     # make seperate array for non-missing P vals
     p_no_miss = skipmissing(pvals) |> collect
     # get indices of where original missing are

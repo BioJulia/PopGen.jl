@@ -5,7 +5,7 @@ copyright: 2019 Pavel Dimens and Jason Selwyn
 
 theme:
   name: 'material'
-  logo: img/favicon.ico
+  logo: img/logo_icon.png
   favicon : 'img/favicon.ico'
   palette:
     primary: green

@@ -16,7 +16,7 @@ julia> sharks = gulfsharks() ;
 ### view individuals' names
 
 ```julia
-samples(x::PopObj)
+samples(data::PopObj)
 ```
 View individual/sample names in a `PopObj`. This is equivalent to `PopObj.samples.name`
 
@@ -51,7 +51,7 @@ samples(sharks)
 ### remove individuals
 
 ```julia
-remove_samples!(x::PopObj, samp_id::Union{String, Array{String,1}})
+remove_samples!(data::PopObj, samp_id::Union{String, Array{String,1}})
 ```
 
 Removes selected individuals from a `PopObj`. Input can be a single sample, or an array of samples. Will output entire `PopObj`, so it's better to use a semicolon to suppress the output. Use `summary` or `.name`  if you want to confirm that the samples were removed. This command will inform you if samples were not found in the data.
@@ -65,35 +65,27 @@ julia> summary(sharks)
 ```
 
 ``` tab="single output"
-Object of type PopObj:
+ Object of type PopObj
+ Marker type: SNP
+ Ploidy: 2
 
-Longitude:
-["-80.59958", "-80.42248", "-80.35779"] … ["-87.36617", "-85.71432", "-85.71432"]
+ Number of individuals: 211
+ Number of loci: 2213
+ Longitude: present with 0 missing
+ Latitude: present with 0 missing
 
-Latitude:
-["28.30624", "28.30787", "28.30234"] … ["30.05217", "29.82344", "29.82344"]
-
-
-Number of individuals: 211
-["cc_002", "cc_003", "cc_005"] … ["seg_029", "seg_030", "seg_031"]
-
-Number of loci: 2213
-["contig_35208", "contig_23109", "contig_4493"] … ["contig_19384", "contig_22368", "contig_2784"]
-
-Ploidy: 2
-Number of populations: 7
-
-   #Inds | Pop
-   --------------
-	 20	 |	1
-	 30	 |	2
-	 28	 |	3
-	 65	 |	4
-	 28	 |	5
-	 20	 |	6
-	 20	 |	7
-
-Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
+ Population names and counts:
+7×2 DataFrame
+│ Row │ population     │ count │
+│     │ Union…         │ Int64 │
+├─────┼────────────────┼───────┤
+│ 1   │ Cape Canaveral │ 20    │
+│ 2   │ Georgia        │ 30    │
+│ 3   │ South Carolina │ 28    │
+│ 4   │ Florida Keys   │ 65    │
+│ 5   │ Mideast Gulf   │ 28    │
+│ 6   │ Northeast Gulf │ 20    │
+│ 7   │ Southeast Gulf │ 20    │
 ```
 
 ``` julia tab="multiple individuals"
@@ -103,37 +95,27 @@ julia> summary(sharks)
 ```
 
 ``` tab="multiple output"
-NOTICE: ind "cc_001" not found!
+ Object of type PopObj
+ Marker type: SNP
+ Ploidy: 2
 
-Object of type PopObj:
+ Number of individuals: 209
+ Number of loci: 2213
+ Longitude: present with 0 missing
+ Latitude: present with 0 missing
 
-Longitude:
-["-80.34815", "-80.34822", "-80.43027"] … ["-87.36617", "-85.71432", "-85.71432"]
-
-Latitude:
-["28.30624", "28.30787", "28.30234"] … ["30.05217", "29.82344", "29.82344"]
-
-
-Number of individuals: 209
-["cc_005", "cc_007", "cc_008"] … ["seg_029", "seg_030", "seg_031"]
-
-Number of loci: 2213
-["contig_35208", "contig_23109", "contig_4493"] … ["contig_19384", "contig_22368", "contig_2784"]
-
-Ploidy: 2
-Number of populations: 7
-
-   #Inds | Pop
-   --------------
-	 18	 |	1
-	 30	 |	2
-	 28	 |	3
-	 65	 |	4
-	 28	 |	5
-	 20	 |	6
-	 20	 |	7
-
-Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
+ Population names and counts:
+7×2 DataFrame
+│ Row │ population     │ count │
+│     │ Union…         │ Int64 │
+├─────┼────────────────┼───────┤
+│ 1   │ Cape Canaveral │ 18    │
+│ 2   │ Georgia        │ 30    │
+│ 3   │ South Carolina │ 28    │
+│ 4   │ Florida Keys   │ 65    │
+│ 5   │ Mideast Gulf   │ 28    │
+│ 6   │ Northeast Gulf │ 20    │
+│ 7   │ Southeast Gulf │ 20    │
 ```
 
 !!! info "sample not found!"
@@ -142,7 +124,7 @@ Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
 ## Population ID's
 ### view population names
 ```julia
-populations(x::PopObj; listall::Bool = false)
+populations(data::PopObj; listall::Bool = false)
 ```
 Just as you can view population ID's with `.population`, you can also view them with the `populations` command, which by default shows you a summary of the number of individuals in each population, much like you see when using `summary`.  
 
@@ -151,16 +133,16 @@ julia> populations(sharks)
 ```
 
 ``` tab="output"
-│ Row │ population    │ count │
-│     │ String        │ Int32 │
-├─────┼───────────────┼───────┤
-│ 1   │ 1             │ 21    │
-│ 2   │ 2             │ 30    │
-│ 3   │ 3             │ 28    │
-│ 4   │ 4             │ 65    │
-│ 5   │ 5             │ 28    │
-│ 6   │ 6             │ 20    │
-│ 7   │ 7             │ 20    │
+│ Row │ population     │ count │
+│     │ Union…         │ Int64 │
+├─────┼────────────────┼───────┤
+│ 1   │ Cape Canaveral │ 18    │
+│ 2   │ Georgia        │ 30    │
+│ 3   │ South Carolina │ 28    │
+│ 4   │ Florida Keys   │ 65    │
+│ 5   │ Mideast Gulf   │ 28    │
+│ 6   │ Northeast Gulf │ 20    │
+│ 7   │ Southeast Gulf │ 20    │
 ```
 
 You can use the keyword `listall=true` to display each individual and their associated population as a DataFrame. You'll notice the DataFrame looks remarkably like the first two columns of the one from `locations`, and it sort of is. Unlike `locations`, this will not give you an error when location data is missing. 
@@ -170,26 +152,23 @@ julia> populations(sharks, listall=true)
 ```
 
 ``` tab="output"
-212×2 DataFrames.DataFrame
-│ Row │ ind     │ population │
-│     │ String  │ Union…     │
-├─────┼─────────┼────────────┤
-│ 1   │ cc_001  │ 1          │
-│ 2   │ cc_002  │ 1          │
-│ 3   │ cc_003  │ 1          │
-│ 4   │ cc_005  │ 1          │
-│ 5   │ cc_007  │ 1          │
-│ 6   │ cc_008  │ 1          │
-│ 7   │ cc_009  │ 1          │
+│ Row │ name    │ population     │
+│     │ String  │ Union…         │
+├─────┼─────────┼────────────────┤
+│ 1   │ cc_005  │ Cape Canaveral │
+│ 2   │ cc_007  │ Cape Canaveral │
+│ 3   │ cc_008  │ Cape Canaveral │
+│ 4   │ cc_009  │ Cape Canaveral │
+│ 5   │ cc_010  │ Cape Canaveral │
+│ 6   │ cc_012  │ Cape Canaveral │
 ⋮
-│ 205 │ seg_024 │ 7          │
-│ 206 │ seg_025 │ 7          │
-│ 207 │ seg_026 │ 7          │
-│ 208 │ seg_027 │ 7          │
-│ 209 │ seg_028 │ 7          │
-│ 210 │ seg_029 │ 7          │
-│ 211 │ seg_030 │ 7          │
-│ 212 │ seg_031 │ 7          │
+│ 203 │ seg_025 │ Southeast Gulf │
+│ 204 │ seg_026 │ Southeast Gulf │
+│ 205 │ seg_027 │ Southeast Gulf │
+│ 206 │ seg_028 │ Southeast Gulf │
+│ 207 │ seg_029 │ Southeast Gulf │
+│ 208 │ seg_030 │ Southeast Gulf │
+│ 209 │ seg_031 │ Southeast Gulf │
 ```
 
 !!! note "synonymous functions"
@@ -198,76 +177,97 @@ julia> populations(sharks, listall=true)
 ### rename populations
 
 ```julia
-popid!(x::PopObj; rename::Dict)
+populations!(data::PopObj; rename::Dict, replace::Tuple)
 ```
-Rename the population ID's of a `PopObj` (the `.popid`). Uses a `Dict` of `[popid] => replacement` to rename. It returns `popid(::PopObj,listall=true)` of your renamed PopObj.
+Use the `rename = ` keyword to rename the population ID's of a `PopObj` (the `.population`). Uses a `Dict` of `[population_name] => replacement` to rename. It returns `population(::PopObj,listall=true)` of your renamed PopObj.
 
 ``` julia tab="rename populations"
 # create a dictionary of name conversions
-julia> new_popnames = Dict(1 => "Cape Canaveral",
-						   2 => "Georgia",
-						   3 => "S Carolina",
-    					   4 => "FL Keys",
-    					   5 => "Mideast Gulf",
-    					   6 => "Northeast Gulf",
-    					   7 => "Southeast Gulf")
+julia> new_popnames = Dict(
+    		"Cape Canaveral" => "Atlantic",
+			"Georgia" => "Atlantic",
+			"S Carolina" => "Atlantic",
+    		"FL Keys" => "Gulf",
+    		"Mideast Gulf" => "Gulf",
+    		"Northeast Gulf" => "Gulf",
+    		"Southeast Gulf" => "Gulf"
+		)
 
-julia> popid!(sharks, rename = new_popnames)
+julia> populations!(sharks, rename = new_popnames)
 ```
 
 ``` tab="output"
-212×2 DataFrame
-│ Row │ ind     │ population     │
-│     │ String  │ Union…         │
-├─────┼─────────┼────────────────┤
-│ 1   │ cc_001  │ Cape Canaveral │
-│ 2   │ cc_002  │ Cape Canaveral │
-│ 3   │ cc_003  │ Cape Canaveral │
-│ 4   │ cc_005  │ Cape Canaveral │
-│ 5   │ cc_007  │ Cape Canaveral │
-│ 6   │ cc_008  │ Cape Canaveral │
-│ 7   │ cc_009  │ Cape Canaveral │
-│ 8   │ cc_010  │ Cape Canaveral │
-│ 9   │ cc_012  │ Cape Canaveral │
-│ 10  │ cc_013  │ Cape Canaveral │
-│ 11  │ cc_014  │ Cape Canaveral │
-│ 12  │ cc_015  │ Cape Canaveral │
-│ 13  │ cc_016  │ Cape Canaveral │
-│ 14  │ cc_017  │ Cape Canaveral │
-│ 15  │ cc_018  │ Cape Canaveral │
-│ 16  │ cc_019  │ Cape Canaveral │
-│ 17  │ cc_020  │ Cape Canaveral │
-│ 18  │ cc_021  │ Cape Canaveral │
+│ Row │ name    │ population │
+│     │ String  │ Union…     │
+├─────┼─────────┼────────────┤
+│ 1   │ cc_005  │ Atlantic   │
+│ 2   │ cc_007  │ Atlantic   │
+│ 3   │ cc_008  │ Atlantic   │
+│ 4   │ cc_009  │ Atlantic   │
+│ 5   │ cc_010  │ Atlantic   │
+│ 6   │ cc_012  │ Atlantic   │
 ⋮
-│ 194 │ seg_003 │ Southeast Gulf │
-│ 195 │ seg_009 │ Southeast Gulf │
-│ 196 │ seg_010 │ Southeast Gulf │
-│ 197 │ seg_011 │ Southeast Gulf │
-│ 198 │ seg_012 │ Southeast Gulf │
-│ 199 │ seg_014 │ Southeast Gulf │
-│ 200 │ seg_015 │ Southeast Gulf │
-│ 201 │ seg_016 │ Southeast Gulf │
-│ 202 │ seg_018 │ Southeast Gulf │
-│ 203 │ seg_021 │ Southeast Gulf │
-│ 204 │ seg_023 │ Southeast Gulf │
-│ 205 │ seg_024 │ Southeast Gulf │
-│ 206 │ seg_025 │ Southeast Gulf │
-│ 207 │ seg_026 │ Southeast Gulf │
-│ 208 │ seg_027 │ Southeast Gulf │
-│ 209 │ seg_028 │ Southeast Gulf │
-│ 210 │ seg_029 │ Southeast Gulf │
-│ 211 │ seg_030 │ Southeast Gulf │
-│ 212 │ seg_031 │ Southeast Gulf │
+│ 203 │ seg_025 │ Gulf       │
+│ 204 │ seg_026 │ Gulf       │
+│ 205 │ seg_027 │ Gulf       │
+│ 206 │ seg_028 │ Gulf       │
+│ 207 │ seg_029 │ Gulf       │
+│ 208 │ seg_030 │ Gulf       │
+│ 209 │ seg_031 │ Gulf       │
 ```
 
+### replace population names
+
+You may also use the `replace` keyword in `populations!` to outright replace all the population names or fill in new ones. This is particularly useful when importing from VCF format when population information is not provided. This method will completely replace the population names of a `PopObj` regardless of what they currently are. Internally, it will generate an vector of population names from a tuple of (counts, names) where `counts` is a vector of the number of samples per population and `names` is a vector of the names of the populations. You can also use a named tuple `(counts = , names = )` if you prefer. Since we know our number of samples per population from earlier, we can create a vector of those counts as so:
+
+```
+counts = [18, 30, 28, 65, 28, 20, 20]
+```
+
+and we can also create the vector of the names in the order in which they appeared:
+
+```
+popnames = ["Cape Canaveral", "Georgia", "S Carolina", "FL Keys", "Mideast Gulf", "Northeast Gulf", "Southeast Gulf"]
+```
+
+And now we can combine them with `populations!` to restore the population names to how they were originally:
+
+```julia tab="replace populations"
+julia> populations!(sharks, replace = (counts, popnames))  # Tuple
+
+julia> populations!(sharks, replace = (counts = counts, names = popnames))   # NamedTuple
+```
+
+```tab="output"
+│ Row │ name    │ population     │
+│     │ String  │ String         │
+├─────┼─────────┼────────────────┤
+│ 1   │ cc_005  │ Cape Canaveral │
+│ 2   │ cc_007  │ Cape Canaveral │
+│ 3   │ cc_008  │ Cape Canaveral │
+│ 4   │ cc_009  │ Cape Canaveral │
+│ 5   │ cc_010  │ Cape Canaveral │
+│ 6   │ cc_012  │ Cape Canaveral │
+⋮
+│ 203 │ seg_025 │ Southeast Gulf │
+│ 204 │ seg_026 │ Southeast Gulf │
+│ 205 │ seg_027 │ Southeast Gulf │
+│ 206 │ seg_028 │ Southeast Gulf │
+│ 207 │ seg_029 │ Southeast Gulf │
+```
+
+
+
+
 ## Display Specific Loci and/or Samples
+
 ### get loci names
 
 ```
-loci(x::PopObj)
+loci(data::PopObj)
 ```
 
-Returns an array of strings of the loci names in a `PopObj`
+Returns a vector of strings of the loci names in a `PopObj`
 
 ```julia tab="example"
 julia> loci(sharks)
@@ -300,7 +300,7 @@ julia> loci(sharks)
 ### view loci
 
 ```julia
-view_genotypes(x::PopObj; samples= nothing, loci= nothing)
+view_genotypes(data::PopObj; samples= nothing, loci= nothing)
 ```
 
 Default shows all genotypes for all individuals. Returns a DataFrame.
@@ -433,7 +433,11 @@ view_genotypes(sharks, samples= ["cc_001", "seg_028"], loci = "contig_10013")
 ## Remove Loci
 
 ```julia
-remove_loci!(x::PopObj, loci::Union{String, Array{String,1}})
+remove_loci!(data::PopObj, loci::String)
+```
+
+```julia
+remove_loci!(data::PopObj, loci::Vector{String})
 ```
 
 Removes selected loci from a `PopObj`. Input can be a single locus, or an array of loci.
@@ -444,39 +448,30 @@ Examples:
 julia> remove_loci!(sharks, "contig_35208") ;
 
 julia> summary(sharks)
-
 ```
 
 ``` tab="single output"
-Object of type PopObj:
+ Object of type PopObj
+ Marker type: SNP
+ Ploidy: 2
 
-Longitude:
-["-80.59928", "-80.59954", "-80.59958"] … ["-87.36617", "-85.71432", "-85.71432"]
+ Number of individuals: 209
+ Number of loci: 2212
+ Longitude: present with 0 missing
+ Latitude: present with 0 missing
 
-Latitude:
-["28.30624", "28.30787", "28.30234"] … ["30.05217", "29.82344", "29.82344"]
-
-
-Number of individuals: 212
-["cc_001", "cc_002", "cc_003"] … ["seg_029", "seg_030", "seg_031"]
-
-Number of loci: 2212
-["contig_23109", "contig_4493", "contig_10742"] … ["contig_19384", "contig_22368", "contig_2784"]
-
-Ploidy: 2
-Number of populations: 7
-
-   #Inds | Pop
-   --------------
-     21  |  1
-     30  |  2
-     28  |  3
-     65  |  4
-     28  |  5
-     20  |  6
-     20  |  7
-
-Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
+ Population names and counts:
+7×2 DataFrame
+│ Row │ population     │ count │
+│     │ String         │ Int64 │
+├─────┼────────────────┼───────┤
+│ 1   │ Cape Canaveral │ 18    │
+│ 2   │ Georgia        │ 30    │
+│ 3   │ S Carolina     │ 28    │
+│ 4   │ FL Keys        │ 65    │
+│ 5   │ Mideast Gulf   │ 28    │
+│ 6   │ Northeast Gulf │ 20    │
+│ 7   │ Southeast Gulf │ 20    │
 ```
 
 ``` julia tab="multiple loci"
@@ -488,45 +483,37 @@ julia> summary(sharks)
 ``` tab="multiple output"
 NOTICE: locus "contig_35208" not found
 
-Object of type PopObj:
+ Object of type PopObj
+ Marker type: SNP
+ Ploidy: 2
 
-Longitude:
-["-80.59928", "-80.59954", "-80.59958"] … ["-87.36617", "-85.71432", "-85.71432"]
+ Number of individuals: 212
+ Number of loci: 2210
+ Longitude: present with 0 missing
+ Latitude: present with 0 missing
 
-Latitude:
-["28.30624", "28.30787", "28.30234"] … ["30.05217", "29.82344", "29.82344"]
-
-
-Number of individuals: 212
-["cc_001", "cc_002", "cc_003"] … ["seg_029", "seg_030", "seg_031"]
-
-Number of loci: 2210
-["contig_10742", "contig_14898", "contig_8483"] … ["contig_19384", "contig_22368", "contig_2784"]
-
-Ploidy: 2
-Number of populations: 7
-
-   #Inds | Pop
-   --------------
-     21  |  1
-     30  |  2
-     28  |  3
-     65  |  4
-     28  |  5
-     20  |  6
-     20  |  7
-
-Available .samples fields: .name, .population, .ploidy, .longitude, 
+ Population names and counts:
+7×2 DataFrame
+│ Row │ population     │ count │
+│     │ Union…         │ Int64 │
+├─────┼────────────────┼───────┤
+│ 1   │ Cape Canaveral │ 21    │
+│ 2   │ Georgia        │ 30    │
+│ 3   │ South Carolina │ 28    │
+│ 4   │ Florida Keys   │ 65    │
+│ 5   │ Mideast Gulf   │ 28    │
+│ 6   │ Northeast Gulf │ 20    │
+│ 7   │ Southeast Gulf │ 20    │
 ```
 
 !!! info "locus not found!"
-    If removing a single locus and it is not found in the PopObj, an error will be returned. However, if removing multiple loci, you will receive a notice above the PopObj summary indicating which loci were not found, while removing the ones that were.
+    If removing a single locus and it is not found in the PopObj, an error will be returned. However, if removing multiple loci, you will receive a notice above the PopObj summary indicating which loci were not found, while removing the ones that were. If none of the loci specified were found, it will return an error.
 
 ## Missing Data
 ### view missing data
 
 ```julia
-missing(x::PopObj)
+missing(data::PopObj)
 ```
 
 Used to show missingness information-- that is, loci missing allele information. This command outputs two DataFrames, the first being a count of number of missing loci per samples, the other being the number of times a locus is missing across samples. 
@@ -697,7 +684,7 @@ julia> df2
 ### plot missing data
 
 ```julia
-plot_missing(x::PopObj; color = false)
+plot_missing(data::PopObj; color = false)
 ```
 Return an interactive plot of the number of missing loci in individuals of a `PopObj`, along with the number of missing individuals per locus. Use `color = [color1, color2, ...]` to set a custom color palette for the boxplots. 
 
@@ -729,7 +716,7 @@ julia> plot_missing(sharks)
 ## Location Data
 ### view location data
 ```julia
-locations(x::PopObj)
+locations(data::PopObj)
 ```
 View location data (`.longitude` and `.latitude`) in a `PopObj`If you want to do your own plotting, or just to look at the spatial data of your PopObj, this function is handy. It takes no additional arguments and outputs a DataFrame of individual names, population ID's, and their latitude/longitude information. 
 
@@ -760,8 +747,7 @@ julia> locations(sharks)
 │ 212 │ seg_031 │ 7          │ -85.7143  │ 29.8234  │
 ```
 
-!!! info  "`locations` secondary feature"
-    There is a built-in component in `locations` to test if the location data 1) exists, and 2) is of equal length, or it will spit out an error. It's probably a good idea to do this for your data at least once to be assured everything is ok!
+
 
 ### add location data
 Location data can be added by directly accessing the fields `.longitude` and `.latitude` in your `PopObj`, such as this example:
@@ -776,7 +762,7 @@ However, if your data is in decimal minutes rather than decimal degrees, use the
 
 ####  decimal minutes data
 ```julia
-locations!(x::PopObj; xloc::Array, yloc::Array)
+locations!(data::PopObj; xloc::Vector{String}, yloc::Vector{String})
 ```
 
 Adds location data (longitude, latitude) to `PopObj`. Takes decimal degrees or decimal minutes format. **Must** use minus-sign instead of cardinal directions (i.e. 14 32.11W is **not** vaild). Location data must be in order of  individuals (`ind`). Replaces existing `PopObj` location data.
@@ -796,7 +782,7 @@ julia> locations!(a, long, lat)	;
 
 ### plot location data
 ```julia
-plot_locations(x::PopObj, region = "world", projection = "orthogonal")
+plot_locations(data::PopObj, region = "world", projection = "orthogonal")
 ```
 You're encouraged to plot locations how you see fit. For convenience and speed, we provide this command to make a decent, albeit simple interactive plot (Plotly) and save some time. There is a sizeable list of available map projections and regions if you look this function up in the `help?>` REPL prompt. 
 
