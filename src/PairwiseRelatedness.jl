@@ -21,7 +21,7 @@
     pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
 Calculate the probability of observing the particular allele state given each of
 the 9 Jacquard Identity States for a single locus to create Table 1 from
-Milligan 2002.
+Milligan 2003.
 """
 function pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
     #= Example
@@ -225,6 +225,25 @@ function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles:
     return relatedness_from_Δ(Δ), Δ, convergence
 end
 
+"""
+    qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, verbose::Bool = true)
+Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
+
+Bases allele frequencies on entire population
+
+Inbreeding can only be assumed not to exist. Verbose controls the
+verbosity of the optimization process to find the Maximum likelihood Δ coefficents
+"""
+function qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, verbose::Bool = true)
+
+    #For each locus
+
+    #Calculate allele frequency without either individual
+
+    #
+
+end
+
 
 """
     pairwise_relatedness(data::PopObj, method::String, inbreeding::Bool = true, verbose::Bool = true)
@@ -269,27 +288,3 @@ end
 
 cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
 cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
-
-test = filter(row -> row.relatedness < 0, cat_rel)
-
-test = filter(row -> row.relatedness > 1, cat_rel)
-
-
-test = filter(row -> row.convergence != :Optimal, cat_rel)
-test2 = filter(row -> row.convergence != :Suboptimal, test)
-test3 = filter(row -> row.convergence != :UserLimit, test2)
-
-#maxit = 100 feastol = 1e-7 - 37.4% non-optimal; 49 total hit user limit
-#maxit = 1000 feastol = 1e-7 - 26% non-optimal;  21 total hit user limit - more backtracking issues
-#maxit = 100 feastol = 1e-6 - 30.7% non-optimal; 30 total hit user limit 76 infeasable
-#maxit = 100 feastol = 1e-5 - 23.2% non-optimal; 0 total hit user limit  5728 infeasable - way fewer backtracking issues (only 2)
-#maxit = 100 feastol = 5e-6 - 23.1% non-optimal; 0 total hit user limit 1570 infeasable - 7 failed backtracking
-#maxit = 100 feastol = 1e-4 - % non-optimal;  total hit user limit  infeasable -  failed backtracking
-
-## Introduce whacky fun if is infeasable to drop the feastol to 1e-8
-#maxit = 100 feastol = 5e-6 - 21.9% non-optimal; 49 total hit user limit 0 infeasable - 7 failed backtracking
-
-## SCSSolver defaults
-# - takes much longer than ECOSSolver defaults
-# -
-shark_rel_Inbreeding = pairwise_relatedness(gulfsharks(), method = "dyadml", inbreeding = true, verbose = false)
