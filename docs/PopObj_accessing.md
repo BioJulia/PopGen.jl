@@ -11,51 +11,37 @@ julia> ncats = nancycats() ; summary(ncats)
 ```
 
 ```  tab="output"
-Object of type PopObj:
+ Object of type PopObj:
+ Marker type: Microsatellite
+ Ploidy: 2
+ Number of individuals: 237
+ Number of loci: 9
+ Longitude: none provided
+ Latitude: none provided
 
-Longitude:
-Any[missing, missing, missing, missing, missing, missing] … Any[missing, missing, missing, missing, missing, missing]
-
-Latitude:
-Any[missing, missing, missing, missing, missing, missing] … Any[missing, missing, missing, missing, missing, missing]
-
-Number of individuals: 237
-["N215", "N216", "N217"] … ["N281", "N289", "N290"]
-
-Number of loci: 9
-["fca23", "fca37", "fca43"] … ["fca8", "fca90", "fca96"]
-
-Ploidy:
-Int8[2, 2, 2] … Int8[2, 2, 2]
-Number of populations: 17
-
-Population names and counts:
-17×2 DataFrames.DataFrame
-│ Row │ population    │ count │
-│     │ Categorical…⍰ │ Int32 │
-├─────┼───────────────┼───────┤
-│ 1   │ "1"           │ 10    │
-│ 2   │ "2"           │ 22    │
-│ 3   │ "3"           │ 12    │
-│ 4   │ "4"           │ 23    │
-│ 5   │ "5"           │ 15    │
-│ 6   │ "6"           │ 11    │
-│ 7   │ "7"           │ 14    │
-│ 8   │ "8"           │ 10    │
-│ 9   │ "9"           │ 9     │
-│ 10  │ "10"          │ 11    │
-│ 11  │ "11"          │ 20    │
-│ 12  │ "12"          │ 14    │
-│ 13  │ "13"          │ 13    │
-│ 14  │ "14"          │ 17    │
-│ 15  │ "15"          │ 11    │
-│ 16  │ "16"          │ 12    │
-│ 17  │ "17"          │ 13    │
-
-Available .samples fields: .name, .population, .ploidy, .longitude, .latitude
+ Population names and counts:
+17×2 DataFrame
+│ Row │ population │ count │
+│     │ Union…     │ Int64 │
+├─────┼────────────┼───────┤
+│ 1   │ P01        │ 10    │
+│ 2   │ P02        │ 22    │
+│ 3   │ P03        │ 12    │
+│ 4   │ P04        │ 23    │
+│ 5   │ P05        │ 15    │
+│ 6   │ P06        │ 11    │
+│ 7   │ P07        │ 14    │
+│ 8   │ P08        │ 10    │
+│ 9   │ P09        │ 9     │
+│ 10  │ P10        │ 11    │
+│ 11  │ P11        │ 20    │
+│ 12  │ P12        │ 14    │
+│ 13  │ P13        │ 13    │
+│ 14  │ P14        │ 17    │
+│ 15  │ P15        │ 11    │
+│ 16  │ P16        │ 12    │
+│ 17  │ P17        │ 13    │
 ```
-
-Note the last line of the output. These `samples` fields can be accessed by name using the dot `.` accessor.
 
 Now that we have nancycats loaded in, we can use standard Julia accessor  conventions to view the elements within our PopObj.
 

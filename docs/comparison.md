@@ -34,7 +34,7 @@ Since `gulfsharks` is shamelessly provided in PopGen.jl, we simply invoke the `g
 
 ```julia tab="Julia"
 julia> @btime x = gulfsharks() ; # hide the output
-  2.223 s (12697454 allocations: 673.02 MiB)
+  1.157 s (12697454 allocations: 673.02 MiB)
 ```
 
 This R benchmark will take a few minutes. Consider  making some tea while you wait.
@@ -48,7 +48,7 @@ Unit: seconds
  5.670637 6.218719 6.745065 6.387936 7.019667 9.173005   100
 ```
 
-Comparing averages, PopGen.jl clocks in at `2.098s` versus adegenet's `6.745s` , so ~3x faster.
+Comparing averages, PopGen.jl clocks in at `1.157s` versus adegenet's `6.745s` , so ~5.8x faster.
 
 Julia  :rocket:   |    R  :snail:
 

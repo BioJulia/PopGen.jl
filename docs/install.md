@@ -14,6 +14,8 @@ add "https://github.com/pdimens/PopGen.jl"
 
 
 
+![install](img/install.gif)
+
 ### With Jupyter Notebooks or nteract
 
 ```julia

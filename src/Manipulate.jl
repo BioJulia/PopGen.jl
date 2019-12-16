@@ -195,7 +195,7 @@ function populations!(data::PopObj; rename::Dict=Dict(), replace::Union{Tuple,Na
         flat_popid = Iterators.flatten(popid_array) |> collect
         length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
         data.samples.population = flat_popid
-        @info "overwriting all population names"
+        #@info "overwriting all population names"
         return populations(data, listall = true)
     else
         error("specify rename = Dict() to rename populations, or replace=(counts,names) to replace all names")
@@ -254,13 +254,13 @@ function remove_samples!(data::PopObj, samp_id::Union{String, Vector{String}})
         samp_id ∉ data.samples.name && error("sample \"$samp_id\" not found")
         idx = findfirst(i -> i == samp_id, data.samples.name)
     else
-        idx = []
+        idx = Vector{Int}()
         for ind in samp_id
             if ind ∉ data.samples.name
                 println("NOTICE: sample \"$ind\" not found!")
                 continue
             end
-            push!(idx, findfirst(i -> i == ind, data.samples.name) )
+            push!(idx, findfirst(i -> i == ind, data.samples.name))
         end
         println()
     end
@@ -285,26 +285,33 @@ Prints a summary of the information contained in a PopObj
 """
 function Base.summary(data::PopObj)
 
-    println("Object of type $(typeof(data)):")
-    if typeof(data.loci[!, :1][1][1]) == Int16
+    println(" Object of type PopObj")
+    if typeof(skipmissing(data.loci[!, :1])[1][1]) == Int16
         marker = "Microsatellite"
     else
         marker = "SNP"
     end
-    println("Marker type: $marker")
-    println("\nLongitude:")
-    println("$(data.samples.longitude[1:3])" , " \u2026 ", "$(data.samples.longitude[end-2:end])", "\n")
-    println("Latitude:")
-    println("$(data.samples.latitude[1:3])" , " \u2026 ", "$(data.samples.latitude[end-2:end])", "\n")
-    println("Number of individuals: $(length(data.samples.name))")
-    println(data.samples.name[1:3] , " \u2026 ", data.samples.name[end-2:end], "\n")
-    println("Number of loci: $(size(data.loci,2))")
-    println(string.(names(data.loci))[1:3], " \u2026 " , string.(names(data.loci))[end-2:end], "\n" )
-    println("Ploidy:")
-    println("$(data.samples.ploidy[1:3])", " \u2026 ", "$(data.samples.ploidy[end-2:end])", "\n")
-    println("Population names and counts:")
+    println(" Marker type: ", marker)
+    ploidy = unique(data.samples.ploidy) |> sort
+    length(ploidy) == 1 && println(" Ploidy: ", ploidy |> join)
+    if length(ploidy) != 1
+        print(" Ploidy (varies): ")
+        print(ploidy[1]), [print(", $i") for i in ploidy[2:end]]
+    end
+    println("\n Number of individuals: ", length(data.samples.name))
+    println(" Number of loci: ", size(data.loci,2))
+    if ismissing.(data.samples.longitude) |> unique == [true]
+        println(" Longitude: none provided")
+    else
+        println(" Longitude: present with ", count(i -> i === missing, data.samples.longitude), " missing")
+    end
+    if ismissing.(data.samples.longitude) |> unique == [true]
+        println(" Latitude: none provided")
+    else
+        println(" Latitude: present with ", count(i -> i === missing, data.samples.latitude), " missing")
+    end
+    println("\n Population names and counts:")
     print(populations(data), "\n")
-    println("\nAvailable .samples fields: .name, .population, .ploidy, .longitude, .latitude")
 end
 
 

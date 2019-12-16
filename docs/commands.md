@@ -11,7 +11,7 @@ julia> sharks = gulfsharks() ;
 
 
 
-## Individuals 
+## Individuals / Samples
 
 ### view individuals' names
 

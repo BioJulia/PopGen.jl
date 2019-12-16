@@ -10,7 +10,7 @@ theme:
   palette:
     primary: green
     secondary: blue
-    
+
 repo_url: https://github.com/pdimens/PopGen.jl
 repo_name: PopGen.jl
 
@@ -23,7 +23,7 @@ nav:
     - What's a PopObj: popobj_type.md
     - Accessing: PopObj_accessing.md
     - Location data: popobj_location.md
-- Importing Data: 
+- Importing Data:
     - CSV and delimited: delimited.md
     - Genepop: genepop.md
     - VCF: vcf.md
@@ -35,7 +35,8 @@ nav:
 - Community: community.md
 - Development:
     Under the hood functions: hidden_api.md
-- Frequently Asked Questions: faq.md
+- Misc:
+    Logo Graveyard: logo_graveyard.md
 
 
 markdown_extensions:

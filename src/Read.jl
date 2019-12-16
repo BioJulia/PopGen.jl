@@ -243,6 +243,98 @@ $(length(gpop[1])) loci detected"
     return PopObj(samples, loci)
 end
 
+#= Alternative line-by-line genepop reader
+
+# Alternative line-by-line reader
+## NOT EXPORTED
+
+function gpop2(
+    infile::String;
+    digits::Int = 3,
+    popsep::String = "POP",
+    marker::String = "snp",
+)
+
+    if lowercase(marker) == "snp"
+        geno_type = Int8
+    else
+        geno_type = Int16
+    end
+
+    sample_meta_names = [:name, :population, :ploidy, :latitude, :longitude]
+    sample_meta_array = [
+        Vector{String}(),
+        Vector{Union{String,Int}}(),
+        Vector{Int8}(),
+        Vector{Union{Missing,Float32}}(),
+        Vector{Union{Missing, Float32}}()
+    ]
+
+    locinames = Vector{String}()
+    sample_geno_array = Vector{Vector{Union{Missing, Tuple}}}()
+    popcount = 1
+
+    gpop = open(infile, "r")
+
+    # skip first line
+    readline(gpop)
+
+    # test for loci horizontal/vertical formatting
+    locus_name = readline(gpop)
+    if occursin(",", locus_name) == true
+        append!(locinames, strip.(split(locus_name |> join, ",")))
+        replace!(locinames, "." => "_")
+    else
+        while locus_name != popsep
+            push!(locinames, locus_name)
+            locus_name = readline(gpop)
+        end
+    end
+
+    for ln in readlines(gpop)
+        if ln == popsep
+            popcount += 1
+            continue
+        else
+            samplerow = map(join, split(strip(ln), r"\,\t|\,\s|\s|\t"))
+
+            # just in case missing genotypes are coded as -9 (msats)
+            replace!(samplerow, "-9" => "0"^digits)
+
+            # sample name and population
+            push!(sample_meta_array[1], popfirst!(samplerow))
+            push!(sample_meta_array[2], popcount)
+
+            # phase the loci into tuples
+            converted_row = map(k -> phase(k, geno_type, digits), samplerow)
+            push!(sample_geno_array, converted_row)
+
+            # get the ploidy via # of alleles in the first non-missing locus
+            push!(sample_meta_array[3], length((skipmissing(converted_row) |> collect)[1]))
+
+            # long and lat
+            push!(sample_meta_array[4], missing) ; push!(sample_meta_array[5], missing)
+        end
+    end
+
+    @info "\n$(abspath(infile))
+$(length(sample_meta_array[1])) samples detected
+$(popcount) populations detected using \"$popsep\" seperator
+$(length(locinames)) loci detected"
+    # convert the entire thing into a matrix
+    geno_matrix = hcat(sample_geno_array...)
+
+    # convert back into an array of arrays of loci instead of samples
+    loci_array = collect.(eachrow(geno_matrix))
+
+    # create the two dataframes necessary for a PopObj
+    samples = DataFrame([j => k for (j,k) in zip(sample_meta_names, sample_meta_array)])
+    loci = DataFrame([j => k for (j,k) in zip(Symbol.(locinames), loci_array)])
+
+    return PopObj(samples, loci)
+end
+=#
+
 ### VCF parsing ###
 
 """
@@ -285,7 +377,7 @@ function vcf(infile::String)
         # convert everything to an integer
         geno_int = map(i -> parse.(Int8, i), geno_corr_miss)
 
-        # add 1 to shift genos so 0 is 1 and -1 is 0
+        # add 1 to shift genos so 0 is 1 and -1 is 0 etc.
         geno_shift = map(i -> i .+ Int8(1), geno_int)
         geno_final = [replace(i, 0 => missing) for i in geno_shift]
         geno_tuple = [Tuple(i) for i in geno_final]
@@ -332,7 +424,7 @@ inferred from the file extension:
 - genepop: .gen | .genepop
 - variant call format: .vcf
 This function uses the same keyword arguments (and defaults) as the file importing
-functions it wraps, so please see their respective docstrings in the Julia help console.
+functions it wraps; please see their respective docstrings in the Julia help console.
 (e.g. `?genepop`) for specific usage details.
 
 ## Examples
