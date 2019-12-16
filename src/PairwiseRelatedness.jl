@@ -225,6 +225,25 @@ function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles:
     return relatedness_from_Δ(Δ), Δ, convergence
 end
 
+"""
+    qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, verbose::Bool = true)
+Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
+
+Bases allele frequencies on entire population
+
+Inbreeding can only be assumed not to exist. Verbose controls the
+verbosity of the optimization process to find the Maximum likelihood Δ coefficents
+"""
+function qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, verbose::Bool = true)
+
+    #For each locus
+
+    #Calculate allele frequency without either individual
+
+    #
+
+end
+
 
 """
     pairwise_relatedness(data::PopObj, method::String, inbreeding::Bool = true, verbose::Bool = true)
