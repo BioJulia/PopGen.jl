@@ -23,14 +23,18 @@ Calculate the relatedness of all pairs of individuals in the dataframe using eit
 
 ### arguments
 
--
--
--
+- `data` : the input `PopObj`
 
 ### keyword arguments
 
--
--
+- `method` : Method of relatedness estimation (see below for details)
+- `inbreeding` : Include the possibility of inbreeding (true) or not (false) - Only used with `method = "dyadml"`
+- `verbose` : Would you like extra verbose output. If false only progress bar will be shown. If true extra output will be shown depending on the method chosen
+
+### `method` methods
+
+- `"dyadml"` : Milligan (2003) Dyadic Likelihood Relatedness
+- `"qg"` : Queller & Goodnight (1989) Relatedness
 
 
 ### example
