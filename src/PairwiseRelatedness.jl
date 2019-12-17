@@ -6,12 +6,16 @@
             #N63 N64
         ~1/3 - 1/5 not with optimal solution in cats dataset
     Multithread
-
+    
 =#
 
 #= Would be good to include
 
     Implement alternative relatedness metrics
+
+    Warning if a not implemented (or typo) of method included
+
+    Streamline output
 
 =#
 
@@ -230,6 +234,8 @@ Calculates the moments based estimator of pairwise relatedness developed by Quel
 Bases allele frequencies on entire population
 
 Inbreeding can only be assumed not to exist.
+
+See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
 function qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
 
