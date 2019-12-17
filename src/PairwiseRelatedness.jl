@@ -6,7 +6,7 @@
             #N63 N64
         ~1/3 - 1/5 not with optimal solution in cats dataset
     Multithread
-    
+
 =#
 
 #= Would be good to include
@@ -329,5 +329,5 @@ cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbree
 
 
 cat_rel_qg = pairwise_relatedness(nancycats(), method = "qg", verbose = false)
-
+test
 =#
