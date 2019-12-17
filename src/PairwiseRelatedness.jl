@@ -5,8 +5,6 @@
             #N111 N83
             #N63 N64
         ~1/3 - 1/5 not with optimal solution in cats dataset
-    Solve dyadic inbreeding/no_inbreeding being exactly flipped from the estimates from the related R package
-    Output Δ coefficents
     Multithread
 
 =#
@@ -226,23 +224,40 @@ function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles:
 end
 
 """
-    qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, verbose::Bool = true)
+    qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
 
 Bases allele frequencies on entire population
 
-Inbreeding can only be assumed not to exist. Verbose controls the
-verbosity of the optimization process to find the Maximum likelihood Δ coefficents
+Inbreeding can only be assumed not to exist.
 """
-function qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, verbose::Bool = true)
+function qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
 
-    #For each locus
+    n1 = n2 = d1 = d2 = 0
 
-    #Calculate allele frequency without either individual
+    for locus in String.(names(data.loci))
+        #Extract the pair of interest's genotypes
+        gen1 = get_genotype(data, sample = ind1, locus = locus)
+        gen2 = get_genotype(data, sample = ind2, locus = locus)
 
-    #
+        #Skip missing
+        if gen1 !== missing && gen2 !== missing
+            a = gen1[1]
+            b = gen1[2]
+            c = gen2[1]
+            d = gen2[2]
+
+            n1 = n1 + (Int(a==c) + Int(a==d) + Int(b==c) + Int(b==d) - 2 * (alleles[locus][a] + alleles[locus][b]))
+            n2 = n2 + (Int(a==c) + Int(a==d) + Int(b==c) + Int(b==d) - 2 * (alleles[locus][c] + alleles[locus][d]))
+
+            d1 = d1 + (2 * (1 + Int(a==b) - alleles[locus][a] - alleles[locus][b]))
+            d2 = d2 + (2 * (1 + Int(c==d) - alleles[locus][c] - alleles[locus][d]))
+        end
+    end
+    return (n1/d1 + n2/d2)/2
 
 end
+
 
 
 """
@@ -250,9 +265,11 @@ end
 Calculates various pairwise relatedness measures between all pairs of individuals based on the entire sample population
 allele frequency
 
+If verbose is set to false then there is a progress bar. If set to true then there is estimator specific feedback and statements when an individual has been compared to all other pairs
+
 If the method is able to account for inbreeding in it's calculation then that option may be used
 
-Currently only the Milligan 2002 Dyadic Maximum Likelihood relatedness estimator is implemented
+Currently implemented are Milligan 2002 Dyadic Maximum Likelihood relatedness estimator and Queller & Goodnight 1989
 
 """
 function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
@@ -261,21 +278,36 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
         allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
     end
 
-
-    n = size(data.samples)[1]
-    n = n*(n-1) ÷ 2
-    prog = Progress(n, 1)
+    if !verbose
+        n = size(data.samples)[1]
+        n = n*(n-1) ÷ 2
+        prog = Progress(n, 1)
+    end
 
     #Add switch to slightly change output depending on relatednes metric (e.g. convergence doesn't make sense for Moments Estimators)
-    output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
+    if method == "dyadml"
+        output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
+    end
+    if method == "qg"
+        output = DataFrame(ind1 = [], ind2 = [], relatedness = [])
+    end
+
     for (i,ind1) in enumerate(data.samples.name)
         i == length(data.samples.name) && break
         for ind2 in i+1:length(data.samples.name)
 
-            #In here add switch for which relatedness metric to calculate
-            dyad_out = dyadicML_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
-            append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = dyad_out[1], convergence = dyad_out[3]))
-            next!(prog)
+            if method == "dyadml"
+                dyad_out = dyadicML_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
+                append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = dyad_out[1], convergence = dyad_out[3]))
+            end
+            if method == "qg"
+                qg_out = qg_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies)
+                append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = qg_out))
+            end
+
+            if !verbose
+                next!(prog)
+            end
         end
         if verbose
             println("All pairs with ", ind1, " finished")
@@ -285,6 +317,11 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
     return output
 end
 
-
+#=
 cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
 cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
+
+
+cat_rel_qg = pairwise_relatedness(nancycats(), method = "qg", verbose = false)
+
+=#
