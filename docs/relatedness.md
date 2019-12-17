@@ -1,33 +1,36 @@
 ## Background
 
-Sometimes you want or need to know the relatedness of individuals in a sample. Relatedness is exactly what its name implies: how related individuals are given some provided genetic information. Relatedness can be used in quantitative genetics to estimate heritability, additive genetic variances, and covariances. It can also be used in population genetics to study isolation-by-distance or population structure. 
+Sometimes you want or need to know the relatedness of individuals in a sample. Relatedness is exactly what its name implies: how related individuals are given some provided genetic information. Relatedness can be used in quantitative genetics to estimate heritability, additive genetic variances, and covariances. It can also be used in population genetics to study isolation-by-distance or population structure.
 
-Given two diploid individuals, there are 9 "identity by descent" models available between them ([Jacquard 1975](https://www.springer.com/gp/book/9783642884177), paywall), as shown below (from [Milligan 2003](https://www.genetics.org/content/163/3/1153.full)): 
+The goal of calculating relatedness from molecular markers is to accurately estimate the proportion of the genome which is identical by descent between two individuals. With a pedigree this is "relatively" straightforward. However, for large, natural, populations pedigrees tend not to exist and so many brilliant minds have developed various equations and algorithms to estimate the relatedness from a set of molecular markers. Given two diploid individuals, there are 9 "identity by descent" models available between them ([Jacquard 1975](https://www.springer.com/gp/book/9783642884177), paywall), as shown below (from [Milligan 2003](https://www.genetics.org/content/163/3/1153.full)):
 
-[![Jacquard IBD](img/jacquard_identitiies.jpg)](https://www.genetics.org/content/163/3/1153.full) 
+[![Jacquard IBD](img/jacquard_identitiies.jpg)](https://www.genetics.org/content/163/3/1153.full)
 
-This means that for large not-inbred populations, we can reduce this to the probability a pair of individuals share two alleles (by descent), and the probability they share one. There have been a handful of brilliant minds who have come up with methods for estimating relatedness via these relationships, and currently PopGen.jl implements the maximum likelihood approach presented in [Milligan 2003](https://www.genetics.org/content/163/3/1153.full).  You can imagine there's a lot that  happens under the hood to perform this for all loci across all individuals-- all of which dutifully written by :star2: Jason Selwyn :star2:. 
+Broadly speaking there are two different ways of estimating genetic relatedness using molecular markers, methods of moments, and likelihood estimators. Generally moments estimators will be faster but aren't constrained to being between the theoretical minimum and maximum values of 0 and 1. The likelihood estimators use likelihood functions derived from the set of Jacquard Identity States (above) to determine the most likely inheritance pattern. One difference between the two classes is generally moments estimators require an assumption of no inbreeding, while that assumption isn't necessarily required for likelihood estimators (though it does simplify the math). It is increasingly common to use multiple estimators on pairs, simulated from your molecular marker, with a known relationships to determine the most appropriate estimator to use with your given data.
 
+Here at PopGen.jl we've currently implemented one of each class of estimator. The moments based estimator developed by [Queller & Goodnight 1989](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1989.tb04226.x) using the variant defined by [Lynch & Ritland 1999](https://www.genetics.org/content/152/4/1753.full) and the likelihood estimator created by [Milligan 2003](https://www.genetics.org/content/163/3/1153.full). You can imagine there's a lot that  happens under the hood to perform this for all loci across all individuals-- all of which dutifully written by :star2: Jason Selwyn :star2:.
 
 
 ## Calculate Relatedness
 
-The docstring for the function will go here. This is filler text for now. Mentioning of taking ___ and ____ and input and returns a _______. 
+The docstring for the function will go here. This is filler text for now. Mentioning of taking ___ and ____ and input and returns a _______.
 
 ```julia
-relatedness(data::PopObj, arg::Type, arg::Type, arg::Type)
+pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
 ```
+
+Calculate the relatedness of all pairs of individuals in the dataframe using either Milligan's Dyadic Maximum Likelihood estimator or Queller & Goodnight's estimator.
 
 ### arguments
 
-- 
-- 
-- 
+-
+-
+-
 
 ### keyword arguments
 
-- 
-- 
+-
+-
 
 
 ### example
@@ -40,13 +43,13 @@ relatedness(data::PopObj, arg::Type, arg::Type, arg::Type)
 
 ```
 
-See [Development](hidden_api.md) for all of the APIs associated with `relatedness()` 
+See [Development](hidden_api.md) for all of the APIs associated with `relatedness()`
 
 
 
 ## Speed
 
-Depending on the number samples and loci in your data, the maximum-likelihood approach to relatedness can be quite time consuming. We include a progress bar thanks to [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl) to provide some indication of how long it will take. As a point of reference, it takes approximately 13 hours to perform this relatedness calculation on the `gulfsharks` data (212 samples x 2213 loci). 
+Depending on the number samples and loci in your data, the maximum-likelihood approach to relatedness can be quite time consuming. We include a progress bar thanks to [ProgressMeter.jl](https://github.com/timholy/ProgressMeter.jl) to provide some indication of how long it will take. As a point of reference, it takes approximately 13 hours to perform this relatedness calculation on the `gulfsharks` data (212 samples x 2213 loci).
 
 Currently, relatedness calculations run single-threaded, and we hope to parallelize it with the stable release of Julia 1.3  to make it even faster. Many hands make light work!
 
