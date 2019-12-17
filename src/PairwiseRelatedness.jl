@@ -329,5 +329,4 @@ cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbree
 
 
 cat_rel_qg = pairwise_relatedness(nancycats(), method = "qg", verbose = false)
-test
 =#
