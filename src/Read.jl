@@ -215,6 +215,8 @@ $(length(locinames)) loci detected"
     return PopObj(samples_df, loci_df)
 end
 
+const csv = delimited
+
 ### GenePop parsing ###
 """
     genepop(infile::String; digits::Int = 3, popsep::String = "POP", marker::String = "snp")

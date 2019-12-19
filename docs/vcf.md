@@ -30,7 +30,7 @@ but they will **not** provide:
 
 
 
-This means you will need to add that information separately afterwards. Location data (which is optional!) can be added to the `PopObj` directly with `.samples.latitude` or `.samples.longitude` or with the `locations!` command. Population names (mandatory!) can be added using `populations!()`
+This means you will need to add that information separately afterwards. Location data (which is optional!) can be added to the `PopObj` directly to `.samples.latitude` or `.samples.longitude` or with the `locations!` command. Population names (mandatory!) can be added using `populations!()`
 
 ## Format
 

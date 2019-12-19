@@ -4,9 +4,9 @@ Currently, PopGen.jl provides three different file parsers with which to create 
 
 - Delimited files
 - Genepop files
-- VCF files
+- Variant Call Format files
 
-Each of the filetypes have their own file importer denoted simply by the file type: `delimited()`, `genepop()`, `bcf()`, and `vcf()`. You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper for all three called `read()`. Since `read()` already exists in `Base` Julia, this function should be called formally as `PopGen.read()` to avoid any unintentional dispatch errors. `PopGen.read()` uses all the same keyword arguments as do the commands specific to their filetypes, therefore you should have a look at those commands (usually the defaults suffice). 
+Each of the filetypes have their own file importer denoted simply by the file type: `delimited()`, `genepop()`, `bcf()`, and `vcf()`. You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper for all three called `read()`. Since `read()` already exists in `Base` Julia, this function was not exported, and must be called formally as `PopGen.read()` to avoid any unintentional dispatch errors. `PopGen.read()` uses all the same keyword arguments as do the commands specific to their filetypes, therefore you should have a look at those commands (usually the defaults suffice). 
 
 
 
@@ -35,9 +35,9 @@ Accepted extensions: `.gen`, `.genepop`
 - sample names followed by comma and space
 - genotypes separated by tabs
 - genotypes represented as a combination of ploidy x 3-digits 
-  - e.g. for genotype 001002 
-  - allele 1 = 001
-  - allele 2 = 002
+	- e.g. for genotype 001002 
+	- allele 1 = 001
+	- allele 2 = 002
 
 
 
