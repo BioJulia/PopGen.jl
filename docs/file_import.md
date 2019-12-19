@@ -6,11 +6,11 @@ Currently, PopGen.jl provides three different file parsers with which to create 
 - Genepop files
 - VCF files
 
-Each of the filetypes have their own file importer denoted simply by the file type: `csv()`, `genepop()`, and `vcf()`. You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper for all three called `read()`. Since `read()` already exists in `Base` Julia, this function should be called formally as `PopGen.read()` to avoid any unintentional dispatch errors. `PopGen.read()` uses all the same keyword arguments as do the commands specific to their filetypes, therefore you should have a look at those commands (usually the defaults suffice). 
+Each of the filetypes have their own file importer denoted simply by the file type: `delimited()`, `genepop()`, `bcf()`, and `vcf()`. You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper for all three called `read()`. Since `read()` already exists in `Base` Julia, this function should be called formally as `PopGen.read()` to avoid any unintentional dispatch errors. `PopGen.read()` uses all the same keyword arguments as do the commands specific to their filetypes, therefore you should have a look at those commands (usually the defaults suffice). 
 
 
 
-`PopGen.read()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below. If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.txt.final.final.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and they don't judge your for your file extension decisions. Ultimately, what crazy extensions you give your files is your business, and we love that about you. 
+`PopGen.read()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below. If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.gen.final.v2.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and ignore file extensions. Ultimately, what crazy extensions you give your files is your business, and we love that about you. 
 
 
 
@@ -43,6 +43,6 @@ Accepted extensions: `.gen`, `.genepop`
 
 ## [Variant Call Format](vcf.md)
 
-Accepted extensions: `.vcf`
+Accepted extensions: `.vcf`, `.bcf`
 
-This format is much more abstract and can vary somewhat depending on which variant caller produced the file. If you're super duper interested in the specifications of VCF files, have a look at the [official specification documentation](http://samtools.github.io/hts-specs/VCFv4.3.pdf).
+This format is much more abstract and can vary somewhat depending on which variant caller produced the file. If you're super duper interested in the specifications of BCF/VCF files, have a look at the [official specification documentation](http://samtools.github.io/hts-specs/VCFv4.3.pdf).
