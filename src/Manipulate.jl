@@ -280,41 +280,6 @@ function samples(data::PopObj)
     data.samples.name
 end
 
-"""
-    summary(data::PopObj)
-Prints a summary of the information contained in a PopObj
-"""
-function Base.summary(data::PopObj)
-
-    println(" Object of type PopObj")
-    if typeof(skipmissing(data.loci[!, :1])[1][1]) == Int16
-        marker = "Microsatellite"
-    else
-        marker = "SNP"
-    end
-    println(" Marker type: ", marker)
-    ploidy = unique(data.samples.ploidy) |> sort
-    length(ploidy) == 1 && println(" Ploidy: ", ploidy |> join)
-    if length(ploidy) != 1
-        print(" Ploidy (varies): ")
-        print(ploidy[1]), [print(", $i") for i in ploidy[2:end]]
-    end
-    println("\n Number of individuals: ", length(data.samples.name))
-    println(" Number of loci: ", size(data.loci,2))
-    if ismissing.(data.samples.longitude) |> unique == [true]
-        println(" Longitude: none provided")
-    else
-        println(" Longitude: present with ", count(i -> i === missing, data.samples.longitude), " missing")
-    end
-    if ismissing.(data.samples.longitude) |> unique == [true]
-        println(" Latitude: none provided")
-    else
-        println(" Latitude: present with ", count(i -> i === missing, data.samples.latitude), " missing")
-    end
-    println("\n Population names and counts:")
-    print(populations(data), "\n")
-end
-
 
 """
     view_genotypes(data::PopObj; samples::Union{String, Array, Nothing}, loci::Union{String, Array, Nothing})
