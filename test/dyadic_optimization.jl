@@ -1,7 +1,7 @@
 #Run all lines of code in PopGen.jl
 #Then read in all functions within PairwiseRelatedness.jl
 
-
+verbose = true
 data = nancycats()
 
 alleles = Dict()
