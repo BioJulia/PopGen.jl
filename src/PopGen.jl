@@ -48,13 +48,13 @@ export PopObj,
 ##   O o       O o       O o       O o       O o
 
 include("PopObj.jl")
-include("AlleleFreq.jl")
-include("Datasets.jl")
-include("HardyWeinberg.jl")
-include("Manipulate.jl")
-include("Plotting.jl")
 include("Read.jl")
+include("Datasets.jl")
+include("Manipulate.jl")
+include("AlleleFreq.jl")
+include("HardyWeinberg.jl")
 include("SummaryInfo.jl")
+include("Plotting.jl")
 
 
 end # module PopGen

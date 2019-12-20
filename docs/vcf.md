@@ -38,3 +38,9 @@ Variant Call Format (or *VCF*) files already follow a format standard, and while
 
 !!! failure "filter VCF files beforehand"
     Keep in mind, BCF/VCF files need to be filtered **before** importing them into PopGen.jl. There is no and will be no VCF-filtering functionality to this package, as it is outside of the purpose of PopGen.jl. Refer to `vcftools` and `vcflib` to filter your sequence data. 
+
+
+
+## Acknowledgements
+
+The majority of the BCF/VCF reader is thanks to the tremendous efforts of Ben J. Ward and the BioJulia contributors involved in [GeneticVariation.jl](https://github.com/BioJulia/GeneticVariation.jl), which we use to parse your files into `PopObj` format. If you love the file importer, then give those folks your thanks. If something is wrong and/or you hate the importer, blame us (and please [open up an issue](https://github.com/pdimens/PopGen.jl/issues) :sweat_smile:).

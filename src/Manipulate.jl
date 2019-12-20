@@ -84,6 +84,19 @@ function loci(data::DataFrame)
     String.(names(data))
 end
 
+"""
+    locus(::PopObj, ::Union{String, Symbol})
+Convenience wrapper to display all the genotypes of a locus as an array. Equivalent to
+`PopObj.loci.locusname` and `PopObj.loci[!, :locusname]`.
+"""
+function locus(data::PopObj, locus::String)
+    data.loci[!, Symbol(locus)]
+end
+
+function locus(data::PopObj, locus::Symbol)
+    data.loci[!, locus]
+end
+
 
 #### Find missing ####
 
@@ -277,7 +290,7 @@ View individual/sample names in a `PopObj`
 Equivalent to `PopObj.samples.name`
 """
 function samples(data::PopObj)
-    data.samples.name
+    @view data.samples[!, :name]
 end
 
 

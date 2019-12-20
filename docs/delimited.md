@@ -33,7 +33,7 @@ julia> a = delimited("/data/cali_poppy.csv", digits = 2)
 - Population ID's must be second value in row
 - **Optional:** longitude (x) values third value in row, latitude (y) fourth value in row
 
-### Formatting examples
+### example
 ```bash
 name,population,long,lat,Locus1,Locus2,Locus3   \n
 sierra_01,mountain,11.11,-22.22,001001,002002,001001   \n

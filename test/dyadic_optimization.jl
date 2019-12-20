@@ -5,8 +5,8 @@ verbose = true
 data = nancycats()
 
 alleles = Dict()
-for locus in names(data.loci)
-    alleles[String(locus)] = allele_freq(data.loci[:, locus])
+for loc in loci(data)
+    alleles[loc] = allele_freq(locus(data, loc))
 end
 alleles
 
