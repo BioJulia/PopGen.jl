@@ -82,11 +82,11 @@ Julia  :house_with_garden: ​   |    R  :european_castle:
 
 ### Chi-squared test for HWE
 
-This is a classic popgen test and a relatively simple one. 
+This is a classic population genetics test and a relatively simple one. 
 
 ```julia tab="Julia"
 julia> @btime hwe_test(x, correction = "bh") ;
-  486.001 ms (2695797 allocations: 80.71 MiB)
+  494.021 ms (2621469 allocations: 80.32 MiB)
 ```
 
 The R benchmark will take a while again, so if you're following along, this would be a good time to reconnect with an old friend.
@@ -98,7 +98,7 @@ Unit: seconds
  hw.test(gen, B = 0) 5.100298 5.564807 6.265948 5.878842 6.917006 8.815179   100
 ```
 
-Comparing averages, PopGen.jl clocks in at `486ms` versus adegenet's `6.3s`, so ~13x faster.
+Comparing averages, PopGen.jl clocks in at `494ms` versus adegenet's `6.3s`, so ~12x faster.
 
 Julia  :rocket:  |   R  :snail:
 

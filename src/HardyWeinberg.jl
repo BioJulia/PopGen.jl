@@ -30,8 +30,6 @@ function heterozygosity(data::PopObj, mode = "locus")
         exp_pops = exp["pops_exp"] .* "_exp"
 
         # interleave pop_obs/exp for column names
-        #col_names = Iterators.flatten(zip(obs_pops, exp_pops)) |> collect
-        df = DataFrame(locus = locinames)
         out_df = []
         for (i,j) in zip(obs_pops, exp_pops)
             tmp = DataFrame(locus = locinames, het_obs = merged_het[i], het_exp = merged_het[j])
@@ -93,8 +91,8 @@ a `PopObj`
 """
 function het_population_exp(data::PopObj)
     # get population order and store in its own dict key
-    popid = unique(data.samples.population) |> collect
-    fixed_popid = replace.(popid, " " => "_")
+    popid = unique(data.samples.population |> collect)
+    fixed_popid = [replace(i, " " => "") for i in popid]
     d = Dict()
     d["pops_exp"] = fixed_popid
 
@@ -124,7 +122,10 @@ a `PopObj`
 """
 function het_population_obs(data::PopObj)
     # get population order and store in its own dict key
-    d = Dict{String, Vector{Union{Missing,Float64}}}()
+    popid = unique(data.samples.population |> collect)
+    fixed_popid = [replace(i, " " => "") for i in popid]
+    d = Dict()
+    d["pops_exp"] = fixed_popid
 
     y = deepcopy(data.loci)
     insertcols!(y, 1, :population => data.samples.population)
@@ -235,12 +236,13 @@ function hwe_test(data::PopObj; by_pop::Bool = false, correction::String = "none
             chisq, df, pval = locus_chi_sq(locus)
             push!.(output, [chisq, df, pval])
         end
-        #output = locus_chi_sq.(eachcol(x.loci, false)) |> DataFrame
+
         het = heterozygosity(data)
         insertcols!(het, size(het,2)+1, χ² = output[1]) #|> Array{Union{Missing,Float64},1})
         insertcols!(het, size(het,2)+1, DF = output[2])# |> Array{Union{Missing,Float64},1})
         insertcols!(het, size(het,2)+1, P = output[3])#|> Array{Union{Missing,Float64},1})
-        ## corrections
+
+        # corrections
         @info "Χ² test for conformation to Hardy-Weinberg Equilibrium"
         if correction == "none"
             return het
@@ -256,7 +258,7 @@ function hwe_test(data::PopObj; by_pop::Bool = false, correction::String = "none
         popid = unique(data.samples.population |> collect)
 
         y = deepcopy(data.loci)
-        insertcols!(y, 1, :population => x.samples.population)
+        insertcols!(y, 1, :population => data.samples.population)
         y_subdf = groupby(y[!, :], :population) |> collect
         het = heterozygosity(data, "pop")
         for (eachpop, het_pop) in zip(y_subdf, het)
@@ -312,22 +314,28 @@ Calculate the chi square statistic and p-value for a locus
 Returns a tuple with chi-square statistic, degrees of freedom, and p-value
 """
 function locus_chi_sq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-    #Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
+    # Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
     number_ind = count(i -> i !== missing, locus)
 
-    ## Get expected number of genotypes in a locus
+    # Get expected number of genotypes in a locus
     the_allele_dict = allele_freq(locus)
-    p = the_allele_dict |> values |> collect
+
+    # split the appropriate pairs into their own vectors
+    alleles = Vector{String}()
+    p = Vector{Float64}()
+    for (i,j) in pairs(the_allele_dict)
+        push!(alleles, "$i")
+        push!(p, j)
+    end
 
     #Calculate Expected Genotype numbers
     expected_genotype_freq = p * transpose(p) .* number_ind
-    expected_genotype_freq = [expected_genotype_freq]
+    expected_genotype_freq = vec(expected_genotype_freq)
 
-    alleles = ["$i" for i in the_allele_dict |> keys |> collect]
     alleles = (alleles .* ",") .* permutedims(alleles)
-    alleles = Array{String}.(sort.(split.(alleles, ",")))
+    alleles = Vector{String}.(sort.(split.(alleles, ",")))
     alleles = [parse.(Int16, i) |> Tuple for i in alleles]
-    alleles = [alleles]
+    alleles = vec(alleles)
 
     expected = Dict()
     for (geno, freq) in zip(alleles, expected_genotype_freq)
@@ -369,19 +377,24 @@ function locus_chi_sq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}},1}) 
     #Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
     number_ind = count(i -> i !== missing, locus)
 
-    ## Get expected number of genotypes in a locus
-    the_allele_dict = allele_freq(locus)
-    p = the_allele_dict |> values |> collect
+    # split the appropriate pairs into their own vectors
+    alleles = Vector{String}()
+    p = Vector{Float64}()
+    for (i,j) in pairs(the_allele_dict)
+        push!(alleles, "$i")
+        push!(p, j)
+    end
+
+    # create a matrix of allele pair combinations
+    alleles = (alleles .* ",") .* permutedims(alleles)
+    alleles = Vector{String}.(sort.(split.(alleles, ",")))
+    alleles = [parse.(Int16, i) |> Tuple for i in alleles]
+    alleles = vec(alleles)
 
     #Calculate Expected Genotype numbers
     expected_genotype_freq = p * transpose(p) .* number_ind
     expected_genotype_freq = vec(expected_genotype_freq)
 
-    alleles = ["$i" for i in the_allele_dict |> keys |> collect]
-    alleles = (alleles .* ",") .* permutedims(alleles)
-    alleles = Array{String}.(sort.(split.(alleles, ",")))
-    alleles = [parse.(Int16, i) |> Tuple for i in alleles]
-    alleles = vec(alleles)
 
     expected = Dict()
     for (geno, freq) in zip(alleles, expected_genotype_freq)
