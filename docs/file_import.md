@@ -14,17 +14,31 @@ Each of the filetypes have their own file importer denoted simply by the file ty
 
 
 
-## [Delimited files](delimited.md) 
+### Specifying `marker = "msat"` and `OverflowError`
+
+For genepop and delimited files, you **must** specify if your markers are microsatellites (`marker = "msat"`)  because the default is for snps.
+
+**Why this matters:**
+
+SNPs are Typed as 8-bit integers, whereas microsatellites are Typed as 16-bit integers. By the nature of those Types, `Int8` cannot exceed the value 127, while `Int16` is capped at 37767. Since SNP alleles will only ever be coded as values between `1` and `4`, we never have to worry about the genotype exceeding 127. Microsatellites can of course exceed 127, so we use the next-smallest Integer type for them, naively hoping no one will ever have a microsatellite allele exceeding 37767 repeats. If you have microsatellite data but don't specify `marker = "msat"`, you will receive an `OverflowError`  as soon as the file reader tries to parse an allele greater than 127 as an `Int8`.
+
+
+
+****
+
+## Supported File Types
+
+### [Delimited files](delimited.md) 
 
 Accepted extensions: `.csv`, `.tsv`, `.txt`
 
-- files in which values are separated using a constant delimiter, such as commas, spaces, or tabs
-- first rows are usually column names
+- files in which values are separated using a consistent delimiter, such as commas, spaces, or tabs
+- first rows are column names
 - each line represents a row
 
 
 
-## [Genepop Files](genepop.md)
+### [Genepop Files](genepop.md)
 
 Accepted extensions: `.gen`, `.genepop`
 
@@ -41,7 +55,7 @@ Accepted extensions: `.gen`, `.genepop`
 
 
 
-## [Variant Call Format](vcf.md)
+### [Variant Call Format](vcf.md)
 
 Accepted extensions: `.vcf`, `.bcf`
 

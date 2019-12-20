@@ -125,7 +125,7 @@ function het_population_obs(data::PopObj)
     popid = unique(data.samples.population |> collect)
     fixed_popid = [replace(i, " " => "") for i in popid]
     d = Dict()
-    d["pops_exp"] = fixed_popid
+    d["pops_obs"] = fixed_popid
 
     y = deepcopy(data.loci)
     insertcols!(y, 1, :population => data.samples.population)
@@ -238,9 +238,9 @@ function hwe_test(data::PopObj; by_pop::Bool = false, correction::String = "none
         end
 
         het = heterozygosity(data)
-        insertcols!(het, size(het,2)+1, χ² = output[1]) #|> Array{Union{Missing,Float64},1})
-        insertcols!(het, size(het,2)+1, DF = output[2])# |> Array{Union{Missing,Float64},1})
-        insertcols!(het, size(het,2)+1, P = output[3])#|> Array{Union{Missing,Float64},1})
+        insertcols!(het, size(het,2)+1, χ² = output[1])
+        insertcols!(het, size(het,2)+1, DF = output[2])
+        insertcols!(het, size(het,2)+1, P = output[3])
 
         # corrections
         @info "Χ² test for conformation to Hardy-Weinberg Equilibrium"
