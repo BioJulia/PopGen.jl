@@ -95,6 +95,26 @@ function Fstats(x::PopObj, mode::String = "global")
     end
 end
 
+function fst_global(data:: PopObj)
+    H_i_sample = het_sample(data)
+    @info "Global F-statistics"
+
+    # FIS = (HS - HI) / HS
+    FIS = (H_s .- H_i) ./ H_s |> mean
+
+    # FIT = (HT- HI)/HT
+    FIT = map(i -> (H_t - i) / H_t, H_i_sample.het) |> mean
+
+    # FST = (HT- HS) / HT
+    FST = map(i -> (H_t - i) / H_t, H_s) |> mean
+
+    return DataFrame(
+        FIS = round.(FIS, digits = 4),
+        FIT = round.(FIT, digits = 4),
+        FST = round.(FST, digits = 4),
+    )
+end
+
 
 
 #======= FST_alpha =======#

@@ -4,6 +4,12 @@ There is nothing inherently special about this documentation relative to other d
 
 
 
+## Using Julia
+
+Everyone has their own particular workflows, and if you're new to Julia, you might not have established one yet. Julia can be used rather comfortably using its built-in interpreter, but you can also use it via Atom (the [officially supported](https://junolab.org/) `uber-juno` add-on) for an RStudio-like experience. If you're already a fan of Jupyter notebooks (or [**nteract**](https://nteract.io/)), then all you need is to install the `IJulia` package in Julia and you have full Jupyter support for Julia! Other popular options are VScode (julia add-on), or Emacs. 
+
++  If you didn't already know,  the name "Jupyter" is actually a concatenation of Ju (julia) Pyt (python) and R (...R).
+
 ## First-time Performance
 If you're migrating to Julia from Python or R (or Matlab, etc.), you'll think Julia is slow and laggy because loading packages and running stuff has a noticeable wait time (10-40sec). It's worth mentioning that this lag is "compilation overhead". What this means is, Julia tries to pre-compile as much code as possible (into optimized machine code) when running something or loading a package. This lag exists **only the first time** you run something. Every subsequent run of a function, even with different parameters, will be **substantially** faster, and in most cases instant. If you want to test this yourself, try to run a line of code twice with `@time` before the function and compare the results. Here's an example:
 ``` 
@@ -79,14 +85,14 @@ search: population populations population! populations!
 
 Julia encourages strong typing of variables, and the functions in `PopGen` are no exception to this. However, to reduce the barrier of entry required to understand this documentation and the subsequent package, we have chosen to omit some of the `type` information from functions to reduce visual clutter for newer users. As experienced users already know, if you would like to see the explicit type information, you can look at the code on github, invoke the `help` system in the REPL (above), or search for a function in the Documentation pane in Juno. 
 
-You'll notice types follow a specific format, which is `object::type`. This format is a type assignment, so in the function `population`, which looks like: `population(x::PopObj; listall::Bool = false)`:
+You'll notice types follow a specific format, which is `object::type`. This format is a type declaration, so in the function `population`, which looks like: `population(x::PopObj; listall::Bool = false)`:
 
 - `x` is a variable of type `PopObj` 
 - `listall` is a variable of type `Bool` (boolean) meaning it only takes `true` or `false` without quotes, and the default value is set to `false`.
 
 ### Type Unions
 
-You might see the type `Union` appear occasionally throughout this documentation, and you can consider it a list of types. For example, if something was of type `::Union{String,Integer}`, that means that **either** a `String` or `Integer` works. These kinds of `Union` appear in a few places, like `remove_samples!` , where the input can be either a `String` (a single individual) or an `Array{String,1}` (one-dimensional list of names). For `remove_inds!`, the second argument type appears as `::Union{String, Array{String,1}}`. Also, the order in which types appear in `Union` types don't matter.
+You might see the type `Union` appear occasionally throughout this documentation, and you can consider it a list of allowable types. For example, if something was of type `::Union{String,Integer}`, that means that **either** a `String` or `Integer` works. 
 
 
 
@@ -134,10 +140,12 @@ Stacktrace:
 
 This error is telling us "there is no such function called `add`, who's inputs are an `Integer` followed by a `String`". But, it does offer us some alternatives, like the two `add` functions we created earlier.
 
-The functions within `PopGen` are almost always explicitly typed, so if you are getting the `MethodError: no method matching` error, then you are inputting the incorrect types into the function, or perhaps your inputs for the arguments are in the wrong order (see "Functions with and without keywords" below). 
+The functions within `PopGen` are almost always explicitly typed, so if you are getting the `MethodError: no method matching` error, then you are inputting the incorrect types into the function, or perhaps your inputs for the arguments are in the wrong order (see "Functions with and without keywords" below).
+
+Sometimes you might include an argument with a keyword when there isn't one, or include an argument without a keyword when there needs to be one (honestly, we make that mistake too and we *wrote* this stuff). To help minimize those mistakes, please read below about which arguments have keywords and which don't.
 
 !!! Note "keep in mind"
-    MethodError's can definitely get annoying, but they are usually the result of incorrect input from the user and not buggy programming by the developers. Please take that into consideration before assuming something is broken or bugged.
+    MethodError's can definitely get annoying, but they are usually the result of incorrect input from the user and not buggy programming by the developers. Please double-check your inputs before assuming something is broken or bugged.
 
 
 
@@ -153,6 +161,8 @@ Let's talk about semicolons some more.
     -  arguments after a semicolon have a keyword `argument = value` and their order doesn't matter
     - `MethodError: no methods matching` is more likely an issue on your side and not on our side :smile:
         - unless we accidentally forgot to export a function! :facepalm:
+        - or we typed a function incorrectly
+        - really, it's a coin flip who could be at fault
 
 Broadly speaking, there are two types of function declarations in Julia: ones with keywords and ones without keywords. The term "keywords" refers to an input argument that has the format `argument = value`. This format is present in many of the functions in this and other packages, however there are some specifics to understand when functions use keywords and when they don't. 
 

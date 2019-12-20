@@ -73,7 +73,7 @@ versus
 
 ![clutches pearls](img/clutches pearls cactus.png)
 
-**What the eff??** How is that possible?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles). An `Int8` is a signed integer that occupies 8bits of memory, whereas an `Int16` occupies 16bits (as compared to a standard `Int64`).
+What sorcery is this?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles). An `Int8` is a signed integer that occupies 8bits of memory, whereas an `Int16` occupies 16bits (as compared to a standard `Int64`). 
 
 The original file is `3.2mb`, and our `PopObj`takes up ~`1.6mb` in memory (half as big as the source file!) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file and ~3.3x larger than our `PopObj`. That's quite a big difference!
 
@@ -82,11 +82,11 @@ Julia  :house_with_garden: ​   |    R  :european_castle:
 
 ### Chi-squared test for HWE
 
-This is a classic popgen test and a relatively simple one. 
+This is a classic population genetics test and a relatively simple one. 
 
 ```julia tab="Julia"
 julia> @btime hwe_test(x, correction = "bh") ;
-  486.001 ms (2695797 allocations: 80.71 MiB)
+  494.021 ms (2621469 allocations: 80.32 MiB)
 ```
 
 The R benchmark will take a while again, so if you're following along, this would be a good time to reconnect with an old friend.
@@ -98,7 +98,7 @@ Unit: seconds
  hw.test(gen, B = 0) 5.100298 5.564807 6.265948 5.878842 6.917006 8.815179   100
 ```
 
-Comparing averages, PopGen.jl clocks in at `486ms` versus adegenet's `6.3s`, so ~13x faster.
+Comparing averages, PopGen.jl clocks in at `494ms` versus adegenet's `6.3s`, so ~12x faster.
 
 Julia  :rocket:  |   R  :snail:
 

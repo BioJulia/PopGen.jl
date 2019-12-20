@@ -9,29 +9,27 @@ heterozygosity(nancycats(), "population" )
 - `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
 - `"population"` or `"pop"` : heterozygosity per population (PopObj.samples.population)
 """
-function heterozygosity(x::PopObj, mode = "locus")
+function heterozygosity(data::PopObj, mode = "locus")
     if mode == "locus"
-        obs = het_observed(x)
-        exp = het_expected(x)
-        locinames = String.(names(x.loci))
+        obs = het_observed(data)
+        exp = het_expected(data)
+        locinames = loci(data)
         return DataFrame(locus = locinames, het_obs = obs, het_exp = exp)
 
     elseif lowercase(mode) == "sample" || lowercase(mode) == "ind" || lowercase(mode) == "individual"
-        return het_sample(x)
+        return DataFrame(name = samples(data), het_obs = het_sample(data))
 
     elseif lowercase(mode) == "pop" || lowercase(mode) == "population"
-        obs = het_population_obs(x)
-        exp = het_population_exp(x)
+        obs = het_population_obs(data)
+        exp = het_population_exp(data)
         merged_het = merge(obs, exp)
-        locinames = String.(names(x.loci))
+        locinames = loci(data)
 
         # remake obs/exp distinction
         obs_pops = obs["pops_obs"] .* "_obs"
         exp_pops = exp["pops_exp"] .* "_exp"
 
         # interleave pop_obs/exp for column names
-        #col_names = Iterators.flatten(zip(obs_pops, exp_pops)) |> collect
-        df = DataFrame(locus = locinames)
         out_df = []
         for (i,j) in zip(obs_pops, exp_pops)
             tmp = DataFrame(locus = locinames, het_obs = merged_het[i], het_exp = merged_het[j])
@@ -50,16 +48,16 @@ const He = heterozygosity
 Calculate the expected heterozygosity for each locus in a `PopObj`. Returns an
 array of heterozygosity values.
 """
-function het_expected(x::PopObj)
-    het_vals = []
-    for locus in eachcol(x.loci, false)
-        a = allele_freq(locus) # get allele freqs at locus
-        a = a |> values |> collect # isolate the freqs
-        homz = a .^ 2 |> sum
-        hetz = 1 - homz
-        push!(het_vals, hetz)  # push the sum of hetz to the output array
+function het_expected(data::PopObj)
+    het_vals = Vector{Float64}()
+    @inbounds for locus in eachcol(data.loci, false)
+        # get allele freqs at locus and isolate the freqs
+        a = allele_freq(locus) |> values |> collect
+        hom = a .^ 2 |> sum
+        het = 1 - hom
+        push!(het_vals, het)  # push the sum of hetz to the output array
     end
-    return het_vals |> Array{Float64,1}
+    return het_vals
 end
 
 
@@ -69,20 +67,20 @@ end
 Calculate the observed heterozygosity for each locus in a `PopObj`. Returns an
 array of heterozygosity values.
 """
-function het_observed(x::PopObj)
-    het_vals = []
-    for locus in eachcol(x.loci, false)
+function het_observed(data::PopObj)
+    het_vals = Vector{Float64}()
+    for locus in eachcol(data.loci, false)
         a = geno_freq(locus)  # get genotype freqs at locus
         tmp = 0
-        for geno in collect(keys(a))
-            geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
-            if geno != geno_hom        # test if geno isn't homozygous
+        genos = keys(a) |> collect
+        for geno in genos
+            if length(unique(geno)) != 1
                 tmp += a[geno]     # if true, add freq to total in tmp
             end
         end
         push!(het_vals, tmp)
     end
-    return (het_vals) |> Array{Float64,1}
+    return het_vals
 end
 
 
@@ -91,29 +89,28 @@ end
 Return a `Dict` of the expected heterozygosity per population for each locus in
 a `PopObj`
 """
-function het_population_exp(x::PopObj)
+function het_population_exp(data::PopObj)
     # get population order and store in its own dict key
-    popid = unique(x.samples.population |> collect)
+    popid = unique(data.samples.population |> collect)
     fixed_popid = [replace(i, " " => "") for i in popid]
     d = Dict()
     d["pops_exp"] = fixed_popid
 
-    y = deepcopy(x.loci)
-    insertcols!(y, 1, :population => x.samples.population)
+    y = deepcopy(data.loci)
+    insertcols!(y, 1, :population => data.samples.population)
     y_subdf = groupby(y[!, :], :population)
     for pop in y_subdf
-        pop_het_vals = []
+        pop_het_vals = Vector{Union{Missing, Float64}}()
         for locus in eachcol(pop[!, :2:end], false)
-            a = allele_freq(locus) # get allele freqs at locus
-            a = a |> values |> collect # isolate the freqs
-            homz = a .^ 2 |> sum
-            hetz = 1 - homz
-            push!(pop_het_vals, hetz)  # push the sum of hetz to the output array
+            a = allele_freq(locus) |> values |> collect # isolate the freqs
+            hom = a .^ 2 |> sum
+            het = 1 - hom
+            push!(pop_het_vals, het)  # push the sum of hetz to the output array
         end
 
         # add "_obs" for distinction vs "_exp"
-        popname = replace(pop.population[1], " " => "")*"_exp"
-        d[popname] = pop_het_vals |> Array{Union{Missing,Float64},1}
+        popname = replace(pop.population[1], " " => "_")*"_exp"
+        d[popname] = pop_het_vals
     end
         return d
 end
@@ -123,18 +120,18 @@ end
 Return a Dict of the observed heterozygosity per population for each locus in
 a `PopObj`
 """
-function het_population_obs(x::PopObj)
+function het_population_obs(data::PopObj)
     # get population order and store in its own dict key
-    popid = unique(x.samples.population |> collect)
+    popid = unique(data.samples.population |> collect)
     fixed_popid = [replace(i, " " => "") for i in popid]
     d = Dict()
     d["pops_obs"] = fixed_popid
 
-    y = deepcopy(x.loci)
-    insertcols!(y, 1, :population => x.samples.population)
+    y = deepcopy(data.loci)
+    insertcols!(y, 1, :population => data.samples.population)
     y_subdf = groupby(y[!, :], :population)
     for pop in y_subdf
-        pop_het_vals = []
+        pop_het_vals = Vector{Union{Missing,Float64}}()
         for locus in eachcol(pop[!, :2:end], false)
             # get genotype freqs at locus
             a = geno_freq(locus)
@@ -145,10 +142,9 @@ function het_population_obs(x::PopObj)
                 continue
             end
             tmp = 0
-            for geno in collect(keys(a))
-                # create hom geno
-                geno_hom = fill(geno[1], length(geno)) |> Tuple
-                if geno != geno_hom    # test if geno isn't homozygous
+            genos = keys(a) |> collect
+            for geno in genos
+                if length(unique(geno)) != 1
                     tmp += a[geno]     # if true, add freq to total in tmp
                 end
             end
@@ -156,64 +152,56 @@ function het_population_obs(x::PopObj)
         end
 
         # add "_obs" for distinction vs "_exp"
-        popname = replace(pop.population[1], " " => "")*"_obs"
-        d[popname] = pop_het_vals |> Array{Union{Missing,Float64},1}
+        popname = replace(pop.population[1], " " => "_")*"_obs"
+        d[popname] = pop_het_vals
     end
     return d
 end
 
 """
-    het_sample(x::PopObj)
+    het_sample(data::PopObj)
 Calculate the observed heterozygosity for each individual in a `PopObj`. Returns
-an array of heterozygosity values.
+a vector of heterozygosity values corresponding to the order of samples in the PopObj.
 """
-function het_sample(x::PopObj)
-    #transpose loci df to have samples as columns
-    y = deepcopy(x.loci)
-    insertcols!(y, 1, :name => x.samples.name)
-    insertcols!(y, 2, :id => 1:length(y[!, 1]))
-    tmp_stack = stack(y, names(y[!, 3:end]))
-    by_ind = unstack(tmp_stack, :variable, :id, :value)
-    select!(by_ind, Not(:variable))
+function het_sample(data::PopObj)
+    # psuedo-transpose to format genotypes as vectors per individual
+    by_ind = map(i -> get_sample_genotypes(data, i), samples(data))
+
     # calculate observed heterozygosity like for loci
-    het_vals = []
-    for samp in eachcol(by_ind, false)
-        a = geno_freq(samp)  # get genotype freqs at sample
-        #delete!(a, missing)     # remove missing values
-        tmp = 0
-        for geno in collect(keys(a))
-            geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
-            if geno != geno_hom        # test if geno isn't homozygous
-                tmp += a[geno]     # if true, add freq to total in tmp
-            end
-        end
-        push!(het_vals, tmp)
-    end
-    return DataFrame(
-        name = x.samples.name,
-        het = (het_vals |> Array{Float64,1}),
-    )
+    map(het_sample, by_ind)
 end
 
 """
-    het_sample(x::Array)
-Calculate the observed heterozygosity for each individual in a `PopObj`. Returns
+    het_sample(individual::Vector{<:Union{Missing, Tuple{Vararg}}}))
+Calculate the observed heterozygosity for an individual in a `PopObj`. Returns
 an array of heterozygosity values.
 """
-function het_sample(individual::Array{Union{Missing,Tuple},1})
-    # calculate observed heterozygosity
-    het_vals = []
-    a = geno_freq(individual)  # get genotype freqs at sample
-    tmp = 0
-    for geno in collect(keys(a))
-        geno_hom = fill(geno[1], length(geno)) |> Tuple   # create hom geno
-        if geno != geno_hom        # test if geno isn't homozygous
-            tmp += a[geno]     # if true, add freq to total in tmp
+function het_sample(individual::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
+    # calculate observed heterozygosity for an individual
+    het = 0
+    genos = skipmissing(individual) |> collect
+    for geno in genos
+        if length(unique(geno)) != 1
+            het += 1
         end
     end
-    push!(het_vals, tmp)
-    het = het_vals |> Array{Float64,1}
+    return het/length(genos)
 end
+
+
+function het_sample(individual::Vector{<:Union{Missing, Tuple{Vararg}}})
+    # calculate observed heterozygosity for an individual
+    het = 0
+    genos = skipmissing(individual) |> collect
+    for geno in genos
+        if length(unique(geno)) != 1
+            het += 1
+        end
+    end
+    return het/length(genos)
+end
+
+
 
 """
     hwe_test(x::PopObj; by_pop::Bool = false; correction = "none")
@@ -241,19 +229,20 @@ correction method for multiple testing.
 - `"forward stop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` or `"b-c"` : Barber-Candès adjustment
 """
-function hwe_test(x::PopObj; by_pop::Bool = false, correction::String = "none")
+function hwe_test(data::PopObj; by_pop::Bool = false, correction::String = "none")
     if !by_pop
         output = [Vector{Union{Missing,Float64}}(), Vector{Union{Missing,Int32}}(), Vector{Union{Missing,Float64}}()]
-        for locus in eachcol(x.loci, false)
+        for locus in eachcol(data.loci, false)
             chisq, df, pval = locus_chi_sq(locus)
             push!.(output, [chisq, df, pval])
         end
-        #output = locus_chi_sq.(eachcol(x.loci, false)) |> DataFrame
-        het = heterozygosity(x)
-        insertcols!(het, size(het,2)+1, χ² = output[1]) #|> Array{Union{Missing,Float64},1})
-        insertcols!(het, size(het,2)+1, DF = output[2])# |> Array{Union{Missing,Float64},1})
-        insertcols!(het, size(het,2)+1, P = output[3])#|> Array{Union{Missing,Float64},1})
-        ## corrections
+
+        het = heterozygosity(data)
+        insertcols!(het, size(het,2)+1, χ² = output[1])
+        insertcols!(het, size(het,2)+1, DF = output[2])
+        insertcols!(het, size(het,2)+1, P = output[3])
+
+        # corrections
         @info "Χ² test for conformation to Hardy-Weinberg Equilibrium"
         if correction == "none"
             return het
@@ -266,12 +255,12 @@ function hwe_test(x::PopObj; by_pop::Bool = false, correction::String = "none")
     else
         out_array = []
         # get population order and store in its own dict key
-        popid = unique(x.samples.population |> collect)
+        popid = unique(data.samples.population |> collect)
 
-        y = deepcopy(x.loci)
-        insertcols!(y, 1, :population => x.samples.population)
+        y = deepcopy(data.loci)
+        insertcols!(y, 1, :population => data.samples.population)
         y_subdf = groupby(y[!, :], :population) |> collect
-        het = heterozygosity(x, "pop")
+        het = heterozygosity(data, "pop")
         for (eachpop, het_pop) in zip(y_subdf, het)
             output = [[], [], []]
             for locus in eachcol(eachpop, false)[2:end]
@@ -298,7 +287,7 @@ function hwe_test(x::PopObj; by_pop::Bool = false, correction::String = "none")
             end
 
             # convert p_array to suitible Type
-            p_vals = p_array |> Array{Union{Missing,Float64},1}
+            p_vals = p_array |> Vector{Union{Missing,Float64}}
 
             # do actual correction
             corrected_P = multitest_missing(p_vals, correction)
@@ -325,22 +314,28 @@ Calculate the chi square statistic and p-value for a locus
 Returns a tuple with chi-square statistic, degrees of freedom, and p-value
 """
 function locus_chi_sq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-    #Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
+    # Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
     number_ind = count(i -> i !== missing, locus)
 
-    ## Get expected number of genotypes in a locus
+    # Get expected number of genotypes in a locus
     the_allele_dict = allele_freq(locus)
-    p = the_allele_dict |> values |> collect
+
+    # split the appropriate pairs into their own vectors
+    alleles = Vector{String}()
+    p = Vector{Float64}()
+    for (i,j) in pairs(the_allele_dict)
+        push!(alleles, "$i")
+        push!(p, j)
+    end
 
     #Calculate Expected Genotype numbers
     expected_genotype_freq = p * transpose(p) .* number_ind
-    expected_genotype_freq = [expected_genotype_freq]
+    expected_genotype_freq = vec(expected_genotype_freq)
 
-    alleles = ["$i" for i in the_allele_dict |> keys |> collect]
     alleles = (alleles .* ",") .* permutedims(alleles)
-    alleles = Array{String}.(sort.(split.(alleles, ",")))
+    alleles = Vector{String}.(sort.(split.(alleles, ",")))
     alleles = [parse.(Int16, i) |> Tuple for i in alleles]
-    alleles = [alleles]
+    alleles = vec(alleles)
 
     expected = Dict()
     for (geno, freq) in zip(alleles, expected_genotype_freq)
@@ -382,19 +377,24 @@ function locus_chi_sq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}},1}) 
     #Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
     number_ind = count(i -> i !== missing, locus)
 
-    ## Get expected number of genotypes in a locus
-    the_allele_dict = allele_freq(locus)
-    p = the_allele_dict |> values |> collect
+    # split the appropriate pairs into their own vectors
+    alleles = Vector{String}()
+    p = Vector{Float64}()
+    for (i,j) in pairs(the_allele_dict)
+        push!(alleles, "$i")
+        push!(p, j)
+    end
+
+    # create a matrix of allele pair combinations
+    alleles = (alleles .* ",") .* permutedims(alleles)
+    alleles = Vector{String}.(sort.(split.(alleles, ",")))
+    alleles = [parse.(Int16, i) |> Tuple for i in alleles]
+    alleles = vec(alleles)
 
     #Calculate Expected Genotype numbers
     expected_genotype_freq = p * transpose(p) .* number_ind
     expected_genotype_freq = vec(expected_genotype_freq)
 
-    alleles = ["$i" for i in the_allele_dict |> keys |> collect]
-    alleles = (alleles .* ",") .* permutedims(alleles)
-    alleles = Array{String}.(sort.(split.(alleles, ",")))
-    alleles = [parse.(Int16, i) |> Tuple for i in alleles]
-    alleles = vec(alleles)
 
     expected = Dict()
     for (geno, freq) in zip(alleles, expected_genotype_freq)

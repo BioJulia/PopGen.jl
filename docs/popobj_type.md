@@ -25,7 +25,7 @@ The `samples` dataframe has 5 specific categories: name, population, ploidy, lat
 
 ### `samples.name` 
 
-`::Array{String,1}`
+`::Vector{String}`
 
 The individual/sample names
 
@@ -35,7 +35,7 @@ The individual/sample names
 
 ### `samples.population`
 
-`::Array{String,1}`
+`::Vector{String}`
 
 The individual/sample population ID's
 
@@ -45,7 +45,7 @@ The individual/sample population ID's
 
 ### `samples.ploidy`
 
-`::Array{Int8,1}`
+`::Vector{Int8}`
 
 The ploidy of the samples
 
@@ -55,7 +55,7 @@ The ploidy of the samples
 
 ### `samples.latitude`
 
-`::Array{Union{Int64,Float64},1}`
+`::Vector{Union{Missing,Float32}}`
 
 latitude data of samples (decimal degrees)
 
@@ -65,7 +65,7 @@ latitude data of samples (decimal degrees)
 
 ### `samples.longitude`
 
-`::Array{Union{Int64,Float64},1}`
+`::Vector{Union{Missing,Float64}}`
 
 longitude data of samples (decimal degrees)
 
@@ -81,7 +81,7 @@ The genotype information is stored in a separate dataframe called `loci`, where 
 
 `::Vector{Tuple{Int16,...}}`
 
-The genotypes of the `loci` are an array of tuples, with each value corresponding to an allele. The length of the tuple will vary based on the ploidy of the sample, therefor the `type` shown above is conceptually accurate, but computationally incorrect.
+The genotypes of the `loci` are an array of tuples, with each value corresponding to an allele. The length of the tuple will vary based on the ploidy of the sample, and the `type` will vary whether the markers are snps or microsatellites, therefor the `type` shown above is conceptually accurate, but computationally incorrect.
 
 ```
 [(0,1),(0,0),(1,2)]

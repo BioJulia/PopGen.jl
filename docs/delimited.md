@@ -1,14 +1,14 @@
-## Import a CSV/delimited file as a `PopObj`
+## Import a delimited file as a `PopObj`
 
 !!! warning "Windows users"
     make sure to change your backslashes "\" to forward slashes "/" 
     
 
 ```julia
-csv(infile; delim, digits = 3, marker = "snp")
+delimited(infile; delim, digits = 3, marker = "snp")
 
 # Example
-julia> a = csv("/data/cali_poppy.csv", digits = 2)
+julia> a = delimited("/data/cali_poppy.csv", digits = 2)
 ```
 
 ### Arguments
@@ -42,3 +42,7 @@ snbarb_03,coast,0,0,001001,001001,001002 \n
 snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
 snbarb_03,coast,11.15,0,001002,001001,001001 \n
 ```
+
+**Fun fact**
+
+You can also use the command `csv()` synonymously with `delimited()`. 
