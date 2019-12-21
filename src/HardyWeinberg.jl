@@ -92,7 +92,7 @@ a `PopObj`
 function het_population_exp(data::PopObj)
     # get population order and store in its own dict key
     popid = unique(data.samples.population |> collect)
-    fixed_popid = [replace(i, " " => "") for i in popid]
+    fixed_popid = [replace(i, " " => "_") for i in popid]
     d = Dict()
     d["pops_exp"] = fixed_popid
 
@@ -123,7 +123,7 @@ a `PopObj`
 function het_population_obs(data::PopObj)
     # get population order and store in its own dict key
     popid = unique(data.samples.population |> collect)
-    fixed_popid = [replace(i, " " => "") for i in popid]
+    fixed_popid = [replace(i, " " => "_") for i in popid]
     d = Dict()
     d["pops_obs"] = fixed_popid
 

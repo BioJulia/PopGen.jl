@@ -1,5 +1,5 @@
 """
-    Fstats(x::PopObj, mode::String = "global")
+    f_stats(x::PopObj, mode::String = "global")
 Returns a DataFrame of the F-statistics of a `PopObj`. See
 `FST` to perform pairwise FST comparisons between populations.
 
@@ -8,105 +8,55 @@ Returns a DataFrame of the F-statistics of a `PopObj`. See
 - `loci` : provides FIS, FIT, and FST for each locus
 - `sample` : provides FIS and FIT for each sample
 """
-function Fstats(x::PopObj, mode::String = "global")
-    hets = He(x, "pop")
-    H_t = het_expected(x) |> mean
-    H_s = map(i -> mean(i.het_exp), hets)
-    H_i = map(i -> mean(i.het_obs), hets)
+function f_stats(x::PopObj, mode::String = "global")
 
     if mode == "locus" || mode == "loci"
-        @info "F-statistics by Locus"
 
-        # FIT = (HT- HI)/HT
-        FIT = map(i -> (H_t - i) / H_t, het_observed(x))
-
-        # FIS = (HS - HI) / HS
-        HI = het_observed(x)
-        HS = map(i -> i.het_exp, hets)
-        FIS = []
-        for (i, j) in enumerate(HI)
-            locus = map(a -> a[i], HS)
-            fis = (locus .- j) ./ locus |> mean
-            push!(FIS, fis)
-        end
-        FIS = round.(FIS, digits = 4) |> Array{Float64,1}
-
-        # FST = (HT- HS) / HT
-        FST = []
-        for i = 1:length(loci(x))
-            locus = map(c -> c[i], HS)
-            fst = (H_t .- locus) ./ H_t |> mean
-            push!(FST, fst)
-        end
-        FST = round.(FST, digits = 4) |> Array{Float64,1}
-
-        return DataFrame(
-            locus = loci(x),
-            FIS = FIS,
-            FIT = round.(FIT, digits = 4),
-            FST = FST,
-        )
+        fst_locus(x)
 
     elseif mode == "sample" || mode == "ind" || mode == "individual"
-        H_i_sample = het_sample(x)
-        @info "F-statistics by Sample"
-        # split sample heterozygosities into their own GroupedDataFrames
-        insertcols!(H_i_sample, 2, :population => x.samples.population)
-        H_i_sample_pop = groupby(H_i_sample[!, :], :population)
 
-        FIS = []
-        for (i, j) in enumerate(H_i_sample_pop)
-            # FIS = (HS - HI) / HS
-            tmp = map(k -> (H_s[i] - k) / H_s[i], j.het)
-            append!(FIS, tmp)
-        end
-
-        FIS = round.(FIS, digits = 4) |> Array{Float64,1}
-
-        # FIT = (HT- HI)/HT
-        FIT = map(i -> (H_t - i) / H_t, H_i_sample.het)
-
-        return DataFrame(
-            name = samples(x),
-            FIS = FIS,
-            FIT = round.(FIT, digits = 4),
-        )
+        fst_sample(x)
 
     elseif mode == "global"
-        H_i_sample = het_sample(x)
-        @info "Global F-statistics"
 
-        # FIS = (HS - HI) / HS
-        FIS = (H_s .- H_i) ./ H_s |> mean
+        fst_global(x)
 
-        # FIT = (HT- HI)/HT
-        FIT = map(i -> (H_t - i) / H_t, H_i_sample.het) |> mean
-
-        # FST = (HT- HS) / HT
-        FST = map(i -> (H_t - i) / H_t, H_s) |> mean
-
-        return DataFrame(
-            FIS = round.(FIS, digits = 4),
-            FIT = round.(FIT, digits = 4),
-            FST = round.(FST, digits = 4),
-        )
     else
         error("please specify \"global\", \"loci\", or \"sample\" as the second argument")
     end
 end
 
-function fst_global(data:: PopObj)
-    H_i_sample = het_sample(data)
+
+"""
+    fst_global(data:: PopObj)
+Calculates the three common F-statistics, FIS, FIT, and FST on a PopObj.
+"""
+function fst_global(data::PopObj)
+
+    ## H_i = (Hobs1*N1 + Hobs2*N2 + etc..) / Ntotal
+    popcounts = populations(data).count
+    pop_hets = het(data, "pop")
+    obs = map(i -> mean(i.het_obs), pop_hets) |> collect
+    exp = map(i -> mean(i.het_exp), pop_hets) |> collect
+    H_i = sum(obs .* popcounts) / sum(popcounts)
+
+    ## H_s = (Hexp1*N1 + Hexp2*N2 + etc..) / Ntotal
+    H_s = sum(exp .* popcounts) / sum(popcounts)
+
+    ## H_t = 1 - ∑(p²+q²)     (expected Het)
+    H_t = mean(het(data).het_exp)
+
     @info "Global F-statistics"
 
     # FIS = (HS - HI) / HS
-    FIS = (H_s .- H_i) ./ H_s |> mean
+    FIS = (H_s - H_i) / H_s
 
     # FIT = (HT- HI)/HT
-    FIT = map(i -> (H_t - i) / H_t, H_i_sample.het) |> mean
+    FIT = (H_t - H_i) / H_t
 
     # FST = (HT- HS) / HT
-    FST = map(i -> (H_t - i) / H_t, H_s) |> mean
+    FST = (H_t - H_s) / H_t
 
     return DataFrame(
         FIS = round.(FIS, digits = 4),
@@ -116,8 +66,69 @@ function fst_global(data:: PopObj)
 end
 
 
+function fst_locus(data::PopObj)
+    hets = He(data, "pop")
+    H_t = het_expected(data) |> mean
+    H_s = map(i -> mean(i.het_exp), hets)
+    H_i = map(i -> mean(i.het_obs), hets)
 
-#======= FST_alpha =======#
-hets = He(x, "pop")
-H_s = map(i -> mean(i.het_exp), hets)
-#H_i = map(i -> mean(i.het_obs), hets)
+    @info "F-statistics by Locus"
+
+    # FIT = (HT- HI)/HT
+    FIT = map(i -> (H_t - i) / H_t, het_observed(data))
+
+    # FIS = (HS - HI) / HS
+    HI = het_observed(data)
+    HS = map(i -> i.het_exp, hets)
+    FIS = []
+    for (i, j) in enumerate(HI)
+        locus = map(a -> a[i], HS)
+        fis = (locus .- j) ./ locus |> mean
+        push!(FIS, fis)
+    end
+    FIS = round.(FIS, digits = 4) |> Array{Float64,1}
+
+    # FST = (HT- HS) / HT
+    FST = []
+    for i = 1:length(loci(data))
+        locus = map(c -> c[i], HS)
+        fst = (H_t .- locus) ./ H_t |> mean
+        push!(FST, fst)
+    end
+    FST = round.(FST, digits = 4) |> Array{Float64,1}
+
+    return DataFrame(
+        locus = loci(x),
+        FIS = FIS,
+        FIT = round.(FIT, digits = 4),
+        FST = FST,
+    )
+end
+
+
+function fst_sample(data::PopObj)
+    H_i_sample = het_sample(x)
+    @info "F-statistics by Sample"
+    # split sample heterozygosities into their own GroupedDataFrames
+    insertcols!(H_i_sample, 2, :population => x.samples.population)
+    H_i_sample_pop = groupby(H_i_sample[!, :], :population)
+
+    FIS = []
+    for (i, j) in enumerate(H_i_sample_pop)
+        # FIS = (HS - HI) / HS
+        tmp = map(k -> (H_s[i] - k) / H_s[i], j.het)
+        append!(FIS, tmp)
+    end
+
+    FIS = round.(FIS, digits = 4) |> Array{Float64,1}
+
+    # FIT = (HT- HI)/HT
+    # H_t =
+    FIT = map(i -> (H_t - i) / H_t, H_i_sample.het)
+
+    return DataFrame(
+        name = samples(x),
+        FIS = FIS,
+        FIT = round.(FIT, digits = 4),
+    )
+end

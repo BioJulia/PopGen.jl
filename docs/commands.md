@@ -691,7 +691,8 @@ Example:
 ```julia
 julia> plot_missing(sharks)
 ```
-![missing_plot](img/missing_plot.png)
+![](img/missing_plot.png)
+
 
 !!! info "saving interactive plots"
     To save the interactive plots, you can use the `savehtml` function from the `PlotlyJS.jl` package:
