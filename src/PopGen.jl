@@ -16,7 +16,8 @@ using DataFrames,
       LinearAlgebra,
       Convex,
       ECOS,
-      ProgressMeter
+      ProgressMeter,
+      Random
 
 
 export PopObj,
