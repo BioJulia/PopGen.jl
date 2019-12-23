@@ -279,6 +279,7 @@ Currently implemented are Milligan 2002 Dyadic Maximum Likelihood relatedness es
 
 """
 function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
+    unique(data.samples.ploidy) != [2] && error("Relatedness analyses currently only support diploid samples")
     allele_frequencies = Dict()
     for locus in names(data.loci)
         allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
