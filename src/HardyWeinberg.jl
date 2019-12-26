@@ -52,9 +52,8 @@ function het_expected(data::PopObj)
     het_vals = Vector{Float64}()
     @inbounds for locus in eachcol(data.loci, false)
         # get allele freqs at locus and isolate the freqs
-        a = allele_freq(locus) |> values |> collect
-        hom = a .^ 2 |> sum
-        het = 1 - hom
+        a = allele_freq(locus)
+        het = 1 - (values(a) .^ 2 |> sum)
         push!(het_vals, het)  # push the sum of hetz to the output array
     end
     return het_vals
@@ -102,9 +101,8 @@ function het_population_exp(data::PopObj)
     for pop in y_subdf
         pop_het_vals = Vector{Union{Missing, Float64}}()
         for locus in eachcol(pop[!, :2:end], false)
-            a = allele_freq(locus) |> values |> collect # isolate the freqs
-            hom = a .^ 2 |> sum
-            het = 1 - hom
+            a = allele_freq(locus)
+            het = 1 - (values(a) .^ 2 |> sum)
             push!(pop_het_vals, het)  # push the sum of hetz to the output array
         end
 
@@ -479,4 +477,30 @@ function multitest_missing(pvals::Array{<:Union{Missing, <:AbstractFloat},1}, co
         insert!(correct, i, missing)
     end
     return correct
+end
+
+
+## JASON LOOK AT ME PLEEEEEASE
+
+function het_obstest(data::PopObj)
+    het_vals = Vector{Float64}()
+    for locus in eachcol(data.loci, false)
+        # get genotype freqs at locus
+        a = geno_freq(locus)
+        tmp = 0
+        # total number of non-missing samples per locus
+        n = skipmissing(locus) |> collect |> length
+        genos = keys(a) |> collect
+        for geno in genos
+            if length(unique(geno)) != 1
+                # if true, add freq to total in tmp
+                tmp += a[geno]
+            end
+        end
+        # include het correction
+        het_adjust = tmp * (n/ (n-1))
+        push!(het_vals, het_adjust)
+    end
+
+    return het_vals
 end

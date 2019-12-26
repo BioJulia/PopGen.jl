@@ -29,10 +29,12 @@ end
 
 
 """
-    fst_global(data:: PopObj)
-Calculates the three common F-statistics, FIS, FIT, and FST on a PopObj.
+    fst_global(data::PopObj, round::Bool = true)
+Calculates the three common F-statistics Fᵢₛ, Fᵢₜ, and Fₛₜ on a PopObj, adjusted for
+different sample sizes in populations. If `round` is `true` (default), the results are
+rounded to 4 decimal places, otherwise `false` returns the entire values as calculated.
 """
-function fst_global(data::PopObj)
+function fst_global(data::PopObj, round::Bool = true)
 
     ## H_i = (Hobs1*N1 + Hobs2*N2 + etc..) / Ntotal
     popcounts = populations(data).count
@@ -41,8 +43,10 @@ function fst_global(data::PopObj)
     exp = map(i -> mean(i.het_exp), pop_hets) |> collect
     H_i = sum(obs .* popcounts) / sum(popcounts)
 
+    ## n/n-1 correction
+    correction = sum(popcounts) / (sum(popcounts) - 1)
     ## H_s = (Hexp1*N1 + Hexp2*N2 + etc..) / Ntotal
-    H_s = sum(exp .* popcounts) / sum(popcounts)
+    H_s = (sum(exp .* popcounts) / sum(popcounts)) * correction
 
     ## H_t = 1 - ∑(p²+q²)     (expected Het)
     H_t = mean(het(data).het_exp)
@@ -58,11 +62,19 @@ function fst_global(data::PopObj)
     # FST = (HT- HS) / HT
     FST = (H_t - H_s) / H_t
 
-    return DataFrame(
-        FIS = round.(FIS, digits = 4),
-        FIT = round.(FIT, digits = 4),
-        FST = round.(FST, digits = 4),
-    )
+    if round == false
+        return DataFrame(
+            FIS = FIS,
+            FIT = FIT,
+            FST = FST
+        )
+    else
+        return DataFrame(
+            FIS = Base.round.(FIS, digits = 4),
+            FIT = Base.round.(FIT, digits = 4),
+            FST = Base.round.(FST, digits = 4),
+        )
+    end
 end
 
 
@@ -135,7 +147,8 @@ end
 
 """
     f_stat_p(data::PopObj, nperm::Int64)
-Performs a permutation test (permuting individuals among populations) to calculate p-values for f-statistics
+Performs a permutation test (permuting individuals among populations) to calculate
+p-values for F-statistics
 """
 function f_stat_p(data::PopObj, nperm::Int64 = 1000)
     tmp = deepcopy(data)

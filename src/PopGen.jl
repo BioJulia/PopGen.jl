@@ -16,8 +16,8 @@ using Convex,
       MultipleTesting,
       PlotlyJS,
       ProgressMeter,
-      Random
-      Statistics,
+      Random,
+      StatsBase
 
 
 export PopObj,
@@ -32,6 +32,7 @@ export PopObj,
     isolate_genotypes,
     locations, locations!,
     population, populations, population!, populations!,
+    relatedness, pairwise_relatedness, kinship,
     remove_inds!,
     remove_loci!,
     missing,

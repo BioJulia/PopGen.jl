@@ -267,16 +267,17 @@ end
 
 
 """
-    pairwise_relatedness(data::PopObj, method::String, inbreeding::Bool = true, verbose::Bool = true)
+    pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
 Calculates various pairwise relatedness measures between all pairs of individuals based on the entire sample population
 allele frequency
 
-If verbose is set to false then there is a progress bar. If set to true then there is estimator specific feedback and statements when an individual has been compared to all other pairs
+If verbose is set to false then there is a progress bar. If set to true then there is
+estimator specific feedback and statements when an individual has been compared to all other pairs
 
 If the method is able to account for inbreeding in it's calculation then that option may be used
 
-Currently implemented are Milligan 2002 Dyadic Maximum Likelihood relatedness estimator and Queller & Goodnight 1989
-
+Available methods:
+- `"qg"` : Queller & Goodnight 1989  (diploid only)
 """
 function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
     unique(data.samples.ploidy) != [2] && error("Relatedness analyses currently only support diploid samples")
@@ -323,6 +324,11 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
 
     return output
 end
+
+const relatedness = pairwise_relatedness
+const kinship = pairwise_relatedness
+
+# - `"dyadml"` : Milligan 2002 Dyadic Maximum Likelihood relatedness estimator
 
 #=
 cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
