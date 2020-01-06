@@ -90,7 +90,7 @@ vector of heterozygosity values.
 function het_observed(data::PopObj)
     ploidy = unique(data.samples.ploidy)
     # faster and cheaper matrix-to-matrix comparison
-    if ploidy == [2]
+    if all(data.samples.ploidy .== 2) == true
         allele_1 = allele_matrix(data.loci, 1)
         allele_2 = allele_matrix(data.loci, 2)
         het_matrix = allele_1 .!= allele_2
@@ -164,9 +164,8 @@ function het_population_obs(data::PopObj)
     insertcols!(y, 1, :population => data.samples.population)
     y_subdf = groupby(y[!, :], :population)
 
-    ploidy = unique(data.samples.ploidy)
     # faster and cheaper diploid version
-    if ploidy == [2]
+    if all(data.samples.ploidy .== 2) == true
         for pop in y_subdf
             ploidy = unique(data.samples.ploidy)
             allele_1 = allele_matrix(select(pop, Not(:population)), 1)
@@ -295,7 +294,11 @@ correction method for multiple testing.
 """
 function hwe_test(data::PopObj; by_pop::Bool = false, correction::String = "none")
     if !by_pop
-        output = [Vector{Union{Missing,Float64}}(), Vector{Union{Missing,Int32}}(), Vector{Union{Missing,Float64}}()]
+        output = [
+            Vector{Union{Missing,Float64}}(),
+            Vector{Union{Missing,Int32}}(),
+            Vector{Union{Missing,Float64}}()
+            ]
         for locus in eachcol(data.loci, false)
             chisq, df, pval = locus_chi_sq(locus)
             push!.(output, [chisq, df, pval])

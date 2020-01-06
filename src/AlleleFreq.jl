@@ -115,7 +115,7 @@ genotypes and their frequencies.
 function geno_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
     d = Dict()
     # conditional testing if all genos are missing
-    ismissing.(locus) |> unique == [true] && return missing
+    all(ismissing.(locus)) == true && return missing
     for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
@@ -133,7 +133,7 @@ samples. Returns a `Dict` of genotypes and their frequencies.
 function geno_freq(locus::Vector{<:Union{Missing, Tuple{Vararg}}})
     d = Dict()
     # conditional testing if all genos are missing
-    ismissing.(locus) |> unique == [true] && return missing
+    all(ismissing.(locus)) == true && return missing
     for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
@@ -151,7 +151,7 @@ by population using `group()`. Returns a `Dict` of genotypes and their frequenci
 function geno_freq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}}}) where N
     d = Dict()
     # conditional testing if all genos are missing
-    ismissing.(locus) |> unique == [true] && return missing
+    all(ismissing.(locus)) == true && return missing
     for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
@@ -170,7 +170,7 @@ genotypes and their frequencies.
 function geno_freq(locus::SubArray{<:Union{Missing, Tuple{Vararg}}})
     d = Dict()
     # conditional testing if all genos are missing
-    ismissing.(locus) |> unique == [true] && return missing
+    all(ismissing.(locus)) == true && return missing
     for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
