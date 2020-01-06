@@ -90,6 +90,23 @@ function allele_freq(locus::SubArray{<:Union{Missing,Tuple{Vararg}}})
     return d
 end
 
+
+"""
+    allele_matrix(data::PopObj, allele::Int)
+Convert a DataFrame of genotypes from a PopObj into a matrix of a single
+allele. Use `allele` to specify which allele you want isolated. Intended
+to be used to create separate allele matrices for comparing alleles 1 and
+2, such as assessing heterozygosity.
+"""
+function allele_matrix(data::T, allele::Int) where T <: DataFrame
+    geno_matrix = Matrix(data)
+    map(geno_matrix) do i
+        i === missing && return missing
+        i[allele]
+    end
+end
+
+
 """
     geno_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
 Calculate genotype frequencies of all loci in a `PopObj`. Returns a `Dict` of

@@ -1,15 +1,14 @@
 ## Import a delimited file as a `PopObj`
 
-!!! warning "Windows users"
-    make sure to change your backslashes "\" to forward slashes "/" 
-    
-
 ```julia
 delimited(infile; delim, digits = 3, marker = "snp")
 
 # Example
 julia> a = delimited("/data/cali_poppy.csv", digits = 2)
 ```
+
+??? warning "Windows users"
+    make sure to change your backslashes "\" to forward slashes "/" 
 
 ### Arguments
 
@@ -19,7 +18,8 @@ julia> a = delimited("/data/cali_poppy.csv", digits = 2)
 
 - `#!julia delim::Union{Char,String,Regex}` : delimiter of the file, can be a string, character, or regex
 
-**by default, it recognizes any of the basic three (comma, tab, space), so likely no input required**
+!!! info ""
+    by default, it recognizes any of the basic three delimiters (comma, tab, space), so likely no input will be required
 
 - `#!julia digits::Int64` : the number of digits used to denote an allele (default = 3)
 - `#!julila marker::String`  : "snp" (default) or "msat" for microsatellites

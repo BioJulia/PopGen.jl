@@ -331,16 +331,6 @@ julia> ncats.samples.longitude
  missing
  missing
  missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
  ⋮      
  missing
  missing
@@ -351,72 +341,42 @@ julia> ncats.samples.longitude
  missing
  missing
  missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
 ```
 
-!!! info "Seeing some location info"
+??? example "actually seeing some location info"
     The nancycats data has some weird coordinate system for information, so those data were omitted. If you want a proof of concept for `.longitude` and `.latitude`, load in `gulfsharks` and try it out. We'll use `hcat` (horizontal concatination) to horizontally bind the individual names, their latitude, and longitude. Later, you'll see that the `locations` command does this and a bit more.
     
 
-``` julia tab="load gulfsharks"
-julia> sharks = gulfsharks() ;    # semicolon just supresses printing output
+    ``` julia tab="load gulfsharks"
+    julia> sharks = gulfsharks() ;    # semicolon just supresses printing output
 
-julia> hcat(sharks.samples.name, sharks.samples.latitude, sharks.samples.longitude)
-```
+    julia> hcat(sharks.samples.name, sharks.samples.latitude, sharks.samples.longitude)
+    ```
 
-``` tab="output"
-212×3 Array{Any,2}:
-"cc_001"   28.3062  -80.5993
-"cc_002"   28.3079  -80.5995
-"cc_003"   28.3023  -80.5996
-"cc_005"   28.6123  -80.4225
-"cc_007"   27.8666  -80.3578
-"cc_008"   27.8666  -80.3579
-"cc_009"   27.8682  -80.3482
-"cc_010"   27.8711  -80.3482
-"cc_012"   28.4815  -80.4303
-"cc_013"   28.2421  -80.2494
-"cc_014"   28.2428  -80.2496
-"cc_015"   28.2378  -80.2496
-"cc_016"   28.2414  -80.2498
-"cc_017"   28.236   -80.2495
-"cc_018"   28.2364  -80.2494
-"cc_019"   28.3906  -80.4963
-"cc_020"   28.3902  -80.4968
-"cc_021"   28.3861  -80.4967
-"cc_022"   28.3869  -80.4966
-"cc_023"   28.3865  -80.496 
-⋮                           
-"seg_001"  29.8901  -87.7189
-"seg_003"  30.1943  -88.0007
-"seg_009"  30.0021  -88.0493
-"seg_010"  30.0069  -88.049 
-"seg_011"  29.8362  -88.1675
-"seg_012"  29.5057  -88.0546
-"seg_014"  30.1428  -88.2974
-"seg_015"  30.2074  -88.36  
-"seg_016"  30.1151  -88.3922
-"seg_018"  29.8362  -88.168 
-"seg_021"  29.9466  -86.0399
-"seg_023"  29.9969  -85.6494
-"seg_024"  29.6966  -87.4403
-"seg_025"  30.064   -86.5374
-"seg_026"  30.0696  -86.5376
-"seg_027"  29.9065  -86.0905
-"seg_028"  30.0532  -87.3661
-"seg_029"  30.0522  -87.3662
-"seg_030"  29.8234  -85.7143
-"seg_031"  29.8234  -85.7143
-```
+    ``` tab="output"
+    212×3 Array{Any,2}:
+    "cc_001"   28.3062  -80.5993
+    "cc_002"   28.3079  -80.5995
+    "cc_003"   28.3023  -80.5996
+    "cc_005"   28.6123  -80.4225
+    "cc_007"   27.8666  -80.3578
+    "cc_008"   27.8666  -80.3579
+    "cc_009"   27.8682  -80.3482
+    "cc_010"   27.8711  -80.3482
+    "cc_012"   28.4815  -80.4303
+    "cc_013"   28.2421  -80.2494
+    ⋮                           
+    "seg_021"  29.9466  -86.0399
+    "seg_023"  29.9969  -85.6494
+    "seg_024"  29.6966  -87.4403
+    "seg_025"  30.064   -86.5374
+    "seg_026"  30.0696  -86.5376
+    "seg_027"  29.9065  -86.0905
+    "seg_028"  30.0532  -87.3661
+    "seg_029"  30.0522  -87.3662
+    "seg_030"  29.8234  -85.7143
+    "seg_031"  29.8234  -85.7143
+    ```
 
 ## loci
 
@@ -700,7 +660,7 @@ julia> unique(ncats.samples.population)
  "17"
 ```
 
-!!! info "Pipes"
+??? tip "Pipes"
     Julia has native piping (much like BASH) which uses the syntax `|>` (pipe + greater-than). With a pipe, `unique(ncats.samples.population)` can also be rewritten as `ncats.samples.population |> unique` for the same result. It's often a matter of preference for which you consider more readable. Use the `Pipe` package for even more robust piping where you can specify which argument the pipe relates to!
 
 ## 🛑❌ What to avoid! ❌🛑

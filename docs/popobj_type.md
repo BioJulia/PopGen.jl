@@ -7,7 +7,7 @@ struct PopObj
 end
 ```
 
-!!! info "pronouncing "PopObj" "
+??? info "pronouncing "PopObj" "
     If you haven't already guessed, `PopObj` is a combination of the words PopGen and Object. PopObj is pronounced "pop ob" with a silent j because it rolls of the tongue better, but writing it as PopOb looks weird. 
     
 
@@ -87,7 +87,7 @@ The genotypes of the `loci` are an array of tuples, with each value correspondin
 [(0,1),(0,0),(1,2)]
 ```
 
-!!! important
+!!! important ""
     We use the tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using `PopGen.jl`, your data should already be filtered and screened. Hand-editing of genotype values is **strongly** discouraged, so we outlawed it outright.
 
 ## viewing a PopObj

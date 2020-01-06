@@ -6,14 +6,16 @@ copyright: 2019 Pavel Dimens and Jason Selwyn
 theme:
   name: 'material'
   logo: img/logo_icon.png
-  favicon : 'img/favicon.ico'
+  favicon: 'img/favicon.ico'
   palette:
     primary: green
     secondary: blue
-
 repo_url: https://github.com/pdimens/PopGen.jl
 repo_name: PopGen.jl
-
+extra_javascript:
+  - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'
+  - 'https://cdn.plot.ly/plotly-latest.min.js'
+  
 nav:
 - Home: index.md
 - Getting started: 
@@ -51,6 +53,7 @@ markdown_extensions:
   - pymdownx.critic
   - pymdownx.details
   - pymdownx.emoji:
+      emoji_index: !!python/name:pymdownx.emoji.twemoji
       emoji_generator: !!python/name:pymdownx.emoji.to_svg
   - pymdownx.inlinehilite
   - pymdownx.magiclink

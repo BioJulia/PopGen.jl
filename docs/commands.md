@@ -118,7 +118,7 @@ julia> summary(sharks)
 │ 7   │ Southeast Gulf │ 20    │
 ```
 
-!!! info "sample not found!"
+??? question "sample not found!"
     If removing a single sample and it is not found in the PopObj, an error will be returned. However, if removing multiple samples, you will receive a notice above the PopObj summary indicating which individuals were not found, while removing the ones that were.
 
 ## Population ID's
@@ -171,7 +171,7 @@ julia> populations(sharks, listall=true)
 │ 209 │ seg_031 │ Southeast Gulf │
 ```
 
-!!! note "synonymous functions"
+??? tip "synonymous functions"
     You can use the command `population` for the same functionality. We made the commands `population` and `populations` synonymous so you wouldn't have to memorize if the name was singular or plural-- it just works! This also applies to `populations!` and `population!`
 
 ### rename populations
@@ -255,8 +255,6 @@ julia> populations!(sharks, replace = (counts = counts, names = popnames))   # N
 │ 206 │ seg_028 │ Southeast Gulf │
 │ 207 │ seg_029 │ Southeast Gulf │
 ```
-
-
 
 
 ## Display Specific Loci and/or Samples
@@ -504,7 +502,7 @@ NOTICE: locus "contig_35208" not found
 │ 7   │ Southeast Gulf │ 20    │
 ```
 
-!!! info "locus not found!"
+??? question "locus not found!"
     If removing a single locus and it is not found in the PopObj, an error will be returned. However, if removing multiple loci, you will receive a notice above the PopObj summary indicating which loci were not found, while removing the ones that were. If none of the loci specified were found, it will return an error.
 
 ## Missing Data
@@ -661,14 +659,13 @@ julia> df2
 │ 2213 │ contig_2784  │ 7        │
 ```
 
-!!! info "a simple example"
-    If this still looks weird to you, here is a simple example to help wrap your mind around it.
+??? example "a simple example"
+    If this still looks weird to you, here is a simple example to help wrap your mind around it:
     ``` julia 
     a,b,c,d = (1,2,3,[4,5,6,7])
     ```
-​    where 
-​    
-
+    where 
+    ```
     a = 1
     
     b = 2
@@ -676,7 +673,7 @@ julia> df2
     c = 3
     
     d = [4, 5, 6, 7]
-    
+    ```
     embrace the convenience!
 
 ### plot missing data
@@ -694,7 +691,7 @@ julia> plot_missing(sharks)
 ![](img/missing_plot.png)
 
 
-!!! info "saving interactive plots"
+??? info "saving interactive plots"
     To save the interactive plots, you can use the `savehtml` function from the `PlotlyJS.jl` package:
     ```julia 
     PlotlyJS.savehtml(plot, "filename.html")

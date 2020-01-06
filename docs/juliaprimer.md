@@ -144,7 +144,7 @@ The functions within `PopGen` are almost always explicitly typed, so if you are 
 
 Sometimes you might include an argument with a keyword when there isn't one, or include an argument without a keyword when there needs to be one (honestly, we make that mistake too and we *wrote* this stuff). To help minimize those mistakes, please read below about which arguments have keywords and which don't.
 
-!!! Note "keep in mind"
+!!! question ""
     MethodError's can definitely get annoying, but they are usually the result of incorrect input from the user and not buggy programming by the developers. Please double-check your inputs before assuming something is broken or bugged.
 
 
@@ -153,7 +153,7 @@ Sometimes you might include an argument with a keyword when there isn't one, or 
 
 Let's talk about semicolons some more.
 
-!!! info "TL;DR"
+??? info "TL;DR"
     Reading these docs, pay attention to semicolons in the function argument lists.
     
 

@@ -24,7 +24,7 @@ library(microbenchmark)
 using BenchmarkTools, PopGen
 ```
 
-As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux system on a nothing-specia lLenovo Thinkbook 14S  with 8gigs of RAM and a 8th gen Intel i5 mobile processor. **Note:** all of the Julia benchmarks, unless explicitly stated, are performed single-threaded (i.e. not parallel, distributed, or GPU). 
+As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux system on a nothing-special Lenovo Thinkbook 14S  with 8gigs of RAM and a 8th gen Intel i5 mobile processor. **Note:** all of the Julia benchmarks, unless explicitly stated, are performed single-threaded (i.e. not parallel, distributed, or GPU). 
 
 
 
@@ -86,7 +86,7 @@ This is a classic population genetics test and a relatively simple one.
 
 ```julia tab="Julia"
 julia> @btime hwe_test(x, correction = "bh") ;
-  494.021 ms (2621469 allocations: 80.32 MiB)
+  392.527 ms (1599668 allocations: 57.20 MiB)
 ```
 
 The R benchmark will take a while again, so if you're following along, this would be a good time to reconnect with an old friend.
@@ -98,7 +98,7 @@ Unit: seconds
  hw.test(gen, B = 0) 5.100298 5.564807 6.265948 5.878842 6.917006 8.815179   100
 ```
 
-Comparing averages, PopGen.jl clocks in at `494ms` versus adegenet's `6.3s`, so ~12x faster.
+Comparing averages, PopGen.jl clocks in at ~`400ms` versus adegenet's `6.3s`, so ~15x faster.
 
 Julia  :rocket:  |   R  :snail:
 

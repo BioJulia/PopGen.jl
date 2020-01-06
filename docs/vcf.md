@@ -12,7 +12,8 @@ and similar for `bcf` formatted files:
 cabbage = bcf("/home/data/nappa_cabbage.bcf")
 ```
 
-
+??? warning "Windows users"
+    make sure to change your backslashes "\" to forward slashes "/" 
 
 ## What BCF/VCF files lack
 
@@ -36,7 +37,7 @@ This means you will need to add that information separately afterwards. Location
 
 Variant Call Format (or *VCF*) files already follow a format standard, and while there is some wiggle-room for optional values, PopGen.jl only requires the core/mandatory components of a VCF, meaning problems should hopefully not arise regardless of which variant caller you are using (although we use `Freebayes` ourselves). Please open an issue if they do, or reach out to us on the community Slack.
 
-!!! failure "filter VCF files beforehand"
+!!! failure ""
     Keep in mind, BCF/VCF files need to be filtered **before** importing them into PopGen.jl. There is no and will be no VCF-filtering functionality to this package, as it is outside of the purpose of PopGen.jl. Refer to `vcftools` and `vcflib` to filter your sequence data. 
 
 
