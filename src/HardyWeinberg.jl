@@ -60,28 +60,6 @@ function het_expected(data::PopObj)
 end
 
 
-
-"""
-    het_observed(data::PopObj)
-Calculate the observed heterozygosity for each locus in a `PopObj`. Returns an
-array of heterozygosity values.
-"""
-function het_observed(data::PopObj)
-    het_vals = Vector{Float64}()
-    for locus in eachcol(data.loci, false)
-        a = geno_freq(locus)  # get genotype freqs at locus
-        tmp = 0
-        genos = keys(a) |> collect
-        for geno in genos
-            if length(unique(geno)) != 1
-                tmp += a[geno]     # if true, add freq to total in tmp
-            end
-        end
-        push!(het_vals, tmp)
-    end
-    return het_vals
-end
-
 """
     het_observed(data::PopObj)
 Calculate the observed heterozygosity for each locus in a `PopObj`. Returns a
@@ -113,7 +91,6 @@ function het_observed(data::PopObj)
         return het_vals
     end
 end
-
 
 
 """
@@ -227,12 +204,13 @@ function het_sample(data::PopObj)
             mean(i |> skipmissing)
         end
     else
-    # psuedo-transpose to format genotypes as vectors per individual
-    by_ind = map(i -> get_sample_genotypes(data, i), samples(data))
+        # psuedo-transpose to format genotypes as vectors per individual
+        by_ind = map(i -> get_sample_genotypes(data, i), samples(data))
 
-    # calculate observed heterozygosity like for loci
-    map(het_sample, by_ind)
+        # calculate observed heterozygosity like for loci
+        map(het_sample, by_ind)
 end
+
 
 """
     het_sample(individual::Vector{<:Union{Missing, Tuple{Vararg}}}))
