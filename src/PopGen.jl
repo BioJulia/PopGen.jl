@@ -14,10 +14,10 @@ using Convex,
       GeneticVariation,
       LinearAlgebra,
       MultipleTesting,
-      PlotlyJS,
       ProgressMeter,
       Random,
       StatsBase
+      #PlotlyJS     REMOVE IN FAVOR OF PLOTRECIPES FOR Plots.jl
 
 
 export PopObj,

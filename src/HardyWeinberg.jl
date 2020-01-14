@@ -1,6 +1,6 @@
 
 """
-    heterozygosity(x::PopObj, mode = "locus")
+    heterozygosity(data::PopObj, mode = "locus")
 Calculate observed and expected heterozygosity in a `PopObj`
 ## Example
 heterozygosity(nancycats(), "population" )
@@ -44,7 +44,7 @@ const He = heterozygosity
 
 
 """
-    het_expected(x::PopObj)
+    het_expected(data::PopObj)
 Calculate the expected heterozygosity for each locus in a `PopObj`. Returns an
 array of heterozygosity values.
 """
@@ -62,7 +62,7 @@ end
 
 
 """
-    het_observed(x::PopObj)
+    het_observed(data::PopObj)
 Calculate the observed heterozygosity for each locus in a `PopObj`. Returns an
 array of heterozygosity values.
 """
@@ -267,7 +267,7 @@ end
 
 
 """
-    hwe_test(x::PopObj; by_pop::Bool = false; correction = "none")
+    hwe_test(data::PopObj; by_pop::Bool = false; correction = "none")
 Calculate chi-squared test of HWE for each locus and returns observed and
 expected heterozygosity with chi-squared, degrees of freedom and p-values for
 each locus. Use `by_pop = true` to perform this separately for each population

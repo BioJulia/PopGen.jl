@@ -280,7 +280,9 @@ Available methods:
 - `"qg"` : Queller & Goodnight 1989  (diploid only)
 """
 function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
-    unique(data.samples.ploidy) != [2] && error("Relatedness analyses currently only support diploid samples")
+    # check that dataset is entirely diploid
+    all(data.samples.ploidy == 2) == false && error("Relatedness analyses currently only support diploid samples")
+
     allele_frequencies = Dict()
     for locus in names(data.loci)
         allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
