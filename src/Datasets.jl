@@ -470,5 +470,5 @@ function gulfsharks()
         replace!(data.samples.population, eachkey => renames[eachkey])
     end
 
-    return x
+    return data
 end
