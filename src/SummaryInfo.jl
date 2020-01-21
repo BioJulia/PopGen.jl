@@ -53,15 +53,15 @@ function Base.summary(data::PopObj)
     println("\n Number of individuals: ", length(data.samples.name))
     println(" Number of loci: ", size(data.loci,2))
     if ismissing.(data.samples.longitude) |> all == true
-        printstyled("\n Longitude: absent", color = :yellow)
+        print(" Longitude:") ; printstyled(" absent\n", color = :yellow)
     else
         println(" Longitude: present with ", count(i -> i === missing, data.samples.longitude), " missing")
     end
     if ismissing.(data.samples.longitude) |> all == true
-        printstyled("\n Latitude: absent", color = :yellow)
+        print(" Latitude:") ; printstyled(" absent\n", color = :yellow)
     else
         println(" Latitude: present with ", count(i -> i === missing, data.samples.latitude), " missing")
     end
-    print("\n\n Population names and counts:")
+    print("\n Population names and counts:")
     DataFrames.show(populations(data), summary = false, rowlabel = :num, allrows = true)
 end

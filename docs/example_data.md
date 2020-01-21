@@ -20,8 +20,7 @@ julia> ncats = nancycats() ; summary(ncats)
  Latitude: absent
 
  Population names and counts:
-17×2 DataFrame
-│ Row │ population │ count │
+│ num │ population │ count │
 │     │ Union…     │ Int64 │
 ├─────┼────────────┼───────┤
 │ 1   │ P01        │ 10    │
@@ -64,8 +63,7 @@ julia> sharks = gulfsharks() ; summary(sharks)
  Latitude: present with 0 missing
 
  Population names and counts:
-7×2 DataFrame
-│ Row │ population     │ count │
+│ num │ population     │ count │
 │     │ Union…         │ Int64 │
 ├─────┼────────────────┼───────┤
 │ 1   │ Cape Canaveral │ 21    │
