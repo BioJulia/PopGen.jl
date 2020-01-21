@@ -1,4 +1,3 @@
-
 """
     heterozygosity(data::PopObj, mode = "locus")
 Calculate observed and expected heterozygosity in a `PopObj`
@@ -66,7 +65,6 @@ Calculate the observed heterozygosity for each locus in a `PopObj`. Returns a
 vector of heterozygosity values.
 """
 function het_observed(data::PopObj)
-    ploidy = unique(data.samples.ploidy)
     # faster and cheaper matrix-to-matrix comparison
     if all(data.samples.ploidy .== 2) == true
         allele_1 = allele_matrix(data.loci, 1)

@@ -171,7 +171,7 @@ Assign population names to a `PopObj`. There are two modes of operation:
 
 ## Rename
 
-Rename existing population ID's of `PopObj.population` using a `Dict` of `[population] => replacement`
+Rename existing population ID's of `PopObj.samples.population` using a `Dict` of `[population] => replacement`
 
 Example:
 
@@ -181,29 +181,29 @@ Example:
 
 ## Replace (overwrite)
 Completely replace the population names of a `PopObj` regardless of what they currently are.
-Will generate an array of population names from a tuple of (counts, names) where `counts` is
-an array of the number of samples per population and `names` is an array of the names of the
-populations. Can also use a named tuple.
+Will generate an array of population names from a tuple of (names, counts) where `names` is
+an array of the names of the populations and `counts` is an array of the number of samples
+per population. Can also use a named tuple with the keys `names` and `counts`.
 
-Example assigning names for three populations in a `PopObj` named "Starlings":
-Assuming population sizes are 15, 32, 11 and we want to name them "North", "South", "East"
+Example assigning names for three populations in a `PopObj` named "Starlings" assuming
+population names are "North", "South", "East" and their sizes are 15, 32, 11:
 
-`populations!(Starlings, replace = ([15,32,11], ["North","South", "East"])`
-`populations!(Starlings, replace = (counts = [15,32,11], names = ["North","South", "East"])`
+`populations!(Starlings, replace = (["North","South", "East"], [15,32,11]))`
+`populations!(Starlings, replace = (counts = [15,32,11], names = ["North","South", "East"]))`
 """
-function populations!(data::PopObj; rename::Dict=Dict(), replace::Union{Tuple,NamedTuple}=(0,0))
-    if length(keys(rename)) != 0
+function populations!(data::PopObj; rename::Union{Nothing, Dict} = nothing, replace::Union{Nothing, Tuple, NamedTuple} = nothing)
+    if rename != nothing
         for eachkey in keys(rename)
             eachkey ∉ data.samples.population && @warn "$eachkey not found in PopObj"
             replace!(data.samples.population, eachkey => rename[eachkey])
         end
         @info "renaming populations"
         return populations(data,listall = true)
-    elseif replace != (0,0)
+    elseif replace != nothing
         if typeof(replace) <: NamedTuple
             popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
         else typeof(replace) <: Tuple
-            popid_array = [fill(i, j) for (i,j) in zip(replace[2], replace[1])]
+            popid_array = [fill(i, j) for (i,j) in zip(replace[1], replace[2])]
         end
         flat_popid = Iterators.flatten(popid_array) |> collect
         length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
