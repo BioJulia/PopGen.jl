@@ -9,6 +9,7 @@ Have questions, want to talk population genetics, or have ideas? Join the PopGen
       team_id:'popgenjl'
    })
   };
+
   (function(d, s, id){
     var js, fjs = d.getElementsByTagName(s)[0];
     if (d.getElementById(id)) {return;}
