@@ -233,7 +233,7 @@ popnames = ["Cape Canaveral", "Georgia", "S Carolina", "FL Keys", "Mideast Gulf"
 And now we can combine them with `populations!` to restore the population names to how they were originally:
 
 ```julia tab="replace populations"
-julia> populations!(sharks, replace = (counts, popnames))  # Tuple
+julia> populations!(sharks, replace = (popnames, counts))  # Tuple
 
 julia> populations!(sharks, replace = (counts = counts, names = popnames))   # NamedTuple
 ```

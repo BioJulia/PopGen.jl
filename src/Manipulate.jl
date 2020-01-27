@@ -114,6 +114,7 @@ function Base.missing(data::PopObj)
     ind_geno = map(i -> get_sample_genotypes(data, i), data.samples.name)
     count_miss_ind = map(ind_geno) do ind
         count(i -> i === missing, ind)
+        # sum(ismissing.(ind))
     end
 
     # which loci are missing per sample
@@ -125,6 +126,7 @@ function Base.missing(data::PopObj)
     # missing per locus
     miss_per_loci = map(eachcol(data.loci)) do col
         count(i->i===missing, col)
+        # sum(ismissing.(col))
     end
 
     # create DataFrames of the two
@@ -166,16 +168,21 @@ function populations(data::PopObj; listall::Bool = false)
 end
 
 """
-    populations!(data::PopObj; rename::Dict, replace::Union{Tuple, NamedTuple})
+    populations!(data::PopObj; rename::Union{Dict, Vector}, replace::Union{Tuple, NamedTuple})
 Assign population names to a `PopObj`. There are two modes of operation:
 
 ## Rename
 
-Rename existing population ID's of `PopObj.samples.population` using a `Dict` of `[population] => replacement`
+Rename existing population ID's of `PopObj.samples.population` using either:
+- `Dict` of `[population] => replacement`
+    - `potatopops = Dict("1" => "Idaho", "2" => "Russet")``
 
-Example:
+or
 
-`potatopops = Dict(1 => "Idaho", 2 => "Russet")`
+- `Vector` of new population names in the order that they appear in the PopObj
+    - `potatopops = ["Idaho", "Russet"]`
+
+### Example:
 
 `populations!(potatoes, rename = potatopops)`
 
@@ -189,9 +196,10 @@ Example assigning names for three populations in a `PopObj` named "Starlings" as
 population names are "North", "South", "East" and their sizes are 15, 32, 11:
 
 `populations!(Starlings, replace = (["North","South", "East"], [15,32,11]))`
+
 `populations!(Starlings, replace = (counts = [15,32,11], names = ["North","South", "East"]))`
 """
-function populations!(data::PopObj; rename::Union{Nothing, Dict} = nothing, replace::Union{Nothing, Tuple, NamedTuple} = nothing)
+function populations!(data::PopObj; rename::Union{Nothing, Dict, Vector} = nothing, replace::Union{Nothing, Tuple, NamedTuple} = nothing)
     if rename != nothing
         for eachkey in keys(rename)
             eachkey ∉ data.samples.population && @warn "$eachkey not found in PopObj"
@@ -200,16 +208,26 @@ function populations!(data::PopObj; rename::Union{Nothing, Dict} = nothing, repl
         @info "renaming populations"
         return populations(data,listall = true)
     elseif replace != nothing
-        if typeof(replace) <: NamedTuple
-            popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
-        else typeof(replace) <: Tuple
-            popid_array = [fill(i, j) for (i,j) in zip(replace[1], replace[2])]
+        if typeof(replace) == Dict
+            if typeof(replace) <: NamedTuple
+                popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
+            else typeof(replace) <: Tuple
+                popid_array = [fill(i, j) for (i,j) in zip(replace[1], replace[2])]
+            end
+            flat_popid = Iterators.flatten(popid_array) |> collect
+            length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
+            data.samples.population = flat_popid
+            #@info "overwriting all population names"
+            return populations(data, listall = true)
+        else
+            current_popnames = unique(data.samples.population)
+            ln_current = length(current_popnames)
+            ln_new = length(rename)
+            ln_current != ln_new && error("$ln_new population names provided, but $ln_current found in PopObj")
+            rn_dict = Dict()
+            [rn_dict[i] = j for (i,j) in zip(current_popnames, rename)]
+            populations!(data, rename = rn_dict)
         end
-        flat_popid = Iterators.flatten(popid_array) |> collect
-        length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
-        data.samples.population = flat_popid
-        #@info "overwriting all population names"
-        return populations(data, listall = true)
     else
         error("specify rename = Dict() to rename populations, or replace=(counts,names) to replace all names")
     end
