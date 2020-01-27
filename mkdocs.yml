@@ -35,9 +35,9 @@ nav:
 - Types of Analyses:
     Hardy-Weinberg Equilibrium: hardyweinberg.md
     Relatedness: relatedness.md
+- Community: community.md
 - Other:
-    Community: community.md
-    Development:
+    API:
         Under the hood functions: hidden_api.md
     Logo Graveyard: logo_graveyard.md
     Misc:
