@@ -26,21 +26,22 @@ nav:
         What's a PopObj: popobj_type.md
         Accessing parts of a PopObj: PopObj_accessing.md
 - Importing Data:
-    - Example Data: example_data.md
-    - Reading in Data: file_import.md
-    - Delimited: delimited.md
-    - Genepop: genepop.md
-    - VCF: vcf.md
+    Example Data: example_data.md
+    Reading in Data: file_import.md
+    Delimited: delimited.md
+    Genepop: genepop.md
+    VCF: vcf.md
 - Manipulating a PopObj: commands.md
 - Types of Analyses:
-    - Hardy-Weinberg Equilibrium: hardyweinberg.md
-    - Relatedness: relatedness.md
+    Hardy-Weinberg Equilibrium: hardyweinberg.md
+    Relatedness: relatedness.md
 - Other:
     Community: community.md
     Development:
         Under the hood functions: hidden_api.md
     Logo Graveyard: logo_graveyard.md
-
+    Misc:
+        Genepop IBD Conversion: genepopIBD.md
 
 markdown_extensions:
   - admonition
