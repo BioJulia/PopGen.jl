@@ -6,6 +6,7 @@ Population Genetics in Julia. This is a fork of `PopGen.jl` in `BioJulia` with t
 
 #### How to install:
 Invoke the package manager by pressing `]` on an empty line and `add` this repo
+
 ![install_instructions](docs/img/install_carbon.png)
 
 ---------

@@ -9,6 +9,7 @@ Have questions, want to talk population genetics, or have ideas? Join the PopGen
       team_id:'popgenjl'
    })
   };
+
   (function(d, s, id){
     var js, fjs = d.getElementsByTagName(s)[0];
     if (d.getElementById(id)) {return;}
@@ -39,11 +40,9 @@ Julia's overall performance is rooted in really clever dispatch to the LLVM comp
 During PopGen.jl's development, we generally use `nancycats` and `gulfsharks` for just about everything. Those two datasets cover the range of what we expect are common use-cases; a smaller microsatellite dataset (nancycats) and a medium sized SNP dataset (gulfsharks). However, we know better than to put all of our faith into _n_ = 2, so please use your own data and mess around with PopGen.jl and let us know if something doesn't jive.
 
 
-
 ### Writing new functions or methods for existing functions
 
 By all means, extend PopGen.jl to include all sorts of analyses! GST, Tajima's D, AMOVA, SAMOVA, porting `BOTTLENECK`, coalescence, etc. Yes please! Part of the intent behind PopGen.jl is to have it act as a sort of sandbox to play around in, which is why most of the package's basic calculations are modularized (see the hidden API). As a design choice, it made the most sense to have written the package in this way, because many population genetic calculations are built on top of other ones (like allele frequency or heterozygosity).
-
 
 
 ### Writing or editing the docs
@@ -53,17 +52,13 @@ The documentation of PopGen.jl must be approachable and _helpful_. Helpful in th
 If you want to contribute but don't feel comfortable with the programming side of things, then we encourage you to help grow the documentation. Clarify the language in some sections, or maybe provide a useful diagram where one doesn't exist. Or typos. There are always typoes.
 
 
-
 ### Spreading the word
 
 The very soul of open-source projects relies on people wanting to get involved. Spread the word :smiley:. If you are into social media, give us a shoutout. We can't imagine why you'd want to, but if you insisted on using a hashtag, then #PopGenjl is probably the sensible choice. 
 
 
-
 ### Kindness and encouragement
 
 This stuff can be hard. As the package grows, we expect that we'll be dealing with a growing number of issues/complaints. A little thumbs-up :thumbsup: or prayer-hands :pray: emoji (Pavel's personal favorite) can go a long way. Or cook up your own cactus graphic (like the one below) and send it to us. Who doesn't love adorable cactuses doing human things?
-
-​                 
 
 ![error_cactus](img/terminal_cactus.png)
