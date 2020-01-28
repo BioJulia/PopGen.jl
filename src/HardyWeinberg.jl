@@ -207,6 +207,7 @@ function het_sample(data::PopObj)
 
         # calculate observed heterozygosity like for loci
         map(het_sample, by_ind)
+    end
 end
 
 
