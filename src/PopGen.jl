@@ -17,7 +17,7 @@ using Convex,
       ProgressMeter,
       Random,
       StatsBase
-      #PlotlyJS     REMOVE IN FAVOR OF PLOTRECIPES FOR Plots.jl
+      #PlotlyJS     REMOVE IN FAVOR OF PLOTRECIPES
 
 
 export PopObj,
@@ -26,7 +26,7 @@ export PopObj,
     gulfsharks,
     delimited, csv,
     genepop,
-    bfc, vcf,
+    bcf, vcf,
     samples,
     loci,
     isolate_genotypes,
@@ -38,8 +38,8 @@ export PopObj,
     missing,
     heterozygosity, het, He,
     hwe_test, hwe,
-    plot_missing,
-    plot_locations
+    #plot_missing,
+    #plot_locations
 
 
 
@@ -56,7 +56,7 @@ include("Manipulate.jl")
 include("AlleleFreq.jl")
 include("HardyWeinberg.jl")
 include("SummaryInfo.jl")
-include("Plotting.jl")
+#include("PlotRecipes.jl")  # not yet ready
 
 
 end # module PopGen

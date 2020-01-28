@@ -20,17 +20,17 @@ nav:
 - Home: index.md
 - Getting started: 
     A Julia primer: juliaprimer.md
-    Benchmarks: comparison.md
     How to Install: install.md
     The PopGen 'PopObj':
         What's a PopObj: popobj_type.md
         Accessing parts of a PopObj: PopObj_accessing.md
+    Benchmarks: comparison.md
 - Importing Data:
     Example Data: example_data.md
     Reading in Data: file_import.md
     Delimited: delimited.md
     Genepop: genepop.md
-    VCF: vcf.md
+    Variant Call Format: vcf.md
 - Manipulating a PopObj: commands.md
 - Types of Analyses:
     Hardy-Weinberg Equilibrium: hardyweinberg.md
