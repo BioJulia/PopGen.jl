@@ -9,8 +9,8 @@ module PopGen
 
 using Convex,
       DataFrames,
-      ECOS,
       Distributions,
+      ECOS,
       GeneticVariation,
       LinearAlgebra,
       MultipleTesting,
