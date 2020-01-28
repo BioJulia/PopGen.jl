@@ -20,7 +20,6 @@ julia> ncats = nancycats() ; summary(ncats)
  Latitude: none provided
 
  Population names and counts:
-17×2 DataFrame
 │ Row │ population │ count │
 │     │ Union…     │ Int64 │
 ├─────┼────────────┼───────┤
@@ -279,25 +278,7 @@ julia> ncats.samples.latitude
  missing
  missing
  missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
  ⋮      
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
  missing
  missing
  missing
@@ -349,10 +330,10 @@ julia> ncats.samples.longitude
 
     ``` julia tab="load gulfsharks"
     julia> sharks = gulfsharks() ;    # semicolon just supresses printing output
-
+    
     julia> hcat(sharks.samples.name, sharks.samples.latitude, sharks.samples.longitude)
     ```
-
+    
     ``` tab="output"
     212×3 Array{Any,2}:
     "cc_001"   28.3062  -80.5993
@@ -496,21 +477,7 @@ julia> ncats.loci.fca8
  (137, 141)
  (133, 129)
  (133, 129)
- (133, 133)
- (135, 131)
- (135, 129)
- (133, 129)
- (135, 129)
- (135, 135)
- (135, 131)
  ⋮         
- (139, 139)
- (137, 139)
- (137, 139)
- (143, 137)
- (135, 139)
- (143, 139)
- (135, 139)
  (135, 133)
  (135, 133)
  (133, 141)
@@ -613,9 +580,9 @@ julia> names(ncats.loci)[3:end]
 ```
 
 !!! info ":end"
-     All things start at 1, so there is no need for a special word for it. On the other hand, objects can have unknown lengths or varied lengths as you work with them. In Julia, use the word `end` in a slice range to indicate you want it to go to the end,, regardless of length or known size. 
+     All things start at 1, so there is no need for a special word for it. On the other hand, objects can have unknown lengths or varied lengths as you work with them. In Julia, use the word `end` in a slice range to indicate you want it to go to the end, regardless of length or known size. 
 
-One more example withh genotypes:
+One more example with genotypes:
 
 ``` julia tab="slice genotypes"
 julia> ncats.loci.fca8[1:3]
@@ -661,7 +628,7 @@ julia> unique(ncats.samples.population)
 ```
 
 ??? tip "Pipes"
-    Julia has native piping (much like BASH) which uses the syntax `|>` (pipe + greater-than). With a pipe, `unique(ncats.samples.population)` can also be rewritten as `ncats.samples.population |> unique` for the same result. It's often a matter of preference for which you consider more readable. Use the `Pipe` package for even more robust piping where you can specify which argument the pipe relates to!
+    Julia has native piping (much like Bash) which uses the syntax `|>` (pipe + greater-than). With a pipe, `unique(ncats.samples.population)` can also be rewritten as `ncats.samples.population |> unique` for the same result. It's often a matter of preference for which you consider more readable. Use the `Pipe.jl` package for even more robust piping where you can specify which argument the pipe relates to!
 
 ## 🛑❌ What to avoid! ❌🛑
 Given the relationships of the ordered list of individuals (`.name`) and the order of genotypes in `.loci`, **NEVER USE `sort`, `sort!`, or manually arrange/add/delete anything in either dataframes `loci` or `samples`!!!** There are included functions `remove_loci!` and `remove_inds!` that do that kind of thing. That being said, you can rename individuals and their popid's without issue. Just no manual moving or deleting!

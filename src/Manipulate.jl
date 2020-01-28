@@ -147,15 +147,15 @@ end
 
 """
     populations(data::PopObj; listall::Bool = false)
-View unique population ID's in a `PopObj`.
+View unique population ID's and their counts in a `PopObj`.
 
-`listall = true`, displays `ind` and their `population` instead (default = `false`).
+- `listall = true` displays all samples and their `population` instead (default = `false`)
 """
-function populations(data::PopObj; listall::Bool = false)
+function populations(data::PopObj; listall::Bool = false, print::Bool = true)
     if listall == true
         @view data.samples[!, [:name, :population]]
     else
-        if ismissing.(data.samples.population) |> unique == [true]
+        if all(ismissing.(data.samples.population)) == true
             @info "no population data present in PopObj"
             return @view data.samples[!, [:name, :population]]
         end
@@ -164,6 +164,7 @@ function populations(data::PopObj; listall::Bool = false)
             population = unique(data.samples.population),
             count = popcounts
         )
+        return popcounts
     end
 end
 

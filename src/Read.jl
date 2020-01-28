@@ -19,7 +19,7 @@ function phase(loc::String, type::DataType, digit::Int)
     return tupled
 end
 
-### VCF parsing ###
+### Variant Call Format parsing ###
 
 """
     bcf(infile::String)
@@ -27,7 +27,7 @@ Load a BCF file into memory as a PopObj object. Population and [optional]
 location information need to be provided separately.
 - `infile` : path to BCF file
 """
-function vcf(infile::String)
+function bcf(infile::String)
     bcf_file = BCF.Reader(open(infile, "r"))
 
     # get sample names from header

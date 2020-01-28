@@ -1,4 +1,10 @@
-Testing for Hardy-Weinberg Equilibrium (often abbreviated to "HW" or "HWE") is a fairly common practice in population genetics. In a two-allele system (alleles *p* and *q*), the HWE equation is defined as  *p^2^ + 2pq + q^2^ = 1*. 
+Testing for Hardy-Weinberg Equilibrium (often abbreviated to "HW" or "HWE") is a fairly common practice in population genetics. In a two-allele system (alleles *p* and *q*), the HWE equation is defined as  *p^2^ + 2pq + q^2^ = 1* , where _p_ is the frequency of the first allele and _q_ is the frequency of the second allele. The formula describes the frequency of all possible genotypes where
+
+| HWE variable | Genotype |
+| :----------: | :------: |
+|    _p^2^_    |   "pp"   |
+|    _q^2^_    |   "qq"   |
+|    _2pq_     |   "pq"   |
 
 Testing for deviation from HWE is usually done with a Chi-Squared test, where one compares the observed genotype frequencies to the expected genotype frequencies given the observed allele frequencies at a locus. 
 
@@ -224,5 +230,5 @@ If using `by_pop = true`, there may be a very long output which you may want to 
     All in all, you'll be doing this: 
     
     `\ChiTAB\^2TAB`. It's actually a lot easier than it looks.
-    
+
 
