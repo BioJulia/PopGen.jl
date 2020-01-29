@@ -1,5 +1,5 @@
 """
-    heterozygosity(data::PopObj, mode = "locus")
+    heterozygosity(data::PopObj, mode::String = "locus")
 Calculate observed and expected heterozygosity in a `PopObj`
 ## Example
 heterozygosity(nancycats(), "population" )
@@ -8,7 +8,7 @@ heterozygosity(nancycats(), "population" )
 - `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
 - `"population"` or `"pop"` : heterozygosity per population (PopObj.samples.population)
 """
-function heterozygosity(data::PopObj, mode = "locus")
+function heterozygosity(data::PopObj, mode::String = "locus")
     if mode == "locus"
         obs = het_observed(data)
         exp = het_expected(data)
@@ -99,7 +99,7 @@ a `PopObj`
 function het_population_exp(data::PopObj)
     # get population order and store in its own dict key
     popid = unique(data.samples.population |> collect)
-    fixed_popid = [replace(i, " " => "_") for i in popid]
+    fixed_popid = replace.(popid, " " => "_")
     d = Dict()
     d["pops_exp"] = fixed_popid
 

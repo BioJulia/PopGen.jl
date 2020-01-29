@@ -11,8 +11,10 @@ Example:
 `nancy = nancycats()`
 """
 function nancycats()
-    filename = normpath(joinpath(@__DIR__,"..","data", "data", "nancycats.csv"))
-    return csv(filename, marker = "msat")
+    filename = normpath(joinpath(@__DIR__,"..","data", "data", "nancycats.gen"))
+    gen = genepop(filename,  digits = 2, popsep = "Pop", marker = "msat")
+    gen.samples.name = string.(collect(1:237))
+    return gen
 end
 
 
