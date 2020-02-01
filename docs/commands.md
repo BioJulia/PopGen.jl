@@ -509,174 +509,109 @@ NOTICE: locus "contig_35208" not found
 ### view missing data
 
 ```julia
-missing(data::PopObj)
+missing(data::PopObj; mode::String = "sample")
 ```
 
-Used to show missingness information-- that is, loci missing allele information. This command outputs two DataFrames, the first being a count of number of missing loci per samples, the other being the number of times a locus is missing across samples. 
+Get missing genotype information in a `PopObj`. Specify a `mode` of operation to return a DataFrame corresponding with that missing information type.
 
-``` julia tab="missing"
+| mode     | what it does                                                 |
+| -------- | ------------------------------------------------------------ |
+| "sample" | returns a count and list of missing loci per individual (default) |
+| "pop"    | returns a count of missing genotypes per population          |
+| "locus"  | returns a count of missing genotypes per locus               |
+| "full"   | returns a count of missing genotypes per locus per population |
+
+
+
+``` tab="sample"
 julia> missing(sharks)
-```
-
-``` tab="output"
-by_ind = (212×4 DataFrames.DataFrame. Omitted printing of 1 columns
-│ Row │ name    │ population │ missing │
-│     │ String  │ String     │ Any      │
-├─────┼─────────┼────────────┼──────────┤
-│ 1   │ cc_001  │ 1          │ 124      │
-│ 2   │ cc_002  │ 1          │ 94       │
-│ 3   │ cc_003  │ 1          │ 100      │
-│ 4   │ cc_005  │ 1          │ 0        │
-│ 5   │ cc_007  │ 1          │ 2        │
-│ 6   │ cc_008  │ 1          │ 1        │
-│ 7   │ cc_009  │ 1          │ 2        │
+212×3 DataFrame. Omitted printing of 1 columns
+│ Row │ name    │ missing │
+│     │ String  │ Int64   │
+├─────┼─────────┼─────────┤
+│ 1   │ cc_001  │ 124     │
+│ 2   │ cc_002  │ 94      │
+│ 3   │ cc_003  │ 100     │
+│ 4   │ cc_005  │ 0       │
+│ 5   │ cc_007  │ 2       │
+│ 6   │ cc_008  │ 1       │
+│ 7   │ cc_009  │ 2       │
+│ 8   │ cc_010  │ 1       │
 ⋮
-│ 205 │ seg_024 │ 7          │ 0        │
-│ 206 │ seg_025 │ 7          │ 0        │
-│ 207 │ seg_026 │ 7          │ 0        │
-│ 208 │ seg_027 │ 7          │ 2        │
-│ 209 │ seg_028 │ 7          │ 25       │
-│ 210 │ seg_029 │ 7          │ 0        │
-│ 211 │ seg_030 │ 7          │ 1        │
-│ 212 │ seg_031 │ 7          │ 1        │, by_loci = 2213×2 DataFrames.DataFrame
-│ Row  │ locus        │ missing │
-│      │ String       │ Any      │
-├──────┼──────────────┼──────────┤
-│ 1    │ contig_35208 │ 0        │
-│ 2    │ contig_23109 │ 6        │
-│ 3    │ contig_4493  │ 3        │
-│ 4    │ contig_10742 │ 2        │
-│ 5    │ contig_14898 │ 0        │
-│ 6    │ contig_8483  │ 0        │
-│ 7    │ contig_8065  │ 0        │
-⋮
-│ 2206 │ contig_24711 │ 0        │
-│ 2207 │ contig_18959 │ 0        │
-│ 2208 │ contig_43517 │ 6        │
-│ 2209 │ contig_27356 │ 2        │
-│ 2210 │ contig_475   │ 0        │
-│ 2211 │ contig_19384 │ 5        │
-│ 2212 │ contig_22368 │ 3        │
-│ 2213 │ contig_2784  │ 7        │)
+│ 204 │ seg_023 │ 1       │
+│ 205 │ seg_024 │ 0       │
+│ 206 │ seg_025 │ 0       │
+│ 207 │ seg_026 │ 0       │
+│ 208 │ seg_027 │ 2       │
+│ 209 │ seg_028 │ 25      │
+│ 210 │ seg_029 │ 0       │
+│ 211 │ seg_030 │ 1       │
+│ 212 │ seg_031 │ 1       │
 ```
-
-`missing` outputs a named tuple of dataframes, which means there are two options for assignment:
-
-#### single assignment
-The first DataFrame of the named tuple is named `by_sample` and the second named `by_loci`. If you assign a single variable to this tuple, it will inherit those names as accessors like so:
-
-``` julia tab="single assignment"
-julia> miss = missing(sharks) ;
+```tab=""pop""
+julia> missing(sharks, mode = "pop")
+7×2 DataFrame
+│ Row │ population     │ missing │
+│     │ Union…         │ Int64   │
+├─────┼────────────────┼─────────┤
+│ 1   │ Cape Canaveral │ 666     │
+│ 2   │ Georgia        │ 425     │
+│ 3   │ South Carolina │ 234     │
+│ 4   │ Florida Keys   │ 1246    │
+│ 5   │ Mideast Gulf   │ 99      │
+│ 6   │ Northeast Gulf │ 474     │
+│ 7   │ Southeast Gulf │ 1504    │
 ```
-
-``` tab="by_ind"
-julia> miss.by_sample
-212×4 DataFrame. Omitted printing of 1 columns
-│ Row │ name    │ population │ missing │
-│     │ String  │ String     │ Int64    │
-├─────┼─────────┼────────────┼──────────┤
-│ 1   │ cc_001  │ 1          │ 124      │
-│ 2   │ cc_002  │ 1          │ 94       │
-│ 3   │ cc_003  │ 1          │ 100      │
-│ 4   │ cc_005  │ 1          │ 0        │
-⋮
-│ 208 │ seg_027 │ 7          │ 2        │
-│ 209 │ seg_028 │ 7          │ 25       │
-│ 210 │ seg_029 │ 7          │ 0        │
-│ 211 │ seg_030 │ 7          │ 1        │
-│ 212 │ seg_031 │ 7          │ 1        │
-```
-
-``` tab="by_loci"
-julia> miss.by_loci
+```tab=""locus""
+julia> missing(sharks, mode = "locus")
 2213×2 DataFrame
 │ Row  │ locus        │ missing │
-│      │ String       │ Int64    │
-├──────┼──────────────┼──────────┤
-│ 1    │ contig_35208 │ 0        │
-│ 2    │ contig_23109 │ 6        │
-│ 3    │ contig_4493  │ 3        │
-│ 4    │ contig_10742 │ 2        │
+│      │ String       │ Int64   │
+├──────┼──────────────┼─────────┤
+│ 1    │ contig_35208 │ 0       │
+│ 2    │ contig_23109 │ 6       │
+│ 3    │ contig_4493  │ 3       │
+│ 4    │ contig_10742 │ 2       │
+│ 5    │ contig_14898 │ 0       │
+│ 6    │ contig_8483  │ 0       │
+│ 7    │ contig_8065  │ 0       │
+│ 8    │ contig_14708 │ 1       │
 ⋮
-│ 2209 │ contig_27356 │ 2        │
-│ 2210 │ contig_475   │ 0        │
-│ 2211 │ contig_19384 │ 5        │
-│ 2212 │ contig_22368 │ 3        │
-│ 2213 │ contig_2784  │ 7        │
+│ 2205 │ contig_15342 │ 4       │
+│ 2206 │ contig_24711 │ 0       │
+│ 2207 │ contig_18959 │ 0       │
+│ 2208 │ contig_43517 │ 6       │
+│ 2209 │ contig_27356 │ 2       │
+│ 2210 │ contig_475   │ 0       │
+│ 2211 │ contig_19384 │ 5       │
+│ 2212 │ contig_22368 │ 3       │
+│ 2213 │ contig_2784  │ 7       │
 ```
-#### multiple assignment
-Python has this feature, however, if you're migrating from R, multiple assignment probably looks weird, or like flat-out sorcery. Whenever a function returns a tuple of values, like `missing` does, you can assign as many variables to it at once.
-
-``` julia tab="missing"
-julia> df1,df2 = missing(sharks) ;
+```tab=""full""
+julia> missing(sharks, mode = "full")
+7×2214 DataFrame. Omitted printing of 2207 columns
+│ Row │ population     │ contig_35208 │ contig_23109 │ contig_4493 │ contig_10742 │ contig_14898 │ contig_8483 │
+│     │ Union…         │ Int64        │ Int64        │ Int64       │ Int64        │ Int64        │ Int64       │
+├─────┼────────────────┼──────────────┼──────────────┼─────────────┼──────────────┼──────────────┼─────────────┤
+│ 1   │ Cape Canaveral │ 0            │ 2            │ 0           │ 0            │ 0            │ 0           │  
+│ 2   │ Georgia        │ 0            │ 0            │ 0           │ 0            │ 0            │ 0           │
+│ 3   │ South Carolina │ 0            │ 0            │ 0           │ 0            │ 0            │ 0           │
+│ 4   │ Florida Keys   │ 0            │ 1            │ 1           │ 1            │ 0            │ 0           │  
+│ 5   │ Mideast Gulf   │ 0            │ 0            │ 0           │ 0            │ 0            │ 0           │
+│ 6   │ Northeast Gulf │ 0            │ 0            │ 0           │ 0            │ 0            │ 0           │
+│ 7   │ Southeast Gulf │ 0            │ 3            │ 2           │ 1            │ 0            │ 0           │
 ```
+??? tip "alternative names"
+    Each `mode` has an extra synonymous name just because we can and want you to have the option of more explicitly legible code. If you get the `mode` wrong, it will let you know with an error message and run the default `"sample"` mode anyway.
+    | mode     | alt. name    |
+    | -------- | ------------ |
+    | "sample" | "individual" |
+    | "pop"    | "population" |
+    | "locus"  | "loci"       |
+    | "full"   | "detailed"   |
 
-``` tab="df1"
-julia> df1
-212×4 DataFrames.DataFrame. Omitted printing of 1 columns
-│ Row │ name    │ population │ missing │
-│     │ String  │ String     │ Any      │
-├─────┼─────────┼────────────┼──────────┤
-│ 1   │ cc_001  │ 1          │ 124      │
-│ 2   │ cc_002  │ 1          │ 94       │
-│ 3   │ cc_003  │ 1          │ 100      │
-│ 4   │ cc_005  │ 1          │ 0        │
-│ 5   │ cc_007  │ 1          │ 2        │
-│ 6   │ cc_008  │ 1          │ 1        │
-│ 7   │ cc_009  │ 1          │ 2        │
-⋮
-│ 205 │ seg_024 │ 7          │ 0        │
-│ 206 │ seg_025 │ 7          │ 0        │
-│ 207 │ seg_026 │ 7          │ 0        │
-│ 208 │ seg_027 │ 7          │ 2        │
-│ 209 │ seg_028 │ 7          │ 25       │
-│ 210 │ seg_029 │ 7          │ 0        │
-│ 211 │ seg_030 │ 7          │ 1        │
-│ 212 │ seg_031 │ 7          │ 1        │
-```
 
-``` tab="df2"
-julia> df2
-2213×2 DataFrames.DataFrame
-│ Row  │ locus        │ nmissing │
-│      │ String       │ Any      │
-├──────┼──────────────┼──────────┤
-│ 1    │ contig_35208 │ 0        │
-│ 2    │ contig_23109 │ 6        │
-│ 3    │ contig_4493  │ 3        │
-│ 4    │ contig_10742 │ 2        │
-│ 5    │ contig_14898 │ 0        │
-│ 6    │ contig_8483  │ 0        │
-│ 7    │ contig_8065  │ 0        │
-⋮
-│ 2206 │ contig_24711 │ 0        │
-│ 2207 │ contig_18959 │ 0        │
-│ 2208 │ contig_43517 │ 6        │
-│ 2209 │ contig_27356 │ 2        │
-│ 2210 │ contig_475   │ 0        │
-│ 2211 │ contig_19384 │ 5        │
-│ 2212 │ contig_22368 │ 3        │
-│ 2213 │ contig_2784  │ 7        │
-```
-
-??? example "a simple example"
-    If this still looks weird to you, here is a simple example to help wrap your mind around it:
-    ``` julia 
-    a,b,c,d = (1,2,3,[4,5,6,7])
-    ```
-    where 
-    ```
-    a = 1
-    
-    b = 2
-    
-    c = 3
-    
-    d = [4, 5, 6, 7]
-    ```
-    embrace the convenience!
-
-### plot missing data
+### plot missing data (under construction)
 
 ```julia
 plot_missing(data::PopObj; color = false)

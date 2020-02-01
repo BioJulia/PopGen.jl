@@ -101,48 +101,92 @@ end
 #### Find missing ####
 
 """
-    missing(data::PopObj)
-Identify and count missing loci in each sample of a `PopObj`. Returns a tuple
-of `DataFrames`: loci per sample, number per loci.
+    missing(data::PopObj; mode::String = "sample")
+Get missing genotype information in a `PopObj`. Specify a mode of operation
+to return a DataFrame corresponding with that missing information.
 
-Example:
+#### Modes
+- "sample" - returns a count and list of missing loci per individual (default)
+- "pop" - returns a count of missing genotypes per population
+- "locus" - returns a count of missing genotypes per locus
+- "full" - returns a count of missing genotypes per locus per population
 
-`missing_ind,missing_loc = missing(gulfsharks)`
+### Example:
+
+`missing(gulfsharks(), mode = "pop")`
 """
-function Base.missing(data::PopObj)
-    # missing per sample
-    ind_geno = map(i -> get_sample_genotypes(data, i), data.samples.name)
-    count_miss_ind = map(ind_geno) do ind
-        count(i -> i === missing, ind)
-        # sum(ismissing.(ind))
-    end
+function Base.missing(data::PopObj; mode::String = "sample")
+    if mode == "sample" || mode == "individual"
+        # missing per sample
+        ind_geno = map(i -> get_sample_genotypes(data, i), data.samples.name)
+        count_miss_ind = map(ind_geno) do ind
+            count(i -> i === missing, ind)
+        end
 
-    # which loci are missing per sample
-    loci_names = loci(data)
-    miss_loci = map(ind_geno) do ind
-        [loci_names[i] for i in findall(j -> j === missing, ind)]
-    end
+        # which loci are missing per sample
+        loci_names = loci(data)
+        miss_loci = map(ind_geno) do ind
+            [loci_names[i] for i in findall(j -> j === missing, ind)]
+        end
 
-    # missing per locus
-    miss_per_loci = map(eachcol(data.loci)) do col
-        count(i->i===missing, col)
-        # sum(ismissing.(col))
-    end
-
-    # create DataFrames of the two
     by_sample_df = DataFrame(
         name = data.samples.name,
-        population = data.samples.population,
         missing = count_miss_ind,
         loci = miss_loci |> Vector{Vector{String}}
     )
 
-    by_locus_df = DataFrame(
-        locus = loci_names,
-        missing = miss_per_loci
-    )
+    return by_sample_df
 
-    return by_sample_df, by_locus_df
+    elseif mode == "pop" || mode == "population"
+        # missing per sample
+        ind_geno = map(i -> get_sample_genotypes(data, i), data.samples.name)
+        count_miss_ind = map(ind_geno) do ind
+            count(i -> i === missing, ind)
+        end
+
+        by_sample_df = DataFrame(
+            name = data.samples.name,
+            population = data.samples.population,
+            missing = count_miss_ind
+        )
+
+        # collapse by_sample_df to get missing per population
+        by_pop_df = by(by_sample_df, :population, missing = :missing => sum)
+
+        return by_pop_df
+
+    elseif mode == "locus" || mode == "loci"
+        # missing per locus
+        miss_per_loci = map(eachcol(data.loci)) do col
+            count(i->i===missing, col)
+        end
+
+        by_locus_df = DataFrame(
+            locus = loci(data),
+            missing = miss_per_loci
+        )
+
+        return by_locus_df
+
+    elseif mode == "detailed" || mode == "full"
+        y = deepcopy(data.loci)
+        insertcols!(y, 1, :population => data.samples.population)
+
+        # get missing per locus per pop
+        z = aggregate(y, :population, i -> count(j -> j === missing, i))
+        return rename!(z, [:population, names(data.loci)...])
+
+        #= if pivoting
+        new_df = z[!, 2:end] |> Matrix |> permutedims |> DataFrame
+        rename!(new_df, Symbol.(unique(data.samples.population)))
+        insertcols!(new_df, 1, :loci => loci(data))
+        return new_df
+        =#
+
+    else
+        @error "Mode \"$mode\" not recognized. Please specify one of: sample, pop, locus, or full"
+        missing(data)
+    end
 end
 
 """
