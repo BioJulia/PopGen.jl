@@ -21,15 +21,15 @@ Calculate allele counts for a single locus of a `PopObj`. Returns a `Dict` of
 allele's and their frequencies.
 """
 function allele_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-    d = Dict()
-    for genotype in skipmissing(locus)
-        # sum up alleles
-        for allele in genotype
-            d[allele] = get!(d, allele, 0) + 1
-        end
+    d = Dict{String,Float64}()
+    flat_alleles = Base.Iterators.flatten(locus |> skipmissing) |> collect
+    uniq_alleles = unique(flat_alleles)
+    allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
+    total = sum(allele_counts)
+    freq = allele_counts ./ total
+    for (i,j) in enumerate(uniq_alleles)
+        d[string(j)] = freq[i]
     end
-    total = values(d) |> sum    # sum of all non-missing alleles
-    [d[i] = d[i] / total for i in keys(d)]  # allele count / sum
     return d
 end
 
@@ -39,15 +39,15 @@ Calculate allele counts for a single locus of a `PopObj` with unequal ploidy acr
 samples. Returns a `Dict` of allele's and their frequencies.
 """
 function allele_freq(locus::Vector{<:Union{Missing, Tuple{Vararg}}})
-    d = Dict()
-    for genotype in skipmissing(locus)
-        # sum up alleles
-        for allele in genotype
-            d[allele] = get!(d, allele, 0) + 1
-        end
+    d = Dict{String,Float64}()
+    flat_alleles = Base.Iterators.flatten(locus |> skipmissing) |> collect
+    uniq_alleles = unique(flat_alleles)
+    allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
+    total = sum(allele_counts)
+    freq = allele_counts ./ total
+    for (i,j) in enumerate(uniq_alleles)
+        d[string(j)] = freq[i]
     end
-    total = values(d) |> sum    # sum of all non-missing alleles
-    [d[i] = d[i] / total for i in keys(d)]  # allele count / sum
     return d
 end
 
@@ -57,16 +57,15 @@ Calculate allele counts for a single locus of a `PopObj` split by population
 using `group()`. Returns a `Dict` of allele's and their frequencies.
 """
 function allele_freq(locus::SubArray{<:Union{Missing,NTuple{N,<:Integer}}}) where N
-    d = Dict()
-    for genotype in locus
-        genotype === missing && continue
-        # sum up alleles
-        for allele in genotype
-            d[allele] = get!(d, allele, 0) + 1
-        end
+    d = Dict{String,Float64}()
+    flat_alleles = Base.Iterators.flatten(locus |> skipmissing) |> collect
+    uniq_alleles = unique(flat_alleles)
+    allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
+    total = sum(allele_counts)
+    freq = allele_counts ./ total
+    for (i,j) in enumerate(uniq_alleles)
+        d[string(j)] = freq[i]
     end
-    total = values(d) |> sum    # sum of all non-missing alleles
-    [d[i] = d[i] / total for i in keys(d)]  # allele count / sum
     return d
 end
 
@@ -77,16 +76,15 @@ using `group()` with unequal ploidy across samples. Returns a `Dict` of
 allele's and their frequencies.
 """
 function allele_freq(locus::SubArray{<:Union{Missing,Tuple{Vararg}}})
-    d = Dict()
-    for genotype in locus
-        genotype === missing && continue
-        # sum up alleles
-        for allele in genotype
-            d[allele] = get!(d, allele, 0) + 1
-        end
+    d = Dict{String,Float64}()
+    flat_alleles = Base.Iterators.flatten(locus |> skipmissing) |> collect
+    uniq_alleles = unique(flat_alleles)
+    allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
+    total = sum(allele_counts)
+    freq = allele_counts ./ total
+    for (i,j) in enumerate(uniq_alleles)
+        d[string(j)] = freq[i]
     end
-    total = values(d) |> sum    # sum of all non-missing alleles
-    [d[i] = d[i] / total for i in keys(d)]  # allele count / sum
     return d
 end
 
@@ -112,11 +110,11 @@ end
 Calculate genotype frequencies of all loci in a `PopObj`. Returns a `Dict` of
 genotypes and their frequencies.
 """
-function geno_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-    d = Dict()
+@inline function geno_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
     # conditional testing if all genos are missing
     all(ismissing.(locus)) == true && return missing
-    for genotype in skipmissing(locus)
+    d = Dict()
+    @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
     end
@@ -130,11 +128,11 @@ end
 Calculate genotype frequencies of all loci in a `PopObj` with unequal ploidy across
 samples. Returns a `Dict` of genotypes and their frequencies.
 """
-function geno_freq(locus::Vector{<:Union{Missing, Tuple{Vararg}}})
-    d = Dict()
+@inline function geno_freq(locus::Vector{<:Union{Missing, Tuple{Vararg}}})
     # conditional testing if all genos are missing
     all(ismissing.(locus)) == true && return missing
-    for genotype in skipmissing(locus)
+    d = Dict()
+    @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
     end
@@ -148,11 +146,11 @@ end
 Calculate genotype frequencies of all loci in `PopObj` split
 by population using `group()`. Returns a `Dict` of genotypes and their frequencies.
 """
-function geno_freq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-    d = Dict()
+@inline function geno_freq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}}}) where N
     # conditional testing if all genos are missing
     all(ismissing.(locus)) == true && return missing
-    for genotype in skipmissing(locus)
+    d = Dict()
+    @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
     end
@@ -167,11 +165,11 @@ Calculate genotype frequencies of all loci in `PopObj` split by population
 using `group()` with unequal ploidy across samples. Returns a `Dict` of
 genotypes and their frequencies.
 """
-function geno_freq(locus::SubArray{<:Union{Missing, Tuple{Vararg}}})
-    d = Dict()
+@inline function geno_freq(locus::SubArray{<:Union{Missing, Tuple{Vararg}}})
     # conditional testing if all genos are missing
     all(ismissing.(locus)) == true && return missing
-    for genotype in skipmissing(locus)
+    d = Dict()
+    @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
     end

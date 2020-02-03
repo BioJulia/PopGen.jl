@@ -11,11 +11,12 @@ and `digit` to specify the number of digits/characters used per allele in a locu
 
 `[phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]`
 """
-function phase(loc::String, type::DataType, digit::Int)
-    phased = [join(k) for k in Iterators.partition(loc, digit)]
-    typed = parse.(type, phased) |> sort!
-    tupled = Tuple(typed)
-    iszero(tupled |> collect) && return missing
+@inline function phase(loc::String, type::DataType, digit::Int)
+    phased = map(i -> parse(type, join(i)), Iterators.partition(loc, digit))
+    #typed = parse.(type, phased) |> sort!
+    iszero(phased |> collect) && return missing
+    sort!(phased)
+    tupled = Tuple(phased)
     return tupled
 end
 

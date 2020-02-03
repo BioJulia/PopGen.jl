@@ -8,6 +8,7 @@ module PopGen
 
 
 using Convex,
+      CSV,  # possibly
       DataFrames,
       Distributions,
       ECOS,
