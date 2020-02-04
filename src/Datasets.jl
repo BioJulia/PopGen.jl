@@ -459,13 +459,13 @@ function gulfsharks()
     data = genepop(filename)
     data.samples.latitude = yloc ; data.samples.longitude = xloc
     renames = Dict(
-        1 => "Cape Canaveral",
-        2 => "Georgia",
-        3 => "South Carolina",
-        4 => "Florida Keys",
-        5 => "Mideast Gulf",
-        6 => "Northeast Gulf",
-        7 => "Southeast Gulf"
+        "1" => "Cape Canaveral",
+        "2" => "Georgia",
+        "3" => "South Carolina",
+        "4" => "Florida Keys",
+        "5" => "Mideast Gulf",
+        "6" => "Northeast Gulf",
+        "7" => "Southeast Gulf"
     )
     # manually rename things so as to not trigger @info prompt in populations!()
     for eachkey in keys(renames)

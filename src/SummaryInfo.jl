@@ -38,7 +38,7 @@ Prints a summary of the information contained in a PopObj
 function Base.summary(data::PopObj)
 
     println(" Object of type PopObj")
-    if typeof(skipmissing(data.loci[!, :1])[1][1]) == Int16
+    if typeof(collect(skipmissing(data.loci[!, :1]))[1][1]) == Int16
         marker = "Microsatellite"
     else
         marker = "SNP"

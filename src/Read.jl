@@ -12,12 +12,43 @@ and `digit` to specify the number of digits/characters used per allele in a locu
 `[phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]`
 """
 @inline function phase(loc::String, type::DataType, digit::Int)
+    loc == "-9" && return missing
     phased = map(i -> parse(type, join(i)), Iterators.partition(loc, digit))
-    #typed = parse.(type, phased) |> sort!
-    iszero(phased |> collect) && return missing
+    iszero.(phased |> collect) && return missing
     sort!(phased)
     tupled = Tuple(phased)
     return tupled
+end
+
+"""
+    phase_dip(loc::String, type::DataType, digit::Int)
+A diploid-optimized variant of `phase()` that uses integer division to split the alleles
+of a locus into a tuple of `type` Type. Use `type` to specify output type (`Int8` or `Int16`),
+and `digit` to specify the number of digits/characters used per allele in a locus.
+
+## Examples
+`ph_locus = phase("128114", Int16, 3)`
+
+`map(i -> phase_dip(i, Int16, 3), ["112131", "211112", "001003", "516500"])`
+
+`[phase_dip(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]`
+"""
+@inline function phase_dip(loc::Int, type::DataType, digit::Int)
+    loc == -9 || iszero(loc) && return missing
+    units = 10^digit
+    allele1 = loc ÷ units |> type
+    allele2 = loc % units |> type
+    return [allele1, allele2] |> sort |> Tuple
+end
+
+@inline function phase_dip(loc::String, type::DataType, digit::Int)
+    loc == "-9" && return missing
+    newloc = parse(Int32, loc)
+    iszero(newloc) && return missing
+    units = 10^digit
+    allele1 = newloc ÷ units |> type
+    allele2 = newloc % units |> type
+    return [allele1, allele2] |> sort |> Tuple
 end
 
 ### Variant Call Format parsing ###
@@ -138,101 +169,105 @@ snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
 snbarb_03,coast,11.15,0,001002,001001,001001 \n
 """
 function delimited(
-    infile::String;
-    delim::Union{Char,String,Regex} = r"\,|\t|\s",
+    delim::Union{String} = ",",
+    marker::String = "snp",
     digits::Int = 3,
-    marker = "snp",
-)
-
-    # instantiate empty vectors
-    indnames = Vector{String}()
-    popid = Vector{Union{String,Int32}}()
-    ploidy = Vector{Int8}()
-    locx = Vector{Union{Missing, Float32}}()
-    locy = Vector{Union{Missing, Float32}}()
-    sample_geno_array = Array{Vector{Union{Missing, Tuple}},1}()
-
-    # establish types for genotypes
+    diploid::Bool = true
+    )
     if lowercase(marker) == "snp"
         geno_type = Int8
     else
         geno_type = Int16
     end
 
-    file = open(infile, "r")
+    # read in CSV
+    csv_in = CSV.read(infile, delim = delim, header = 1, copycols = true, type = String)
 
-    # get header information
-    col_names = map(join, split(readline(file), delim))
-    replace!(col_names, "." => "_")
-    locinames = col_names[5:end]
+    # pull out loci
+    loci_df = select(csv_in, Not(:1,:2,:3,:4))
 
-    @inbounds for ln in eachline(file)
-        tmp = map(join, split(ln, delim))
-        # just in case -9 = missing
-        replace!(tmp, "-9" => "0"^digits)
-        push!(indnames, popfirst!(tmp))
-        push!(popid, popfirst!(tmp))
-        push!(locx, parse(Float32, popfirst!(tmp)))
-        push!(locy, parse(Float32, popfirst!(tmp)))
+    # pull out sample meta
+    select!(csv_in, [:1,:2,:3,:4])
+    rename!(csv_in, [:name, :population, :longitude, :latitude])
+    csv_in.name = String.(csv_in.name)
+    csv_in.population = String.(csv_in.population)
 
-        # phase the loci
-        phasedloci = map(i -> phase(i, geno_type, digits), tmp)
-        push!(sample_geno_array, phasedloci)
-
-        # get the ploidy via # of alleles in the first non-missing locus
-        sample_ploidy = (skipmissing(phasedloci) |> collect)[1]  |> length
-        push!(ploidy, sample_ploidy)
-
-    end
-    close(file)
-
+    # print some basic file info
     @info "\n$(abspath(infile))
-$(length(indnames)) samples detected
-$(length(unique(popid))) populations detected
-$(length(locinames)) loci detected"
+$(size(csv_in,1)) samples detected
+$(length(unique(csv_in.population))) populations detected
+$(size(loci_df,2)) loci detected"
 
-    # convert the entire thing into a matrix
-    geno_matrix = hcat(sample_geno_array...)
+    # handle location data
+    csv_in.longitude = map(csv_in.longitude) do val
+        floatval = parse(Float64, val)
+        if iszero(floatval) == true
+            return missing
+        else
+            return floatval
+        end
+    end |> Vector{Union{Missing, Float64}}
 
-    # convert is back into an array of arrays, transposed across loci
-    # instead of samples
-    loci_array = collect.(eachrow(geno_matrix))
+    csv_in.latitude = map(csv_in.latitude) do val
+        floatval = parse(Float64, val)
+        if iszero(floatval) == true
+            return missing
+        else
+            return floatval
+        end
+    end |> Vector{Union{Missing, Float64}}
 
-    # replace 0.0 with missing in location
-    replace!(locx, 0.0 => missing)
-    replace!(locy, 0.0 => missing)
+    # phase the locus genotypes
+    if diploid == true
+        phased_df = map(eachcol(loci_df)) do locus
+                phase_dip.(locus, geno_type, digits)
+            end |> DataFrame
 
-    # genotype DataFrame
-    loci_df = DataFrame([j => k for (j,k) in zip(Symbol.(locinames), loci_array)])
+        ploidy = fill(2, length(csv_in.name))
 
-    samples_df = DataFrame(
-        name = indnames,
-        population = popid,
-        ploidy = ploidy,
-        longitude = locx,
-        latitude = locy,
-    )
+    else
+        phased_df = map(eachcol(loci_df)) do locus
+                phase.(locus, geno_type, digits)
+            end |> DataFrame
 
-    return PopObj(samples_df, loci_df)
+        ## ploidy finding
+        ploidy = Vector{Int8}()
+
+        @inbounds for i in 1:length(csv_in.name)
+            @inbounds for j in eachcol(phased_df)
+                j[i] === missing && continue   # if missing, go to next locus
+                push!(ploidy, length(j[i]))   # if not, get ploidy and push to vector
+                break   # break out of the loop and begin next sample
+            end
+        end
+    end
+
+    rename!(phased_df, names(loci_df))
+    insertcols!(csv_in, 3, :ploidy => ploidy)
+
+    return PopObj(csv_in, phased_df)
+
 end
 
 const csv = delimited
 
 ### GenePop parsing ###
 """
-    genepop(infile::String; digits::Int = 3, popsep::String = "POP", marker::String = "snp")
+    genepop(infile::String; kwargs...)
 Load a Genepop format file into memory as a PopObj object.
-### Arguments
-- `infile` : path to Genepop file
-- `digits` : number of digits denoting each allele
-- `popsep` : word that separates populations in `infile` (default: "POP")
-- `marker` : "snp" (default) or "msat"
+- `infile::String` : path to Genepop file
+
+### Keyword Arguments
+- `digits::Integer`: number of digits denoting each allele (default:  3)
+- `popsep::String` : word that separates populations in `infile` (default: "POP")
+- `marker::String` : "snp" (default) or "msat"
+- `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: true)
 ### File must follow standard Genepop formatting:
 - First line is a comment (and skipped)
 - Loci are listed after first line as one-per-line without commas or in single comma-separated row
 - A line with a particular keyword (default "POP") must delimit populations
-- Sample name is followed by a comma and space or tab (", ")
-- File is tab or space delimted
+- Sample name is followed by a *comma and tab* (",  ")
+- File is *tab delimted*
 
 ## Example
 
@@ -244,179 +279,132 @@ Locus1\n
 Locus2\n
 Locus3\n
 POP\n
-Oneida_01,  250230 564568 110100\n
-Oneida_02,  252238 568558 100120\n
-Oneida_03,  254230 564558 090100\n
+Oneida_01,  250230  564568  110100\n
+Oneida_02,  252238  568558  100120\n
+Oneida_03,  254230  564558  090100\n
 POP\n
-Newcomb_01,  254230 564558 080100\n
-Newcomb_02,  000230 564558 090080\n
-Newcomb_03,  254230 000000 090100\n
-Newcomb_04,  254230 564000 090120\n
+Newcomb_01, 254230  564558  080100\n
+Newcomb_02, 000230  564558  090080\n
+Newcomb_03, 254230  000000  090100\n
+Newcomb_04, 254230  564000  090120\n
 """
 function genepop(
     infile::String;
     digits::Int = 3,
     popsep::String = "POP",
     marker::String = "snp",
+    diploid::Bool = true
 )
+    # establish types for genotypes
     if lowercase(marker) == "snp"
         geno_type = Int8
     else
         geno_type = Int16
     end
 
-    gpop = split(open(readlines, infile)[2:end], popsep)
-
-    @info "\n$(abspath(infile))
-$(sum(length.(gpop[2:end]))) samples detected
-$(length(gpop)-1) populations detected using \"$popsep\" seperator
-$(length(gpop[1])) loci detected"
-
-    if length(gpop[1]) == 1     # loci horizontally stacked.
-        locinames = strip.(split(gpop[1] |> join, ",") |> Vector{String})
-        replace!(locinames, "." => "_")
-    else                        # loci vertically stacked
-        locinames = replace(gpop[1], "." => "_")
-    end
-
-    sample_meta_names = [:name, :population, :ploidy, :latitude, :longitude]
-    sample_meta_array = [
-        Vector{String}(),
-        Vector{Union{String,Int}}(),
-        Vector{Int8}(),
-        Vector{Union{Missing,Float32}}(),
-        Vector{Union{Missing, Float32}}()
-    ]
-
-    sample_geno_array = Vector{Vector{Union{Missing, Tuple}}}()
-
-    for i = 2:length(gpop)
-        for j in gpop[i]
-            samplerow = map(join, split(strip(j), r"\,\t|\,\s|\s|\t"))
-
-            # just in case missing genotypes are coded as -9 (msats)
-            replace!(samplerow, "-9" => "0"^digits)
-
-            # sample name and population
-            push!(sample_meta_array[1], popfirst!(samplerow))
-            push!(sample_meta_array[2], i-1)
-
-            # phase the loci into tuples
-            converted_row = map(k -> phase(k, geno_type, digits), samplerow)
-            push!(sample_geno_array, converted_row)
-
-            # get the ploidy via # of alleles in the first non-missing locus
-            push!(sample_meta_array[3], length((skipmissing(converted_row) |> collect)[1]))
-
-            # long and lat
-            push!(sample_meta_array[4], missing) ; push!(sample_meta_array[5], missing)
+    # find the #samples per population
+    pop_idx = Vector{Int}()
+    for (line, gtext) in enumerate(readlines(infile))
+        if gtext == popsep
+            push!(pop_idx, line)
         end
     end
-
-    # convert the entire thing into a matrix
-    geno_matrix = hcat(sample_geno_array...)
-
-    # convert back into an array of arrays of loci instead of samples
-    loci_array = collect.(eachrow(geno_matrix))
-
-    # create the two dataframes necessary for a PopObj
-    samples = DataFrame([j => k for (j,k) in zip(sample_meta_names, sample_meta_array)])
-    loci = DataFrame([j => k for (j,k) in zip(Symbol.(locinames), loci_array)])
-
-    return PopObj(samples, loci)
-end
-
-#= Alternative line-by-line genepop reader
-
-# Alternative line-by-line reader
-## NOT EXPORTED
-
-function gpop2(
-    infile::String;
-    digits::Int = 3,
-    popsep::String = "POP",
-    marker::String = "snp",
-)
-
-    if lowercase(marker) == "snp"
-        geno_type = Int8
-    else
-        geno_type = Int16
-    end
-
-    sample_meta_names = [:name, :population, :ploidy, :latitude, :longitude]
-    sample_meta_array = [
-        Vector{String}(),
-        Vector{Union{String,Int}}(),
-        Vector{Int8}(),
-        Vector{Union{Missing,Float32}}(),
-        Vector{Union{Missing, Float32}}()
-    ]
+    length(pop_idx) == 0 && error("No populations found in $infile using separator \"$popsep\". Please check the spelling and try again.")
+    push!(pop_idx, countlines(infile) + 1)
+    popcounts = (pop_idx[2:end] .- pop_idx[1:end-1]) .- 1
 
     locinames = Vector{String}()
-    sample_geno_array = Vector{Vector{Union{Missing, Tuple}}}()
-    popcount = 1
-
-    gpop = open(infile, "r")
-
-    # skip first line
-    readline(gpop)
-
-    # test for loci horizontal/vertical formatting
-    locus_name = readline(gpop)
-    if occursin(",", locus_name) == true
-        append!(locinames, strip.(split(locus_name |> join, ",")))
-        replace!(locinames, "." => "_")
+    # check for horizontal formatting
+    # if popsep starts on the third line
+    if pop_idx[1] <= 3
+        gpop = open(infile, "r")
+        # skip first line
+        readline(gpop)
+        locus_name_raw = readline(gpop)
+        close(gpop)
+        locinames = strip.(split(locus_name_raw |> join, ","))
+        map(i -> replace!(i, "." => "_"), locinames)
+        #locinames = replace.(locinames, "." => "_")
     else
-        while locus_name != popsep
-            push!(locinames, locus_name)
-            locus_name = readline(gpop)
-        end
+        locinames = CSV.read(infile,
+                    header = 0,
+                    datarow = 2,
+                    copycols = false,
+                    limit = pop_idx[1]-2,
+                    type = String
+                    ).Column1
+        locinames = String.(locinames)
     end
 
-    for ln in readlines(gpop)
-        if ln == popsep
-            popcount += 1
-            continue
-        else
-            samplerow = map(join, split(strip(ln), r"\,\t|\,\s|\s|\t"))
-
-            # just in case missing genotypes are coded as -9 (msats)
-            replace!(samplerow, "-9" => "0"^digits)
-
-            # sample name and population
-            push!(sample_meta_array[1], popfirst!(samplerow))
-            push!(sample_meta_array[2], popcount)
-
-            # phase the loci into tuples
-            converted_row = map(k -> phase(k, geno_type, digits), samplerow)
-            push!(sample_geno_array, converted_row)
-
-            # get the ploidy via # of alleles in the first non-missing locus
-            push!(sample_meta_array[3], length((skipmissing(converted_row) |> collect)[1]))
-
-            # long and lat
-            push!(sample_meta_array[4], missing) ; push!(sample_meta_array[5], missing)
-        end
+    # load in samples and genotypes
+    if diploid == true
+        geno_df = CSV.read(infile,
+                delim = "\t",
+                header = 0,
+                datarow = pop_idx[1] + 1,
+                copycols = false,
+                comment = popsep
+                )
+    else
+        geno_df = CSV.read(infile,
+                    delim = "\t",
+                    header = 0,
+                    datarow = pop_idx[1] + 1,
+                    copycols = false,
+                    comment = popsep,
+                    type = String
+                    )
     end
 
+    sample_df = select(geno_df, 1)
+    sample_df[!,1] = replace.(string.(sample_df[!,1]), "," => "")
+    rename!(sample_df, [:name])
+    n_samples = size(sample_df,1)
+    popnames = string.(collect(1:length(popcounts)))
+    popid_array = [fill(i, j) for (i,j) in zip(popnames,popcounts)]
+    flat_popid = Iterators.flatten(popid_array) |> collect
+    insertcols!(sample_df, 2, :population => flat_popid)
+    insertcols!(sample_df,3, :longitude => fill(missing, n_samples) |> Vector{Union{Missing, Float32}})
+    insertcols!(sample_df,4, :latitude => fill(missing, n_samples) |> Vector{Union{Missing, Float32}})
+
+    ## print input info
     @info "\n$(abspath(infile))
-$(length(sample_meta_array[1])) samples detected
-$(popcount) populations detected using \"$popsep\" seperator
+$(n_samples) samples detected
+$(length(popnames)) populations detected using \"$popsep\" seperator
 $(length(locinames)) loci detected"
-    # convert the entire thing into a matrix
-    geno_matrix = hcat(sample_geno_array...)
 
-    # convert back into an array of arrays of loci instead of samples
-    loci_array = collect.(eachrow(geno_matrix))
+    select!(geno_df, Not(1))
 
-    # create the two dataframes necessary for a PopObj
-    samples = DataFrame([j => k for (j,k) in zip(sample_meta_names, sample_meta_array)])
-    loci = DataFrame([j => k for (j,k) in zip(Symbol.(locinames), loci_array)])
+    if diploid == true
+        loc_df = map(eachcol(geno_df)) do locus
+            map(i -> phase_dip(i, geno_type, digits), locus)
+            #phase.(locus, geno_type, digits)
+        end |> DataFrame
+        ploidy = fill(Int8(2), n_samples)
+    else
+        loc_df = map(eachcol(geno_df)) do locus
+            map(i -> phase(i, geno_type, digits), locus)
+            #phase.(locus, geno_type, digits)
+        end |> DataFrame
 
-    return PopObj(samples, loci)
+        ## ploidy finding
+        ploidy = Vector{Int8}()
+
+        @inbounds for i in (1:n_samples)
+            @inbounds for j in eachcol(loc_df)
+                j[i] === missing && continue   # if missing, go to next locus
+                push!(ploidy, length(j[i]))   # if not, get ploidy and push to vector
+                break   # break out of the loop and begin next sample
+            end
+        end
+    end
+
+    rename!(loc_df, locinames)
+    insertcols!(sample_df, 3, :ploidy => ploidy)
+
+    return PopObj(sample_df, loc_df)
 end
-=#
+
 
 ### VCF parsing ###
 
@@ -518,47 +506,17 @@ functions it wraps; please see their respective docstrings in the Julia help con
 `read("juglans_nigra.vcf")`
 """
 function Base.read(infile::String; kwargs...)
-    kwargs = Dict(kwargs)
     ext = split(infile, ".")[end]
     if ext == "gen" || ext == "genepop"
-        if haskey(kwargs, :digits)
-            digits = kwargs[:digits]
-        else
-            digits = 3
-        end
-        if haskey(kwargs, :popsep)
-            popsep = kwargs[:popsep]
-        else
-            popsep = "POP"
-        end
-        if haskey(kwargs, :marker)
-            marker = kwargs[:marker]
-        else
-            marker = "snp"
-        end
-        return genepop(infile, digits = digits, popsep = popsep, marker = marker)
+        return genepop(infile;kwargs...)
 
     elseif ext == "csv" || ext == "txt" || ext == "tsv"
-        if haskey(kwargs, :delim)
-            delim = kwargs[:delim]
-        else
-            delim = r"\,|\s|\t"
-        end
-        if haskey(kwargs, :digits)
-            digits = kwargs[:digits]
-        else
-            digits = 3
-        end
-        if haskey(kwargs, :marker)
-            marker = kwargs[:marker]
-        else
-            marker = "snp"
-        end
-        return csv(infile, delim = delim, digits = digits, marker = marker)
+        return delimited(infile; kwargs...)
 
     elseif ext == "vcf" || ext == "bcf"
-            ext == "vcf" && return vcf(infile)
-            ext == "bcf" && return bcf(infile)
+        ext == "vcf" && return vcf(infile)
+        ext == "bcf" && return bcf(infile)
+
     else
         @error "file type not recognized by filename extension \n delimited: .csv | .tsv | .txt \n genepop: .gen | .genepop \n variant call formant: .bcf | .vcf"
     end

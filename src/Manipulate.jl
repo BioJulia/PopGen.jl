@@ -250,7 +250,7 @@ function populations!(data::PopObj; rename::Union{Nothing, Dict, Vector} = nothi
             eachkey ∉ data.samples.population && @warn "$eachkey not found in PopObj"
             replace!(data.samples.population, eachkey => rename[eachkey])
         end
-        @info "renaming populations"
+        #@info "renaming populations"
         return populations(data,listall = true)
     elseif replace != nothing
         if typeof(replace) == Dict
