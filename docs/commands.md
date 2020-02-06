@@ -1,4 +1,4 @@
-These are the included PopObj viewing and manipulating commands. Using standard Julia conventions, only commands ending with a bang `!` are mutable, meaning they alter the input data. So, commands like `populations` will show you population ID's, whereas `populations!` will change them in your `PopObj`. The mutable commands here alter the data in your `PopObj`, but not the source data (i.e. the files used to create the `PopObj`). Read over [Accessing parts of a PopObj](PopObj_accessing.md) to become familiar with the components of a `PopObj`. 
+These are the included PopObj viewing and manipulating commands. Using standard Julia conventions, only commands ending with a bang `!` are mutable, meaning they alter the input data. So, commands like `populations` will show you population ID's, whereas `populations!` will change them in your `PopObj`. The mutable commands here alter the data in your `PopObj`, but not the source data (i.e. the files used to create the `PopObj`). Read over [Accessing parts of a PopObj](getting_started/PopObj_accessing.md) to become familiar with the components of a `PopObj`. 
 
 
 To follow along like a tutorial,  use the `gulfsharks` data. Load the data in if you haven't already:
@@ -177,12 +177,16 @@ julia> populations(sharks, listall=true)
 ### rename populations
 
 ```julia
-populations!(data::PopObj; rename::Dict, replace::Tuple)
+populations!(data::PopObj; rename::Union{Dict, Vector}}, replace::Tuple)
 ```
-Use the `rename = ` keyword to rename the population ID's of a `PopObj` (the `.population`). Uses a `Dict` of `[population_name] => replacement` to rename. It returns `population(::PopObj,listall=true)` of your renamed PopObj.
+Use the `rename = ` keyword to rename the population ID's of a `PopObj` (the `.population`). Uses a `Dict` of `[population_name] => replacement` to rename or a vector of names to replace the current ones. If using a vector, then the vector length must be the same as the number of unique population names in your PopObj. It returns `population(::PopObj,listall=true)` of your renamed PopObj.
 
 ``` julia tab="rename populations"
-# create a dictionary of name conversions
+# create a vector of new population names
+julia> new_popnames = ["Atlantic", "Atlantic", "Atlantic","Gulf", "Gulf","Gulf","Gulf"];
+
+
+# or create a dictionary of name conversions
 julia> new_popnames = Dict(
     		"Cape Canaveral" => "Atlantic",
 			"Georgia" => "Atlantic",
@@ -191,7 +195,7 @@ julia> new_popnames = Dict(
     		"Mideast Gulf" => "Gulf",
     		"Northeast Gulf" => "Gulf",
     		"Southeast Gulf" => "Gulf"
-		)
+		);	
 
 julia> populations!(sharks, rename = new_popnames)
 ```
@@ -218,15 +222,19 @@ julia> populations!(sharks, rename = new_popnames)
 
 ### replace population names
 
-You may also use the `replace` keyword in `populations!` to outright replace all the population names or fill in new ones. This is particularly useful when importing from VCF format when population information is not provided. This method will completely replace the population names of a `PopObj` regardless of what they currently are. Internally, it will generate an vector of population names from a tuple of (counts, names) where `counts` is a vector of the number of samples per population and `names` is a vector of the names of the populations. You can also use a named tuple `(counts = , names = )` if you prefer. Since we know our number of samples per population from earlier, we can create a vector of those counts as so:
+You may also use the `replace` keyword in `populations!` to outright replace all the population names or fill in new ones. This is particularly useful when importing from VCF format when population information is not provided. This method will completely replace the population names of a `PopObj` regardless of what they currently are. Internally, it will generate an vector of population names from a tuple of (names, counts) where `names` is a vector of the names of the populations and `counts` is a vector of the number of samples per population. You can also use a named tuple `(counts = , names = )` if you prefer. Since we know our number of samples per population from earlier, we can create a vector of those counts as so:
 
-```
+!!!warning "Double-check your population counts"
+	The population counts below are after we've removed some individuals earlier on this page. If you're playing along and getting errors that the lengths don't match, then get make sure you're using the right population counts. You can get those numbers with `populations(sharks)`.
+
+```julia
 counts = [18, 30, 28, 65, 28, 20, 20]
 ```
 
+
 and we can also create the vector of the names in the order in which they appeared:
 
-```
+```julia
 popnames = ["Cape Canaveral", "Georgia", "S Carolina", "FL Keys", "Mideast Gulf", "Northeast Gulf", "Southeast Gulf"]
 ```
 
@@ -259,11 +267,11 @@ julia> populations!(sharks, replace = (counts = counts, names = popnames))   # N
 
 ## Display Specific Loci and/or Samples
 
-These are the "public" functions to retrieve sample genotype information in an easy-on-the-eyes format, whereas calculations in other parts of PopGen.jl use much more barebones functions [under the hood](hidden_api.md) suitable for high-throughput programming.
+These are the "public" functions to retrieve sample genotype information in an easy-on-the-eyes format, whereas calculations in other parts of PopGen.jl use much more barebones functions [under the hood](other/api/hidden_api.md) suitable for high-throughput programming.
 
 ### get loci names
 
-```
+```julia
 loci(data::PopObj)
 ```
 
@@ -603,48 +611,16 @@ julia> missing(sharks, mode = "full")
 ```
 ??? tip "alternative names"
     Each `mode` has an extra synonymous name just because we can and want you to have the option of more explicitly legible code. If you get the `mode` wrong, it will let you know with an error message and run the default `"sample"` mode anyway.
-    | mode     | alt. name    |
-    | -------- | ------------ |
-    | "sample" | "individual" |
-    | "pop"    | "population" |
-    | "locus"  | "loci"       |
-    | "full"   | "detailed"   |
 
+	- "sample"  <=>   "individual"
+	- "pop"   <=>   "population"
+	- "locus"  <=>  "loci"
+	- "full"  <=>  "detailed" 
 
-### plot missing data (under construction)
-
-```julia
-plot_missing(data::PopObj; color = false)
-```
-Return an interactive plot of the number of missing loci in individuals of a `PopObj`, along with the number of missing individuals per locus. Use `color = [color1, color2, ...]` to set a custom color palette for the boxplots. 
-
-Example:
-
-```julia
-julia> plot_missing(sharks)
-```
-![](img/missing_plot.png)
-
-
-??? info "saving interactive plots"
-    To save the interactive plots, you can use the `savehtml` function from the `PlotlyJS.jl` package:
-    ```julia 
-    PlotlyJS.savehtml(plot, "filename.html")
-    ```
-    If you don't specify a full path in the filename, it will save it in your current working directory.
-    ```julia
-    #example
-    julia> using PlotlyJS ;
-    ```
-    
-    ```
-    julia> PlotlyJS.savehtml(plot_missing(sharks), "/home/pdimens/missingness.html")
-    ```
-    
-    - use a third argument `:embed` to make the plots fully viewable offline. The output files are much larger (relatively) because it embeds the Plotly javeascript into the file. For context, the`gulfsharks` plot file is ~3.5mb when using `:embed`
 
 
 ## Location Data
+
 ### view location data
 ```julia
 locations(data::PopObj)
@@ -696,7 +672,7 @@ However, if your data is in decimal minutes rather than decimal degrees, use the
 locations!(data::PopObj; xloc::Vector{String}, yloc::Vector{String})
 ```
 
-Adds location data (longitude, latitude) to `PopObj`. Takes decimal degrees or decimal minutes format. **Must** use minus-sign instead of cardinal directions (i.e. 14 32.11W is **not** vaild). Location data must be in order of  individuals (`ind`). Replaces existing `PopObj` location data.
+Adds location data (longitude, latitude) to `PopObj`. Takes decimal degrees or decimal minutes format. **Must** use minus-sign instead of cardinal directions (i.e. 14 32.11W is **not** vaild). Location data must be in order of  individuals (`name`). Replaces existing `PopObj` location data.
 
 - Decimal Degrees : `-11.431`
 - Decimal Minutes : `"-11 43.11"` (must use space and double-quotes)
@@ -710,15 +686,3 @@ julia> lat = a.latitdue = rand(20:30, 212) ;
 
 julia> locations!(a, long, lat)	;
 ```
-
-### plot location data
-```julia
-plot_locations(data::PopObj, region = "world", projection = "orthogonal")
-```
-You're encouraged to plot locations how you see fit. For convenience and speed, we provide this command to make a decent, albeit simple interactive plot (Plotly) and save some time. There is a sizeable list of available map projections and regions if you look this function up in the `help?>` REPL prompt. 
-
-```julia
-julia> plot_locations(sharks)
-```
-
-![plot_locations](img/locations_plot_world.png)

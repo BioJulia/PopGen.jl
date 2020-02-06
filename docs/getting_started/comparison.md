@@ -6,7 +6,7 @@ There's a reason we started investing so many hours and so many new grey hairs i
 2. written in a single language
 3. easy to use
 
-So, we'd like to prove that Julia and PopGen.jl actually achieves that by showing a few benchmarks comparing PopGen.jl to `adegenet` and `pegas`, which along with `ape` are arguably the most commonly used and robust population genetic packages available. It's worth mentioning that we ourselves use and have published with these packages, and are tremendously grateful for the work invested in those packages. We love those folks and have tremendous respect and envy for the work they continue to do! Here are links to [adegenet](https://github.com/thibautjombart/adegenet), [pegas](https://academic.oup.com/bioinformatics/article/26/3/419/215731/), and [ape](https://cran.r-project.org/package=ape).  
+So, we'd like to prove that Julia and PopGen.jl actually achieves that by showing a few benchmarks comparing PopGen.jl to `adegenet` and `pegas`, which along with `ape` are arguably the most commonly used and robust population genetic packages available. It's worth mentioning that we ourselves use and have published work incorporating these packages, and are tremendously grateful for the work invested in those packages. We appreciate those folks and have tremendous respect and envy for the work they continue to do! Here are links to [adegenet](https://github.com/thibautjombart/adegenet), [pegas](https://academic.oup.com/bioinformatics/article/26/3/419/215731/), and [ape](https://cran.r-project.org/package=ape).  
 
 
 
@@ -30,11 +30,11 @@ As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux
 
 ### Loading in data
 
-Since `gulfsharks` is shamelessly provided in PopGen.jl, we simply invoke the `gulfsharks()` command in Julia. If you would like to try this yourself in R, find the `gulfsharks.gen` file in the package repository under `/data/data/gulfsharks.gen`. It will print out the input filename several times, which is omitted below for clarity.
+Since `gulfsharks` is shamelessly provided in PopGen.jl, we simply invoke the `gulfsharks()` command in Julia. If you would like to try this yourself in R, find the `gulfsharks.gen` file in the package repository under `/data/data/gulfsharks.gen`. It will print out the input filename several times, which is omitted below for clarity. Since the file importer now uses CSV.jl to read in the file, there are two steps of the genepop parser that are multithreaded. However, the majority of the data parsing (formatting the raw data into a correct PopObj structure) occurs using a single thread.
 
 ```julia tab="Julia"
 julia> @btime x = gulfsharks() ; # hide the output
-  1.157 s (12697454 allocations: 673.02 MiB)
+1.049 s (2472280 allocations: 166.30 MiB)
 ```
 
 This R benchmark will take a few minutes. Consider  making some tea while you wait.
@@ -47,7 +47,7 @@ Unit: seconds
  5.670637 6.218719 6.745065 6.387936 7.019667 9.173005   100
 ```
 
-Comparing averages, PopGen.jl clocks in at `1.157s` versus adegenet's `6.745s` , so ~5.8x faster.
+Comparing averages, PopGen.jl clocks in at `1.049s` versus adegenet's `6.745s` , so ~6.4x faster.
 
 Julia  :rocket:   |    R  :snail:
 
@@ -71,7 +71,7 @@ versus
 5331536 bytes
 ```
 
-![clutches pearls](img/clutches pearls cactus.png)
+![clutches pearls](../img/clutches pearls cactus.png)
 
 What sorcery is this?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles). An `Int8` is a signed integer that occupies 8bits of memory, whereas an `Int16` occupies 16bits (as compared to a standard `Int64`). 
 

@@ -8,7 +8,11 @@ Currently, PopGen.jl provides three different file parsers with which to create 
 
 Each of the filetypes have their own file importer denoted simply by the file type: `delimited()`, `genepop()`, `bcf()`, and `vcf()`. You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper for all three called `read()`. Since `read()` already exists in `Base` Julia, this function was not exported, and must be called formally as `PopGen.read()` to avoid any unintentional dispatch errors. `PopGen.read()` uses all the same keyword arguments as do the commands specific to their filetypes, therefore you should have a look at those commands (usually the defaults suffice). 
 
+```julia
+PopGen.read(infile::String; kwargs...)
+```
 
+where `infile` is a String of your filename (in quotes) and `kwargs` are the corresponding keyword arguments associated with your file type, which are found on their respective pages.
 
 `PopGen.read()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below. If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.gen.final.v2.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and ignore file extensions. Ultimately, what crazy extensions you give your files is your business, and we love that about you. 
 
@@ -46,16 +50,16 @@ Accepted extensions: `.gen`, `.genepop`
 - then comes list of all loci, usually 1-per-line
   - sometimes horizontally arranged and separated by commas
 - populations separated by word "POP"
-- sample names followed by comma and space
-- genotypes separated by tabs
-- genotypes represented as a combination of ploidy x 3-digits 
-	- e.g. for genotype 001002 
+- sample names followed by **comma and tab**
+- genotypes separated by **tabs**
+- genotypes represented as a combination of ploidy x _n_-digits 
+	- e.g. for genotype 001002 (3 digits per allele)
 	- allele 1 = 001
 	- allele 2 = 002
 
 
 
-### [Variant Call Format](vcf.md)
+### [Variant Call Format](variantcall.md)
 
 Accepted extensions: `.vcf`, `.bcf`
 

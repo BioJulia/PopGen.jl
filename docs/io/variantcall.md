@@ -1,6 +1,6 @@
 ## Import a BCF/VCF file as a `PopObj`
 
-PopGen.jl provides a simple command `vcf` to import a VCF file as a `PopObj`, which requires only the name of the file and nothing else.
+PopGen.jl provides a simple command `vcf` to import a VCF file as a `PopObj`, which requires only the name of the file and nothing else. While not strictly necessary, if you have polyploid or mixed-ploidy samples, this import method may be most efficient.
 
 ```julia
 potato = vcf("/home/data/russet_potatoes.vcf")
@@ -15,16 +15,16 @@ cabbage = bcf("/home/data/nappa_cabbage.bcf")
 ??? warning "Windows users"
     make sure to change your backslashes "\" to forward slashes "/" 
 
-## What BCF/VCF files lack
+## What BCF/VCF files contain and lack
 
-Due to the nature of the file format, importing variant call files will provide:
+Due to the nature of the file format, importing variant call files **will** provide:
 
 - sample names
 - ploidy of each sample
 - locus names
 - genotypes
 
-but they will **not** provide:
+but they **will not** provide:
 
 - population information
 - latitude or longitude

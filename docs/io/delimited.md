@@ -1,7 +1,7 @@
 ## Import a delimited file as a `PopObj`
 
 ```julia
-delimited(infile; delim, digits = 3, marker = "snp")
+delimited(infile; delim = ",", digits = 3, marker = "snp", diploid = true)
 
 # Example
 julia> a = delimited("/data/cali_poppy.csv", digits = 2)
@@ -16,13 +16,11 @@ julia> a = delimited("/data/cali_poppy.csv", digits = 2)
 
 ### Keyword Arguments
 
-- `#!julia delim::Union{Char,String,Regex}` : delimiter of the file, can be a string, character, or regex
+- `#!julia delim::String` : delimiter of the file, as a string. must be a single delimiter. (default: `","`)
 
-!!! info ""
-    by default, it recognizes any of the basic three delimiters (comma, tab, space), so likely no input will be required
-
-- `#!julia digits::Int64` : the number of digits used to denote an allele (default = 3)
+- `#!julia digits::Int64` : the number of digits used to denote an allele (default: `3`)
 - `#!julila marker::String`  : "snp" (default) or "msat" for microsatellites
+- `#!julila diploid::Bool` :  uses memory-optimized parsing for diploid samples (default: `true`)
 
 
 
@@ -31,7 +29,8 @@ julia> a = delimited("/data/cali_poppy.csv", digits = 2)
 - Loci names must be first row
 - Individuals names must be first value in row
 - Population ID's must be second value in row
-- **Optional:** longitude (x) values third value in row, latitude (y) fourth value in row
+- longitude (x) values third value in row, latitude (y) fourth value in row
+  - fill with zeroes if no location data
 
 ### example
 ```bash
@@ -46,3 +45,9 @@ snbarb_03,coast,11.15,0,001002,001001,001001 \n
 **Fun fact**
 
 You can also use the command `csv()` synonymously with `delimited()`. 
+
+
+
+## Acknowledgements
+
+Thanks to the efforts of the [CSV.jl](https://github.com/JuliaData/CSV.jl) and [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl) teams, we leverage those packages to do much of the heavy lifting within this parser. 

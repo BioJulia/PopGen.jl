@@ -30,7 +30,7 @@ Documentation is everything! We recognize Julia is a comparatively young languag
 
 #### Speed and syntax
 
-The speed is comparable to C when coded correctly. Also, has Python-like syntax with **optional** tabs. We are also fans of 1-indexing, but that's more of a perk. Not convinced? Check out our [comparison benchmarks](comparison.md).
+The speed is comparable to C when coded correctly. Also, has Python-like syntax with **optional** tabs. We are also fans of 1-indexing, but that's more of a perk. Not convinced? Check out our [comparison benchmarks](getting_started/comparison.md).
 
 #### A modern language for modern problems
 
@@ -46,7 +46,7 @@ Like most Julia packages, PopGen.jl is written entirely in Julia, meaning the co
 
 #### Package manager
 
-Which, let's be honest, is such a delight to use. [Installing PopGen.jl](install.md) should be simple, consistent, and effortless thanks to the brilliant built-in package manager in Julia. 
+Which, let's be honest, is such a delight to use. [Installing PopGen.jl](getting_started/install.md) should be simple, consistent, and effortless thanks to the brilliant built-in package manager in Julia. 
 
 ## Authors
 

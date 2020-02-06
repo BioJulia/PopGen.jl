@@ -88,6 +88,11 @@ end
     locus(::PopObj, ::Union{String, Symbol})
 Convenience wrapper to display all the genotypes of a locus as an array. Equivalent to
 `PopObj.loci.locusname` and `PopObj.loci[!, :locusname]`.
+
+### Example
+```
+locus(gulfsharks(), "contig_211212")
+```
 """
 function locus(data::PopObj, locus::String)
     data.loci[!, Symbol(locus)]
@@ -112,8 +117,9 @@ to return a DataFrame corresponding with that missing information.
 - "full" - returns a count of missing genotypes per locus per population
 
 ### Example:
-
-`missing(gulfsharks(), mode = "pop")`
+```
+missing(gulfsharks(), mode = "pop")
+```
 """
 function Base.missing(data::PopObj; mode::String = "sample")
     if mode == "sample" || mode == "individual"
@@ -246,33 +252,36 @@ population names are "North", "South", "East" and their sizes are 15, 32, 11:
 """
 function populations!(data::PopObj; rename::Union{Nothing, Dict, Vector} = nothing, replace::Union{Nothing, Tuple, NamedTuple} = nothing)
     if rename != nothing
-        for eachkey in keys(rename)
-            eachkey ∉ data.samples.population && @warn "$eachkey not found in PopObj"
-            replace!(data.samples.population, eachkey => rename[eachkey])
-        end
-        #@info "renaming populations"
-        return populations(data,listall = true)
-    elseif replace != nothing
-        if typeof(replace) == Dict
-            if typeof(replace) <: NamedTuple
-                popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
-            else typeof(replace) <: Tuple
-                popid_array = [fill(i, j) for (i,j) in zip(replace[1], replace[2])]
+        if typeof(rename == Dict)
+            for eachkey in keys(rename)
+                eachkey ∉ data.samples.population && @warn "$eachkey not found in PopObj"
+                replace!(data.samples.population, eachkey => rename[eachkey])
             end
-            flat_popid = Iterators.flatten(popid_array) |> collect
-            length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
-            data.samples.population = flat_popid
-            #@info "overwriting all population names"
-            return populations(data, listall = true)
+            #@info "renaming populations"
+            return populations(data,listall = true)
         else
             current_popnames = unique(data.samples.population)
             ln_current = length(current_popnames)
             ln_new = length(rename)
             ln_current != ln_new && error("$ln_new population names provided, but $ln_current found in PopObj")
+            [replace!(data.samples.population, i => j) for (i,j) in zip(current_popnames, rename)]
+            return populations(data,listall = true)
+            #=
             rn_dict = Dict()
             [rn_dict[i] = j for (i,j) in zip(current_popnames, rename)]
-            populations!(data, rename = rn_dict)
+            return populations!(data, rename = rn_dict)
+            =#
+    elseif replace != nothing
+        if typeof(replace) <: NamedTuple
+            popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
+        else typeof(replace) <: Tuple
+            popid_array = [fill(i, j) for (i,j) in zip(replace[1], replace[2])]
         end
+        flat_popid = Iterators.flatten(popid_array) |> collect
+        length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
+        data.samples.population = flat_popid
+        #@info "overwriting all population names"
+        return populations(data, listall = true)
     else
         error("specify rename = Dict() to rename populations, or replace=(counts,names) to replace all names")
     end
@@ -280,7 +289,7 @@ end
 
 const population = populations
 const population! = populations!
-
+const popnames = populations!
 
 ##### Removal #####
 
@@ -288,11 +297,11 @@ const population! = populations!
     remove_loci!(data::PopObj, loci::Union{String, Vector{String}})
 Removes selected loci from a `PopObj`.
 
-Examples:
-
-`remove_loci!(nancycats, "fca8")`
-
-`remove_loci!(nancycats, ["fca8", "fca23"])`
+### Examples
+```
+remove_loci!(nancycats, "fca8")
+remove_loci!(nancycats, ["fca8", "fca23"])
+```
 """
 function remove_loci!(data::PopObj, loci::String)
     sym_loci = Symbol(loci)
@@ -319,11 +328,11 @@ end
     remove_samples!(data::PopObj, samp_id::Union{Vector{String}})
 Removes selected samples from a `PopObj`.
 
-Examples:
-
-`remove_samples!(nancycats, "N100")`
-
-`remove_samples!(nancycats, ["N100", "N102", "N211"])`
+### Examples
+```
+remove_samples!(nancycats, "N100")
+remove_samples!(nancycats, ["N100", "N102", "N211"])
+```
 """
 function remove_samples!(data::PopObj, samp_id::Union{String, Vector{String}})
     # get samp_id indices
@@ -363,9 +372,11 @@ Returns a dataframe of samples, population, genotypes. View the genotypes of
 specific samples for specific loci in a `PopObj`. Default shows all genotypes
 for all individuals.
 
-`view_genotypes(nancycats, loci = "fca8")`
-
-`view_genotypes(nancycats, samples = "N226", loci = ["fca8", "fca23"])`
+### Examples
+```
+view_genotypes(nancycats, loci = "fca8")
+view_genotypes(nancycats, samples = "N226", loci = ["fca8", "fca23"])
+```
 """
 function view_genotypes(data::PopObj; samples::Union{String, Array, Nothing}= nothing, loci::Union{String, Array, Nothing}= nothing)
     if loci == nothing && samples == nothing

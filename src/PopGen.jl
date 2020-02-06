@@ -32,7 +32,7 @@ export PopObj,
     loci,
     isolate_genotypes,
     locations, locations!,
-    population, populations, population!, populations!,
+    population, populations, population!, populations!, popnames
     relatedness, pairwise_relatedness, kinship,
     remove_inds!,
     remove_loci!,
