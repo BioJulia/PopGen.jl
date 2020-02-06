@@ -41,6 +41,10 @@ and `digit` to specify the number of digits/characters used per allele in a locu
     return [allele1, allele2] |> sort |> Tuple
 end
 
+@inline function phase_dip(loc::Missing, type::DataType, digit::Int)
+    return missing
+end
+
 @inline function phase_dip(loc::String, type::DataType, digit::Int)
     loc == "-9" && return missing
     newloc = parse(Int32, loc)
