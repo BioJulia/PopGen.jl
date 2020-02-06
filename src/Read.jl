@@ -5,11 +5,12 @@ Takes a String of numbers returns a typed locus appropriate for PopGen.jl as use
 and `digit` to specify the number of digits/characters used per allele in a locus.
 
 ## Examples
-`ph_locus = phase("128114", Int16, 3)`
-
-`map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])`
-
-`[phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]`
+```
+ph_locus = phase("128114", Int16, 3)
+map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
+# or #
+[phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
+```
 """
 @inline function phase(loc::String, type::DataType, digit::Int)
     loc == "-9" && return missing
@@ -27,11 +28,12 @@ of a locus into a tuple of `type` Type. Use `type` to specify output type (`Int8
 and `digit` to specify the number of digits/characters used per allele in a locus.
 
 ## Examples
-`ph_locus = phase("128114", Int16, 3)`
-
-`map(i -> phase_dip(i, Int16, 3), ["112131", "211112", "001003", "516500"])`
-
-`[phase_dip(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]`
+```
+ph_locus = phase("128114", Int16, 3)
+map(i -> phase_dip(i, Int16, 3), ["112131", "211112", "001003", "516500"])
+# or #
+[phase_dip(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
+```
 """
 @inline function phase_dip(loc::Int, type::DataType, digit::Int)
     loc == -9 || iszero(loc) && return missing
@@ -39,6 +41,10 @@ and `digit` to specify the number of digits/characters used per allele in a locu
     allele1 = loc ÷ units |> type
     allele2 = loc % units |> type
     return [allele1, allele2] |> sort |> Tuple
+end
+
+@inline function phase_dip(loc::Missing, type::DataType, digit::Int)
+    return missing
 end
 
 @inline function phase_dip(loc::String, type::DataType, digit::Int)
@@ -158,7 +164,9 @@ If location data is missing for a sample (which is ok!), make sure the value is 
 as *0*, otherwise there will be transcription errors!
 
 ## Example
-`lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);`
+```
+lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
+```
 
 ### Formatting example:
 name,population,long,lat,Locus1,Locus2,Locus3   \n
@@ -261,18 +269,19 @@ Load a Genepop format file into memory as a PopObj object.
 - `digits::Integer`: number of digits denoting each allele (default:  3)
 - `popsep::String` : word that separates populations in `infile` (default: "POP")
 - `marker::String` : "snp" (default) or "msat"
+- `delim::String` : file is tab `"\t"` (default) or space `" "` delimited
 - `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: true)
 ### File must follow standard Genepop formatting:
 - First line is a comment (and skipped)
 - Loci are listed after first line as one-per-line without commas or in single comma-separated row
 - A line with a particular keyword (default "POP") must delimit populations
 - Sample name is followed by a *comma and tab* (",  ")
-- File is *tab delimted*
+- File is *tab or space delimted*
 
 ## Example
-
- `waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "POP")`
-
+```
+waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "POP")
+```
 ### Genepop file example:
 Wasp populations in New York \n
 Locus1\n
@@ -293,7 +302,8 @@ function genepop(
     digits::Int = 3,
     popsep::String = "POP",
     marker::String = "snp",
-    diploid::Bool = true
+    diploid::Bool = true,
+    delim::String = "\t"
 )
     # establish types for genotypes
     if lowercase(marker) == "snp"
@@ -313,7 +323,7 @@ function genepop(
     push!(pop_idx, countlines(infile) + 1)
     popcounts = (pop_idx[2:end] .- pop_idx[1:end-1]) .- 1
 
-    locinames = Vector{String}()
+    #locinames = Vector{String}()
     # check for horizontal formatting
     # if popsep starts on the third line
     if pop_idx[1] <= 3
@@ -339,7 +349,7 @@ function genepop(
     # load in samples and genotypes
     if diploid == true
         geno_df = CSV.read(infile,
-                delim = "\t",
+                delim = delim,
                 header = 0,
                 datarow = pop_idx[1] + 1,
                 copycols = false,
@@ -347,7 +357,7 @@ function genepop(
                 )
     else
         geno_df = CSV.read(infile,
-                    delim = "\t",
+                    delim = delim,
                     header = 0,
                     datarow = pop_idx[1] + 1,
                     copycols = false,
@@ -499,11 +509,13 @@ functions it wraps; please see their respective docstrings in the Julia help con
 (e.g. `?genepop`) for specific usage details.
 
 ## Examples
-`read("cavernous_assfish.gen", markers = "msat", digits = 3)`
+```
+read("cavernous_assfish.gen", markers = "msat", digits = 3)
 
-`read("bos_tauros.csv")`
+read("bos_tauros.csv")`
 
-`read("juglans_nigra.vcf")`
+read("juglans_nigra.vcf")
+```
 """
 function Base.read(infile::String; kwargs...)
     ext = split(infile, ".")[end]

@@ -18,7 +18,6 @@ using Convex,
       ProgressMeter,
       Random,
       StatsBase
-      #PlotlyJS     REMOVE IN FAVOR OF PLOTRECIPES
 
 
 export PopObj,
@@ -32,13 +31,13 @@ export PopObj,
     loci,
     isolate_genotypes,
     locations, locations!,
-    population, populations, population!, populations!, popnames
+    population, populations, population!, populations!, popnames!,
     relatedness, pairwise_relatedness, kinship,
     remove_inds!,
     remove_loci!,
     missing,
     heterozygosity, het, He,
-    hwe_test, hwe,
+    hwe_test, hwe
     #plot_missing,
     #plot_locations
 
