@@ -317,7 +317,7 @@ function genepop(
     push!(pop_idx, countlines(infile) + 1)
     popcounts = (pop_idx[2:end] .- pop_idx[1:end-1]) .- 1
 
-    locinames = Vector{String}()
+    #locinames = Vector{String}()
     # check for horizontal formatting
     # if popsep starts on the third line
     if pop_idx[1] <= 3
