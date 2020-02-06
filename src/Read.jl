@@ -320,22 +320,23 @@ function genepop(
         end
     end
     length(pop_idx) == 0 && error("No populations found in $infile using separator \"$popsep\". Please check the spelling and try again.")
+    # create a theoretical place were another POP would be (preserve last population for counting)
     push!(pop_idx, countlines(infile) + 1)
     popcounts = (pop_idx[2:end] .- pop_idx[1:end-1]) .- 1
 
-    #locinames = Vector{String}()
-    # check for horizontal formatting
-    # if popsep starts on the third line
+    # check for horizontal formatting, where popsep would appear on the third line
     if pop_idx[1] <= 3
         gpop = open(infile, "r")
         # skip first line
         readline(gpop)
+        # second line should have all the loci
         locus_name_raw = readline(gpop)
         close(gpop)
         locinames = strip.(split(locus_name_raw |> join, ","))
         map(i -> replace!(i, "." => "_"), locinames)
         #locinames = replace.(locinames, "." => "_")
     else
+        #standard  vertical formatting
         locinames = CSV.read(infile,
                     header = 0,
                     datarow = 2,
@@ -353,7 +354,7 @@ function genepop(
                 header = 0,
                 datarow = pop_idx[1] + 1,
                 copycols = false,
-                comment = popsep
+                comment = popsep,
                 )
     else
         geno_df = CSV.read(infile,
@@ -366,14 +367,21 @@ function genepop(
                     )
     end
 
+    # split out sample name
     sample_df = select(geno_df, 1)
+    # remove trailing commas from sample names
     sample_df[!,1] = replace.(string.(sample_df[!,1]), "," => "")
+    # name the column
     rename!(sample_df, [:name])
+    # get the number of samples
     n_samples = size(sample_df,1)
+
+    # Count the number of popseps appearing in the file and name the pops 1...n in order of appearance
     popnames = string.(collect(1:length(popcounts)))
     popid_array = [fill(i, j) for (i,j) in zip(popnames,popcounts)]
     flat_popid = Iterators.flatten(popid_array) |> collect
     insertcols!(sample_df, 2, :population => flat_popid)
+    # add remaining columns needed for PopObj.samples
     insertcols!(sample_df,3, :longitude => fill(missing, n_samples) |> Vector{Union{Missing, Float32}})
     insertcols!(sample_df,4, :latitude => fill(missing, n_samples) |> Vector{Union{Missing, Float32}})
 
@@ -384,11 +392,19 @@ $(length(popnames)) populations detected using \"$popsep\" seperator
 $(length(locinames)) loci detected"
 
     select!(geno_df, Not(1))
+    # check columns to trim off ends if there were trailing whitespaces creating columns
+    # full of only missing values
+    while length(locinames) != size(geno_df,2)
+        if ismissing.(geno_df[!, size(geno_df,2)]) |> all == true
+            select!(geno_df, Not(size(geno_df,2)))
+        end
+    end
 
+    # phasing the loci depending on diploid or not
     if diploid == true
         loc_df = map(eachcol(geno_df)) do locus
             map(i -> phase_dip(i, geno_type, digits), locus)
-            #phase.(locus, geno_type, digits)
+            #phase_dip.(locus, geno_type, digits)
         end |> DataFrame
         ploidy = fill(Int8(2), n_samples)
     else
@@ -399,7 +415,6 @@ $(length(locinames)) loci detected"
 
         ## ploidy finding
         ploidy = Vector{Int8}()
-
         @inbounds for i in (1:n_samples)
             @inbounds for j in eachcol(loc_df)
                 j[i] === missing && continue   # if missing, go to next locus
@@ -409,7 +424,9 @@ $(length(locinames)) loci detected"
         end
     end
 
+    # rename to locus dataframe columns with the loci names
     rename!(loc_df, locinames)
+    # add the ploidy to the samples dataframe
     insertcols!(sample_df, 3, :ploidy => ploidy)
 
     return PopObj(sample_df, loc_df)

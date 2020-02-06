@@ -250,46 +250,104 @@ population names are "North", "South", "East" and their sizes are 15, 32, 11:
 
 `populations!(Starlings, replace = (counts = [15,32,11], names = ["North","South", "East"]))`
 """
-function populations!(data::PopObj; rename::Union{Nothing, Dict, Vector} = nothing, replace::Union{Nothing, Tuple, NamedTuple} = nothing)
-    if rename != nothing
-        if typeof(rename == Dict)
-            for eachkey in keys(rename)
-                eachkey ∉ data.samples.population && @warn "$eachkey not found in PopObj"
-                replace!(data.samples.population, eachkey => rename[eachkey])
-            end
-            #@info "renaming populations"
-            return populations(data,listall = true)
-        else
-            current_popnames = unique(data.samples.population)
-            ln_current = length(current_popnames)
-            ln_new = length(rename)
-            ln_current != ln_new && error("$ln_new population names provided, but $ln_current found in PopObj")
-            [replace!(data.samples.population, i => j) for (i,j) in zip(current_popnames, rename)]
-            return populations(data,listall = true)
-            #=
-            rn_dict = Dict()
-            [rn_dict[i] = j for (i,j) in zip(current_popnames, rename)]
-            return populations!(data, rename = rn_dict)
-            =#
-    elseif replace != nothing
-        if typeof(replace) <: NamedTuple
-            popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
-        else typeof(replace) <: Tuple
-            popid_array = [fill(i, j) for (i,j) in zip(replace[1], replace[2])]
-        end
-        flat_popid = Iterators.flatten(popid_array) |> collect
-        length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
-        data.samples.population = flat_popid
-        #@info "overwriting all population names"
-        return populations(data, listall = true)
-    else
-        error("specify rename = Dict() to rename populations, or replace=(counts,names) to replace all names")
+
+"""
+```
+populations!(data::PopObj, rename::Dict)
+populations!(data::PopObj, rename::Vector{String})
+populations!(data::PopObj, rename::Union{Tuple, NamedTuple})
+populations!(data::PopObj, oldnames::Vector{String}, newnames::Vector{String})
+```
+Multiple methods to assign or reassign population names to a `PopObj`.
+
+## Rename using a Dictionary
+Rename existing population ID's of `PopObj.samples.population` using a `Dict` of
+`population_name => replacement`
+### Example
+```
+potatopops = Dict("1" => "Idaho", "2" => "Russet")
+populations!(potatoes, potatopops)
+```
+
+## Rename using a Vector of Strings
+`Vector` of new unique population names in the order that they appear in the PopObj
+### Example
+```
+potatopops = ["Idaho", "Russet"]
+populations!(potatoes, potatopops)
+```
+## Rename using two Vectors of Strings
+Similar to the `Dict` method, except instead of creating a dictionary of "oldname" => "newname"
+you input a Vector{String} of `oldnames` followed by another of `newnames`. Logically, the
+new names will replace the old names in the same order as they appear (e.g. the first newname
+replaces the first oldname, etc.). Generally, the `Dict` method is preferred over this.
+### Example
+```
+populations!(potatoes, ["russet1", "russet2"], ["north_russet", "south_russet"])
+```
+## Replace using a Tuple or NamedTuple
+Completely replace the population names of a `PopObj` regardless of what they currently are.
+Will generate an array of population names from a tuple of (names, counts) where `names` is
+an array of the names of the populations and `counts` is an array of the number of samples
+per population. Can also use a named tuple with the keys `names` and `counts`.
+### Example
+To assign names for three populations in a `PopObj` named "Starlings" where new
+population names are "North", "South", "East" and their sizes are 15, 32, 11:
+```
+populations!(Starlings, (["North","South", "East"], [15,32,11]))
+populations!(Starlings, (counts = [15,32,11], names = ["North","South", "East"]))
+```
+"""
+function populations!(data::PopObj, rename::Dict)
+    for eachkey in keys(rename)
+        eachkey ∉ data.samples.population && @warn "$eachkey not found in PopObj"
+        replace!(data.samples.population, eachkey => rename[eachkey])
     end
+    return populations(data,listall = true)
 end
+
+function populations!(data::PopObj, rename::Vector{String})
+    current_popnames = unique(data.samples.population)
+    ln_current = length(current_popnames)
+    ln_new = length(rename)
+    ln_current != ln_new && error("$ln_new population names provided, but $ln_current found in PopObj")
+    [replace!(data.samples.population, i => j) for (i,j) in zip(current_popnames, rename)]
+    return populations(data,listall = true)
+end
+    #=
+    rn_dict = Dict()
+    [rn_dict[i] = j for (i,j) in zip(current_popnames, rename)]
+    return populations!(data, rename = rn_dict)
+    =#
+
+function populations!(data::PopObj, rename::Union{Tuple, NamedTuple})
+    if typeof(rename) <: NamedTuple
+        popid_array = [fill(i, j) for (i,j) in zip(rename.names, rename.counts)]
+    else typeof(rename) <: Tuple
+        if typeof(rename[1]) == Vector{String}
+            #if the first vector in the tuple is the names
+            popid_array = [fill(i, j) for (i,j) in zip(rename[1], rename[2])]
+        else
+            popid_array = [fill(i, j) for (i,j) in zip(rename[2], rename[1])]
+        end
+    end
+    flat_popid = Iterators.flatten(popid_array) |> collect
+    length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
+    data.samples.population = flat_popid
+    #@info "overwriting all population names"
+    return populations(data, listall = true)
+end
+
+function populations!(data::PopObj, oldnames::Vector{String}, newnames::Vector{String})
+    length(newnames) != length(oldnames) && error("number of current names and new names must match \n\t current: $(length(oldnames))  new: $(length(newnames))")
+    [replace!(data.samples.population, i => j) for (i,j) in zip(oldnames, newnames)]
+    return populations(data,listall = true)
+end
+
 
 const population = populations
 const population! = populations!
-const popnames = populations!
+const popnames! = populations!
 
 ##### Removal #####
 
