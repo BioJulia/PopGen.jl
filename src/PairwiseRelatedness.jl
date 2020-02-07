@@ -322,6 +322,7 @@ If the method is able to account for inbreeding in it's calculation then that op
 Available methods:
 - `"qg"` : Queller & Goodnight 1989  (diploid only)
 """
+#=
 function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
     all(data.samples.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
@@ -369,6 +370,59 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
 
     return output
 end
+=#
+
+#Multithreaded version - requires "Combinatorics" Package
+function pairwise_relatedness2(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
+    # check that dataset is entirely diploid
+    all(data.samples.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+
+    allele_frequencies = Dict()
+    for locus in names(data.loci)
+        allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
+    end
+
+    n = size(data.samples)[1]
+    n = n*(n-1) ÷ 2
+
+    if !verbose
+        prog = Progress(n, 1)
+    end
+
+    #Add switch to slightly change output depending on relatednes metric (e.g. convergence doesn't make sense for Moments Estimators)
+    if method == "dyadml"
+        output = DataFrame([String, String, Float64, Float64, Float64, Symbol], Symbol.(["Ind1", "Ind2", "I", "thread", "relatedness", "convergence"]), n)
+    end
+    if method == "qg"
+        #output = DataFrame(ind1 = [], ind2 = [], relatedness = [])
+        output = DataFrame([String, String, Float64, Float64, Float64], Symbol.(["Ind1", "Ind2", "I", "thread", "relatedness"]), n)
+    end
+
+    pairs = combinations(data.samples.name, 2) |> collect #This line requires Combinatorics pacakge
+
+    Threads.@threads for i in 1:n
+        ind1 = pairs[i][1]
+        ind2 = pairs[i][2]
+
+        output[i, :I] = i
+        output[i, :Ind1] = ind1
+        output[i, :Ind2] = ind2
+        output[i, :thread] = Threads.threadid()
+        if method == "qg"
+            output[i, :relatedness] = qg_relatedness(data, ind1, ind2, alleles = allele_frequencies)
+        end
+        if method == "dyadml"
+            dyad_out = dyadicML_relatedness(data, ind1, ind2, alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
+            output[i, :relatedness] = dyad_out[1]
+            output[i, :convergence] = dyad_out[3]
+        end
+
+        next!(prog)
+    end
+    return output
+end
+
+
 
 const relatedness = pairwise_relatedness
 const kinship = pairwise_relatedness
