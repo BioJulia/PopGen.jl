@@ -8,6 +8,7 @@ module PopGen
 
 
 using Convex,
+      Combinatorics,
       CSV,  # possibly
       DataFrames,
       Distributions,
