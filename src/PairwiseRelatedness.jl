@@ -373,7 +373,7 @@ end
 =#
 
 #Multithreaded version - requires "Combinatorics" Package
-function pairwise_relatedness2(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
+function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
     all(data.samples.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
