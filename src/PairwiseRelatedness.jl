@@ -170,15 +170,16 @@ function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = t
     #is then used to calculate relatedness
 
     Δ = Variable(8)
-    problem = maximize(sum(log(Pr_L_S * vcat(1 - sum(Δ), Δ))))
+    #problem = maximize(sum(log(Pr_L_S * vcat(1 - sum(Δ), Δ))))
+    problem = maximize(sum(Pr_L_S * vcat(1 - sum(Δ), Δ)))
     problem.constraints += 0 <= 1 - sum(Δ)
     problem.constraints += 1 - sum(Δ) <= 1
     problem.constraints += 0 <= Δ[1:8]
     problem.constraints += Δ[1:8] <= 1
 
     #shifted from actual relatedness calculations because the 1 - sum(Δ) goes at beginning
-    problem.constraints += 2 * ((1 - sum(Δ)) + 0.5 * (Δ[2] + Δ[4] + Δ[6]) + 0.25 * Δ[7]) <= 1
-    problem.constraints += 0 <= 2 * ((1 - sum(Δ)) + 0.5 * (Δ[2] + Δ[4] + Δ[6]) + 0.25 * Δ[7])
+    # problem.constraints += 2 * ((1 - sum(Δ)) + 0.5 * (Δ[2] + Δ[4] + Δ[6]) + 0.25 * Δ[7]) <= 1
+    # problem.constraints += 0 <= 2 * ((1 - sum(Δ)) + 0.5 * (Δ[2] + Δ[4] + Δ[6]) + 0.25 * Δ[7])
 
     Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit = 100), verbose = verbose) #maxit=100,
     #Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=5e-6, reltol = 1e-3, reltol_inacc = 5e-2), verbose = verbose)
@@ -261,7 +262,6 @@ function qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
         end
     end
     return (n1/d1 + n2/d2)/2
-
 end
 
 
@@ -330,3 +330,15 @@ cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbree
 
 cat_rel_qg = pairwise_relatedness(nancycats(), method = "qg", verbose = false)
 =#
+
+
+cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
+
+cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
+
+count(cat_rel_noInbreeding[i,4] == :Optimal for i in 1:27966)
+count(cat_rel_Inbreeding[i,4] == :Optimal for i in 1:27966)
+
+
+"N100"
+"N106"
