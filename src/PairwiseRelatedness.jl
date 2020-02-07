@@ -383,7 +383,8 @@ cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbree
 cat_rel_qg = pairwise_relatedness(nancycats(), method = "qg", verbose = false)
 =#
 
-
+#=
+Testing area
 cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
 
 cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
@@ -394,3 +395,4 @@ count(cat_rel_Inbreeding[i,4] == :Optimal for i in 1:27966)
 
 "N100"
 "N106"
+=#
