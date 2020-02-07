@@ -20,8 +20,7 @@ julia> ncats = nancycats() ; summary(ncats)
  Latitude: absent
 
  Population names and counts:
-17×2 DataFrame
-│ Row │ population │ count │
+│ num │ population │ count │
 │     │ Union…     │ Int64 │
 ├─────┼────────────┼───────┤
 │ 1   │ P01        │ 10    │
@@ -48,7 +47,7 @@ The spatial coordinates provided for the dataset in `adegenet` are completely un
 
 ## gulfsharks
 
-We also include the SNP dataset used in Dimens *et al.* 2019 "[A **genomic** assessment of movement and gene flow around the South Florida vicariance zone in the migratory coastal **blacknose shark**, *Carcharhinus acronotus*](https://link.springer.com/article/10.1007/s00227-019-3533-1)" since it was already on hand. Like `nancycats`, we provide a convenient function to load these data into PopGen.jl as a `PopObj`.
+We also include the SNP dataset used in Dimens *et al.* 2019 "[A genomic assessment of movement and gene flow around the South Florida vicariance zone in the migratory coastal blacknose shark, *Carcharhinus acronotus*](https://link.springer.com/article/10.1007/s00227-019-3533-1)" since it was already on hand. Like `nancycats`, we provide a convenient function to load these data into PopGen.jl as a `PopObj`.
 
 To use those data, simply invoke `gulfsharks()` without any arguments. 
 
@@ -64,8 +63,7 @@ julia> sharks = gulfsharks() ; summary(sharks)
  Latitude: present with 0 missing
 
  Population names and counts:
-7×2 DataFrame
-│ Row │ population     │ count │
+│ num │ population     │ count │
 │     │ Union…         │ Int64 │
 ├─────┼────────────────┼───────┤
 │ 1   │ Cape Canaveral │ 21    │

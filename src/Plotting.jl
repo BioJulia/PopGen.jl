@@ -1,39 +1,36 @@
 """
-    plot_missing(x::PopObj; color = false)
+    plot_missing(data::PopObj)
 Return an interactive plot of the number of missing loci in individuals of a
-`PopObj`, along with the number of missing individuals per locus. To set a
-custom color palette, use `color = [color1, color2, etc.]`
+`PopObj`, along with the number of missing individuals per locus.
 """
-function plot_missing(x::PopObj; color = false)
-    by_sample,by_loci = missing(x);
-    ys = Array[subdf[!, :missing] for subdf in groupby(by_sample[!, 1:3], :population)]
-    texts = Array[subdf[!, :name] for subdf in groupby(by_sample[!, 1:3], :population)]
-    popnum = length(by_sample[!, :population] |> unique)
-    if color == false
-        colors = ["hsl($i, 50%, 50%)" for i in range(0, stop=300, length=popnum)]
-    else
-        colors = color
-    end
-    returnplots = []
+function plot_missing(data::PopObj)
+    by_sample,by_loci = missing(data);
+    #ys = Array[subdf[!, :missing] for subdf in groupby(by_sample[!, 1:3], :population)]
+    #texts = Array[subdf[!, :name] for subdf in groupby(by_sample[!, 1:3], :population)]
+    popnum = length(by_sample.population |> unique)
+    colors = ["hsl($i, 50%, 50%)" for i in range(0, stop=300, length=popnum)]
 
-    byind = [box(y=y,
-            marker_color=mc,
-            name=name,
-            text = text,
-            jitter = 1,
-            pointpos = 0,
-            marker_size = 8.5,
-            boxpoints = "all",
-            marker=attr(line=attr(width=0.75)),
-            )
-            for (y, mc, name, text) in zip(ys, colors, unique(by_sample[!, :population]), texts)]
+    byind = box(
+        by_sample,
+        x = :missing,
+        group = :population,
+        marker_color=colors,
+        text = :name,
+        jitter = 1,
+        pointpos = 0,
+        marker_size = 8.5,
+        boxpoints = "all",
+        marker=attr(line=attr(width=0.75))
+    )
 
-    #=bylocus = bar(;x = by_loci[!, :1],
-                  y = by_loci[!, :2],
-                  marker=attr(color="rgb(146,134,184)"),
-                  name = "# missing data",
-                  )
-    =#
+    layout_ind = Layout(
+        title = "Number of missing loci per population",
+        hovermode = "closest",
+        yaxis = attr(title = "# missing loci", zeroline = false),
+        xaxis = attr(title = "Population", zeroline = false)
+    )
+
+
     loci_hist = histogram(x = by_loci[!, :missing],
                           marker_color = "rgb(217, 217, 217)",
                           name = "",
@@ -41,18 +38,8 @@ function plot_missing(x::PopObj; color = false)
                           xbins_size = 1,
                           showlegend = false)
 
-    layout_ind = Layout(title = "Number of missing loci per population",
-                    hovermode = "closest",
-                    yaxis = attr(title = "# missing loci", zeroline = false),
-                    xaxis = attr(title = "Population", zeroline = false)
-                    )
-    #=layout_loci = Layout(title = "Missing data per locus",
-                    hovermode = "closest",
-                    bargap = 0.05,
-                    yaxis = attr(title = "# missing", zeroline = false),
-                    xaxis = attr(title = "loci", zeroline = false, showticklabels = false),
-                    )
-    =#
+
+
     layout_hist = Layout(title = "Distribution of Locus Missingness",
                          xaxis = attr(title = "# of times locus missing", zeroline = false),
                          yaxis = attr(title = "# of loci", zeroline = false)

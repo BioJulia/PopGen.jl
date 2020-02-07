@@ -23,17 +23,7 @@ struct PopObj
             Columns should be: name, population, ploidy, longitude, latitude")
         end
         size(x,1) != size(y,1) && error("length mismatch of dataframes. samples: $(size(x,1)) | loci: $(size(y, 1))")
-        typeof(x.name) != Array{String,1} && @error ":name values must be of type String"
+        typeof(x.name) != Array{String,1} && error(":name values must be of type String")
         new(x,y)
     end
-end
-
-"""
-    PopOpt(samples::DataFrame, loci::DataFrame)
-An immutable version of a `PopObj`, used for under-the-hood processes in PopGen.jl.
-"""
-struct PopOpt
-    samples::DataFrame
-    loci::DataFrame
-    PopOpt(x::PopObj) = new(x.samples, x.loci)
 end

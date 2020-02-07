@@ -84,63 +84,122 @@ function loci(data::DataFrame)
     String.(names(data))
 end
 
+"""
+    locus(::PopObj, ::Union{String, Symbol})
+Convenience wrapper to display all the genotypes of a locus as an array. Equivalent to
+`PopObj.loci.locusname` and `PopObj.loci[!, :locusname]`.
+"""
+function locus(data::PopObj, locus::String)
+    data.loci[!, Symbol(locus)]
+end
+
+function locus(data::PopObj, locus::Symbol)
+    data.loci[!, locus]
+end
+
 
 #### Find missing ####
 
 """
-    missing(data::PopObj)
-Identify and count missing loci in each sample of a `PopObj`. Returns a tuple
-of `DataFrames`: loci per sample, number per loci.
+    missing(data::PopObj; mode::String = "sample")
+Get missing genotype information in a `PopObj`. Specify a mode of operation
+to return a DataFrame corresponding with that missing information.
 
-Example:
+#### Modes
+- "sample" - returns a count and list of missing loci per individual (default)
+- "pop" - returns a count of missing genotypes per population
+- "locus" - returns a count of missing genotypes per locus
+- "full" - returns a count of missing genotypes per locus per population
 
-`missing_ind,missing_loc = missing(gulfsharks)`
+### Example:
+
+`missing(gulfsharks(), mode = "pop")`
 """
-function Base.missing(data::PopObj)
-    # missing per sample
-    ind_geno = map(i -> get_sample_genotypes(data, i), data.samples.name)
-    count_miss_ind = map(ind_geno) do ind
-        count(i -> i === missing, ind)
-    end
+function Base.missing(data::PopObj; mode::String = "sample")
+    if mode == "sample" || mode == "individual"
+        # missing per sample
+        ind_geno = map(i -> get_sample_genotypes(data, i), data.samples.name)
+        count_miss_ind = map(ind_geno) do ind
+            count(i -> i === missing, ind)
+        end
 
-    # which loci are missing per sample
-    loci_names = loci(data)
-    miss_loci = map(ind_geno) do ind
-        [loci_names[i] for i in findall(j -> j === missing, ind)]
-    end
+        # which loci are missing per sample
+        loci_names = loci(data)
+        miss_loci = map(ind_geno) do ind
+            [loci_names[i] for i in findall(j -> j === missing, ind)]
+        end
 
-    # missing per locus
-    miss_per_loci = map(eachcol(data.loci)) do col
-        count(i->i===missing, col)
-    end
-
-    # create DataFrames of the two
     by_sample_df = DataFrame(
         name = data.samples.name,
-        population = data.samples.population,
         missing = count_miss_ind,
         loci = miss_loci |> Vector{Vector{String}}
     )
 
-    by_locus_df = DataFrame(
-        locus = loci_names,
-        missing = miss_per_loci
-    )
+    return by_sample_df
 
-    return by_sample_df, by_locus_df
+    elseif mode == "pop" || mode == "population"
+        # missing per sample
+        ind_geno = map(i -> get_sample_genotypes(data, i), data.samples.name)
+        count_miss_ind = map(ind_geno) do ind
+            count(i -> i === missing, ind)
+        end
+
+        by_sample_df = DataFrame(
+            name = data.samples.name,
+            population = data.samples.population,
+            missing = count_miss_ind
+        )
+
+        # collapse by_sample_df to get missing per population
+        by_pop_df = by(by_sample_df, :population, missing = :missing => sum)
+
+        return by_pop_df
+
+    elseif mode == "locus" || mode == "loci"
+        # missing per locus
+        miss_per_loci = map(eachcol(data.loci)) do col
+            count(i->i===missing, col)
+        end
+
+        by_locus_df = DataFrame(
+            locus = loci(data),
+            missing = miss_per_loci
+        )
+
+        return by_locus_df
+
+    elseif mode == "detailed" || mode == "full"
+        y = deepcopy(data.loci)
+        insertcols!(y, 1, :population => data.samples.population)
+
+        # get missing per locus per pop
+        z = aggregate(y, :population, i -> count(j -> j === missing, i))
+        return rename!(z, [:population, names(data.loci)...])
+
+        #= if pivoting
+        new_df = z[!, 2:end] |> Matrix |> permutedims |> DataFrame
+        rename!(new_df, Symbol.(unique(data.samples.population)))
+        insertcols!(new_df, 1, :loci => loci(data))
+        return new_df
+        =#
+
+    else
+        @error "Mode \"$mode\" not recognized. Please specify one of: sample, pop, locus, or full"
+        missing(data)
+    end
 end
 
 """
     populations(data::PopObj; listall::Bool = false)
-View unique population ID's in a `PopObj`.
+View unique population ID's and their counts in a `PopObj`.
 
-`listall = true`, displays `ind` and their `population` instead (default = `false`).
+- `listall = true` displays all samples and their `population` instead (default = `false`)
 """
-function populations(data::PopObj; listall::Bool = false)
+function populations(data::PopObj; listall::Bool = false, print::Bool = true)
     if listall == true
         @view data.samples[!, [:name, :population]]
     else
-        if ismissing.(data.samples.population) |> unique == [true]
+        if all(ismissing.(data.samples.population)) == true
             @info "no population data present in PopObj"
             return @view data.samples[!, [:name, :population]]
         end
@@ -149,54 +208,71 @@ function populations(data::PopObj; listall::Bool = false)
             population = unique(data.samples.population),
             count = popcounts
         )
+        return popcounts
     end
 end
 
 """
-    populations!(data::PopObj; rename::Dict, replace::Union{Tuple, NamedTuple})
+    populations!(data::PopObj; rename::Union{Dict, Vector}, replace::Union{Tuple, NamedTuple})
 Assign population names to a `PopObj`. There are two modes of operation:
 
 ## Rename
 
-Rename existing population ID's of `PopObj.population` using a `Dict` of `[population] => replacement`
+Rename existing population ID's of `PopObj.samples.population` using either:
+- `Dict` of `[population] => replacement`
+    - `potatopops = Dict("1" => "Idaho", "2" => "Russet")``
 
-Example:
+or
 
-`potatopops = Dict(1 => "Idaho", 2 => "Russet")`
+- `Vector` of new population names in the order that they appear in the PopObj
+    - `potatopops = ["Idaho", "Russet"]`
+
+### Example:
 
 `populations!(potatoes, rename = potatopops)`
 
 ## Replace (overwrite)
 Completely replace the population names of a `PopObj` regardless of what they currently are.
-Will generate an array of population names from a tuple of (counts, names) where `counts` is
-an array of the number of samples per population and `names` is an array of the names of the
-populations. Can also use a named tuple.
+Will generate an array of population names from a tuple of (names, counts) where `names` is
+an array of the names of the populations and `counts` is an array of the number of samples
+per population. Can also use a named tuple with the keys `names` and `counts`.
 
-Example assigning names for three populations in a `PopObj` named "Starlings":
-Assuming population sizes are 15, 32, 11 and we want to name them "North", "South", "East"
+Example assigning names for three populations in a `PopObj` named "Starlings" assuming
+population names are "North", "South", "East" and their sizes are 15, 32, 11:
 
-`populations!(Starlings, replace = ([15,32,11], ["North","South", "East"])`
-`populations!(Starlings, replace = (counts = [15,32,11], names = ["North","South", "East"])`
+`populations!(Starlings, replace = (["North","South", "East"], [15,32,11]))`
+
+`populations!(Starlings, replace = (counts = [15,32,11], names = ["North","South", "East"]))`
 """
-function populations!(data::PopObj; rename::Dict=Dict(), replace::Union{Tuple,NamedTuple}=(0,0))
-    if length(keys(rename)) != 0
+function populations!(data::PopObj; rename::Union{Nothing, Dict, Vector} = nothing, replace::Union{Nothing, Tuple, NamedTuple} = nothing)
+    if rename != nothing
         for eachkey in keys(rename)
             eachkey ∉ data.samples.population && @warn "$eachkey not found in PopObj"
             replace!(data.samples.population, eachkey => rename[eachkey])
         end
         @info "renaming populations"
         return populations(data,listall = true)
-    elseif replace != (0,0)
-        if typeof(replace) <: NamedTuple
-            popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
-        else typeof(replace) <: Tuple
-            popid_array = [fill(i, j) for (i,j) in zip(replace[2], replace[1])]
+    elseif replace != nothing
+        if typeof(replace) == Dict
+            if typeof(replace) <: NamedTuple
+                popid_array = [fill(i, j) for (i,j) in zip(replace.names, replace.counts)]
+            else typeof(replace) <: Tuple
+                popid_array = [fill(i, j) for (i,j) in zip(replace[1], replace[2])]
+            end
+            flat_popid = Iterators.flatten(popid_array) |> collect
+            length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
+            data.samples.population = flat_popid
+            #@info "overwriting all population names"
+            return populations(data, listall = true)
+        else
+            current_popnames = unique(data.samples.population)
+            ln_current = length(current_popnames)
+            ln_new = length(rename)
+            ln_current != ln_new && error("$ln_new population names provided, but $ln_current found in PopObj")
+            rn_dict = Dict()
+            [rn_dict[i] = j for (i,j) in zip(current_popnames, rename)]
+            populations!(data, rename = rn_dict)
         end
-        flat_popid = Iterators.flatten(popid_array) |> collect
-        length(flat_popid) != size(data.samples, 1) && error("length of names ($(length(flat_popid))) does not match sample number ($(length(data.samples.name)))")
-        data.samples.population = flat_popid
-        #@info "overwriting all population names"
-        return populations(data, listall = true)
     else
         error("specify rename = Dict() to rename populations, or replace=(counts,names) to replace all names")
     end
@@ -277,42 +353,7 @@ View individual/sample names in a `PopObj`
 Equivalent to `PopObj.samples.name`
 """
 function samples(data::PopObj)
-    data.samples.name
-end
-
-"""
-    summary(data::PopObj)
-Prints a summary of the information contained in a PopObj
-"""
-function Base.summary(data::PopObj)
-
-    println(" Object of type PopObj")
-    if typeof(skipmissing(data.loci[!, :1])[1][1]) == Int16
-        marker = "Microsatellite"
-    else
-        marker = "SNP"
-    end
-    println(" Marker type: ", marker)
-    ploidy = unique(data.samples.ploidy) |> sort
-    length(ploidy) == 1 && println(" Ploidy: ", ploidy |> join)
-    if length(ploidy) != 1
-        print(" Ploidy (varies): ")
-        print(ploidy[1]), [print(", $i") for i in ploidy[2:end]]
-    end
-    println("\n Number of individuals: ", length(data.samples.name))
-    println(" Number of loci: ", size(data.loci,2))
-    if ismissing.(data.samples.longitude) |> unique == [true]
-        println(" Longitude: none provided")
-    else
-        println(" Longitude: present with ", count(i -> i === missing, data.samples.longitude), " missing")
-    end
-    if ismissing.(data.samples.longitude) |> unique == [true]
-        println(" Latitude: none provided")
-    else
-        println(" Latitude: present with ", count(i -> i === missing, data.samples.latitude), " missing")
-    end
-    println("\n Population names and counts:")
-    print(populations(data), "\n")
+    @view data.samples[!, :name]
 end
 
 

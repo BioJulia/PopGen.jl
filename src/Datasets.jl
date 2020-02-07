@@ -11,8 +11,10 @@ Example:
 `nancy = nancycats()`
 """
 function nancycats()
-    filename = normpath(joinpath(@__DIR__,"..","data", "data", "nancycats.csv"))
-    return csv(filename, marker = "msat")
+    filename = normpath(joinpath(@__DIR__,"..","data", "data", "nancycats.gen"))
+    gen = genepop(filename,  digits = 2, popsep = "Pop", marker = "msat")
+    gen.samples.name = string.(collect(1:237))
+    return gen
 end
 
 
@@ -454,8 +456,8 @@ function gulfsharks()
             29.82344
             29.82344
             ]
-    x = genepop(filename)
-    x.samples.latitude = yloc ; x.samples.longitude = xloc
+    data = genepop(filename)
+    data.samples.latitude = yloc ; data.samples.longitude = xloc
     renames = Dict(
         1 => "Cape Canaveral",
         2 => "Georgia",
@@ -465,6 +467,10 @@ function gulfsharks()
         6 => "Northeast Gulf",
         7 => "Southeast Gulf"
     )
-    populations!(x, rename = renames);
-    return x
+    # manually rename things so as to not trigger @info prompt in populations!()
+    for eachkey in keys(renames)
+        replace!(data.samples.population, eachkey => renames[eachkey])
+    end
+
+    return data
 end

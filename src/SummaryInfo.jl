@@ -24,7 +24,9 @@ either rarefied or not.
 """
 function richness(data::PopObj)
     # collapse genotypes into array of alleles |> count number of unique alleles
-    rich = map(i -> Iterators.flatten(i |> skipmissing) |> collect |> unique |> length, eachcol(data.loci, false))
+    rich = map(eachcol(data.loci, false)) do i
+        Iterators.flatten(i |> skipmissing) |> collect |> unique |> length
+    end
     return DataFrame(locus = names(data.loci), richness = rich)
 end
 
@@ -50,16 +52,16 @@ function Base.summary(data::PopObj)
     end
     println("\n Number of individuals: ", length(data.samples.name))
     println(" Number of loci: ", size(data.loci,2))
-    if ismissing.(data.samples.longitude) |> unique == [true]
-        println(" Longitude: absent")
+    if ismissing.(data.samples.longitude) |> all == true
+        print(" Longitude:") ; printstyled(" absent\n", color = :yellow)
     else
         println(" Longitude: present with ", count(i -> i === missing, data.samples.longitude), " missing")
     end
-    if ismissing.(data.samples.longitude) |> unique == [true]
-        println(" Latitude: absent")
+    if ismissing.(data.samples.longitude) |> all == true
+        print(" Latitude:") ; printstyled(" absent\n", color = :yellow)
     else
         println(" Latitude: present with ", count(i -> i === missing, data.samples.latitude), " missing")
     end
-    println("\n Population names and counts:")
-    print(populations(data), "\n")
+    print("\n Population names and counts:")
+    DataFrames.show(populations(data), summary = false, rowlabel = :num, allrows = true)
 end

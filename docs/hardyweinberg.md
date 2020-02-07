@@ -1,11 +1,17 @@
-Testing for Hardy-Weinberg Equilibrium (often abbreviated to "HW" or "HWE") is a fairly common practice in population genetics. In a two-allele system (alleles *p* and *q*), the HWE equation is defined as *p^2^ + 2pq + q^2^ = 1*. 
+Testing for Hardy-Weinberg Equilibrium (often abbreviated to "HW" or "HWE") is a fairly common practice in population genetics. In a two-allele system (alleles *p* and *q*), the HWE equation is defined as  *p^2^ + 2pq + q^2^ = 1* , where _p_ is the frequency of the first allele and _q_ is the frequency of the second allele. The formula describes the frequency of all possible genotypes where
+
+| HWE variable | Genotype |
+| :----------: | :------: |
+|    _p^2^_    |   "pp"   |
+|    _q^2^_    |   "qq"   |
+|    _2pq_     |   "pq"   |
 
 Testing for deviation from HWE is usually done with a Chi-Squared test, where one compares the observed genotype frequencies to the expected genotype frequencies given the observed allele frequencies at a locus. 
 
 ## Test for Hardy-Weinberg equilibrium
 
 ```julia
-hwe_test(x::PopObj, by_pop::Bool = false correction::{String} = "none")
+hwe_test(x::PopObj, by_pop::Bool = false, correction::String = "none")
 ```
 
 Calculate chi-squared test of HWE for each locus and returns observed and expected heterozygosity with chi-squared, degrees of freedom and p-values for each locus. Use `by_pop = true` to perform this separately for each population (default: by_pop = false) and return a NamedTuple with the names corresponding to the population names. Use `correction =` to specify a P-value
@@ -216,9 +222,13 @@ If using `by_pop = true`, there may be a very long output which you may want to 
 
 
 
-!!!info "indexing the Chiq-sq column"
-    If you wish to use the dot operator to index the chi-squared values, you will need to use the unicode characters in Julia to do so, b/c the column is literally named `χ²`. To generate those characters, type in `\Chi` + press `TAB` + type in `\^2` + press `TAB` without spaces and it will magically appear. Written out in more explicit English (we really want you to get it!), it's a backslash `\`, the word `Chi` with a capital C, the TAB key on your keyboard (and you'll notice it's already changed it to the letter χ), another backslash `\`, a caret `^`, the number `2`, then the TAB key again. 
+??? tip "indexing the Chiq-sq column"
+    **The Fast(er) Way**: you can just index the column using the DataFrames numerical index like so: `df[!, 4]`
+    
+    **The Fun Way:** to index the chi-squared column from the dataframe using the dot operator (i.e. `df.χ²`), you will need to use the unicode characters in Julia, b/c the column is literally named χ². To generate those characters, type in `\Chi` + press `TAB` + type in `\^2` + press `TAB` without spaces and it will magically appear (in the REPL and Juno, at least). Written out in more explicit English (we really want you to get it!), it's a backslash `\`, the word `Chi` with a capital C, the TAB key on your keyboard (and you'll notice it's already changed it to the letter χ), another backslash `\`, a caret `^`, the number `2`, then the TAB key again. 
     
     All in all, you'll be doing this: 
     
     `\ChiTAB\^2TAB`. It's actually a lot easier than it looks.
+
+

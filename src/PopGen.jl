@@ -7,37 +7,40 @@ module PopGen
 ##   O o       O o       O o       O o       O o
 
 
-using DataFrames,
-      Statistics,
-      PlotlyJS,
-      GeneticVariation,
+using Convex,
+      CSV,  # possibly
+      DataFrames,
       Distributions,
-      MultipleTesting,
-      LinearAlgebra,
-      Convex,
       ECOS,
-      ProgressMeter
+      GeneticVariation,
+      LinearAlgebra,
+      MultipleTesting,
+      ProgressMeter,
+      Random,
+      StatsBase
+      #PlotlyJS     REMOVE IN FAVOR OF PLOTRECIPES
 
 
 export PopObj,
     summary,
     nancycats,
     gulfsharks,
-    csv,
+    delimited, csv,
     genepop,
-    vcf,
+    bcf, vcf,
     samples,
     loci,
     isolate_genotypes,
     locations, locations!,
     population, populations, population!, populations!,
+    relatedness, pairwise_relatedness, kinship,
     remove_inds!,
     remove_loci!,
     missing,
     heterozygosity, het, He,
-    hwe_test, hwe,
-    plot_missing,
-    plot_locations
+    hwe_test, hwe
+    #plot_missing,
+    #plot_locations
 
 
 
@@ -48,13 +51,13 @@ export PopObj,
 ##   O o       O o       O o       O o       O o
 
 include("PopObj.jl")
-include("AlleleFreq.jl")
-include("Datasets.jl")
-include("HardyWeinberg.jl")
-include("Manipulate.jl")
-include("Plotting.jl")
 include("Read.jl")
+include("Datasets.jl")
+include("Manipulate.jl")
+include("AlleleFreq.jl")
+include("HardyWeinberg.jl")
 include("SummaryInfo.jl")
+#include("PlotRecipes.jl")  # not yet ready
 
 
 end # module PopGen

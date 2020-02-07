@@ -4,17 +4,10 @@ Population Genetics in Julia. This is a fork of `PopGen.jl` in `BioJulia` with t
 
 [![alt text](https://img.shields.io/badge/docs-stable-informational?style=for-the-badge&logo=Read%20The%20Docs)](https://pdimens.github.io/PopGen.jl/stable) [![alt text](https://img.shields.io/badge/docs-latest-75ae6c?style=for-the-badge&logo=Read%20The%20Docs)](https://pdimens.github.io/PopGen.jl/latest) [![alt text](https://img.shields.io/badge/slack-join%20PopGen.jl-9d72b1?style=for-the-badge&logo=slack)](https://pdimens.github.io/PopGen.jl/community/)
 
-### Want to test out what's available so far?
-
 #### How to install:
 Invoke the package manager by pressing `]` on an empty line and `add` this repo
-![install_instructions](docs/img/install.gif)
-- if Jupyter is your thing: `using Pkg; Pkg.add("https://github.com/pdimens/PopGen.jl")`
 
-After the package is installed, load it with `using PopGen`
-
-
-Feel free to play around with the test data `nancycats` and `gulfsharks`!
+![install_instructions](docs/img/install_carbon.png)
 
 ---------
 

@@ -40,73 +40,116 @@ function pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
     return that array of 9 distinct probabilities
     =#
 
+
     ## class L1 -  AᵢAᵢ AᵢAᵢ ##
     if x[1] == x[2] == y[1] == y[2]
+        x = string.(x)
+        y = string.(y)
+
         p = alleles[x[1]]
         [p, p^2, p^2, p^3, p^2, p^3, p^2, p^3, p^4]
 
     ## class L2 - AᵢAᵢ AⱼAⱼ ##
     elseif (x[1] == x[2]) & (y[1] == y[2]) & (x[1] != y[1])
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[1]], alleles[y[1]])
         [0, prod(p), 0, prod(p) * p[2], 0, prod(p) * p[1], 0, 0, prod(p) * prod(p)]
 
     ## class L3a - AᵢAᵢ AᵢAⱼ ## - has issues because of allele order
     elseif ((x[1] == x[2] == y[1]) & (x[1] != y[2]))
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[1]], alleles[y[2]])
         [0, 0, prod(p), 2 * prod(p) * p[1], 0, 0, 0, prod(p) * p[1], 2 * prod(p) * p[1]^2]
 
     ## class L3b - AᵢAᵢ AⱼAᵢ ## - has issues because of allele order
     elseif ((x[1] == x[2] == y[2]) & (x[1] != y[1]))
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[1]], alleles[y[1]])
         [0, 0, prod(p), 2 * prod(p) * p[1], 0, 0, 0, prod(p) * p[1], 2 * prod(p) * p[1]^2]
 
     ## class L4 - AᵢAᵢ AⱼAₖ ##
     elseif (x[1] == x[2]) & (y[1] != y[2]) & (x[1] != y[1]) & (x[1] != y[2])
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[1]], alleles[y[1]], alleles[y[2]])
         [0, 0, 0, 2 * prod(p), 0, 0, 0, 0, 2 * prod(p) * p[1]]
 
     ## L5a - AiAj AiAi ## - has issues because of allele order
     elseif ((x[1] == y[1] == y[2]) & (x[1] != x[2]))
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[1]], alleles[x[2]])
         [0, 0, 0, 0, prod(p), 2 * prod(p) * p[1], 0, prod(p) *p[1], 2 * prod(p) * p[1]^2]
 
     ## L5b - AjAi AiAi ## - has issues because of allele order
     elseif (x[2] == y[1] == y[2] & (x[1] != x[2]))
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[2]], alleles[x[1]])
         [0, 0, 0, 0, prod(p), 2 * prod(p) * p[1], 0, prod(p) *p[1], 2 * prod(p) * p[1]^2]
 
     ## L6 - AjAk AiAi ##
     elseif (x[1] != x[2]) & (y[1] == y[2]) & (x[1] != y[1]) & (x[2] != y[1])
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[y[1]], alleles[x[1]], alleles[x[2]])
         [0, 0, 0, 0, 0, 2 * prod(p), 0, 0, 2 * prod(p) * p[1]]
 
     ## L7 - AiAj AiAj ##
     elseif (x[1] == y[1]) & (x[2] == y[2]) & (x[1] != x[2])
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[1]], alleles[x[2]])
         [0, 0, 0, 0, 0, 0, 2 * prod(p), prod(p) * sum(p), 4 * prod(p) * prod(p)]
 
     ## L8a - AiAj AiAk ##  - has issues because of allele order
     elseif ((x[1] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[2] != y[2]))
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[1]], alleles[x[2]], alleles[y[2]])
         [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
 
     ## L8b - AjAi AkAi ##  - has issues because of allele order
     elseif ((x[2] == y[2]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[1]))
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[2]], alleles[x[1]], alleles[y[1]])
         [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
 
     ## L8c - AjAi AiAk ##  - has issues because of allele order
     elseif ((x[2] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[2]))
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[2]], alleles[x[1]], alleles[y[2]])
         [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
 
     ## L8d - AiAj AkAi ##  - has issues because of allele order
     elseif ((x[1] == y[2]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[1]))
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[1]], alleles[x[2]], alleles[y[1]])
         [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
 
     ## L9 - AiAj AkAl ##
     elseif (x[1] != x[2]) & (x[1] != y[1]) & (x[1] != y[2]) & (x[2] != y[1]) & (x[2] != y[2]) & (y[1] != x[2])
+        x = string.(x)
+        y = string.(y)
+
         p = (alleles[x[1]], alleles[x[2]], alleles[y[1]], alleles[y[2]])
         [0, 0, 0, 0, 0, 0, 0, 0, 4 * prod(p)]
     else
@@ -249,10 +292,10 @@ function qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
 
         #Skip missing
         if gen1 !== missing && gen2 !== missing
-            a = gen1[1]
-            b = gen1[2]
-            c = gen2[1]
-            d = gen2[2]
+            a = string(gen1[1])
+            b = string(gen1[2])
+            c = string(gen2[1])
+            d = string(gen2[2])
 
             n1 = n1 + (Int(a==c) + Int(a==d) + Int(b==c) + Int(b==d) - 2 * (alleles[locus][a] + alleles[locus][b]))
             n2 = n2 + (Int(a==c) + Int(a==d) + Int(b==c) + Int(b==d) - 2 * (alleles[locus][c] + alleles[locus][d]))
@@ -267,18 +310,22 @@ end
 
 
 """
-    pairwise_relatedness(data::PopObj, method::String, inbreeding::Bool = true, verbose::Bool = true)
+    pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
 Calculates various pairwise relatedness measures between all pairs of individuals based on the entire sample population
 allele frequency
 
-If verbose is set to false then there is a progress bar. If set to true then there is estimator specific feedback and statements when an individual has been compared to all other pairs
+If verbose is set to false then there is a progress bar. If set to true then there is
+estimator specific feedback and statements when an individual has been compared to all other pairs
 
 If the method is able to account for inbreeding in it's calculation then that option may be used
 
-Currently implemented are Milligan 2002 Dyadic Maximum Likelihood relatedness estimator and Queller & Goodnight 1989
-
+Available methods:
+- `"qg"` : Queller & Goodnight 1989  (diploid only)
 """
 function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
+    # check that dataset is entirely diploid
+    all(data.samples.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+
     allele_frequencies = Dict()
     for locus in names(data.loci)
         allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
@@ -322,6 +369,11 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
 
     return output
 end
+
+const relatedness = pairwise_relatedness
+const kinship = pairwise_relatedness
+
+# - `"dyadml"` : Milligan 2002 Dyadic Maximum Likelihood relatedness estimator
 
 #=
 cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)

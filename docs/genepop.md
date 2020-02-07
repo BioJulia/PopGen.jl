@@ -1,14 +1,14 @@
 ## Import a genepop file as a `PopObj`
 
-!!! warning "Windows users"
-    make sure to change your backslashes "\" to forward slashes "/" 
-
 ```julia
 genepop(infile; digits = 3, popsep = "POP", marker = "snp")
 
 # Example
 julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
 ```
+
+??? warning "Windows users"
+    make sure to change your backslashes "\" to forward slashes "/" 
 
 ### arguments
 
@@ -20,7 +20,7 @@ julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
 - `#!julila popsep::String` : word that separates populations in `infile` (default: "POP")
 - `#!julila marker::String` : "snp" (default) or "msat" for microsatellites
 
-!!! info "Default population names"
+!!! info ""
     By default, the file reader will assign numbers as population ID's in order of appearance in the genepop file. Use the `populations!` function to rename these with your own population ID's.
 
 ## Format
