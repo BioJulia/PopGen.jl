@@ -39,9 +39,10 @@ function gulfsharks_lf_table()
 end
 a,b,c,d,e = gulfsharks_lf_table()
 #a standard loci DF
-#b long-format loci DF
-#c long-format JDB table with CategoricalArrays
-#d long-format JDB table without categorical
+#b long-format loci DF no CatArrays
+#c long-format loci DF with CatArrays
+#d long-format JDB table with CategoricalArrays
+#e long-format JDB table without categorical
 
 sharks = gulfsharks();
 
