@@ -28,7 +28,7 @@ struct PopObj
     end
 end
 
-
+#=
 # define convenient Types for the two markers
 const MicroSat = NTuple{N,Int16} where N
 const SNP = NTuple{N,Int8} where N
@@ -45,3 +45,4 @@ function Base.show(io::IO, genotype::SNP)
         print(io, each, " ")
     end
 end
+=#
