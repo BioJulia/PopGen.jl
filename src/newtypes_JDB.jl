@@ -1,4 +1,4 @@
-using DataFrames, BenchmarkTools, JuliaDBMeta, DataFrames, PopGen, CategoricalArrays, DataFramesMeta, StatsBase
+using DataFrames, BenchmarkTools, JuliaDBMeta, DataFrames, PopGen, CategoricalArrays, DataFramesMeta, StatsBase, Profile
 import JuliaDB
 #=
 abstract type PopObj end
@@ -67,7 +67,7 @@ sharks = gulfsharks();
 @btime by(c, :locus, het = :genotype => i -> mean(length.(unique.(skipmissing(i) |> collect))))
 # 179.847 ms (3055436 allocations: 244.91 MiB)
 
-@btime @groupby d (:locus) {hetero = mean(length.(unique.(skipmissing(:genotype) |> collect)) .> 1)}
+@btime @groupby d (:locus) {hetero = mean(ishet.(:genotype) |> skipmissing)}
 # 543.717 ms (2851555 allocations: 241.94 MiB)
 @btime @groupby d (:locus, :population) {hetero = mean(length.(unique.(skipmissing(:genotype) |> collect)) .> 1)}
 # 2.871 s (3184984 allocations: 306.68 MiB)
@@ -78,7 +78,7 @@ sharks = gulfsharks();
 @btime @groupby e (:locus, :population) {hetero = mean(length.(unique.(skipmissing(:genotype) |> collect)) .> 1)}
 # 278.037 ms (3149464 allocations: 306.51 MiB)
 
-@btime PopGen.het_observed(sharks)
+Profile.@profile PopGen.het_observed(sharks)
 # 1.318 s (1894933 allocations: 48.14 MiB)
 @btime PopGen.het_population_obs(sharks)
 # 71.318 ms (580830 allocations: 28.91 MiB)
@@ -95,9 +95,36 @@ sharks = gulfsharks();
 
 #JuliaDB
 ## CategoricalArrays
-@btime @groupby $d (:locus) {hetero = mean(length.(unique.(skipmissing(:genotype) |> collect)) .> 1)}
+@groupby d (:locus) {hetero = mean(length.(unique.(skipmissing(:genotype) |> collect)) .> 1)}
 # 543.717 ms (2851555 allocations: 241.94 MiB)
 
 ## Regular String arrays
 @btime @groupby $e (:locus) {hetero = mean(length.(unique.(skipmissing(:genotype) |> collect)) .> 1)}
 # 246.636 ms (2844834 allocations: 241.48 MiB)
+
+function grouptest()
+  @groupby d (:locus) {hetero = mean(length.(unique.(skipmissing(:genotype) |> collect)) .> 1)}
+end
+
+function nomacro()
+  JuliaDB.groupby(i -> mean(length.(unique.(skipmissing(i) |> collect)) .> 1), d, :locus, select=:genotype)
+end
+
+
+Profile.clear()
+Profile.@profile grouptest()
+Profile.print()
+
+@btime grouptest()
+
+function groupdf()
+  @btime by(b, :locus, het = :genotype => i -> mean(length.(unique.(skipmissing(i) |> collect))))
+  @btime  @by(b, :locus, het = mean(length.(unique.(skipmissing(:genotype) |> collect))))
+end
+
+Profile.clear()
+Profile.@profile groupdf()
+Profile.print()
+
+
+  @groupby d (:locus) {hetero = mean(length.(unique.(skipmissing(:genotype) |> collect)) .> 1)}

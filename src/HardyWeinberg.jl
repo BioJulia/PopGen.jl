@@ -1,3 +1,21 @@
+@inline function ishet(locus::NTuple{N,Int16} where N)
+    locus |> unique |> length != 1 && return true
+    return false
+end
+
+@inline function ishet(locus::NTuple{N,Int8} where N)
+    all(locus[1] .== locus) && return true
+    return false
+end
+
+@inline function ishet(locus::Missing)
+    return missing
+end
+
+@inline function ishet(locus::Vector{Union{Missing, NTuple{N,Int8}}} where N)
+    ishet.(locus)
+end
+
 """
     heterozygosity(data::PopObj, mode::String = "locus")
 Calculate observed and expected heterozygosity in a `PopObj`
