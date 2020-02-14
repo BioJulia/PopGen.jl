@@ -36,6 +36,7 @@ export PopObj,
     remove_inds!,
     remove_loci!,
     missing,
+    show,
     heterozygosity, het, He,
     hwe_test, hwe
     #plot_missing,

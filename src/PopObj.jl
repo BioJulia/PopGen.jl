@@ -28,20 +28,21 @@ struct PopObj
     end
 end
 
-
+#=
 # define convenient Types for the two markers
 const MicroSat = NTuple{N,Int16} where N
 const SNP = NTuple{N,Int8} where N
 
 # define "prettier" printing of tuples inside the dataframes
-function Base.show(io::IO, genotype::T where T<:MicroSat)
+function Base.show(io::IO, genotype::MicroSat)
     for each in genotype
         print(io, each, " ")
     end
 end
 
-function Base.show(io::IO, genotype::T where T<:SNP)
+function Base.show(io::IO, genotype::SNP)
     for each in genotype
         print(io, each, " ")
     end
 end
+=#

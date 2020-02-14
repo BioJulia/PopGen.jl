@@ -1,4 +1,40 @@
 """
+```
+ishet(locus::Vector{Union{Missing, NTuple{N,Int8}}} where N)
+ishet(locus::Vector{Union{Missing, NTuple{N,Int16}}} where N)
+ishet(locus::NTuple{N,Int8} where N)
+ishet(locus::NTuple{N,Int16} where N)
+ishet(locus::Missing)
+```
+A series of methods to test if a locus is a heterozygote and return `true` if
+it is. The methods are specific to SNP (Int8) and MicroSat (Int16) types, and
+the vector versions simply broadcast the functions over their elements.
+"""
+@inline function ishet(locus::NTuple{N,Int16} where N)
+    # if allele 1 doesnt equels all others, return true (as in, ishet = true)
+    return false
+end
+
+@inline function ishet(locus::NTuple{N,Int8} where N)
+    # if allele 1 doesnt equels all others, return true (as in, ishet = true)
+    all(locus[1] .== locus) && return true
+    return false
+end
+
+@inline function ishet(locus::Missing)
+    # if the locus is Missing, return missing. no muss no fuss
+    return missing
+end
+
+@inline function ishet(locus::Vector{Union{Missing, NTuple{N,Int16}}} where N)
+    ishet.(locus)
+end
+
+@inline function ishet(locus::Vector{Union{Missing, NTuple{N,Int8}}} where N)
+    ishet.(locus)
+end
+
+"""
     heterozygosity(data::PopObj, mode::String = "locus")
 Calculate observed and expected heterozygosity in a `PopObj`
 ## Example
