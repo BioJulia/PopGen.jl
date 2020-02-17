@@ -1,6 +1,5 @@
-using DataFrames, BenchmarkTools, JuliaDBMeta, DataFrames, PopGen, CategoricalArrays, DataFramesMeta, StatsBase, Profile
-import JuliaDB
-#=
+using BenchmarkTools, JuliaDBMeta, CategoricalArrays, StatsBase, JuliaDB
+
 abstract type PopObj end
 
 mutable struct PopSample <: PopObj
@@ -15,7 +14,7 @@ struct PopData <: PopObj
     samples::Vector{PopSample}
     loci::T where T<:IndexedTable
 end
-=#
+
 
 ##### gulfsharks stuff
 function gulfsharks_lf_table()

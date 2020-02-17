@@ -7,8 +7,9 @@ ishet(locus::NTuple{N,Int16} where N)
 ishet(locus::Missing)
 ```
 A series of methods to test if a locus is a heterozygote and return `true` if
-it is. The methods are specific to SNP (Int8) and MicroSat (Int16) types, and
-the vector versions simply broadcast the functions over their elements.
+it is, `false` if it isn't. The methods are specific to SNP (Int8) and MicroSat
+(Int16) types, and the vector versions simply broadcast the functions over their
+elements.
 """
 @inline function ishet(locus::NTuple{N,Int16} where N)
     # if allele 1 doesnt equels all others, return true (as in, ishet = true)
