@@ -26,7 +26,7 @@ function longen(
     end
     length(pop_idx) == 0 && error("No populations found in $infile using separator \"$popsep\". Please check the spelling and try again.")
 
-    # create a theoretical place were another popsep would be (preserve last population for counting)
+    # create a theoretical place were the last popsep would be (preserve last population for counting)
     push!(pop_idx, countlines(infile) + 1)
     popcounts = (pop_idx[2:end] .- pop_idx[1:end-1]) .- 1
 
@@ -36,16 +36,20 @@ function longen(
         error("$infile contains both tab and space delimiters. Please format the file so it uses either one or the other.")
     elseif occursin("\t", firstrecord)
         delim = "\t"
+        delim_txt = "tab"
     elseif occursin(" ", firstrecord)
         delim = " "
+        delim_txt = "space"
     else
         error("Please format $infile to be either tab or space delimited")
     end
 
     # check for the marker type and assign Int8 or Int16 depending on max value
-    # there's no real reason 40 was chosen other than being a reasonable buffer for edge cases
+    # there's no real reason 40 was chosen other than being a reasonable buffer
+    # for edge cases and missing data
+    # since the genotypes are sorted anyway, we can look at the last (largest) value
     sample_geno = phase.(split(firstrecord, delim)[2:end], Int16, digits)
-    if maximum(map(i -> i[2], sample_geno |> skipmissing)) < 40
+    if maximum(map(i -> i[end], sample_geno |> skipmissing)) < 40
         geno_type = Int8    # is a snp
     else
         geno_type = Int16   # is a msat
@@ -61,6 +65,7 @@ function longen(
         close(gpop)
         locinames = strip.(split(locus_name_raw |> join, ","))
         map(i -> replace!(i, "." => "_"), locinames)
+        horizontal = true
     else
         #standard  vertical formatting
         locinames = CSV.read(
@@ -72,7 +77,14 @@ function longen(
                     type = String
         )
         locinames = String.(locinames.Column1)
+        horizontal = false
     end
+
+    @info "\n$(abspath(infile))
+$(delim_txt) delimiter detected
+horizontal formatting: $(horizontal)
+$(sum(popcounts)) samples detected
+$(length(locinames)) loci detected"
 
     # load in samples and genotypes
     coln = append!(["name"], locinames)
