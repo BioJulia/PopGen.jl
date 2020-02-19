@@ -13,9 +13,8 @@ map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
 ```
 """
 @inline function phase(loc::String, type::DataType, digit::Int)
-    loc == "-9" && return missing
+    loc == "-9" || loc == "0"^length(loc) && return missing
     phased = map(i -> parse(type, join(i)), Iterators.partition(loc, digit))
-    iszero.(phased |> collect) && return missing
     sort!(phased)
     tupled = Tuple(phased)
     return tupled
@@ -48,9 +47,8 @@ end
 end
 
 @inline function phase_dip(loc::String, type::DataType, digit::Int)
-    loc == "-9" && return missing
+    loc == "-9" || loc == "0"^length(loc) && return missing
     newloc = parse(Int32, loc)
-    iszero(newloc) && return missing
     units = 10^digit
     allele1 = newloc ÷ units |> type
     allele2 = newloc % units |> type
