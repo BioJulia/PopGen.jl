@@ -4,15 +4,114 @@ infile = "data/data/nancycats.gen"
 infile2 = "data/data/gulfsharks.gen"
 
 @inline function find_ploidy(genotypes::T where T<:SubArray)
-    collect(skipmissing(genotypes))[1] |> length |> Int8
+    for i in genotypes
+        i !== missing && return Int8(length(i))
+    end
 end
 
+"""
+    phase(loc::String, type::DataType, digit::Int)
+Takes a String of numbers returns a typed locus appropriate for PopGen.jl as used in the
+`genepop` and `csv` file parsers. Use `type` to specify output type (`Int8` or `Int16`),
+and `digit` to specify the number of digits/characters used per allele in a locus.
+
+## Examples
+```
+ph_locus = phase("128114", Int16, 3)
+map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
+# or #
+[phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
+```
+"""
+@inline function phase(loc::T, type::DataType, digit::Int) where T<:AbstractString
+    loc == "-9" || loc == "0"^length(loc) && return missing
+    phased = map(i -> parse(type, join(i)), Iterators.partition(loc, digit))
+    sort!(phased)
+    tupled = Tuple(phased)
+    return tupled
+end
+
+"""
+    phase_dip(loc::String, type::DataType, digit::Int)
+A diploid-optimized variant of `phase()` that uses integer division to split the alleles
+of a locus into a tuple of `type` Type. Use `type` to specify output type (`Int8` or `Int16`),
+and `digit` to specify the number of digits/characters used per allele in a locus.
+
+## Examples
+```
+ph_locus = phase("128114", Int16, 3)
+map(i -> phase_dip(i, Int16, 3), ["112131", "211112", "001003", "516500"])
+# or #
+[phase_dip(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
+```
+"""
+@inline function phase_dip(loc::T, type::DataType, digit::Int) where T<:Signed
+    loc == -9 || iszero(loc) && return missing
+    units = 10^digit
+    allele1 = loc ÷ units |> type
+    allele2 = loc % units |> type
+    return [allele1, allele2] |> sort |> Tuple
+end
+
+@inline function phase_dip(loc::Missing, type::DataType, digit::Int)
+    return missing
+end
+
+@inline function phase_dip(loc::String, type::DataType, digit::Int)
+    loc == "-9" || loc == "0"^length(loc) && return missing
+    newloc = parse(Int32, loc)
+    units = 10^digit
+    allele1 = newloc ÷ units |> type
+    allele2 = newloc % units |> type
+    return [allele1, allele2] |> sort |> Tuple
+end
+
+
+
 ##### read_genepop long
-function longen(
+"""
+    genepop(infile::String; kwargs...)
+Load a Genepop format file into memory as a PopObj object.
+- `infile::String` : path to Genepop file
+
+### Keyword Arguments
+- `digits::Integer`: number of digits denoting each allele (default: `3`)
+- `popsep::String` : word that separates populations in `infile` (default: "POP")
+- `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
+- `silent::Bool`   : whether to print file information during import (default: `true`)
+
+### File must follow standard Genepop formatting:
+- First line is a comment (and skipped)
+- Loci are listed after first line as one-per-line without commas or in single comma-separated row
+- A line with a particular keyword (default `POP`) must delimit populations
+- Sample name is immediately followed by a *comma*
+- File is *tab or space delimted* (but not both!)
+
+## Example
+```
+waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "POP")
+```
+### Genepop file example:
+Wasp populations in New York \n
+Locus1\n
+Locus2\n
+Locus3\n
+POP\n
+Oneida_01,  250230  564568  110100\n
+Oneida_02,  252238  568558  100120\n
+Oneida_03,  254230  564558  090100\n
+POP\n
+Newcomb_01, 254230  564558  080100\n
+Newcomb_02, 000230  564558  090080\n
+Newcomb_03, 254230  000000  090100\n
+Newcomb_04, 254230  564000  090120\n
+"""
+function genepop(
     infile::String;
     digits::Int = 3,
     popsep::String = "POP",
-    diploid::Bool = true
+    diploid::Bool = true,
+    silent::Bool = false,
 )
     # open the file as lines of strings to suss out loci names, pop idx, and popcounts
     gpop_readlines = readlines(infile)
@@ -24,7 +123,8 @@ function longen(
             push!(pop_idx, line)
         end
     end
-    length(pop_idx) == 0 && error("No populations found in $infile using separator \"$popsep\". Please check the spelling and try again.")
+    length(pop_idx) == 0 &&
+    error("No populations found in $infile using separator \"$popsep\". Please check the spelling and try again.")
 
     # create a theoretical place were the last popsep would be (preserve last population for counting)
     push!(pop_idx, countlines(infile) + 1)
@@ -69,93 +169,99 @@ function longen(
     else
         #standard  vertical formatting
         locinames = CSV.read(
-                    infile,
-                    header = 0,
-                    datarow = 2,
-                    copycols = false,
-                    limit = pop_idx[1]-2,
-                    type = String
+            infile,
+            header = 0,
+            datarow = 2,
+            copycols = false,
+            limit = pop_idx[1] - 2,
+            type = String,
         )
         locinames = String.(locinames.Column1)
         horizontal = false
     end
 
-    @info "\n$(abspath(infile))
-$(delim_txt) delimiter detected
-horizontal formatting: $(horizontal)
-$(sum(popcounts)) samples detected
-$(length(locinames)) loci detected"
+    if !silent
+        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nhorizontal formatting: $(horizontal)\n$(sum(popcounts)) samples detected\n$(length(locinames)) loci detected"
+    end
 
     # load in samples and genotypes
     coln = append!(["name"], locinames)
     if diploid == true
         geno_parse = CSV.File(
-                infile,
-                delim = delim,
-                header = coln,
-                datarow = pop_idx[1] + 1,
-                comment = popsep,
+            infile,
+            delim = delim,
+            header = coln,
+            datarow = pop_idx[1] + 1,
+            comment = popsep,
         )
     else
         geno_parse = CSV.File(
-                    infile,
-                    delim = delim,
-                    header = coln,
-                    datarow = pop_idx[1] + 1,
-                    comment = popsep,
-                    type = String
+            infile,
+            delim = delim,
+            header = coln,
+            datarow = pop_idx[1] + 1,
+            comment = popsep,
+            type = String,
         )
     end
-    # initiate with empty table
-    outtable = table((
-        name=Vector{String}(),
-        locus=Vector{String}(),
-        genotype=Vector{Union{Missing, NTuple{N, geno_type}} where N}()
-        ))
-
-    for samplerow in geno_parse
-        vals = values(samplerow)
-        tmp = table((
-                name = fill(vals[1],length(locinames)),
-                locus = locinames,
-                genotype = vals[2:end]
-                ))
-        outtable = merge(outtable, tmp)
+    # initiate with empty vectors for samplename, locus, and geno
+    name = Vector{String}()
+    loci = Vector{String}()
+    if diploid == true
+        geno_raw = Vector{Int32}()
+    else
+        geno_raw = Vector{String}()
     end
 
-    ## create population column
-    popnames = string.(collect(1:length(popcounts)))
-    popid_array = [fill(i, j) for (i,j) in zip(popnames,popcounts .* length(locinames))] |>
-        Iterators.flatten |>
-        collect |>
-        CategoricalArray
-
-    # add population names to genotype table
-    outtable = insertcolsafter(outtable, 1, :population => (popid_array))
-
-    # do some table formatting
-    ## remove commas from names, and format types for names and loci
-    outtable = transform(outtable,
-                    :name => replace.(outtable.columns.name, "," => "") |> CategoricalArray,
-                    :locus => CategoricalArray(outtable.columns.locus),
-                    )
+    @inbounds for samplerow in geno_parse
+        vals = values(samplerow)
+        corr_name = replace(vals[1], "," => "")
+        append!(name, fill(corr_name, length(locinames)))
+        append!(loci, locinames)
+        append!(geno_raw, vals[2:end])
+    end
 
     ## phase the genotypes
     if diploid == true
-        outtable = transform(outtable, :genotype => map(i -> phase_dip.(i.genotype, geno_type, digits), outtable))
+        genotype = map(i -> phase_dip.(i, geno_type, digits), geno_raw)
     else
-        outtable = transform(outtable, :genotype => map(i -> phase.(i.genotype, geno_type, digits), outtable))
+        genotype = map(i -> phase.(i, geno_type, digits), geno_raw)
     end
 
+    ## create population vector for loci table
+    popnames = string.(collect(1:length(popcounts)))
+    popid_array =
+        [
+            fill(i, j)
+            for (i, j) in zip(popnames, popcounts .* length(locinames))
+        ] |> Base.Iterators.flatten |> collect
+
+    # add population names to genotype table
+    loci_table = table((
+        name = categorical(name, true),
+        population = categorical(popid_array, true),
+        locus = categorical(loci, true),
+        genotype = genotype,
+    ))
+
+    ploidy = (@groupby loci_table :name {
+        ploidy = find_ploidy(:genotype),
+    }).columns.ploidy
+
     # take a piece of the genotype table out and create a new table with the ploidy
-    sample_table = @groupby outtable (:name, :population) {ploidy = find_ploidy(:genotype)}
+    sample_table = table((
+        name = levels(loci_table.columns.name),
+        population =
+                [fill(i, j) for (i, j) in zip(popnames, popcounts)] |>
+                Base.Iterators.flatten |> collect,
+        ploidy = ploidy,
+        latitude =
+                fill(missing, length(levels(loci_table.columns.name))) |>
+                Vector{Union{Missing,Float32}},
+        longitude =
+                fill(missing, length(levels(loci_table.columns.name))) |>
+                Vector{Union{Missing,Float32}},
+    ))
 
-    # add missing long and lat columns
-    sample_table = insertcolsafter(sample_table, 3, :longitude => fill(missing, length(sample_table.columns.name)) |> Vector{Union{Missing, Float32}},
-                        :latitude => fill(missing, length(sample_table.columns.name)) |> Vector{Union{Missing, Float32}})
-
-    return sample_table
-    sample_table = transform(sample_table, :name => string.(sample_table.columns.name),  :population => string.(sample_table.columns.population))#, :population => string.(:population))
-
-    PopObj(sample_table, outtable)
+    PopObj(sample_table, loci_table)
 end

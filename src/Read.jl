@@ -12,7 +12,7 @@ map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
 [phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
 ```
 """
-@inline function phase(loc::String, type::DataType, digit::Int)
+@inline function phase(loc::T, type::DataType, digit::Int) where T<:AbstractString
     loc == "-9" || loc == "0"^length(loc) && return missing
     phased = map(i -> parse(type, join(i)), Iterators.partition(loc, digit))
     sort!(phased)
@@ -34,7 +34,7 @@ map(i -> phase_dip(i, Int16, 3), ["112131", "211112", "001003", "516500"])
 [phase_dip(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
 ```
 """
-@inline function phase_dip(loc::Int, type::DataType, digit::Int)
+@inline function phase_dip(loc::T, type::DataType, digit::Int) where T<:Signed
     loc == -9 || iszero(loc) && return missing
     units = 10^digit
     allele1 = loc ÷ units |> type
