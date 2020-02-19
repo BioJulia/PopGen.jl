@@ -95,13 +95,22 @@ function longen(
         outtable = merge(outtable, tmp)
     end
 
+    ## create population column
+    popnames = string.(collect(1:length(popcounts)))
+    popid_array = [fill(i, j) for (i,j) in zip(popnames,popcounts .* length(locinames))] |>
+        Iterators.flatten |>
+        collect |>
+        CategoricalArray
+
+    # add population names to genotype table
+    outtable = insertcolsafter(outtable, 1, :population => (popid_array))
+
     # do some table formatting
-    ## remove commas from names
-    outtable = transform(outtable, :name => replace.(outtable.columns.name, "," => ""))
-    ## make names CategoricalArray
-    outtable = transform(outtable, :name => CategoricalArray(outtable.columns.name))
-    ## make loci CategoricalArray
-    outtable = transform(outtable, :locus => CategoricalArray(outtable.columns.locus))
+    ## remove commas from names, and format types for names and loci
+    outtable = transform(outtable,
+                    :name => replace.(outtable.columns.name, "," => "") |> CategoricalArray,
+                    :locus => CategoricalArray(outtable.columns.locus),
+                    )
 
     ## phase the genotypes
     if diploid == true
@@ -110,22 +119,14 @@ function longen(
         outtable = transform(outtable, :genotype => map(i -> phase.(i.genotype, geno_type, digits), outtable))
     end
 
-    ## create population column
-    popnames = string.(collect(1:length(popcounts)))
-    popid_array = [fill(i, j) for (i,j) in zip(popnames,popcounts .* length(locinames))] |>
-                Iterators.flatten |>
-                collect |>
-                CategoricalArray
-
-    # add population names to genotype table
-    outtable = insertcolsafter(outtable, 1, :population => (popid_array))
-
     # take a piece of the genotype table out and create a new table with the ploidy
     sample_table = @groupby outtable (:name, :population) {ploidy = find_ploidy(:genotype)}
-    # add missing long and lat columns
-    sample_table = insertcolsafter(sample_table, 3, :longitude => fill(missing, length(sample_table.columns.name)) |> Vector{Union{Missing, Float32}})
-    sample_table = insertcolsafter(sample_table, 4, :latitude => fill(missing, length(sample_table.columns.name)) |> Vector{Union{Missing, Float32}})
 
+    # add missing long and lat columns
+    sample_table = insertcolsafter(sample_table, 3, :longitude => fill(missing, length(sample_table.columns.name)) |> Vector{Union{Missing, Float32}},
+                        :latitude => fill(missing, length(sample_table.columns.name)) |> Vector{Union{Missing, Float32}})
+
+    return sample_table
     sample_table = transform(sample_table, :name => string.(sample_table.columns.name),  :population => string.(sample_table.columns.population))#, :population => string.(:population))
 
     PopObj(sample_table, outtable)
