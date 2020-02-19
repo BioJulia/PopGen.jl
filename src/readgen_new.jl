@@ -12,28 +12,44 @@ function longen(
     infile::String;
     digits::Int = 3,
     popsep::String = "POP",
-    marker::String = "snp",
-    diploid::Bool = true,
-    delim::String = "\t"
+    diploid::Bool = true
 )
-    # establish types for genotypes
-    if lowercase(marker) == "snp"
-        geno_type = Int8
-    else
-        geno_type = Int16
-    end
+    # open the file as lines of strings to suss out loci names, pop idx, and popcounts
+    gpop_readlines = readlines(infile)
 
     # find the #samples per population
     pop_idx = Vector{Int}()
-    for (line, gtext) in enumerate(readlines(infile))
+    for (line, gtext) in enumerate(gpop_readlines)
         if gtext == popsep
             push!(pop_idx, line)
         end
     end
     length(pop_idx) == 0 && error("No populations found in $infile using separator \"$popsep\". Please check the spelling and try again.")
-    # create a theoretical place were another POP would be (preserve last population for counting)
+
+    # create a theoretical place were another popsep would be (preserve last population for counting)
     push!(pop_idx, countlines(infile) + 1)
     popcounts = (pop_idx[2:end] .- pop_idx[1:end-1]) .- 1
+
+    # check for the delimiter type in the first sample record
+    firstrecord = gpop_readlines[pop_idx[1]+1]
+    if occursin("\t", firstrecord) & occursin(" ", firstrecord)
+        error("$infile contains both tab and space delimiters. Please format the file so it uses either one or the other.")
+    elseif occursin("\t", firstrecord)
+        delim = "\t"
+    elseif occursin(" ", firstrecord)
+        delim = " "
+    else
+        error("Please format $infile to be either tab or space delimited")
+    end
+
+    # check for the marker type and assign Int8 or Int16 depending on max value
+    # there's no real reason 40 was chosen other than being a reasonable buffer for edge cases
+    sample_geno = phase.(split(firstrecord, delim)[2:end], Int16, digits)
+    if maximum(map(i -> i[2], sample_geno |> skipmissing)) < 40
+        geno_type = Int8    # is a snp
+    else
+        geno_type = Int16   # is a msat
+    end
 
     # check for horizontal formatting, where popsep would appear on the third line
     if pop_idx[1] <= 3
