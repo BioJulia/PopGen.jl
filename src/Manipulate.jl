@@ -7,7 +7,7 @@ alter the source PopObj*.
 Use `locations!` to add spatial data to a `PopObj`
 """
 function locations(data::PopObj)
-    @view data.samples[!, [:name, :population, :longitude, :latitude]]
+    select(data.samples, (:longitude, :latitude))
 end
 
 """
@@ -23,8 +23,8 @@ If conversion is not necessary, can directly assign `PopObj.samples.longitude` a
 function locations!(data::PopObj; lat::Array, long::Array)
     # test for decimal degrees vs decimal minutes
     if occursin(" ", string(lat[1])) == false && occursin(" ", string(long[1])) == false
-        data.samples.longitude = lat ;
-        data.samples.latitude = long ;
+        data.samples.columns.longitude = lat ;
+        data.samples.columns.latitude = long ;
     else
         @info "Converting decimal minutes to decimal degrees"
         # make sure decimal minutes are Strings
@@ -62,8 +62,8 @@ function locations!(data::PopObj; lat::Array, long::Array)
                 push!(longConverted, decideg)
             end
         end
-        data.samples.longitude = latConverted
-        data.samples.latitude = longConverted
+        data.samples.columns.longitude = latConverted
+        data.samples.columns.latitude = longConverted
     end
 end
 
@@ -72,39 +72,36 @@ end
 Returns an array of strings of the loci names in a `PopObj`
 """
 function loci(data::PopObj)
-    String.(names(data.loci))
+    levels(data.loci.columns.locus)
 end
 
 """
-    loci(data::DataFrame)
-Convenience wrapper to return an array of column names as string in the `.loci`
-DataFrame of a `PopObj`
+    loci(data::IndexedTable)
+Convenience wrapper to return an array of column names as string in the `loci`
+Table of a `PopObj`
 """
-function loci(data::DataFrame)
-    String.(names(data))
+function loci(data::IndexedTable)
+    levels(data.loci.columns.locus)
 end
 
 """
     locus(::PopObj, ::Union{String, Symbol})
-Convenience wrapper to display all the genotypes of a locus as an array. Equivalent to
-`PopObj.loci.locusname` and `PopObj.loci[!, :locusname]`.
+Convenience wrapper to display all the genotypes of a locus as a two-column table.
 
 ### Example
 ```
-locus(gulfsharks(), "contig_211212")
+locus(gulfsharks(), "contig_475")
 ```
 """
 function locus(data::PopObj, locus::String)
-    data.loci[!, Symbol(locus)]
+    @apply data.loci begin
+        select(_, (:locus, :genotype))
+        @where :locus == locus
+    end
 end
-
-function locus(data::PopObj, locus::Symbol)
-    data.loci[!, locus]
-end
-
 
 #### Find missing ####
-
+#TODO
 """
     missing(data::PopObj; mode::String = "sample")
 Get missing genotype information in a `PopObj`. Specify a mode of operation
@@ -182,13 +179,6 @@ function Base.missing(data::PopObj; mode::String = "sample")
         z = aggregate(y, :population, i -> count(j -> j === missing, i))
         return rename!(z, [:population, names(data.loci)...])
 
-        #= if pivoting
-        new_df = z[!, 2:end] |> Matrix |> permutedims |> DataFrame
-        rename!(new_df, Symbol.(unique(data.samples.population)))
-        insertcols!(new_df, 1, :loci => loci(data))
-        return new_df
-        =#
-
     else
         @error "Mode \"$mode\" not recognized. Please specify one of: sample, pop, locus, or full"
         missing(data)
@@ -201,23 +191,19 @@ View unique population ID's and their counts in a `PopObj`.
 
 - `listall = true` displays all samples and their `population` instead (default = `false`)
 """
-function populations(data::PopObj; listall::Bool = false, print::Bool = true)
+function populations(data::PopObj; listall::Bool = false)
     if listall == true
-        @view data.samples[!, [:name, :population]]
+        return select(data.samples, (:name, :population))
     else
-        if all(ismissing.(data.samples.population)) == true
+        if all(ismissing.(data.samples.columns.population)) == true
             @info "no population data present in PopObj"
-            return @view data.samples[!, [:name, :population]]
+            return populations(data, listall = true)
         end
-        popcounts = [count(i -> i == j, data.samples.population) for j in unique(data.samples.population)]
-        popcounts = DataFrame(
-            population = unique(data.samples.population),
-            count = popcounts
-        )
-        return popcounts
+        return @groupby data.samples :population {count = length(:population)}
     end
 end
 
+#TODO
 """
     populations!(data::PopObj; rename::Union{Dict, Vector}, replace::Union{Tuple, NamedTuple})
 Assign population names to a `PopObj`. There are two modes of operation:
@@ -352,26 +338,29 @@ const popnames! = populations!
 ##### Removal #####
 
 """
-    remove_loci!(data::PopObj, loci::Union{String, Vector{String}})
+    remove_loci!(data::PopObj, locus::String)
+    ```remove_loci!(data::PopObj, loci::Vector{String})```
 Removes selected loci from a `PopObj`.
 
 ### Examples
 ```
-remove_loci!(nancycats, "fca8")
-remove_loci!(nancycats, ["fca8", "fca23"])
+remove_loci!(nancycats(), "fca8")
+remove_loci!(nancycats(), ["fca8", "fca23"])
 ```
 """
-function remove_loci!(data::PopObj, loci::String)
-    sym_loci = Symbol(loci)
-    sym_loci ∉ names(data.loci) && error("Locus \"$loci\" not found")
-    return select!(data.loci, Not(sym_loci))
+function remove_loci!(data::PopObj, locus::String)
+    locus ∉ loci(data) && error("Locus \"$locus\" not found")
+    new_table = @apply data.loci begin
+        @where :locus != locus
+    end
+    data.loci = new_table
+    #return select!(data.loci, Not(sym_loci))
 end
 
 function remove_loci!(data::PopObj, loci::Vector{String})
-    present_loci = Vector{Symbol}()
-    sym_loci = Symbol.(loci)
-    for each in sym_loci
-        if each ∉ names(data.loci)
+    present_loci = Vector{String}()
+    for each in loci
+        if each ∉ loci(data)
             println("NOTICE: locus \"$each\" not found")
             continue
         else
@@ -379,7 +368,10 @@ function remove_loci!(data::PopObj, loci::Vector{String})
         end
     end
     length(present_loci) == 0 && error("None of those loci were found in the data")
-    return select!(data.loci, Not(present_loci))
+    new_table = @apply data.loci begin
+        @where :locus .!= present_loci
+    end
+    data.loci = new_table
 end
 
 """

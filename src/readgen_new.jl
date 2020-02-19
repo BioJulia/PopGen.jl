@@ -3,7 +3,18 @@ using CSV, JuliaDB, CategoricalArrays, JuliaDBMeta, BenchmarkTools
 infile = "data/data/nancycats.gen"
 infile2 = "data/data/gulfsharks.gen"
 
+"""
+    find_ploidy(genotypes::T where T<:SubArray)
+Used internally in the `genepop` and `delimited` file parsers to scan the genotypes
+of a sample and return the ploidy of the first non-missing locus.
+"""
 @inline function find_ploidy(genotypes::T where T<:SubArray)
+    for i in genotypes
+        i !== missing && return Int8(length(i))
+    end
+end
+
+@inline function find_ploidy(genotypes::T where T<:AbstractArray)
     for i in genotypes
         i !== missing && return Int8(length(i))
     end
@@ -243,6 +254,10 @@ function genepop(
         locus = categorical(loci, true),
         genotype = genotype,
     ))
+
+    # make sure levels are sorted by order of appearance
+    levels!(loci_table.columns.locus, unique(loci_table.columns.locus))
+    levels!(loci_table.columns.name, unique(loci_table.columns.name))
 
     ploidy = (@groupby loci_table :name {
         ploidy = find_ploidy(:genotype),

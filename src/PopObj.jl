@@ -14,7 +14,7 @@ and instead should use the provided genepop, csv, or vcf file importers.
     - columns are named by loci
     - genotypes are Tuples of Int16 or Int16, arraged in order of `.samples.name`
 """
-struct PopObj
+mutable struct PopObj
     samples::IndexedTable
     loci::IndexedTable
     #=
