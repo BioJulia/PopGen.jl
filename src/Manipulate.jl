@@ -338,8 +338,10 @@ const popnames! = populations!
 ##### Removal #####
 
 """
-    remove_loci!(data::PopObj, locus::String)
-    ```remove_loci!(data::PopObj, loci::Vector{String})```
+```
+remove_loci!(data::PopObj, locus::String)
+remove_loci!(data::PopObj, loci::Vector{String})
+```
 Removes selected loci from a `PopObj`.
 
 ### Examples
@@ -350,28 +352,15 @@ remove_loci!(nancycats(), ["fca8", "fca23"])
 """
 function remove_loci!(data::PopObj, locus::String)
     locus ∉ loci(data) && error("Locus \"$locus\" not found")
-    new_table = @apply data.loci begin
-        @where :locus != locus
-    end
-    data.loci = new_table
-    #return select!(data.loci, Not(sym_loci))
+    data.loci = @where data.loci :locus != locus
 end
 
 function remove_loci!(data::PopObj, loci::Vector{String})
-    present_loci = Vector{String}()
     for each in loci
         if each ∉ loci(data)
             println("NOTICE: locus \"$each\" not found")
-            continue
-        else
-            push!(present_loci, each)
         end
-    end
-    length(present_loci) == 0 && error("None of those loci were found in the data")
-    new_table = @apply data.loci begin
-        @where :locus .!= present_loci
-    end
-    data.loci = new_table
+    data.loci =  @where data.loci :locus ∉ loci
 end
 
 """
