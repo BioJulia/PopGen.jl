@@ -1,5 +1,5 @@
 using CSV, JuliaDB, CategoricalArrays, JuliaDBMeta, BenchmarkTools
-
+cd("/Users\\pdime\\Desktop\\PopGen.jl\\")
 infile = "data/data/nancycats.gen"
 infile2 = "data/data/gulfsharks.gen"
 
@@ -82,7 +82,7 @@ end
 ##### read_genepop long
 """
     genepop(infile::String; kwargs...)
-Load a Genepop format file into memory as a PopObj object.
+Load a Genepop format file into memory as a PopData object.
 - `infile::String` : path to Genepop file
 
 ### Keyword Arguments
@@ -157,8 +157,8 @@ function genepop(
 
     # check for the marker type and assign Int8 or Int16 depending on max value
     # there's no real reason 40 was chosen other than being a reasonable buffer
-    # for edge cases and missing data
-    # since the genotypes are sorted anyway, we can look at the last (largest) value
+    # for edge cases since SNP data <= 4, and haplotyped data could be a bit higher
+    # since the genotypes will be sorted anyway, we can look at the last (largest) value
     sample_geno = phase.(split(firstrecord, delim)[2:end], Int16, digits)
     if maximum(map(i -> i[end], sample_geno |> skipmissing)) < 40
         geno_type = Int8    # is a snp
@@ -168,12 +168,10 @@ function genepop(
 
     # check for horizontal formatting, where popsep would appear on the third line
     if pop_idx[1] <= 3
-        gpop = open(infile, "r")
-        # skip first line
-        readline(gpop)
+
+        gpop = open(infile, "r") ; readline(gpop)  # skip first line
         # second line should have all the loci
-        locus_name_raw = readline(gpop)
-        close(gpop)
+        locus_name_raw = readline(gpop) ; close(gpop)
         locinames = strip.(split(locus_name_raw |> join, ","))
         map(i -> replace!(i, "." => "_"), locinames)
         horizontal = true
@@ -278,5 +276,5 @@ function genepop(
                 Vector{Union{Missing,Float32}},
     ))
 
-    PopObj(sample_table, loci_table)
+    PopData(sample_table, loci_table)
 end
