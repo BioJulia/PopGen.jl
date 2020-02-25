@@ -214,7 +214,7 @@ end
 
 """
     locus(::PopData, ::Union{String, Symbol})
-Convenience wrapper to display all the genotypes of a locus as a two-column table.
+Convenience wrapper to return a vector of all the genotypes of a single locus
 
 ### Example
 ```
@@ -222,10 +222,9 @@ locus(gulfsharks(), "contig_475")
 ```
 """
 function locus(data::PopData, locus::String)
-    @apply data.loci begin
-        select(_, (:locus, :genotype))
+    tmp = select(data.loci, (:locus, :genotype)) |>
         @where :locus == locus
-    end
+    return tmp.columns.genotype
 end
 
 function meta(data::PopData)
