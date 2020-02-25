@@ -6,19 +6,22 @@ module PopGen
 ## O | | o   O | | o   O | | o   O | | o   O | | o
 ##   O o       O o       O o       O o       O o
 
+using CSV, JuliaDB, JuliaDBMeta, MultipleTesting, Random, StatsBase
 
+#=
 using Convex,
       CSV,
-      DataFrames,
       Distributions,
       ECOS,
       GeneticVariation,
+      JuliaDB,
+      JuliaDBMeta,
       LinearAlgebra,
       MultipleTesting,
       ProgressMeter,
       Random,
       StatsBase
-
+=#
 
 export PopObj,
     summary,
@@ -50,14 +53,22 @@ export PopObj,
 ## O | | o   O | | o   O | | o   O | | o   O | | o
 ##   O o       O o       O o       O o       O o
 
-include("PopObj.jl")
-include("Read.jl")
+# The types
+include("Types.jl")
+# file io
+include("io/ioUtils.jl")
+include("io/Delimited.jl")
+include("io/Genepop.jl")
+include("io/VariantCall.jl")
+# example data
 include("Datasets.jl")
+# manipulation commands
 include("Manipulate.jl")
+# allele frequency and heterozygosity functions
 include("AlleleFreq.jl")
 include("HardyWeinberg.jl")
+# summary information
 include("SummaryInfo.jl")
+#include("PairwiseRelatedness.jl")  # not yet ready
 #include("PlotRecipes.jl")  # not yet ready
-
-
 end # module PopGen
