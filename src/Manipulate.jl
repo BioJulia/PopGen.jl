@@ -42,6 +42,12 @@ function locations!(data::PopData, lat::Vector{Union{Missing,T}}, long::Vector{U
     end
 end
 
+function locations!(data::PopData, lat::Vector{T}, long::Vector{T}) where T <: AbstractFloat
+    lat_adjust = lat |> Vector{Union{Missing, Float32}}
+    long_adjust = long |> Vector{Union{Missing, Float32}}
+    locations!(data, lat = lat_adjust, long = long_adjust)
+end
+
 
 """
     locations!(data::PopData; lat::Vector{String}, long::Vector{String})
