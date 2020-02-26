@@ -439,15 +439,22 @@ exclude_loci!(nancycats(), ["fca8", "fca23"])
 """
 function exclude_loci(data::PopData, locus::String)
     locus ∉ loci(data) && error("Locus \"$locus\" not found")
-    data.loci = @where data.loci :locus != locus
+    new_table = @where data.loci :locus != locus
+    droplevels!(new_table.columns.locus)
+    return PopData(data.meta, new_table)
 end
 
 function exclude_loci(data::PopData, loci::Vector{String})
+    msg = ""
+    all_loc = loci(data)
     for each in loci
-        if each ∉ loci(data)
-            println("NOTICE: locus \"$each\" not found")
+        if each ∉ all_loci
+            msg *= "\n  locus \"$each\" not found"
         end
-    data.loci =  @where data.loci :locus ∉ loci
+    end
+    new_table =  @where data.loci :locus ∉ loci
+    msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
+    return PopData(data.meta, new_table)
 end
 
 const omit_loci = exclude_loci
@@ -488,11 +495,9 @@ end
 """
     samples(data::PopData)
 View individual/sample names in a `PopData`
-
-Equivalent to `PopData.samples.name`
 """
 function samples(data::PopData)
-    @view data.samples[!, :name]
+    select(data.meta, :name)
 end
 
 
