@@ -8,13 +8,13 @@ Used internally in the `genepop` and `delimited` file parsers to scan the genoty
 of a sample and return the ploidy of the first non-missing locus.
 """
 @inline function find_ploidy(genotypes::T where T<:SubArray)
-    for i in genotypes
+    @inbounds for i in genotypes
         i !== missing && return Int8(length(i))
     end
 end
 
 @inline function find_ploidy(genotypes::T where T<:AbstractArray)
-    for i in genotypes
+    @inbounds for i in genotypes
         i !== missing && return Int8(length(i))
     end
 end

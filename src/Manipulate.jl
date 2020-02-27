@@ -49,7 +49,7 @@ function locations!(data::PopData, lat::Vector{T}, long::Vector{T}) where T <: A
     locations!(data, lat = lat_adjust, long = long_adjust)
 end
 
-
+#TODO HANDLE MISSING
 """
     locations!(data::PopData; lat::Vector{String}, long::Vector{String})
 Replaces existing `PopData` location data (latitude `lat`, longitude `long`). Takes
@@ -75,6 +75,18 @@ function locations!(data::PopData, lat::Vector{Union{Missing,String}}, long::Vec
     latConverted = Vector{Union{Missing,Float32}}()
     longConverted = Vector{Union{Missing,Float32}}()
     @inbounds for idx in 1:length(lat)
+        # check for missing as strings
+        if lat[idx] == "missing" | long[idx] == "missing"
+            push!(lat_Converted, missing)
+            push!(long_Converted, missing)
+            continue
+        end
+        # check for missing as Missing
+        if ismissing(lat[idx]) | ismissing(long[idx])
+            push!(lat_Converted, missing)
+            push!(long_Converted, missing)
+            continue
+        end
         tmpLat = split(lat[idx], " ")
         tmpLong = split(long[idx], " ")
         lat_deg = parse(Float32,tmpLat[1]) ; lat_min = round(parse(Float32,tmpLat[2])/60, digits = 4)
