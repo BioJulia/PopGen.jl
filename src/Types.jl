@@ -28,8 +28,6 @@ struct PopData <: PopObj
 end
 
 
-#=
-function Base.show(io::IO, data::PopObj)
-    summary(data)
+function Base.show(io::IO, catst::T) where T<:CategoricalString
+    print(io, "\"$(catst)\"")
 end
-=#
