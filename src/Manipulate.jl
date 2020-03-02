@@ -434,7 +434,6 @@ const popnames! = populations!
 To have a built-in "undo button", exclusion functions return new PopData objects
 with the specified loci/samples removed rather than overwriting the original.
 =#
-#TODO
 """
 ```
 exclude_loci(data::PopData, locus::String)
@@ -445,8 +444,8 @@ leaving the original intact. Synonymous with `omit_loci` and `remove_loci`.
 
 ### Examples
 ```
-exclude_loci(nancycats(), "fca8")
-exclude_loci!(nancycats(), ["fca8", "fca23"])
+new_cats = exclude_loci(nancycats(), "fca8")
+very_new_cats = exclude_loci(nancycats(), ["fca8", "fca23"])
 ```
 """
 function exclude_loci(data::PopData, locus::String)
@@ -514,17 +513,3 @@ View individual/sample names in a `PopData`
 function samples(data::PopData)
     select(data.meta, :name)
 end
-
-
-"""
-    view_genotypes(data::PopData; samples::Union{String, Array, Nothing}, loci::Union{String, Array, Nothing})
-Returns a dataframe of samples, population, genotypes. View the genotypes of
-specific samples for specific loci in a `PopData`. Default shows all genotypes
-for all individuals.
-
-### Examples
-```
-view_genotypes(nancycats, loci = "fca8")
-view_genotypes(nancycats, samples = "N226", loci = ["fca8", "fca23"])
-```
-"""

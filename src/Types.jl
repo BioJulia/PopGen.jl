@@ -27,7 +27,7 @@ struct PopData <: PopObj
     loci::IndexedTable
 end
 
-
-function Base.show(io::IO, catst::T) where T<:CategoricalString
-    print(io, "\"$(catst)\"")
+# pretty printing of CategoricalStrings
+function Base.show(io::IO, cat_st::T) where T<:CategoricalString
+    print(io, "\"$(cat_st)\"")
 end
