@@ -452,20 +452,19 @@ exclude_loci!(nancycats(), ["fca8", "fca23"])
 function exclude_loci(data::PopData, locus::String)
     locus ∉ loci(data) && error("Locus \"$locus\" not found")
     new_table = @where data.loci :locus != locus
-    droplevels!(new_table.columns.locus)
     return PopData(data.meta, new_table)
 end
 
-function exclude_loci(data::PopData, loci::Vector{String})
+function exclude_loci(data::PopData, exloci::Vector{String})
     msg = ""
-    all_loc = loci(data)
-    for each in loci
+    all_loci = loci(data)
+    for each in exloci
         if each ∉ all_loci
             msg *= "\n  locus \"$each\" not found"
         end
     end
-    new_table =  @where data.loci :locus ∉ loci
-    msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
+    new_table =  @where data.loci :locus ∉ exloci
+    msg != "" && printstyled("Warnings:", color = :yellow) ; println(msg)
     return PopData(data.meta, new_table)
 end
 
@@ -483,26 +482,30 @@ exclude_samples(nancycats, "N100")
 exclude_samples(nancycats, ["N100", "N102", "N211"])
 ```
 """
-function exclude_samples(data::PopData, samp_id::Union{String, Vector{String}})
-    # get samp_id indices
-    if typeof(samp_id) == String
-        samp_id ∉ data.samples.name && error("sample \"$samp_id\" not found")
-        idx = findfirst(i -> i == samp_id, data.samples.name)
-    else
-        idx = Vector{Int}()
-        for ind in samp_id
-            if ind ∉ data.samples.name
-                println("NOTICE: sample \"$ind\" not found!")
-                continue
-            end
-            push!(idx, findfirst(i -> i == ind, data.samples.name))
-        end
-        println()
-    end
-    deleterows!(data.samples, idx)
-    deleterows!(data.loci, idx)
-    return data
+function exclude_samples(data::PopData, samp_id::String)
+    samp_id ∉ samples(data) && error("Sample \"$samp_id\" not found")
+    new_loc_table = @where data.loci :name != samp_id
+    new_meta_table = @where data.meta :name != samp_id
+    return PopData(new_meta_table, new_loc_table)
 end
+
+
+function exclude_samples(data::PopData, samp_ids::Vector{String})
+    msg = ""
+    all_samp = samples(data)
+    for each in samp_ids
+        if each ∉ all_samp
+            msg *= "\n  Sample \"$each\" not found"
+        end
+    end
+    new_loc_table = @where data.loci :name ∉ samp_ids
+    new_meta_table = @where data.meta :name ∉ samp_ids
+    msg != "" && printstyled("Warnings:", color = :yellow) ; println(msg)
+    return PopData(new_meta_table, new_loc_table)
+end
+
+const omit_samples = exclude_samples
+const remove_samples = exclude_samples
 
 """
     samples(data::PopData)
@@ -525,41 +528,57 @@ view_genotypes(nancycats, loci = "fca8")
 view_genotypes(nancycats, samples = "N226", loci = ["fca8", "fca23"])
 ```
 """
-function view_genotypes(data::PopData; samples::Union{String, Array, Nothing}= nothing, loci::Union{String, Array, Nothing}= nothing)
-    if loci == nothing && samples == nothing
-        @warn "please specify either loci= or samples=, otherwise use PopData.loci"
-    end
 
-    df = deepcopy(data.loci)
-    insertcols!(df, 1, :name => data.samples.name)
-    insertcols!(df, 2, :population => data.samples.population)
-    if samples != nothing
-        if typeof(samples) == String
-            samples ∉ data.samples.name && error("individual $samples not found in PopData")
-            tmp = df[df.name .== samples, :]
-        else
-            tmp = df[df.name .== samples[1], :]
-            for ind in samples[2:end]
-                ind ∉ data.samples.name && println("NOTICE: individual \"$ind\" not found in PopData!")
-                tmp = vcat(tmp, df[df.name .== ind, :])
-            end
-            println()
-        end
+# slighly hacked version of map_helper from JuliaDBMeta to pre-populate the select fields
+function popdata_map_helper(d, x)
+    anon_func, syms = JuliaDBMeta.extract_anonymous_function(x, JuliaDBMeta.replace_field)
+    if !isempty(syms) && !(:(_) in syms)
+        fields = (:name, :population,:locus,:genotype)
+        :(map($anon_func, (JuliaDBMeta._table)($d), select = $fields))
     else
-        tmp = df
+        :(map($anon_func, (JuliaDBMeta._table)($d)))
     end
-    if loci != nothing
-        if typeof(loci) == String
-            loci ∉ string.(names(data.loci)) && error("locus $loci not found in PopData")
-            return tmp[!, [:name, :population, Symbol(loci)]]
-        else
-            for locus in loci[2:end]
-                locus ∉ string.(names(data.loci)) && println("NOTICE: locus \"$locus\" not found in PopData!")
-            end
-            println()
-            return tmp[!, append!([:name, :population], Symbol.(loci))]
-        end
-    else
-        return tmp
-    end
+end
+
+# slightly hacked version of where_helper from JuliaDBMeta to work with popdata_map_helper
+function popdata_where_helper(args...)
+    d = gensym()
+    func = Expr(:(->), d,  Expr(:call, :(view), d, popdata_map_helper(d, args[end])))
+    Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
+end
+
+"""
+    @show_only (args...)
+Use conditional statements to filter data in the `loci` table of `PopData` objects for
+convenience viewing. This macro is a modified version of `@where` from `JuliaDBMeta`
+that pre-selects all the columns in the `loci` table of a `PopData` object. It is
+equivalent to
+```
+@where PopData.loci (:name, :population, :locus, :genotype) args...
+```
+This macro will *only* return a `view` of the `loci` table, not a full `PopData` object. Please use the suitable `exclude_`/`omit_` commands to remove loci or samples.
+Use conditional statements to specify how to filter the table, such as `:name == "cca_005"`. Write column names as symbols (`:colname`).
+Just like `@where`, multiple conditionals can be strung together using "and" (`&&`) and "or" (`||`) statements.
+### Examples
+```
+sharks = gulfsharks();
+
+# show only information for sample cc_005
+@show_only sharks.loci :name == "cc_005"
+
+# show only information for loci "contig_475" and "contig_2748"
+@show_only sharks.loci :locus in ["contig_475", "contig_2748"]
+
+# show information for all loci except "contig_475" and "contig_2748" (using \\notin symbol)
+@show_only sharks.loci :locus ∉ ["contig_475", "contig_2748"]
+
+# show information for contig_475 in all populations except Cape Canaveral
+@show_only sharks.loci :population != "Cape Canaveral" && locus == "contig_475"
+
+# show only heterozygous genotypes
+@show_only sharks.loci PopGen.ishet(:genotype) == true
+```
+"""
+macro show_only(args...)
+    esc(popdata_where_helper(args...))
 end

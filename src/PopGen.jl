@@ -1,10 +1,10 @@
 module PopGen
 
-##   o O       o O       o O       o O       o O
-## o | | O   o | | O   o | | O   o | | O   o | | O
-## | | | | O | | | | Dependencies| | | | O | | | | O
-## O | | o   O | | o   O | | o   O | | o   O | | o
-##   O o       O o       O o       O o       O o
+#   o O       o O       o O       o O       o O
+# o | | O   o | | O   o | | O   o | | O   o | | O
+# | | | | O | | | | Dependencies| | | | O | | | | O
+# O | | o   O | | o   O | | o   O | | o   O | | o
+#   O o       O o       O o       O o       O o
 
 using CSV, JuliaDB, JuliaDBMeta, MultipleTesting, Random, StatsBase, CategoricalArrays
 
@@ -47,11 +47,11 @@ export PopObj,
 
 
 
-##   o O       o O       o O       o O       o O
-## o | | O   o | | O   o | | O   o | | O   o | | O
-## | | | | O | | | |Include Files| | | | O | | | | O
-## O | | o   O | | o   O | | o   O | | o   O | | o
-##   O o       O o       O o       O o       O o
+#   o O       o O       o O       o O       o O
+# o | | O   o | | O   o | | O   o | | O   o | | O
+# | | | | O | | | |Include Files| | | | O | | | | O
+# O | | o   O | | o   O | | o   O | | o   O | | o
+#   O o       O o       O o       O o       O o
 
 # The types
 include("Types.jl")
