@@ -1,21 +1,29 @@
 """
-    allele_avg(data::PopData, rounding::Bool = true)
-Returns a NamedTuple of the average number of alleles ('avg') and standard
-deviation (`stdev`) of a `PopData`. Use `false` as second argument (no keyword)
-to not round results. Default (`true`) rounds to 4 digits.
+    allele_table(data::PopData)
+Return a "tidy" IndexedTable of the loci, their alleles, and their alleles' frequencies.
 """
-function allele_avg(data::PopData, rounding::Bool = true)
-    num_alleles = map(i -> Iterators.flatten(i |> skipmissing) |> collect |> unique |> length, eachcol(data.loci, false))
-    avg = mean(num_alleles)
-    sd = std(num_alleles)
-    if rounding == true
-        return (avg = round(avg, digits = 4), stdev = round(sd, digits = 4))
-    else
-        return (avg = avg, stdev = sd)
-    end
+@inline function allele_table(data::PopData)
+    tmp = @groupby data.loci :locus flatten = true {allele = unique(alleles(:genotype))}
+    frq = @groupby data.loci :locus flatten = true {freq = allele_freq(:genotype)}
+    transform(tmp, :frequency => frq.columns.freq)
 end
 
 
+"""
+    allele_avg(data::PopData, rounding::Bool = true)
+Returns a NamedTuple of the average number of alleles ('mean') and
+standard deviation (`stdev`) of a `PopData`. Use `false` as second
+argument (no keyword) to not round results. Default (`true`) rounds
+to 4 digits.
+"""
+function allele_avg(data::PopData, rounding::Bool = true)
+    tmp = @groupby data.loci :locus {alleles = length(unique(alleles(:genotype)))}
+    if rounding
+        @with tmp {mean = round(mean(:alleles), digits = 4), stdev = round(variation(:alleles), digits = 4)}
+    else
+        @with tmp {mean = mean(:alleles), stdev = variation(:alleles)}
+    end
+end
 """
     richness(data::PopData)
 Calculates various allelic richness and returns vector of per-locus allelic richness.

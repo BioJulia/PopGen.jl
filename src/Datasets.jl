@@ -458,7 +458,7 @@ function gulfsharks()
             29.82344
             29.82344
             ]
-    data = genepop(filename)
+    data = genepop(filename, silent = true)
     locations!(data, lat = yloc, long = xloc)
 
 #    data.meta.columns.latitude = yloc ; data.meta.name.longitude = xloc

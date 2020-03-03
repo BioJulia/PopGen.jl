@@ -1,94 +1,30 @@
 """
-    allele_freq(genotype::Union{Missing, NTuple{N,<:Integer}}) where N
-Calculate allele frequency for a single locus of a single sample. Returns a
-`Dict` of alleles and their frequencies.
+    alleles(locus::T) where T<:AbstractArray
+Return an array of all the non-missing alleles of a locus.
 """
-function allele_freq(genotype::Union{Missing, NTuple{N,<:Integer}}) where N
-    x === missing && return missing
-    d = Dict()
-    for allele in genotype
-        # sum up alleles
-        d[allele] = get!(d, allele, 0) + 1
-    end
-    total = values(d) |> sum    # sum of all non-missing alleles
-    [d[i] = d[i] / total for i in keys(d)]  # allele count / sum
-    return d
+@inline function alleles(locus::T) where T<:AbstractArray
+    Base.Iterators.flatten(locus |> skipmissing) |> collect
 end
+
 
 """
     allele_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-Calculate allele counts for a single locus of a `PopObj`. Returns a `Dict` of
-allele's and their frequencies.
+Calculate allele counts for a single locus of a `PopObj`. Returns a
+ `Dict` of allele's and their frequencies.
 """
-function allele_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-    d = Dict{String,Float64}()
-    flat_alleles = Base.Iterators.flatten(locus |> skipmissing) |> collect
+@inline function allele_freq(locus::T) where T<:AbstractArray
+    d = Dict{String,Float32}()
+    flat_alleles = alleles(locus)
     uniq_alleles = unique(flat_alleles)
     allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
-    total = sum(allele_counts)
-    freq = allele_counts ./ total
+    freq = allele_counts ./ sum(allele_counts)
     for (i,j) in enumerate(uniq_alleles)
         d[string(j)] = freq[i]
     end
     return d
 end
 
-"""
-    allele_freq(locus::Vector{<:Union{Missing, Tuple{Vararg}}}
-Calculate allele counts for a single locus of a `PopObj` with unequal ploidy across
-samples. Returns a `Dict` of allele's and their frequencies.
-"""
-function allele_freq(locus::Vector{<:Union{Missing, Tuple{Vararg}}})
-    d = Dict{String,Float64}()
-    flat_alleles = Base.Iterators.flatten(locus |> skipmissing) |> collect
-    uniq_alleles = unique(flat_alleles)
-    allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
-    total = sum(allele_counts)
-    freq = allele_counts ./ total
-    for (i,j) in enumerate(uniq_alleles)
-        d[string(j)] = freq[i]
-    end
-    return d
-end
-
-"""
-    allele_freq(locus::SubArray{<:Union{Missing,NTuple{N,<:Integer}}}) where N
-Calculate allele counts for a single locus of a `PopObj` split by population
-using `group()`. Returns a `Dict` of allele's and their frequencies.
-"""
-function allele_freq(locus::SubArray{<:Union{Missing,NTuple{N,<:Integer}}}) where N
-    d = Dict{String,Float64}()
-    flat_alleles = Base.Iterators.flatten(locus |> skipmissing) |> collect
-    uniq_alleles = unique(flat_alleles)
-    allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
-    total = sum(allele_counts)
-    freq = allele_counts ./ total
-    for (i,j) in enumerate(uniq_alleles)
-        d[string(j)] = freq[i]
-    end
-    return d
-end
-
-"""
-    allele_freq(locus::SubArray{<:Union{Missing,Tuple{Vararg}}})
-Calculate allele counts for a single locus of a `PopObj` split by population
-using `group()` with unequal ploidy across samples. Returns a `Dict` of
-allele's and their frequencies.
-"""
-function allele_freq(locus::SubArray{<:Union{Missing,Tuple{Vararg}}})
-    d = Dict{String,Float64}()
-    flat_alleles = Base.Iterators.flatten(locus |> skipmissing) |> collect
-    uniq_alleles = unique(flat_alleles)
-    allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
-    total = sum(allele_counts)
-    freq = allele_counts ./ total
-    for (i,j) in enumerate(uniq_alleles)
-        d[string(j)] = freq[i]
-    end
-    return d
-end
-
-
+#TODO
 """
     allele_matrix(data::PopObj, allele::Int)
 Convert a DataFrame of genotypes from a PopObj into a matrix of a single

@@ -60,9 +60,9 @@ export PopObj,
 include("Types.jl")
 # file io
 include("io/ioUtils.jl")
-include("io/Delimited.jl")
+#include("io/Delimited.jl")
 include("io/Genepop.jl")
-include("io/VariantCall.jl")
+#include("io/VariantCall.jl")
 # example data
 include("Datasets.jl")
 # manipulation commands
