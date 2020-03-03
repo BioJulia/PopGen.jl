@@ -12,30 +12,35 @@ end
 """
     allele_avg(data::PopData, rounding::Bool = true)
 Returns a NamedTuple of the average number of alleles ('mean') and
-standard deviation (`stdev`) of a `PopData`. Use `false` as second
-argument (no keyword) to not round results. Default (`true`) rounds
-to 4 digits.
+standard deviation (`stdev`) of a `PopData`. Use `round = false` to
+not round results. Default (`true`) roundsto 4 digits.
 """
-function allele_avg(data::PopData, rounding::Bool = true)
-    tmp = @groupby data.loci :locus {alleles = length(unique(alleles(:genotype)))}
-    if rounding
-        @with tmp {mean = round(mean(:alleles), digits = 4), stdev = round(variation(:alleles), digits = 4)}
+function allele_avg(data::PopData; round::Bool = true, populations = false)
+    tmp = richness(data)
+    if !populations
+        if rounding
+            @with tmp {mean = round(mean(:alleles), digits = 4), stdev = round(variation(:alleles), digits = 4)}
+        else
+            @with tmp {mean = mean(:alleles), stdev = variation(:alleles)}
+        end
     else
-        @with tmp {mean = mean(:alleles), stdev = variation(:alleles)}
+        @groupby tmp (:locus, :population) {mean = mean(:richness), stdev = variation(:richness)}
     end
 end
+
+
 """
     richness(data::PopData)
-Calculates various allelic richness and returns vector of per-locus allelic richness.
-To be called internally by functions calculating overall or per-population richness
-either rarefied or not.
+Calculates various allelic richness and returns a table of per-locus
+allelic richness. Use `populations = true` to calculate richness by
+locus by population.
 """
-function richness(data::PopData)
-    # collapse genotypes into array of alleles |> count number of unique alleles
-    rich = map(eachcol(data.loci, false)) do i
-        Iterators.flatten(i |> skipmissing) |> collect |> unique |> length
+function richness(data::PopData; populations::Bool = false)
+    if !populations
+        @groupby data.loci :locus {richness = length(unique(alleles(:genotype)))}
+    else
+        @groupby data.loci (:locus, :population) {richness =  length(unique(alleles(:genotype)))}
     end
-    return DataFrame(locus = names(data.loci), richness = rich)
 end
 
 
