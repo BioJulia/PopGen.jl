@@ -8,9 +8,9 @@ end
 
 
 """
-    allele_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-Calculate allele counts for a single locus of a `PopObj`. Returns a
- `Dict` of allele's and their frequencies.
+    allele_freq(locus::T) where T<:AbstractArray
+Return a `Dict` of allele frequencies of a single locus in a `PopData`
+object.
 """
 @inline function allele_freq(locus::T) where T<:AbstractArray
     d = Dict{String,Float32}()
@@ -18,13 +18,40 @@ Calculate allele counts for a single locus of a `PopObj`. Returns a
     uniq_alleles = unique(flat_alleles)
     allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
     freq = allele_counts ./ sum(allele_counts)
-    for (i,j) in enumerate(uniq_alleles)
+    @inbounds for (i,j) in enumerate(uniq_alleles)
         d[string(j)] = freq[i]
     end
     return d
 end
 
-#TODO
+
+"""
+    allele_freq(data::PopData, locus::String; population::Bool = false)
+Return a `Dict` of allele frequencies of a single locus in a `PopData`
+object. Use `population = true` to return a table of allele frequencies
+of that locus per population.
+### Example
+```
+cats = nancycats()
+allele_freq(cats, "fca8")
+allele_freq(cats, "fca8", population = true)
+```
+"""
+function allele_freq(data::PopData, locus::String, population::Bool=false)
+    if !population
+        @apply data.loci begin
+            @where :locus == locus
+            @with allele_freq(:genotype)
+        end
+    else
+        @apply data.loci :population begin
+            @where :locus == locus
+            @with {freq = allele_freq(:genotype)}
+        end
+    end
+end
+
+
 """
     allele_matrix(data::PopObj, allele::Int)
 Convert a DataFrame of genotypes from a PopObj into a matrix of a single
@@ -40,6 +67,7 @@ function allele_matrix(data::T, allele::Int) where T <: DataFrame
     end
 end
 
+#TODO
 
 """
     geno_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
