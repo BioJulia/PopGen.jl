@@ -7,6 +7,7 @@ module PopGen
 #   O o       O o       O o       O o       O o
 
 using CSV, JuliaDB, JuliaDBMeta, MultipleTesting, Random, StatsBase, CategoricalArrays
+import IndexedTables: reindex
 
 #=
 using Convex,
@@ -41,8 +42,8 @@ export PopObj,
     relatedness, pairwise_relatedness, kinship,
     meta,
     missing,
+    reindex,
     show,
-    @show_only,
     heterozygosity, het, He,
     hwe_test, hwe
     #plot_missing,

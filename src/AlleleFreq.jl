@@ -13,13 +13,11 @@ Return a `Dict` of allele frequencies of a single locus in a `PopData`
 object.
 """
 @inline function allele_freq(locus::T) where T<:AbstractArray
-    d = Dict{String,Float32}()
+    d = Dict{Int16,Float32}()
     flat_alleles = alleles(locus)
-    uniq_alleles = unique(flat_alleles)
-    allele_counts = [count(i -> i == j, flat_alleles) for j in uniq_alleles]
-    freq = allele_counts ./ sum(allele_counts)
-    @inbounds for (i,j) in enumerate(uniq_alleles)
-        d[string(j)] = freq[i]
+    len = length(flat_alleles)
+    @inbounds Base.@async for allele in flat_alleles
+        @inbounds d[allele] = get!(d, allele, 0) + 1/len
     end
     return d
 end
@@ -70,14 +68,15 @@ end
 #TODO
 
 """
-    geno_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-Calculate genotype frequencies of all loci in a `PopObj`. Returns a `Dict` of
-genotypes and their frequencies.
+    geno_freq(locus::T) where T<:AbstractArray
+Return a `Dict` of genotype frequencies of a single locus in a
+`PopData` object.
 """
-@inline function geno_freq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
+@inline function geno_freq(locus::T) where T<:AbstractArray
     # conditional testing if all genos are missing
-    all(ismissing.(locus)) == true && return missing
-    d = Dict()
+    all(ismissing.(locus)) && return missing
+
+    d = Dict{Tuple, Float32}()
     @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
         d[genotype] = get!(d, genotype, 0) + 1
@@ -87,60 +86,33 @@ genotypes and their frequencies.
     return d
 end
 
-"""
-    geno_freq(locus::Vector{<:Union{Missing, Tuple{Vararg}}})
-Calculate genotype frequencies of all loci in a `PopObj` with unequal ploidy across
-samples. Returns a `Dict` of genotypes and their frequencies.
-"""
-@inline function geno_freq(locus::Vector{<:Union{Missing, Tuple{Vararg}}})
-    # conditional testing if all genos are missing
-    all(ismissing.(locus)) == true && return missing
-    d = Dict()
-    @inbounds for genotype in skipmissing(locus)
-        # sum up non-missing genotypes
-        d[genotype] = get!(d, genotype, 0) + 1
-    end
-    total = values(d) |> sum    # sum of all non-missing genotypes
-    [d[i] = d[i] / total for i in keys(d)] # genotype count/total
-    return d
-end
 
 """
-    geno_freq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-Calculate genotype frequencies of all loci in `PopObj` split
-by population using `group()`. Returns a `Dict` of genotypes and their frequencies.
+    geno_freq(data::PopData, locus::String; population::Bool = false)
+Return a `Dict` of genotype frequencies of a single locus in a `PopData`
+object. Use `population = true` to return a table of genotype frequencies
+of that locus per population.
+### Example
+```
+cats = nancycats()
+geno_freq(cats, "fca8")
+geno_freq(cats, "fca8", population = true)
+```
 """
-@inline function geno_freq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-    # conditional testing if all genos are missing
-    all(ismissing.(locus)) == true && return missing
-    d = Dict()
-    @inbounds for genotype in skipmissing(locus)
-        # sum up non-missing genotypes
-        d[genotype] = get!(d, genotype, 0) + 1
+function geno_freq(data::PopData, locus::String, population::Bool=false)
+    if !population
+        @apply data.loci begin
+            @where :locus == locus
+            @with geno_freq(:genotype)
+        end
+    else
+        @apply data.loci :population begin
+            @where :locus == locus
+            @with {freq = geno_freq(:genotype)}
+        end
     end
-    total = values(d) |> sum    # sum of all non-missing genotypes
-    [d[i] = d[i] / total for i in keys(d)] # genotype count/total
-    return d
 end
 
-"""
-    geno_freq(locus::SubArray{<:Union{Missing, Tuple{Vararg}}})
-Calculate genotype frequencies of all loci in `PopObj` split by population
-using `group()` with unequal ploidy across samples. Returns a `Dict` of
-genotypes and their frequencies.
-"""
-@inline function geno_freq(locus::SubArray{<:Union{Missing, Tuple{Vararg}}})
-    # conditional testing if all genos are missing
-    all(ismissing.(locus)) == true && return missing
-    d = Dict()
-    @inbounds for genotype in skipmissing(locus)
-        # sum up non-missing genotypes
-        d[genotype] = get!(d, genotype, 0) + 1
-    end
-    total = values(d) |> sum    # sum of all non-missing genotypes
-    [d[i] = d[i] / total for i in keys(d)] # genotype count/total
-    return d
-end
 
 """
     get_genotype(data::PopObj; sample::String, locus::String)
@@ -156,14 +128,19 @@ function get_genotype(data::PopObj; sample::String, locus::String)
     return getindex(data.loci[!, Symbol(locus)], idx)
 end
 
+function get_genotype(data::PopData; sample::String, locus::String)
+    @where data.loci :name == sample && :locus == locus
+end
+
 """
-    get_sample_genotypes(data::PopObj, sample::String)
+    get_sample_genotypes(data::PopData, sample::String)
 Return all the genotypes of a specific sample in a `PopObj`.
 This is an extension for the internal function `get_genotype`.
-
-`get_sample_genotypes(nancycats(), "N115")`
+```
+cats = nancycats()
+get_sample_genotypes(cats, "N115")
+```
 """
 function get_sample_genotypes(data::PopObj, sample::String)
-    idx = findfirst(i -> i == sample, data.samples.name)
-    map(i -> i[idx] , eachcol(data.loci))
+    @where data.loci :sample == sample
 end

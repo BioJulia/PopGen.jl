@@ -429,6 +429,22 @@ const population = populations
 const population! = populations!
 const popnames! = populations!
 
+"""
+    reindex(data::PopData, col::Union{String, Symbol})
+Re-index and sort the `loci` table of a `PopData` object by column
+`col`. Returns a new `PopData` object.
+
+### Example
+sharks = gulfsharks()
+reindex(sharks, :population)
+"""
+function reindex(data::PopData, col::Union{String, Symbol})
+    if typeof(col) == String
+        col = Symbol(col)
+    end
+    return PopData(data.meta, reindex(data.loci, col))
+end
+
 ##### Exclusion #####
 #=
 To have a built-in "undo button", exclusion functions return new PopData objects
