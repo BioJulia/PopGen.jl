@@ -75,9 +75,9 @@ longitude data of samples (decimal degrees)
 [-11.12, 15.32, 11.02, -4]
 ```
 
-## loci
+## Genotype Information
 
-The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions, along with leveraging [JuliaDBMeta.jl](https://github.com/piever/JuliaDBMeta.jl). It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are `CategoricalStrings`  from [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks` would occupy about 27mb in your RAM! The classes of `.loci` can be directly accessed with `PopData.loci.columns.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below.
+The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions, along with leveraging [JuliaDBMeta.jl](https://github.com/piever/JuliaDBMeta.jl). It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are `CategoricalStrings`  from [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.loci` can be directly accessed with `PopData.loci.columns.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below.
 
 ### name
 
@@ -108,9 +108,9 @@ The genotypes of the `loci` are an array of tuples, with each value correspondin
 ```
 
 !!! important ""
-    We use the tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using `PopGen.jl`, your data should already be filtered and screened. Hand-editing of genotype values is **strongly** discouraged, so we outlawed it outright.
+    We use the tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using `PopGen.jl`, your data should already be filtered and screened. Hand-editing of genotype values is **strongly** discouraged, so we outlawed it.
 
-## viewing PopData
+## Viewing PopData
 
 Given the volume of information that can be present in a `PopData`, we recommend `summary()` to summarize/overview the data rather than regurgitate everything on the screen. 
 
@@ -130,4 +130,4 @@ PopData Object
 
 ## location data
 
-Location data is optional for a `PopObj`. There are functions that use location information (e.g. `locations`), but most don't, so it's not a dealbreaker.
+Location data is optional for a `PopData`. There are functions that use location information (e.g. `locations`), but most don't, so it's not a dealbreaker. At present, there are no analyses that utilize location information. 
