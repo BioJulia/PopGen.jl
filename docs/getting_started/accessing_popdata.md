@@ -344,4 +344,4 @@ name    population  locus    genotype
 
 
 
-Now that you're somewhat familiar with the parts of `PopData`, [have a look at the commands](../commands.md) to view and manipulate `PopData` objects.
+Now that you're somewhat familiar with the parts of `PopData`, [have a look at the commands](../manipulate/manipulate.md) to view and manipulate `PopData` objects.

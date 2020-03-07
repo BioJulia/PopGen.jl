@@ -99,16 +99,16 @@ The locus associated with the genotype, stored as a `CategoricalString`.
 
 ### genotype
 
-`::Vector{Tuple{Int16,...}}`
+`::Vector{NTuple{N,Int}} where N`
 
-The genotypes of the `loci` are an array of tuples, with each value corresponding to an allele. The length of the tuple will vary based on the ploidy of the sample, and the `type` will vary whether the markers are snps or microsatellites, therefor the `type` shown above is conceptually accurate, but computationally incorrect.
+The genotypes of the `loci` are an array of tuples, with each value corresponding to an allele. The length of the tuple (`N`) will vary based on the ploidy of the sample, and the `type` will vary whether the markers are snps or microsatellites, therefor the `type` shown above is conceptually accurate, but technically misleading.
 
-```
+```julia tab="genotype example"
 [(0,1),(0,0),(1,2)]
 ```
 
 !!! important ""
-    We use the tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using `PopGen.jl`, your data should already be filtered and screened. Hand-editing of genotype values is **strongly** discouraged, so we outlawed it.
+    We use the tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using PopGen.jl, your data should already be filtered and screened. Hand-editing of genotype values is **strongly** discouraged, so we outlawed it.
 
 ## Viewing PopData
 
