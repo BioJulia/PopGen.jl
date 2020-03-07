@@ -16,18 +16,6 @@ where `infile` is a String of your filename (in quotes) and `kwargs` are the cor
 
 `PopGen.read()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below. If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.gen.final.v2.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and ignore file extensions. Ultimately, what crazy extensions you give your files is your business, and we love that about you. 
 
-
-
-### Specifying `marker = "msat"` and `OverflowError`
-
-For genepop and delimited files, you **must** specify if your markers are microsatellites (`marker = "msat"`)  because the default is for snps.
-
-**Why this matters:**
-
-SNPs are Typed as 8-bit integers, whereas microsatellites are Typed as 16-bit integers. By the nature of those Types, `Int8` cannot exceed the value 127, while `Int16` is capped at 37767. Since SNP alleles will only ever be coded as values between `1` and `4`, we never have to worry about the genotype exceeding 127. Microsatellites can of course exceed 127, so we use the next-smallest Integer type for them, naively hoping no one will ever have a microsatellite allele exceeding 37767 repeats. If you have microsatellite data but don't specify `marker = "msat"`, you will receive an `OverflowError`  as soon as the file reader tries to parse an allele greater than 127 as an `Int8`.
-
-
-
 ****
 
 ## Supported File Types

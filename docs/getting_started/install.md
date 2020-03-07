@@ -20,7 +20,7 @@ add "https://github.com/pdimens/PopGen.jl"
 
 ```julia
 using Pkg
-Pkg.add("https://github.com/pdimens/PopGen.jl") 
+Pkg.add(PackageSpec(url="https://github.com/pdimens/PopGen.jl", rev="master")) 
 ```
 
 

@@ -49,7 +49,7 @@ function allele_freq(data::PopData, locus::String, population::Bool=false)
     end
 end
 
-
+#=
 """
     allele_matrix(data::PopObj, allele::Int)
 Convert a DataFrame of genotypes from a PopObj into a matrix of a single
@@ -64,8 +64,8 @@ function allele_matrix(data::T, allele::Int) where T <: DataFrame
         i[allele]
     end
 end
+=#
 
-#TODO
 
 """
     geno_freq(locus::T) where T<:AbstractArray

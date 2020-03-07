@@ -1,6 +1,6 @@
 # A quick Julia primer for getting the most out of this documentation
 
-There is nothing inherently special about this documentation relative to other documentation, other than we really *really* want you to get the most out of what's written here. This means that we need to embrace the fact that both novice and experienced Julia users may be reading these docs and using this package. So let's cover some Julia basics that will really help in navigating this package before we even get into the complicated genetics stuff. This primer is by no means "everything you need to get started in Julia", and is a poor substitute for actually learning the language. In general, we recommend [Think Julia: How to Think Like a Data Scientist](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html) by Ben Lauwens to establish some solid Julia foundations. It's free online!
+There is nothing inherently special about this documentation relative to other documentation, other than we really *really* want you to get the most out of what's written here. This means that we need to embrace the fact that both novice and experienced Julia users may be reading these docs and using this package. So let's cover some Julia basics that will really help in navigating this package before we even get into the complicated genetics stuff. This primer is by no means "everything you need to get started in Julia", and is a poor substitute for actually learning the language. In general, we recommend [Think Julia: How to Think Like a Data Scientist](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html) by Ben Lauwens to establish some solid Julia foundations. It's free online! Also, the Julia language maintains [its own great documentation](https://docs.julialang.org/en/v1/) that we rely on quite heavily for development.
 
 
 
@@ -8,7 +8,8 @@ There is nothing inherently special about this documentation relative to other d
 
 Everyone has their own particular workflows, and if you're new to Julia, you might not have established one yet. Julia can be used rather comfortably using its built-in interpreter, but you can also use it via Atom (the [officially supported](https://junolab.org/) `uber-juno` add-on) for an RStudio-like experience. If you're already a fan of Jupyter notebooks (or [**nteract**](https://nteract.io/)), then all you need is to install the `IJulia` package in Julia and you have full Jupyter support for Julia! Other popular options are VScode (julia add-on), or Emacs. 
 
-+  If you didn't already know,  the name "Jupyter" is actually a concatenation of Ju (julia) Pyt (python) and R (...R).
+!!! info ""
+    If you didn't already know,  the name "Jupyter" is actually a concatenation of **Ju** (julia) **Pyt** (python) and **eR** (R). 🤯
 
 ## First-time Performance
 If you're migrating to Julia from Python or R (or Matlab, etc.), you'll think Julia is slow and laggy because loading packages and running stuff has a noticeable wait time (10-40sec). It's worth mentioning that this lag is "compilation overhead". What this means is, Julia tries to pre-compile as much code as possible (into optimized machine code) when running something or loading a package. This lag exists **only the first time** you run something. Every subsequent run of a function, even with different parameters, will be **substantially** faster, and in most cases instant. If you want to test this yourself, try to run a line of code twice with `@time` before the function and compare the results. Here's an example:
@@ -94,11 +95,43 @@ You'll notice types follow a specific format, which is `object::type`. This form
 
 You might see the type `Union` appear occasionally throughout this documentation, and you can consider it a list of allowable types. For example, if something was of type `::Union{String,Integer}`, that means that **either** a `String` or `Integer` works. 
 
+### Subtypes
+
+The julia language is abound with types (and you can create your own!), and has a hierarchical system of supertypes and subtypes. As you can probably guess, a supertype can contain multiple subtypes, such as `Signed` being a supertype of (among other things) `Int64, Int32, Int16, Int8`. All vectors are subtypes of `AbstractVector`.  If you want to try it yourself, use the `supertype()` command on your favorite Type, like `supertype(Float32)`. You will occasionally see `<:` instead of `::`, which means "is a subtype of". This is used for condtional evaluation, like `typeof(something) <: Signed`, and in some function methods like `function(var1::T) where T <: Supertype`, which leads us to:
+
+#### where T
+
+This looks weird at first,  but it's actually very simple. When we do method definitions, we can define methods with strict types, like `funct(data:PopData, arg1::Int8)`, or we can generalize it with `where T`, which looks like 
+
+```julia
+function funct1(data::PopData, thing1::T) where T
+```
+
+This will auto-create a method for any possible Type for `thing1`. Usually, that's problematic, as incorrect input will lead to obscure errors (e.g. multiplying integers with strings?!). Instead, you can constrain the types for `T` like this:
+
+```julia
+function funct2(data::PopData, thing1::T) where T <: Signed
+```
+
+With the constraint above, it will generate methods for all cases where `thing1` is a subtype of `Signed`, which includes all the numerical Types (integers, Floats, etc.). This will make sure that the function will behave correctly for a range of input types.
+
+You can also use this type of notation to clean up a method definition where multiple arguments have the same Type specification:
+
+```julia
+function funct3(data::PopData, thing1::T, thing2::T, thing3::T) where T::Float64
+```
+
+So, instead of writing `thing1::Float64, thing2::Float64, thing3::Float64`, we just use `T` as a placeholder and assign it a strict Type at the end.  It ends up being pretty handy!
+
+
 
 
 ## Functions vs. Methods 
 
 As part of Julia's type-safe paradigm and multiple dispatch (see "ERROR: MethodError: no method matching" below), type specifications in functions often reduce runtime of functions, but also establish function identity. Multiple dispatch refers to several different functions having the same name, but employing different *methods* depending on the input. In Julia, it's easier to write a single function with multiple type-safe methods, rather than one mega-function that accepts any type and have a bunch of `if` statements that determines what the program does depending on the input. 
+
+!!! info ""
+    As a rule of thumb, `for ` loops with `if` conditions in them slow down the compiler, so best-practice often encourages us to write type-specific methods.
 
 In practice, this looks like:
 
@@ -145,7 +178,7 @@ The functions within `PopGen` are almost always explicitly typed, so if you are 
 Sometimes you might include an argument with a keyword when there isn't one, or include an argument without a keyword when there needs to be one (honestly, we make that mistake too and we *wrote* this stuff). To help minimize those mistakes, please read below about which arguments have keywords and which don't.
 
 !!! question ""
-    MethodError's can definitely get annoying, but they are usually the result of incorrect input from the user and not buggy programming by the developers. Please double-check your inputs before assuming something is broken or bugged.
+    MethodError's can definitely get annoying, but they are usually (but not always!) the result of incorrect input from the user. Please double-check your inputs before assuming something is broken or bugged.
 
 
 
@@ -162,7 +195,7 @@ Let's talk about semicolons some more.
     - `MethodError: no methods matching` is more likely an issue on your side and not on our side :smile:
         - unless we accidentally forgot to export a function! :facepalm:
         - or we typed a function incorrectly
-        - really, it's a coin flip who could be at fault
+        - ok, maybe we made a mistake and please submit an Issue!
 
 Broadly speaking, there are two types of function declarations in Julia: ones with keywords and ones without keywords. The term "keywords" refers to an input argument that has the format `argument = value`. This format is present in many of the functions in this and other packages, however there are some specifics to understand when functions use keywords and when they don't. 
 

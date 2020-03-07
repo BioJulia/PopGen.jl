@@ -49,6 +49,7 @@ function locations!(data::PopData, lat::Vector{T}, long::Vector{T}) where T <: A
     locations!(data, lat = lat_adjust, long = long_adjust)
 end
 
+
 #TODO HANDLE MISSING
 """
     locations!(data::PopData; lat::Vector{String}, long::Vector{String})
@@ -67,7 +68,7 @@ x = fill("-11 22.33", 237) ; y = fill("-41 31.52", 237)
 locations!(ncats, long = x, lat = y)
 ```
 """
-function locations!(data::PopData, lat::Vector{Union{Missing,String}}, long::Vector{Union{Missing,String}})
+function locations!(data::PopData, long::Vector{Union{Missing,String}}, lat::Vector{Union{Missing,String}})
     length(lat) != length(long) && error("latitude ($(length(lat))) and longitude $(length(long)) arrays not equal in length")
     length(lat) != length(data.meta.columns.name) && error("lat/long array length ($(length(lat))) and number of samples in PopData $(length(long)) are not equal")
     @info "Converting decimal minutes to decimal degrees"
@@ -381,6 +382,7 @@ function populations!(data::PopData, rename::Dict)
     end
     msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
     recode!(data.loci.columns.population,rename...)
+    show(populations(data))
     return
 end
 
@@ -409,6 +411,7 @@ function populations!(data::PopData, rename::NamedTuple)
     end
 
     droplevels!(data.loci.columns.population)
+    show(populations(data))
     return
 end
 

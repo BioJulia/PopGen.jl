@@ -78,11 +78,11 @@ function genepop(
     end
 
     # check for the marker type and assign Int8 or Int16 depending on max value
-    # there's no real reason 40 was chosen other than being a reasonable buffer
+    # there's no real reason 10 was chosen other than being a reasonable buffer
     # for edge cases since SNP data <= 4, and haplotyped data could be a bit higher
     # since the genotypes will be sorted anyway, we can look at the last (largest) value
     sample_geno = phase.(split(firstrecord, delim)[2:end], Int16, digits)
-    if maximum(map(i -> i[end], sample_geno |> skipmissing)) < 40
+    if maximum(map(i -> i[end], sample_geno |> skipmissing)) < 10
         geno_type = Int8    # is a snp
     else
         geno_type = Int16   # is a msat

@@ -21,9 +21,9 @@ nav:
 - Getting started: 
     A Julia primer: getting_started/juliaprimer.md
     How to Install: getting_started/install.md
-    The PopGen 'PopObj':
-        What's a PopObj: getting_started/popobj_type.md
-        Accessing parts of a PopObj: getting_started/PopObj_accessing.md
+    PopData and Types:
+        PopData and PopObj: getting_started/popobj_type.md
+        Accessing parts of PopData: getting_started/accessing_popdata.md
     Benchmarks: getting_started/comparison.md
 - Importing Data:
     Example Data: io/example_data.md
@@ -31,7 +31,11 @@ nav:
     Delimited: io/delimited.md
     Genepop: io/genepop.md
     Variant Call Format: io/variantcall.md
-- Manipulating a PopObj: commands.md
+- Manipulating PopData: 
+    Getting Started: manipulate/manipulate.md
+    Viewing and Sorting: manipulate/view_and_sort.md
+    Remove Samples/Loci: manipulate/exclusion.md
+    Location and Population Data: manipulate/location_and_pop.md
 - Types of Analyses:
     Hardy-Weinberg Equilibrium: analyses/hardyweinberg.md
     Relatedness: analyses/relatedness.md

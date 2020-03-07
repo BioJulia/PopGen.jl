@@ -1,7 +1,7 @@
 ## Import a genepop file as a `PopObj`
 
 ```julia
-genepop(infile; digits = 3, popsep = "POP", marker = "snp", diploid = true)
+genepop(infile; kwargs...)
 
 # Example
 julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
@@ -16,10 +16,10 @@ julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
 
 ### keyword Arguments
 
-- `#!julila digits::Int64` : the number of digits used to denote an allele (default: `3`)
-- `#!julila popsep::String` : word that separates populations in `infile` (default: `"POP"`)
-- `#!julila marker::String` : "snp" (default) or "msat" for microsatellites
-- `#!julila diploid::Bool` :  uses memory-optimized parsing for diploid samples (default: `true`)
+- `digits::Integer`: number of digits denoting each allele (default: `3`)
+- `popsep::String` : word that separates populations in `infile` (default: "POP")
+- `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
+- `silent::Bool`   : whether to print file information during import (default: `true`)
 
 !!! info ""
     By default, the file reader will assign numbers as population ID's (as Strings) in order of appearance in the genepop file. Use the `populations!` function to rename these with your own population ID's.
@@ -30,9 +30,9 @@ Files must follow standard Genepop formatting:
 
 - First line is a comment (and skipped)
 - Loci are listed after first line as one-per-line without commas or in single comma-separated row
-- A line with a particular keyword must delimit populations
+- A line with a particular and consistent keyword must delimit populations
 - **Must** be the same word each time and not a unique population name
-- File is **tab** delimited
+- File is **tab** delimited or **space** delimited, but not both
 
 ### formatting examples
 
@@ -66,9 +66,9 @@ Newcomb_03,	254230	000000	090100
 Newcomb_04,	254230	564000	090120
 ```
 
-
+-----------------
 
 ## Acknowledgements
 
-The original implementations of this parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is 3.2mb in size). However, thanks to the efforts of the [CSV.jl](https://github.com/JuliaData/CSV.jl) and [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl) teams, we leverage those packages to do much of the heavy lifting, while preserving the speed and reducing the memory footprint by as much as 65% in diploid cases (~166mb RAM to process `gulfsharks`). 
+The original implementations of this parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is 3.2mb in size). However, thanks to the efforts of the [CSV.jl](https://github.com/JuliaData/CSV.jl) team, we leverage that package to do much of the heavy lifting, in a multicore way, and all the while while preserving the speed and reducing the memory footprint quite a bit!
 

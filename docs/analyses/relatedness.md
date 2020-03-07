@@ -62,7 +62,7 @@ Depending on the number samples and loci in your data, the maximum-likelihood ap
 
 Currently, relatedness calculations run single-threaded, and we hope to parallelize it with the stable release of Julia 1.3  to make it even faster. Many hands make light work!
 
-
+-------------------
 
 ## Acknowledgements
 

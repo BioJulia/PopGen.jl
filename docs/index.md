@@ -16,7 +16,7 @@ To be a comprehensive package for population genetics analyses and visualization
 
 **Sanity**
 
-Functions are written in a way such that their use is sane and natural. When possible (or sensible), we use full words for input variables or other components of input/output. The first argument for all functions is the input data without keywords. Always. If a function has a very obvious name, then it likely it won't need keyword arguments, such as `remove_loci!` , where it would be silly to have a keyword `loci=` since the name is explicit about what it does and the first argument is always the input data.
+Functions are written in a way such that their use is sane and natural. When possible (or sensible), we use full words for input variables or other components of input/output. The first argument for all functions is the input data without keywords. Always. If a function has a very obvious name, then it likely it won't need keyword arguments, such as `exclude_loci` , where it would be silly to have a keyword `loci=` since the name is explicit about what it does and the first argument is always the input data.
 
 **Sensibility**
 
@@ -24,7 +24,7 @@ Functions need to be sensible, both in what they do and how they do it. This mea
 
 **Accessibility**
 
-Documentation is everything! We recognize Julia is a comparatively young language, and we know which languages and packages other population geneticists are using for their work. We *want* you to be comfortable using PopGen.jl, and that means investing a lot of time into writing thorough documentation intended for users (vs developers). We also recognize that you (the reader) might not be very familiar with Julia, or other non-R languages (which is ok!), so we've written a section on clarifying some Julia concepts/conventions that will make reading this documentation a whole lot clearer. It is by no means a replacement for sitting down and learning the Julia language a bit ([here is a great online book on that](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html)), but it should hopefully reduce the barrier of entry somewhat.
+Documentation is everything! Julia is a comparatively young language, and we know which languages and packages other population geneticists are using for their work. We *want* you to be comfortable using PopGen.jl, and that means investing a lot of time into writing thorough documentation intended for users (vs developers). We also recognize that you (the reader) might not be very familiar with Julia, which is ok(!), so we've written a section on clarifying some Julia concepts/conventions that will make reading this documentation a whole lot clearer. It is by no means a replacement for sitting down and learning the Julia language a bit ([here is a great online book on that](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html)), but it should hopefully reduce the barrier of entry somewhat.
 
 ## Why Julia (and not Python or R)?
 
@@ -38,15 +38,17 @@ Julia has native support for: parallelization, distributed computing, GPU proces
 
 #### Community & contribution
 
-Julia's internals solve what's know as the "two language problem". That is, languages that are easy to write in (e.g. Python, R, Ruby) are slow compared to languages that are more difficult to write in, which are fast (e.g. C, C++, Java, Fortran). For languages that are easier to write in, many of the commonly used packages and functions in those languages are written in another, faster language under the hood for performance reasons. On the whole, that's not really a problem for end-users, because things work and they are easy to use. **But**, it does become a problem when you want to investigate the code and implementation of a function. This means that, even as an R power-user, you are kind of helpless to investigate the implementation of something you are using in R if it's actually written in C++ under the hood. In a sense, it makes the publications of those methods less reproducible, because the users of it may be familiar with the language it's deployed in (like R), but not the language it's written in, (like C++). What if there are bugs?! What if the code implementation doesn't match the formulations in the publication?! **Yikes!**
+Julia's internals solve what's know as the "two language problem". That is, languages that are easy to write in (e.g. Python, R, Ruby) are slow compared to languages that are more difficult to write in, which are fast (e.g. C, C++, Fortran). For languages that are easier to write in, many of the commonly used packages and functions in those languages are written in another, faster language under the hood for performance reasons. On the whole, that's not really a problem for end-users, because things work and they are easy to use. **But**, it does become a problem when you want to investigate the code and implementation of a function. This means that, even as an R power-user, you are kind of helpless to investigate the implementation of something you are using in R if it's actually written in C++ under the hood. In a sense, it makes the publications of those methods less reproducible, because the users of it may be familiar with the language it's deployed in (like R), but not the language it's written in, (like C++). What if there are bugs?! What if the code implementation doesn't match the formulations in the publication?! **Yikes!**
 
-So, if we write everything in Julia, and you use everything in Julia, users can themselves diagnose these things if they so choose. Yes, that means that we might be getting more Issues opened up, but a bug found is a lot better than a bug overlooked!
+So, if we write everything in Julia, and you use everything in Julia, users can themselves diagnose these things if they so choose. This means users can contribute to the overall health and accuracy of this package. Yes, that means that we might be getting more Issues opened up, but a bug found is a lot better than a bug overlooked!
 
 Like most Julia packages, PopGen.jl is written entirely in Julia, meaning the community using it need not learn another language if they wanted to contribute! Have you written a clever Julia function to calculate SAMOVA from a `PopObj`? Send us a pull request (please!)! Or [join the Slack!](community.md)
 
 #### Package manager
 
 Which, let's be honest, is such a delight to use. [Installing PopGen.jl](getting_started/install.md) should be simple, consistent, and effortless thanks to the brilliant built-in package manager in Julia. 
+
+---------------------------------------
 
 ## Authors
 

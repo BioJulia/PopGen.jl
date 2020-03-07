@@ -13,13 +13,12 @@ elements.
 """
 @inline function ishet(locus::NTuple{N,Int16} where N)
     # if allele 1 doesnt equels all others, return true (as in, ishet = true)
-    return false
+    return @inbounds all(locus[1] .== locus)
 end
 
 @inline function ishet(locus::NTuple{N,Int8} where N)
     # if allele 1 doesnt equels all others, return true (as in, ishet = true)
-    all(locus[1] .== locus) && return true
-    return false
+    return @inbounds all(locus[1] .== locus)
 end
 
 @inline function ishet(locus::Missing)
