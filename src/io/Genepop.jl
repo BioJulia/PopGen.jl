@@ -77,17 +77,6 @@ function genepop(
         error("Please format $infile to be either tab or space delimited")
     end
 
-    # check for the marker type and assign Int8 or Int16 depending on max value
-    # there's no real reason 10 was chosen other than being a reasonable buffer
-    # for edge cases since SNP data <= 4, and haplotyped data could be a bit higher
-    # since the genotypes will be sorted anyway, we can look at the last (largest) value
-    sample_geno = phase.(split(firstrecord, delim)[2:end], Int16, digits)
-    if maximum(map(i -> i[end], sample_geno |> skipmissing)) < 10
-        geno_type = Int8    # is a snp
-    else
-        geno_type = Int16   # is a msat
-    end
-
     # check for horizontal formatting, where popsep would appear on the third line
     if pop_idx[1] <= 3
 
@@ -135,6 +124,9 @@ function genepop(
             type = String,
         )
     end
+
+    geno_type = determine_marker(infile, geno_parse, digits)
+
     # initiate with empty vectors for samplename, locus, and geno
     name = Vector{String}()
     loci = Vector{String}()
