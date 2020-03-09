@@ -27,7 +27,7 @@ Semicolons will come up a lot in Julia, probably more than you would expect if y
 
 ### At the end of a command
 
- When you see a semicolon after invoking a function, what that means is "don't show me the output in the terminal window".
+ When you see a semicolon after invoking a function, what that means is "don't show me the output".
 
 Example: 
 
@@ -41,13 +41,13 @@ julia> x
 12
 ```
 
-Julia will still process the command and assign `10 + 2` to `x`, but it won't show you the output in the terminal. We sometimes include a semicolon after commands in these docs to mimic what the REPL output would look like without spitting back out an array of over 200 values. **These semicolons are optional** 
+Julia will still process the command and assign `10 + 2` to `x`, but it won't show you the output. We sometimes include a semicolon after commands in these docs to mimic what the REPL output would look like without spitting back large volumes of text. **These semicolons are optional** 
 
 
 
 ### In between assignment commands
 
-If you see a semicolon in between two variable assignments, like so:
+If you see a semicolon in between two variable assignments or commands, like so:
 
 ```julia
 julia> x = [1,2] ; y = [3,4]
@@ -86,10 +86,14 @@ search: population populations population! populations!
 
 Julia encourages strong typing of variables, and the functions in `PopGen` are no exception to this. However, to reduce the barrier of entry required to understand this documentation and the subsequent package, we have chosen to omit some of the `type` information from functions to reduce visual clutter for newer users. As experienced users already know, if you would like to see the explicit type information, you can look at the code on github, invoke the `help` system in the REPL (above), or search for a function in the Documentation pane in Juno. 
 
-You'll notice types follow a specific format, which is `object::type`. This format is a type declaration, so in the function `population`, which looks like: `population(x::PopObj; listall::Bool = false)`:
+You'll notice types follow a specific format, which is `object::type`. This format is a type declaration, so in the function `population`, which looks like: 
 
-- `x` is a variable of type `PopObj` 
-- `listall` is a variable of type `Bool` (boolean) meaning it only takes `true` or `false` without quotes, and the default value is set to `false`.
+```julia
+population(x::PopData; listall::Bool = false)
+```
+
+- `x` is a variable of type `PopData` 
+- `listall` is a variable of type `Bool` (Boolean) meaning it only takes `true` or `false` without quotes, and the default value is set to `false`
 
 ### Type Unions
 
@@ -101,7 +105,7 @@ The julia language is abound with types (and you can create your own!), and has 
 
 #### where T
 
-This looks weird at first,  but it's actually very simple. When we do method definitions, we can define methods with strict types, like `funct(data:PopData, arg1::Int8)`, or we can generalize it with `where T`, which looks like 
+This looks weird at first,  but it's actually very simple. When we do method definitions, we can define methods with strict types, like `funct(data:PopData, arg1::Int8)`, or we can generalize it with `where T`, which looks like :
 
 ```julia
 function funct1(data::PopData, thing1::T) where T
