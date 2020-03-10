@@ -6,12 +6,11 @@ ishet(locus::NTuple{N,Int8} where N)
 ishet(locus::NTuple{N,Int16} where N)
 ishet(locus::Missing)
 ```
-A series of methods to test if a locus is a heterozygote and return `true` if
-it is, `false` if it isn't. The methods are specific to SNP (Int8) and MicroSat
-(Int16) types, and the vector versions simply broadcast the functions over their
+A series of methods to test if a locus is heterozygous and return `true` if
+it is, `false` if it isn't. The vector versions simply broadcast the functions over their
 elements.
 """
-@inline function ishet(locus::NTuple{N,Int16} where N)
+@inline function ishet(locus::NTuple{N,T} where N where T <: Signed)
     # if allele 1 doesnt equels all others, return true (as in, ishet = true)
     return @inbounds all(locus[1] .== locus)
 end
@@ -26,7 +25,7 @@ end
     return missing
 end
 
-@inline function ishet(locus::Vector{Union{Missing, NTuple{N,Int16}}} where N)
+@inline function ishet(locus::T) where T<:AbstractVector
     ishet.(locus)
 end
 
@@ -35,26 +34,38 @@ end
 end
 
 """
+    hetero(data::T) where T <: AbstractVector
+Returns heterozygosity as a mean of the number of heterozygous genotypes, defined
+as genotypes returning `true` for `ishet()`. This is numerically feasible because
+`true` values are mathematically represented as `1`, whereas `false` are represented
+as `0`.
+"""
+@inline function hetero(data::T) where T <: AbstractVector
+    adjusted_vector = ishet(data) |> skipmissing
+    isempty(adjusted_vector) ? missing : mean(adjusted_vector)
+end
+
+"""
     heterozygosity(data::PopObj, mode::String = "locus")
 Calculate observed and expected heterozygosity in a `PopObj`
 ## Example
 heterozygosity(nancycats(), "population" )
 ### Modes
-- `"locus"` : heterozygosity per locus (default)
+- `"locus"` or `"loci"` : heterozygosity per locus (default)
 - `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
 - `"population"` or `"pop"` : heterozygosity per population (PopObj.samples.population)
 """
-function heterozygosity(data::PopObj, mode::String = "locus")
-    if mode == "locus"
+function heterozygosity(data::PopData, mode::String = "locus")
+    if mode ∈ ["locus", "loci"]
         obs = het_observed(data)
         exp = het_expected(data)
         locinames = loci(data)
         return DataFrame(locus = locinames, het_obs = obs, het_exp = exp)
 
-    elseif lowercase(mode) == "sample" || lowercase(mode) == "ind" || lowercase(mode) == "individual"
+    elseif lowercase(mode) ∈  ["sample", "ind", "individual"]
         return DataFrame(name = samples(data), het_obs = het_sample(data))
 
-    elseif lowercase(mode) == "pop" || lowercase(mode) == "population"
+    elseif lowercase(mode) ∈  ["pop", "population"]
         obs = het_population_obs(data)
         exp = het_population_exp(data)
         merged_het = merge(obs, exp)
@@ -96,34 +107,12 @@ end
 
 
 """
-    het_observed(data::PopObj)
-Calculate the observed heterozygosity for each locus in a `PopObj`. Returns a
-vector of heterozygosity values.
+    het_observed(data::PopData)
+Calculate the observed heterozygosity for each locus in `PopData`. Returns a
+table of heterozygosity values.
 """
 function het_observed(data::PopObj)
-    # faster and cheaper matrix-to-matrix comparison
-    if all(data.samples.ploidy .== 2) == true
-        allele_1 = allele_matrix(data.loci, 1)
-        allele_2 = allele_matrix(data.loci, 2)
-        het_matrix = allele_1 .!= allele_2
-        return map(eachcol(het_matrix)) do i
-            mean(i |> skipmissing)
-        end
-    else
-        het_vals = Vector{Float64}()
-        for locus in eachcol(data.loci, false)
-            a = geno_freq(locus)  # get genotype freqs at locus
-            tmp = 0
-            genos = keys(a) |> collect
-            for geno in genos
-                if length(unique(geno)) != 1
-                    tmp += a[geno]     # if true, add freq to total in tmp
-                end
-            end
-            push!(het_vals, tmp)
-        end
-        return het_vals
-    end
+    @groupby data.loci :locus {Het_obs = hetero(:genotype)}
 end
 
 
@@ -161,122 +150,33 @@ end
 
 """
     het_population_obs(data::PopObj)
-Return a Dict of the observed heterozygosity per population for each locus in
-a `PopObj`
+Return a table of the observed heterozygosity per population for each locus in
+`PopData`
 """
 function het_population_obs(data::PopObj)
-    # get population order and store in its own dict key
-    popid = unique(data.samples.population |> collect)
-    fixed_popid = [replace(i, " " => "_") for i in popid]
-    d = Dict()
-    d["pops_obs"] = fixed_popid
-
-    y = deepcopy(data.loci)
-    insertcols!(y, 1, :population => data.samples.population)
-    y_subdf = groupby(y[!, :], :population)
-
-    # faster and cheaper diploid version
-    if all(data.samples.ploidy .== 2) == true
-        for pop in y_subdf
-            ploidy = unique(data.samples.ploidy)
-            allele_1 = allele_matrix(select(pop, Not(:population)), 1)
-            allele_2 = allele_matrix(select(pop, Not(:population)), 2)
-            het_matrix = allele_1 .!= allele_2
-            pop_het_vals = map(eachcol(het_matrix)) do i
-                mean(i |> skipmissing)
-            end
-
-            # add "_obs" for distinction vs "_exp"
-            popname = replace(pop.population[1], " " => "_")*"_obs"
-            d[popname] = pop_het_vals
-        end
-            return d
-    else
-        for pop in y_subdf
-            pop_het_vals = Vector{Union{Missing,Float64}}()
-            for locus in eachcol(pop[!, :2:end], false)
-                # get genotype freqs at locus
-                a = geno_freq(locus)
-                n = length(locus |> skipmissing |> collect)
-
-                # add condition if the locus is missing from that subpop
-                if a === missing
-                    push!(pop_het_vals, missing)
-                    continue
-                end
-                tmp = 0
-                genos = keys(a) |> collect
-                for geno in genos
-                    if length(unique(geno)) != 1
-                        tmp += a[geno]     # if true, add freq to total in tmp
-                    end
-                end
-                het_adjusted = (n/(n-1)) * tmp
-                push!(pop_het_vals, het_adjusted)
-            end
-
-            # add "_obs" for distinction vs "_exp"
-            popname = replace(pop.population[1], " " => "_")*"_obs"
-            d[popname] = pop_het_vals
-        end
-        return d
-    end
+    @groupby data.loci (:locus, :population) {Het_obs = hetero(:genotype)}
 end
+
 
 """
     het_sample(data::PopObj)
-Calculate the observed heterozygosity for each individual in a `PopObj`. Returns
-a vector of heterozygosity values corresponding to the order of samples in the PopObj.
+Calculate the observed heterozygosity for each individual in `PopData`. Returns
+a table of heterozygosity values.
 """
-function het_sample(data::PopObj)
-    # efficient diploid method
-    if all(data.samples.ploidy .== 2) == true
-        allele_1 = allele_matrix(data.loci, 1)
-        allele_2 = allele_matrix(data.loci, 2)
-        het_matrix = allele_1 .!= allele_2
-        return map(eachrow(het_matrix)) do i
-            mean(i |> skipmissing)
-        end
-    else
-        # psuedo-transpose to format genotypes as vectors per individual
-        by_ind = map(i -> get_sample_genotypes(data, i), samples(data))
-
-        # calculate observed heterozygosity like for loci
-        map(het_sample, by_ind)
-    end
+@inline function het_sample(data::PopObj)
+    @groupby data.loci (:name) {Het_obs = hetero(:genotype)}
 end
 
-
+#TODO
 """
-    het_sample(individual::Vector{<:Union{Missing, Tuple{Vararg}}}))
+    het_sample(data::PopData, individual::String)
 Calculate the observed heterozygosity for an individual in a `PopObj`. Returns
 an array of heterozygosity values.
 """
-function het_sample(individual::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
+function het_sample(data::PopData, individual::String)
     # calculate observed heterozygosity for an individual
-    het = 0
-    genos = skipmissing(individual) |> collect
-    for geno in genos
-        if length(unique(geno)) != 1
-            het += 1
-        end
-    end
-    return het/length(genos)
+    @where data.loci :name == individual |> @select {het_obs = hetero(:genotype)}
 end
-
-
-function het_sample(individual::Vector{<:Union{Missing, Tuple{Vararg}}})
-    # calculate observed heterozygosity for an individual
-    het = 0
-    genos = skipmissing(individual) |> collect
-    for geno in genos
-        if length(unique(geno)) != 1
-            het += 1
-        end
-    end
-    return het/length(genos)
-end
-
 
 
 """

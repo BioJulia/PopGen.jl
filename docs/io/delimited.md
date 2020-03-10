@@ -1,7 +1,8 @@
 ## Import a delimited file as a `PopObj`
 
 ```julia
-delimited(infile; delim = ",", digits = 3, marker = "snp", diploid = true)
+delimited(infile::String; delim::Union{Char,String,Regex} = "auto", digits::Int = 3, diploid::Bool = true, silent::Bool = false)
+
 
 # Example
 julia> a = delimited("/data/cali_poppy.csv", digits = 2)
@@ -16,21 +17,32 @@ julia> a = delimited("/data/cali_poppy.csv", digits = 2)
 
 ### Keyword Arguments
 
-- `#!julia delim::String` : delimiter of the file, as a string. must be a single delimiter. (default: `","`)
+- `#!julia delim::String` : delimiter characters. The default (`"auto"`) uses auto-parsing of `CSV.File`
 
-- `#!julia digits::Int64` : the number of digits used to denote an allele (default: `3`)
-- `#!julila marker::String`  : "snp" (default) or "msat" for microsatellites
-- `#!julila diploid::Bool` :  uses memory-optimized parsing for diploid samples (default: `true`)
+- `#!julia digits::Integer` : the number of digits used to denote an allele (default: `3`)
+- `#!julila diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
+- `#!julila silent::Bool` : whether to print file information during import (default: `true`)
 
 
 
 ## Formatting
 
-- Loci names must be first row
-- Individuals names must be first value in row
-- Population ID's must be second value in row
-- longitude (x) values third value in row, latitude (y) fourth value in row
-  - fill with zeroes if no location data
+- First row is column names in this order:
+  1. name
+  2. population
+  3. longitude
+  4. latitude
+  5. locus_1_name
+  6. locus_2_name
+  7. etc...
+
+### Missing data
+#### Genotypes
+Missing genotypes can be formatted as all-zeros (ex.`000000`) or negative-nine `-9`
+
+#### Location data
+If location data is missing for a sample (which is ok!), make sure the value is written
+as `0`, otherwise there will be transcription errors!
 
 ### example
 ```bash
@@ -46,8 +58,8 @@ snbarb_03,coast,11.15,0,001002,001001,001001 \n
 
 You can also use the command `csv()` synonymously with `delimited()`. 
 
-
+-------------
 
 ## Acknowledgements
 
-Thanks to the efforts of the [CSV.jl](https://github.com/JuliaData/CSV.jl) and [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl) teams, we leverage those packages to do much of the heavy lifting within this parser. 
+Thanks to the efforts of the [CSV.jl](https://github.com/JuliaData/CSV.jl) team, we are able leverage that package to do much of the heavy lifting within this parser. 

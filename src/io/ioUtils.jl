@@ -4,7 +4,7 @@ of various file formats.
 =#
 
 """
-    determine_marker(infile::String, geno_parse::CSV.File{false}, digits::Int)
+    determine_marker(infile::String, geno_parse::CSV.File{}, digits::Int)
 Return either `Int8` or `Int16` depending on largest allelic value in all genotypes
 in the first 10 samples of an input file (or all the samples if less than 10 samples).
 If the largest allele is 11 or greater, the marker will be considered a Microsatellite
@@ -16,7 +16,7 @@ and considering how few microsatellite markers are used in typical studies, the
 effect on in-memory size should be negligible (as compared to SNPs).
 """
 function determine_marker(infile::String, geno_parse::CSV.File{false}, digits::Int)
-    test_genotypes = Vector{NTuple{N, Int16} where N}()
+    test_genotypes = Vector{Union{Missing,NTuple{N, Int16} where N}}()
     if (countlines(infile) - 1) < 10
         no_test_samples = countlines(infile) - 1
     else
@@ -29,13 +29,33 @@ function determine_marker(infile::String, geno_parse::CSV.File{false}, digits::I
         append!(test_genotypes, genotypes)
     end
 
-    if maximum(collect(Base.Iterators.flatten(test_genotypes))) <= 10
+    if maximum(collect(Base.Iterators.flatten(test_genotypes |> skipmissing))) <= 10
         return Int8
     else
         return Int16
     end
 end
 
+function determine_marker(infile::String, geno_parse::CSV.File{true}, digits::Int)
+    test_genotypes = Vector{Union{Missing,NTuple{N, Int16} where N}}()
+    if (countlines(infile) - 1) < 10
+        no_test_samples = countlines(infile) - 1
+    else
+        no_test_samples = 10
+    end
+
+    for idx in 1:no_test_samples
+        vals = values(geno_parse[idx])
+        genotypes = map(i -> phase.(i, Int16, digits), vals[5:end])
+        append!(test_genotypes, genotypes)
+    end
+
+    if maximum(collect(Base.Iterators.flatten(test_genotypes |> skipmissing))) <= 10
+        return Int8
+    else
+        return Int16
+    end
+end
 
 """
     find_ploidy(genotypes::T where T<:SubArray)
