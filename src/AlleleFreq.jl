@@ -23,6 +23,13 @@ object.
 end
 
 
+@inline function allele_freq_vec(locus::T) where T<:AbstractArray
+        flat_alleles = alleles(locus)
+        len = length(flat_alleles)
+        d = [count(i -> i == j, flat_alleles) for j in unique(flat_alleles)]
+        return d ./ len
+end
+
 """
     allele_freq(data::PopData, locus::String; population::Bool = false)
 Return a `Dict` of allele frequencies of a single locus in a `PopData`
@@ -48,23 +55,6 @@ function allele_freq(data::PopData, locus::String, population::Bool=false)
         end
     end
 end
-
-#=
-"""
-    allele_matrix(data::PopObj, allele::Int)
-Convert a DataFrame of genotypes from a PopObj into a matrix of a single
-allele. Use `allele` to specify which allele you want isolated. Intended
-to be used to create separate allele matrices for comparing alleles 1 and
-2, such as assessing heterozygosity.
-"""
-function allele_matrix(data::T, allele::Int) where T <: DataFrame
-    geno_matrix = Matrix(data)
-    map(geno_matrix) do i
-        i === missing && return missing
-        i[allele]
-    end
-end
-=#
 
 
 """
@@ -143,4 +133,12 @@ get_sample_genotypes(cats, "N115")
 """
 function get_sample_genotypes(data::PopObj, sample::String)
     @where data.loci :sample == sample
+end
+
+
+
+
+@apply x.loci begin
+    @where :locus == "fca8"
+    @with allele_freq_vec(:genotype)
 end

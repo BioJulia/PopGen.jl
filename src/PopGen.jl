@@ -7,7 +7,7 @@ module PopGen
 #   O o       O o       O o       O o       O o
 
 using CSV, JuliaDB, JuliaDBMeta, MultipleTesting, Random, StatsBase, CategoricalArrays
-import IndexedTables: reindex
+#import IndexedTables: reindex
 
 #=
 using Convex,

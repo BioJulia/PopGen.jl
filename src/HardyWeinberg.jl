@@ -15,11 +15,6 @@ elements.
     return @inbounds all(locus[1] .== locus)
 end
 
-@inline function ishet(locus::NTuple{N,Int8} where N)
-    # if allele 1 doesnt equels all others, return true (as in, ishet = true)
-    return @inbounds all(locus[1] .== locus)
-end
-
 @inline function ishet(locus::Missing)
     # if the locus is Missing, return missing. no muss no fuss
     return missing
@@ -29,81 +24,67 @@ end
     ishet.(locus)
 end
 
-@inline function ishet(locus::Vector{Union{Missing, NTuple{N,Int8}}} where N)
-    ishet.(locus)
-end
 
 """
-    hetero(data::T) where T <: AbstractVector
-Returns heterozygosity as a mean of the number of heterozygous genotypes, defined
+    hetero_o(data::T) where T <: AbstractVector
+Returns observed heterozygosity as a mean of the number of heterozygous genotypes, defined
 as genotypes returning `true` for `ishet()`. This is numerically feasible because
 `true` values are mathematically represented as `1`, whereas `false` are represented
 as `0`.
 """
-@inline function hetero(data::T) where T <: AbstractVector
+@inline function hetero_o(data::T) where T <: AbstractVector
     adjusted_vector = ishet(data) |> skipmissing
     isempty(adjusted_vector) ? missing : mean(adjusted_vector)
 end
 
+
 """
-    heterozygosity(data::PopObj, mode::String = "locus")
-Calculate observed and expected heterozygosity in a `PopObj`
+    hetero_e(allele_freqs::Vector{T}) where T <: AbstractFloat
+    Returns the expected heterozygosity of an array of genotypes, calculated
+    as 1 - sum of the squared allele frequencies.
+"""
+function hetero_e(allele_freqs::Vector{T}) where T <: AbstractFloat
+    1 - sum(allele_freqs .^ 2)
+end
+
+
+
+"""
+    het_expected(data::PopData)
+    Returns the expected heterozygosity of loci in a PopData object.
+"""
+function het_expected(data::PopData)
+    @groupby data.loci :locus {het_exp = hetero_e(allele_freq_vec(:genotype))}
+end
+
+
+"""
+    heterozygosity(data::PopData, mode::String = "locus")
+Calculate observed and expected heterozygosity in a `PopData` object.
 ## Example
 heterozygosity(nancycats(), "population" )
 ### Modes
 - `"locus"` or `"loci"` : heterozygosity per locus (default)
 - `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
-- `"population"` or `"pop"` : heterozygosity per population (PopObj.samples.population)
+- `"population"` or `"pop"` : heterozygosity per population
 """
 function heterozygosity(data::PopData, mode::String = "locus")
     if mode ∈ ["locus", "loci"]
-        obs = het_observed(data)
-        exp = het_expected(data)
-        locinames = loci(data)
-        return DataFrame(locus = locinames, het_obs = obs, het_exp = exp)
+        return @groupby data.loci :locus {het_obs = hetero_o(:genotype), het_exp = hetero_e(allele_freq_vec(:genotype))}
 
     elseif lowercase(mode) ∈  ["sample", "ind", "individual"]
-        return DataFrame(name = samples(data), het_obs = het_sample(data))
+        return @groupby data.loci :name {het_obs = hetero_o(:genotype)}
 
     elseif lowercase(mode) ∈  ["pop", "population"]
-        obs = het_population_obs(data)
-        exp = het_population_exp(data)
-        merged_het = merge(obs, exp)
-        locinames = loci(data)
-
-        # remake obs/exp distinction
-        obs_pops = obs["pops_obs"] .* "_obs"
-        exp_pops = exp["pops_exp"] .* "_exp"
-
-        # interleave pop_obs/exp for column names
-        out_df = []
-        for (i,j) in zip(obs_pops, exp_pops)
-            tmp = DataFrame(locus = locinames, het_obs = merged_het[i], het_exp = merged_het[j])
-            push!(out_df, tmp)
-        end
+        #TODO fix this
+        return @groupby data.loci :population {het_obs = hetero_o(:genotype), het_exp = hetero_e(allele_freq_vec(:genotype))}
+    else
+        error("please specify mode \"locus\", \"sample\", or \"population\"")
     end
-    return Tuple(out_df)
 end
 
 const het = heterozygosity
 const He = heterozygosity
-
-
-"""
-    het_expected(data::PopObj)
-Calculate the expected heterozygosity for each locus in a `PopObj`. Returns an
-array of heterozygosity values.
-"""
-function het_expected(data::PopObj)
-    het_vals = Vector{Float64}()
-    @inbounds for locus in eachcol(data.loci, false)
-        # get allele freqs at locus and isolate the freqs
-        a = allele_freq(locus)
-        het = 1 - (values(a) .^ 2 |> sum)
-        push!(het_vals, het)  # push the sum of hetz to the output array
-    end
-    return het_vals
-end
 
 
 """
@@ -112,7 +93,7 @@ Calculate the observed heterozygosity for each locus in `PopData`. Returns a
 table of heterozygosity values.
 """
 function het_observed(data::PopObj)
-    @groupby data.loci :locus {Het_obs = hetero(:genotype)}
+    @groupby data.loci :locus {het_obs = hetero_o(:genotype)}
 end
 
 
@@ -154,7 +135,7 @@ Return a table of the observed heterozygosity per population for each locus in
 `PopData`
 """
 function het_population_obs(data::PopObj)
-    @groupby data.loci (:locus, :population) {Het_obs = hetero(:genotype)}
+    @groupby data.loci (:locus, :population) {Het_obs = hetero_o(:genotype)}
 end
 
 
@@ -164,7 +145,7 @@ Calculate the observed heterozygosity for each individual in `PopData`. Returns
 a table of heterozygosity values.
 """
 @inline function het_sample(data::PopObj)
-    @groupby data.loci (:name) {Het_obs = hetero(:genotype)}
+    @groupby data.loci (:name) {Het_obs = hetero_o(:genotype)}
 end
 
 #TODO
@@ -175,7 +156,7 @@ an array of heterozygosity values.
 """
 function het_sample(data::PopData, individual::String)
     # calculate observed heterozygosity for an individual
-    @where data.loci :name == individual |> @select {het_obs = hetero(:genotype)}
+    @where data.loci :name == individual |> @select {het_obs = hetero_o(:genotype)}
 end
 
 
