@@ -5,7 +5,7 @@ ishom(locus::NTuple{N,T} where N where T <: Signed)
 ishom(locus::Missing)
 ```
 A series of methods to test if a locus or loci are homozygous and return `true` if
-it is, `false` if it isn't. The vector version simply broadcasts the functions over their
+it is, `false` if it isn't. The vector version simply broadcasts the function over the
 elements.
 """
 @inline function ishom(locus::NTuple{N,T} where N where T <: Signed)
@@ -30,7 +30,7 @@ ishet(locus::NTuple{N,T} where N where T <: Signed)
 ishet(locus::Missing)
 ```
 A series of methods to test if a locus or loci are heterozygous and return `true` if
-it is, `false` if it isn't. The vector version simply broadcasts the functions over their
+it is, `false` if it isn't. The vector version simply broadcasts the function over the
 elements. Under the hood, this function is simply `!ishom`.
 """
 @inline function ishet(locus::NTuple{N,T} where N where T <: Signed)
@@ -237,39 +237,15 @@ const hwe = hwe_test
 Calculate the chi square statistic and p-value for a locus
 Returns a tuple with chi-square statistic, degrees of freedom, and p-value
 """
-function locus_chi_sq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-    # Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
-    number_ind = count(i -> i !== missing, locus)
+function locus_chi_sq(locus::T) where T <: AbstractVector
+    n = count(i -> i !== missing, locus)
 
-    # Get expected number of genotypes in a locus
-    the_allele_dict = allele_freq(locus)
-
-    # split the appropriate pairs into their own vectors
-    alleles = Vector{String}()
-    p = Vector{Float64}()
-    for (i,j) in pairs(the_allele_dict)
-        push!(alleles, "$i")
-        push!(p, j)
-    end
-
-    #Calculate Expected Genotype numbers
-    expected_genotype_freq = p * transpose(p) .* number_ind
-    expected_genotype_freq = vec(expected_genotype_freq)
-
-    alleles = (alleles .* ",") .* permutedims(alleles)
-    alleles = Vector{String}.(sort.(split.(alleles, ",")))
-    alleles = [parse.(Int16, i) |> Tuple for i in alleles]
-    alleles = vec(alleles)
-
-    expected = Dict()
-    for (geno, freq) in zip(alleles, expected_genotype_freq)
-        expected[geno] = get!(expected, geno, 0) + freq
-    end
+    expected = geno_freq_expected(locus)
 
     ## Get observed number of genotypes in a locus
     observed = geno_freq(locus)
     for j in keys(observed)
-        observed[j] = observed[j] * number_ind
+        observed[j] = observed[j] * n
     end
 
     chisq_stat = expected
@@ -280,11 +256,11 @@ function locus_chi_sq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) wher
         chisq_stat[genotype] = (o - e)^2 / e
     end
     chisq_stat = values(chisq_stat) |> sum
-    df = (length(alleles) - length(the_allele_dict)) / 2
+    df = (length(expected) - length(allele_freq(locus))) / 2
 
     if df > 0
         chi_sq_dist = Distributions.Chisq(df)
-        p_val = 1 - cdf(chi_sq_dist, chisq_stat)
+        p_val = 1 - Distributions.cdf(chi_sq_dist, chisq_stat)
     else
         p_val = missing
     end

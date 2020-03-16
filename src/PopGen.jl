@@ -6,7 +6,7 @@ module PopGen
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-using CSV, JuliaDB, JuliaDBMeta, MultipleTesting, Random, StatsBase, CategoricalArrays
+using CategoricalArrays, CSV, Distributions, JuliaDB, JuliaDBMeta, MultipleTesting, Random, StatsBase
 #import IndexedTables: reindex
 
 #=
