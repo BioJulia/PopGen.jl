@@ -106,18 +106,10 @@ end
 
 """
     get_genotype(data::PopObj; sample::String, locus::String)
-Return the genotype of a specific sample for specific locus in a `PopObj`.
-This is a barebones variant to `isolate_genotypes` that is ~1000x faster and
-suitable for development.
+Return the genotype of a specific sample for specific locus in a `PopData` object.
 
 `get_genotype(nancycats, sample = "N115" , locus = "fca8")`
-
 """
-function get_genotype(data::PopObj; sample::String, locus::String)
-    idx = findfirst(i -> i == sample, data.samples.name)
-    return getindex(data.loci[!, Symbol(locus)], idx)
-end
-
 function get_genotype(data::PopData; sample::String, locus::String)
     @where data.loci :name == sample && :locus == locus
 end
@@ -132,13 +124,5 @@ get_sample_genotypes(cats, "N115")
 ```
 """
 function get_sample_genotypes(data::PopObj, sample::String)
-    @where data.loci :sample == sample
-end
-
-
-
-
-@apply x.loci begin
-    @where :locus == "fca8"
-    @with allele_freq_vec(:genotype)
+    @where data.loci :name == sample
 end

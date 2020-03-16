@@ -1,18 +1,40 @@
 """
 ```
-ishet(locus::Vector{Union{Missing, NTuple{N,Int8}}} where N)
-ishet(locus::Vector{Union{Missing, NTuple{N,Int16}}} where N)
-ishet(locus::NTuple{N,Int8} where N)
-ishet(locus::NTuple{N,Int16} where N)
-ishet(locus::Missing)
+ishom(locus::T) where T<:AbstractVector
+ishom(locus::NTuple{N,T} where N where T <: Signed)
+ishom(locus::Missing)
 ```
-A series of methods to test if a locus is heterozygous and return `true` if
-it is, `false` if it isn't. The vector versions simply broadcast the functions over their
+A series of methods to test if a locus or loci are homozygous and return `true` if
+it is, `false` if it isn't. The vector version simply broadcasts the functions over their
 elements.
 """
-@inline function ishet(locus::NTuple{N,T} where N where T <: Signed)
-    # if allele 1 doesnt equels all others, return true (as in, ishet = true)
+@inline function ishom(locus::NTuple{N,T} where N where T <: Signed)
+    # if allele 1 equels all others, return true
     return @inbounds all(locus[1] .== locus)
+end
+
+@inline function ishom(locus::Missing)
+    # if the locus is Missing, return missing. no muss no fuss
+    return missing
+end
+
+@inline function ishom(locus::T) where T<:AbstractVector
+    ishom.(locus)
+end
+
+
+"""
+```
+ishet(locus::T) where T<:AbstractVector
+ishet(locus::NTuple{N,T} where N where T <: Signed)
+ishet(locus::Missing)
+```
+A series of methods to test if a locus or loci are heterozygous and return `true` if
+it is, `false` if it isn't. The vector version simply broadcasts the functions over their
+elements. Under the hood, this function is simply `!ishom`.
+"""
+@inline function ishet(locus::NTuple{N,T} where N where T <: Signed)
+    return @inbounds !ishom(locus)
 end
 
 @inline function ishet(locus::Missing)
@@ -88,75 +110,16 @@ const He = heterozygosity
 
 
 """
-    het_observed(data::PopData)
-Calculate the observed heterozygosity for each locus in `PopData`. Returns a
-table of heterozygosity values.
-"""
-function het_observed(data::PopObj)
-    @groupby data.loci :locus {het_obs = hetero_o(:genotype)}
-end
-
-
-"""
-    het_population_exp(data::PopObj)
-Return a `Dict` of the expected heterozygosity per population for each locus in
-a `PopObj`
-"""
-function het_population_exp(data::PopObj)
-    # get population order and store in its own dict key
-    popid = unique(data.samples.population |> collect)
-    fixed_popid = replace.(popid, " " => "_")
-    d = Dict()
-    d["pops_exp"] = fixed_popid
-
-    y = deepcopy(data.loci)
-    insertcols!(y, 1, :population => data.samples.population)
-    y_subdf = groupby(y[!, :], :population)
-    for pop in y_subdf
-        pop_het_vals = Vector{Union{Missing, Float64}}()
-        for locus in eachcol(pop[!, :2:end], false)
-            a = allele_freq(locus)
-            n = length(locus |> skipmissing |> collect)
-            het = 1 - (values(a) .^ 2 |> sum)
-            het_adjusted = (n/(n-1)) * het
-            push!(pop_het_vals, het_adjusted)  # push the sum of hetz to the output array
-        end
-
-        # add "_obs" for distinction vs "_exp"
-        popname = replace(pop.population[1], " " => "_")*"_exp"
-        d[popname] = pop_het_vals
-    end
-        return d
-end
-
-"""
-    het_population_obs(data::PopObj)
-Return a table of the observed heterozygosity per population for each locus in
-`PopData`
-"""
-function het_population_obs(data::PopObj)
-    @groupby data.loci (:locus, :population) {Het_obs = hetero_o(:genotype)}
-end
-
-
-"""
-    het_sample(data::PopObj)
-Calculate the observed heterozygosity for each individual in `PopData`. Returns
-a table of heterozygosity values.
-"""
-@inline function het_sample(data::PopObj)
-    @groupby data.loci (:name) {Het_obs = hetero_o(:genotype)}
-end
-
-#TODO
-"""
     het_sample(data::PopData, individual::String)
 Calculate the observed heterozygosity for an individual in a `PopObj`. Returns
 an array of heterozygosity values.
 """
 function het_sample(data::PopData, individual::String)
     # calculate observed heterozygosity for an individual
-    @where data.loci :name == individual |> @select {het_obs = hetero_o(:genotype)}
+    @apply data.loci begin
+        @where data.loci :name == individual
+        @with {het = hetero_o(:genotype)}
+    end
 end
 
 
@@ -328,64 +291,6 @@ function locus_chi_sq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) wher
     return (chisq_stat, df, p_val)
 end
 
-"""
-    locus_chi_sq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}},1}) where N
-Calculate the chi square statistic and p-value for a locus of a `PopObj` split by
-population using `groupby()`. Returns a tuple with chi-square statistic, degrees
-of freedom, and p-value.
-"""
-function locus_chi_sq(locus::SubArray{<:Union{Missing, NTuple{N,<:Integer}},1}) where N
-    #Give the function a locus from a genpop object and it will perform the ChiSquared test for HWE
-    number_ind = count(i -> i !== missing, locus)
-
-    # split the appropriate pairs into their own vectors
-    alleles = Vector{String}()
-    p = Vector{Float64}()
-    for (i,j) in pairs(the_allele_dict)
-        push!(alleles, "$i")
-        push!(p, j)
-    end
-
-    # create a matrix of allele pair combinations
-    alleles = (alleles .* ",") .* permutedims(alleles)
-    alleles = Vector{String}.(sort.(split.(alleles, ",")))
-    alleles = [parse.(Int16, i) |> Tuple for i in alleles]
-    alleles = vec(alleles)
-
-    #Calculate Expected Genotype numbers
-    expected_genotype_freq = p * transpose(p) .* number_ind
-    expected_genotype_freq = vec(expected_genotype_freq)
-
-
-    expected = Dict()
-    for (geno, freq) in zip(alleles, expected_genotype_freq)
-        expected[geno] = get!(expected, geno, 0) + freq
-    end
-
-    ## Get observed number of genotypes in a locus
-    observed = geno_freq(locus)
-    for j in keys(observed)
-        observed[j] = observed[j] * number_ind
-    end
-
-    chisq_stat = expected
-    for genotype in keys(expected)
-        o = get(observed, genotype, 0)
-        e = get(expected, genotype, 0)
-
-        chisq_stat[genotype] = (o - e)^2 / e
-    end
-    chisq_stat = values(chisq_stat) |> sum
-    df = (length(alleles) - length(the_allele_dict)) / 2
-
-    if df > 0
-        chi_sq_dist = Distributions.Chisq(df)
-        p_val = 1 - cdf(chi_sq_dist, chisq_stat)
-    else
-        p_val = missing
-    end
-    return (chisq_stat, df, p_val)
-end
 
 """
     multitest_missing(pvals::Array{Float64,1}, correction::String)
