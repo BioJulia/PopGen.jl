@@ -249,7 +249,7 @@ function locus_chi_sq(locus::T) where T <: AbstractVector
     end
 
     chisq_stat = expected
-    for genotype in keys(expected)
+    @inbounds for genotype in keys(expected)
         o = get(observed, genotype, 0)
         e = get(expected, genotype, 0)
 
