@@ -3,7 +3,7 @@
 Return a "tidy" IndexedTable of the loci, their alleles, and their alleles' frequencies.
 """
 @inline function allele_table(data::PopData)
-    tmp = @groupby data.loci :locus flatten = true {allele = unique(alleles(:genotype))}
+    tmp = @groupby data.loci :locus flatten = true {allele = unique_alleles(:genotype)}
     frq = @groupby data.loci :locus flatten = true {freq = allele_freq(:genotype)}
     transform(tmp, :frequency => frq.columns.freq)
 end

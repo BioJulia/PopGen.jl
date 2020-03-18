@@ -19,7 +19,7 @@ end
 end
 
 @inline function ishom(locus::T) where T<:AbstractVector
-    ishom.(locus)
+    return @inbounds ishom.(locus)
 end
 
 
@@ -43,7 +43,7 @@ end
 end
 
 @inline function ishet(locus::T) where T<:AbstractVector
-    ishet.(locus)
+    return @inbounds ishet.(locus)
 end
 
 
@@ -62,13 +62,12 @@ end
 
 """
     hetero_e(allele_freqs::Vector{T}) where T <: AbstractFloat
-    Returns the expected heterozygosity of an array of genotypes, calculated
-    as 1 - sum of the squared allele frequencies.
+Returns the expected heterozygosity of an array of genotypes,
+calculated as 1 - sum of the squared allele frequencies.
 """
-function hetero_e(allele_freqs::Vector{T}) where T <: AbstractFloat
-    1 - sum(allele_freqs .^ 2)
+function hetero_e(data::T) where T <: AbstractVector
+    1 - sum(allele_freq_vec(data) .^ 2)
 end
-
 
 
 """
@@ -76,7 +75,7 @@ end
     Returns the expected heterozygosity of loci in a PopData object.
 """
 function het_expected(data::PopData)
-    @groupby data.loci :locus {het_exp = hetero_e(allele_freq_vec(:genotype))}
+    @groupby data.loci :locus {het_exp = hetero_e(:genotype)}
 end
 
 
@@ -92,7 +91,7 @@ heterozygosity(nancycats(), "population" )
 """
 function heterozygosity(data::PopData, mode::String = "locus")
     if mode ∈ ["locus", "loci"]
-        return @groupby data.loci :locus {het_obs = hetero_o(:genotype), het_exp = hetero_e(allele_freq_vec(:genotype))}
+        return @groupby data.loci :locus {het_obs = hetero_o(:genotype), het_exp = hetero_e(:genotype)}
 
     elseif lowercase(mode) ∈  ["sample", "ind", "individual"]
         return @groupby data.loci :name {het_obs = hetero_o(:genotype)}
@@ -124,6 +123,100 @@ end
 
 
 """
+    locus_chi_sq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
+Calculate the chi square statistic and p-value for a locus
+Returns a tuple with chi-square statistic, degrees of freedom, and p-value
+"""
+function locus_chi_sq(locus::T) where T <: AbstractVector
+    ## Get expected number of genotypes in a locus
+    expected = geno_count_expected(locus)
+
+    ## Get observed number of genotypes in a locus
+    observed = geno_count_observed(locus)
+
+    chisq_stat = expected   # rename for clarity
+    @inbounds for genotype in keys(expected)
+        o = get(observed, genotype, 0)
+        e = get(expected, genotype, 0)
+
+        chisq_stat[genotype] = (o - e)^2 / e
+    end
+    chisq_stat = values(chisq_stat) |> sum
+    n_geno_exp = length(unique_alleles(locus))^2
+    n_geno_obs = length(observed)
+    df = (n_geno_exp - n_geno_obs) / 2
+
+    if df > 0
+        chisq_dist = Distributions.Chisq(df)
+        p_val = 1 - Distributions.cdf(chisq_dist, chisq_stat)
+    else
+        p_val = missing
+    end
+    return (chisq_stat, df, p_val)
+end
+
+
+@apply x.loci begin
+    @where :locus == "fca8"
+    @with alleles(:genotype)
+end
+"""
+    multitest_missing(pvals::Array{Float64,1}, correction::String)
+Modification to `MultipleTesting.adjust` to include `missing` values in the
+returned array. Missing values are first removed from the array, the appropriate
+correction made, then missing values are re-added to the array at their original
+positions. See MultipleTesting.jl docs for full more detailed information.
+#### example
+`multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
+
+### `correction` methods (case insensitive)
+- `"bonferroni"` : Bonferroni adjustment
+- `"holm"` : Holm adjustment
+- `"hochberg"` : Hochberg adjustment
+- `"bh"` or `"b-h"` : Benjamini-Hochberg adjustment
+- `"by"` or `"b-y"`: Benjamini-Yekutieli adjustment
+- `"bl"` or `"b-l"` : Benjamini-Liu adjustment
+- `"hommel"` : Hommel adjustment
+- `"sidak"` : Šidák adjustment
+- `"forward stop"` or `"fs"` : Forward-Stop adjustment
+- `"bc"` or `"b-c"` : Barber-Candès adjustment
+"""
+@inline function multitest_missing(pvals::Array{<:Union{Missing, <:AbstractFloat},1}, correction::String)
+    # get indices of where original missing are
+    miss_idx = findall(i -> i === missing, pvals)
+    # make seperate array for non-missing P vals
+    p_no_miss = skipmissing(pvals) |> collect
+
+    # make a dict of all possible tests and their respective functions
+    d = Dict(
+        "bonferroni" => Bonferroni(),
+        "holm" => Holm(),
+        "hochberg" => Hochberg(),
+        "bh" => BenjaminiHochberg(),
+        "b-h" => BenjaminiHochberg(),
+        "by" => BenjaminiYekutieli(),
+        "b-y" => BenjaminiYekutieli(),
+        "bl" => BenjaminiLiu(),
+        "b-l" => BenjaminiLiu(),
+        "hommel" => Hommel(),
+        "sidak" => Sidak(),
+        "forward stop" => ForwardStop(),
+        "fs" => ForwardStop(),
+        "bc" => BarberCandes(),
+        "b-c" => BarberCandes(),
+    )
+
+    correct = adjust(p_no_miss, d[lowercase(correction)]) |> Vector{Union{Missing, Float64}}
+
+    # re-add missing to original positions
+    @inbounds for i in miss_idx
+        @inbounds insert!(correct, i, missing)
+    end
+    return correct
+end
+
+
+"""
     hwe_test(data::PopObj; by_pop::Bool = false; correction = "none")
 Calculate chi-squared test of HWE for each locus and returns observed and
 expected heterozygosity with chi-squared, degrees of freedom and p-values for
@@ -149,6 +242,16 @@ correction method for multiple testing.
 - `"forward stop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` or `"b-c"` : Barber-Candès adjustment
 """
+@inline function hwe_test(data::PopData; by_pop::Bool = false, correction::String = "none")
+    if !by_pop
+        tmp = @groupby data.loci :locus {Χ² = locus_chi_sq(:genotype)}
+        @map tmp {:locus, Χ² = getindex(:Χ²,1), df = getindex(:Χ²,2), P =  getindex(:Χ²,3)}
+    else
+
+    end
+end
+
+
 function hwe_test(data::PopObj; by_pop::Bool = false, correction::String = "none")
     if !by_pop
         output = [
@@ -230,99 +333,6 @@ function hwe_test(data::PopObj; by_pop::Bool = false, correction::String = "none
 end
 
 const hwe = hwe_test
-
-
-"""
-    locus_chi_sq(locus::Vector{<:Union{Missing, NTuple{N,<:Integer}}}) where N
-Calculate the chi square statistic and p-value for a locus
-Returns a tuple with chi-square statistic, degrees of freedom, and p-value
-"""
-function locus_chi_sq(locus::T) where T <: AbstractVector
-    n = count(i -> i !== missing, locus)
-
-    expected = geno_freq_expected(locus)
-
-    ## Get observed number of genotypes in a locus
-    observed = geno_freq(locus)
-    for j in keys(observed)
-        observed[j] = observed[j] * n
-    end
-
-    chisq_stat = expected
-    @inbounds for genotype in keys(expected)
-        o = get(observed, genotype, 0)
-        e = get(expected, genotype, 0)
-
-        chisq_stat[genotype] = (o - e)^2 / e
-    end
-    chisq_stat = values(chisq_stat) |> sum
-    df = (length(expected) - length(allele_freq(locus))) / 2
-
-    if df > 0
-        chi_sq_dist = Distributions.Chisq(df)
-        p_val = 1 - Distributions.cdf(chi_sq_dist, chisq_stat)
-    else
-        p_val = missing
-    end
-    return (chisq_stat, df, p_val)
-end
-
-
-"""
-    multitest_missing(pvals::Array{Float64,1}, correction::String)
-Modification to `MultipleTesting.adjust` to include `missing` values in the
-returned array. Missing values are first removed from the array, the appropriate
-correction made, then missing values are re-added to the array at their original
-positions. See MultipleTesting.jl docs for full more detailed information.
-#### example
-`multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
-
-### `correction` methods (case insensitive)
-- `"bonferroni"` : Bonferroni adjustment
-- `"holm"` : Holm adjustment
-- `"hochberg"` : Hochberg adjustment
-- `"bh"` or `"b-h"` : Benjamini-Hochberg adjustment
-- `"by"` or `"b-y"`: Benjamini-Yekutieli adjustment
-- `"bl"` or `"b-l"` : Benjamini-Liu adjustment
-- `"hommel"` : Hommel adjustment
-- `"sidak"` : Šidák adjustment
-- `"forward stop"` or `"fs"` : Forward-Stop adjustment
-- `"bc"` or `"b-c"` : Barber-Candès adjustment
-"""
-function multitest_missing(pvals::Array{<:Union{Missing, <:AbstractFloat},1}, correction::String)
-    # make seperate array for non-missing P vals
-    p_no_miss = skipmissing(pvals) |> collect
-    # get indices of where original missing are
-    miss_idx = findall(i -> i === missing, pvals)
-
-    # make a dict of all possible tests and their respective functions
-    d = Dict(
-        "bonferroni" => Bonferroni(),
-        "holm" => Holm(),
-        "hochberg" => Hochberg(),
-        "bh" => BenjaminiHochberg(),
-        "b-h" => BenjaminiHochberg(),
-        "by" => BenjaminiYekutieli(),
-        "b-y" => BenjaminiYekutieli(),
-        "bl" => BenjaminiLiu(),
-        "b-l" => BenjaminiLiu(),
-        "hommel" => Hommel(),
-        "sidak" => Sidak(),
-        "forward stop" => ForwardStop(),
-        "fs" => ForwardStop(),
-        "bc" => BarberCandes(),
-        "b-c" => BarberCandes(),
-    )
-
-    correct = adjust(p_no_miss, d[lowercase(correction)]) |> Array{Union{Missing, Float64},1}
-
-    # re-add missing to original positions
-    for i in miss_idx
-        insert!(correct, i, missing)
-    end
-    return correct
-end
-
 
 ## JASON LOOK AT ME PLEEEEEASE
 

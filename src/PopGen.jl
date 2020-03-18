@@ -26,8 +26,7 @@ using Convex,
 
 export PopObj,
     summary,
-    nancycats,
-    gulfsharks,
+    dataset, nancycats, gulfsharks,
     delimited, csv,
     exclude_loci, omit_loci, remove_loci,
     exclude_samples, omit_samples, remove_samples,
@@ -57,11 +56,11 @@ export PopObj,
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-# The types
+# the types
 include("Types.jl")
 # file io
 include("io/ioUtils.jl")
-#include("io/Delimited.jl")
+include("io/Delimited.jl")
 include("io/Genepop.jl")
 #include("io/VariantCall.jl")
 # example data
