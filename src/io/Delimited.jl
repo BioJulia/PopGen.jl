@@ -131,9 +131,6 @@ function delimited(
         return PopData(sample_table, loci_table)
 end
 
-
-using JuliaDB, CSV, JuliaDBMeta, CategoricalArrays, BenchmarkTools
-infile = "C:/Users/pdime/Desktop/nancycats.csv"
 # keep the pre-allocation parts to test with genepop
 #=
 function delim_opt(

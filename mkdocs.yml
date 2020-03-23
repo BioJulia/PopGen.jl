@@ -26,7 +26,7 @@ nav:
         Accessing parts of PopData: getting_started/accessing_popdata.md
     Benchmarks: getting_started/comparison.md
 - Importing Data:
-    Example Data: io/example_data.md
+    Datasets: io/datasets.md
     Reading in Data: io/file_import.md
     Delimited: io/delimited.md
     Genepop: io/genepop.md

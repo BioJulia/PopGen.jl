@@ -155,11 +155,10 @@ function locus_chi_sq(locus::T) where T <: AbstractVector
     return (chisq_stat, df, p_val)
 end
 
+#TODO
+a = @where x.loci :locus == "contig_35208"
+a = a.columns.genotype |> collect
 
-@apply x.loci begin
-    @where :locus == "fca8"
-    @with alleles(:genotype)
-end
 """
     multitest_missing(pvals::Array{Float64,1}, correction::String)
 Modification to `MultipleTesting.adjust` to include `missing` values in the
@@ -358,3 +357,16 @@ function het_obstest(data::PopObj)
 
     return het_vals
 end
+
+
+@inline function hwe_test(data::PopData; by_pop::Bool = false, correction::String = "none")
+    if !by_pop
+        tmp = @groupby data.loci :locus {Χ² = locus_chi_sq(:genotype)}
+        @map tmp {:locus, Χ² = getindex(:Χ²,1), df = getindex(:Χ²,2), P =  getindex(:Χ²,3)}
+    else
+
+    end
+end
+
+jdb = hwe_test(x)
+df = by(y, :locus, :genotype => locus_chi_sq)
