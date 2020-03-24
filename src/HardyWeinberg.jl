@@ -12,26 +12,25 @@ function Χ²_locus(locus::T) where T <: AbstractVector
     ## Get observed number of genotypes in a locus
     observed = geno_count_observed(locus)
 
-    chisq_stat = deepcopy(expected)   # rename for clarity
+    Χ²_stat = expected
     @inbounds for genotype in keys(expected)
         o = get(observed, genotype, 0)
         e = get(expected, genotype, 0)
-
-        chisq_stat[genotype] = (o - e)^2 / e
+        Χ²_stat[genotype] = (o - e)^2 / e
     end
-    chisq_stat = values(chisq_stat) |> sum
+    Χ²_stat = values(Χ²_stat) |> sum
     n_geno_exp = length(expected)
     n_alleles = length(unique_alleles(locus))
     #return n_geno_exp, n_alleles
-    df = (n_geno_exp - n_alleles)
+    df = n_geno_exp - n_alleles
 
     if df > 0
-        chisq_dist = Distributions.Chisq(df)
-        p_val = 1 - Distributions.cdf(chisq_dist, chisq_stat)
+        Χ²_dist = Distributions.Chisq(df)
+        p_val = 1 - Distributions.cdf(Χ²_dist, Χ²_stat)
     else
         p_val = missing
     end
-    return (chisq_stat, df, p_val)
+    return (Χ²_stat, df, p_val)
 end
 
 #TODO
