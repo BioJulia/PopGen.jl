@@ -24,30 +24,6 @@ using Convex,
       StatsBase
 =#
 
-export PopObj,
-    summary,
-    dataset, nancycats, gulfsharks,
-    delimited, csv,
-    exclude_loci, omit_loci, remove_loci,
-    exclude_samples, omit_samples, remove_samples,
-    genepop,
-    bcf, vcf,
-    samples,
-    loci,
-    locus,
-    isolate_genotypes,
-    locations, locations!,
-    population, populations, population!, populations!, popnames!,
-    relatedness, pairwise_relatedness, kinship,
-    meta,
-    missing,
-    reindex,
-    show,
-    heterozygosity, het, He,
-    hwe_test, hwe
-    #plot_missing,
-    #plot_locations
-
 
 
 #   o O       o O       o O       o O       o O
@@ -62,6 +38,7 @@ include("Types.jl")
 include("io/ioUtils.jl")
 include("io/Delimited.jl")
 include("io/Genepop.jl")
+include("io/Read.jl")
 #include("io/VariantCall.jl")
 # example data
 include("Datasets.jl")
@@ -69,9 +46,12 @@ include("Datasets.jl")
 include("Manipulate.jl")
 # allele frequency and heterozygosity functions
 include("AlleleFreq.jl")
-include("HardyWeinberg.jl")
+include("Heterozygosity.jl")
 # summary information
 include("SummaryInfo.jl")
+#Analyses
+include("HardyWeinberg.jl")
 #include("PairwiseRelatedness.jl")  # not yet ready
 #include("PlotRecipes.jl")  # not yet ready
+
 end # module PopGen

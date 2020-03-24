@@ -46,12 +46,12 @@ as `0`, otherwise there will be transcription errors!
 
 ### example
 ```bash
-name,population,long,lat,Locus1,Locus2,Locus3   \n
-sierra_01,mountain,11.11,-22.22,001001,002002,001001   \n
-sierra_02,mountain,11.12,-22.21,001001,001001,001002   \n
-snbarb_03,coast,0,0,001001,001001,001002 \n
-snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
-snbarb_03,coast,11.15,0,001002,001001,001001 \n
+name,population,long,lat,Locus1,Locus2,Locus3
+sierra_01,mountain,11.11,-22.22,001001,002002,001001
+sierra_02,mountain,11.12,-22.21,001001,001001,001002
+snbarb_03,coast,0,0,001001,001001,001002
+snbarb_02,coast,11.14,-22.24,001001,001001,001001
+snbarb_03,coast,11.15,0,001002,001001,001001
 ```
 
 **Fun fact**

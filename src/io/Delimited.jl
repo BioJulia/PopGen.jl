@@ -1,6 +1,9 @@
 #=
 This file handles the import/export of delmited file formats
 =#
+
+export delimited, csv
+
 """
     delimited(infile::String; delim::Union{Char,String,Regex} = "auto", digits::Int64 = 3, silent::Bool = false)
 Load a delimited-type file into memory as a PopData object. *There should be no empty cells
@@ -131,90 +134,4 @@ function delimited(
         return PopData(sample_table, loci_table)
 end
 
-# keep the pre-allocation parts to test with genepop
-#=
-function delim_opt(
-    infile::String;
-    delim::String = "auto",
-    digits::Int = 3,
-    diploid::Bool = true,
-    silent::Bool = false
-    )
-
-    geno_type = Int16
-
-    if delim == "auto"
-        geno_parse = CSV.File(infile)
-    else
-        geno_parse = CSV.File(infile, delim = delim)
-    end
-
-    locinames = string.(keys(geno_parse[1])[5:end])
-
-    # initiate with empty vectors for samplename, locus, and geno
-    records_total = length(locinames) * (countlines(infile) - 1)
-    name = fill("1", records_total)
-    loci = fill("1", records_total)
-    popid_meta = fill("1", countlines(infile) - 1)
-    popid_loci = fill("1", records_total)
-    long_array = zeros(countlines(infile) - 1) |> Vector{Union{Missing,Float32}}
-    lat_array = zeros(countlines(infile) - 1) |> Vector{Union{Missing,Float32}}
-    if diploid == true
-        geno_raw = convert.(Int32, ones(records_total))
-    else
-        geno_raw = fill("1", records_total)
-    end
-
-#name,population,longitude,latitude,fca8,
-    @inbounds for (num,row) in enumerate(geno_parse)
-        from_idx = findfirst(i -> i == "1", name)
-        to_idx = from_idx + length(locinames) - 1
-        #println(from_idx, to_idx)
-        vals = values(row)
-        name[from_idx:to_idx] = fill(vals[1], length(locinames))
-        popid_loci[from_idx:to_idx] = fill(vals[2], length(locinames))
-        popid_meta[num] = vals[2]
-        long_array[num] = vals[3]
-        lat_array[num] = vals[4]
-        loci[from_idx:to_idx] = locinames
-        geno_raw[from_idx:to_idx] = vals[5:end]
-    end
-
-    if !silent
-        @info "\n$(abspath(infile))\n$(countlines(infile) - 1) samples detected\n$(length(locinames)) loci detected"
-    end
-
-    ## phase the genotypes
-    if diploid == true
-        genotype = map(i -> phase_dip.(i, geno_type, digits), geno_raw)
-    else
-        genotype = map(i -> phase.(i, geno_type, digits), geno_raw)
-    end
-
-    loci_table = table((
-        name = categorical(name, true),
-        population = categorical(popid_loci, true),
-        locus = categorical(loci, true),
-        genotype = genotype
-    ))
-
-    # make sure levels are sorted by order of appearance
-    levels!(loci_table.columns.locus, unique(loci_table.columns.locus))
-    levels!(loci_table.columns.name, unique(loci_table.columns.name))
-
-    ploidy = (@groupby loci_table :name {
-        ploidy = find_ploidy(:genotype),
-    }).columns.ploidy
-
-    # take a piece of the genotype table out and create a new table with the ploidy
-    sample_table = table((
-        name = levels(loci_table.columns.name),
-        population = popid_meta,
-        ploidy = ploidy,
-        longitude = replace(long_array, 0.0 => missing),
-        latitude = replace(lat_array, 0.0 => missing)
-    ))
-
-        PopData(sample_table, loci_table)
-end
-=#
+const csv = delimited

@@ -1,4 +1,5 @@
 ## test data available for use in PopGen
+export dataset, nancycats, gulfsharks
 
 """
     dataset(::String)

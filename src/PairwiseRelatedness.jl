@@ -1,3 +1,5 @@
+export relatedness, pairwise_relatedness, kinship
+
 #=TODO
 
     Solve dyadic optimization issues

@@ -2,6 +2,8 @@
 This file handles the import/export of Variant Call Format files
 =#
 
+export bcf, vcf
+
 """
     bcf(infile::String)
 Load a BCF file into memory as a PopObj object. Population and [optional]
@@ -158,42 +160,4 @@ $(length(locinames)) loci detected"
         longitude = loc_xy
     )
     PopObj(samples_df, loci_df)
-end
-
-
-"""
-    PopGen.read(infile::String; kwargs...)
-Wraps `csv()`, `genepop()`, `bcf()`, and `vcf()` to read a file in as a `PopObj`. File type is
-inferred from the file extension:
-- delimited: .csv | .tsv | .txt
-- genepop: .gen | .genepop
-- variant call format: .vcf
-This function uses the same keyword arguments (and defaults) as the file importing
-functions it wraps; please see their respective docstrings in the Julia help console.
-(e.g. `?genepop`) for specific usage details.
-
-## Examples
-```
-read("cavernous_assfish.gen", markers = "msat", digits = 3)
-
-read("bos_tauros.csv")`
-
-read("juglans_nigra.vcf")
-```
-"""
-function Base.read(infile::String; kwargs...)
-    ext = split(infile, ".")[end]
-    if ext == "gen" || ext == "genepop"
-        return genepop(infile;kwargs...)
-
-    elseif ext == "csv" || ext == "txt" || ext == "tsv"
-        return delimited(infile; kwargs...)
-
-    elseif ext == "vcf" || ext == "bcf"
-        ext == "vcf" && return vcf(infile)
-        ext == "bcf" && return bcf(infile)
-
-    else
-        @error "file type not recognized by filename extension \n delimited: .csv | .tsv | .txt \n genepop: .gen | .genepop \n variant call formant: .bcf | .vcf"
-    end
 end

@@ -2,6 +2,7 @@
 These are commands that are for the general manipulation and viewing of the
 PopData type. The appear in alphabetical order.
 =#
+export locations, locations!, loci, locus, missing, populations, population, populations!, population!, reindex, exclude_loci, remove_loci, omit_loci, exclude_samples, remove_samples, omit_samples, samples
 
 """
     locations(data::PopData)

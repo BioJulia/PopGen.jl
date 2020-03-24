@@ -1,3 +1,4 @@
+export allele_table, allele_avg, richness, summary
 """
     allele_table(data::PopData)
 Return a "tidy" IndexedTable of the loci, their alleles, and their alleles' frequencies.

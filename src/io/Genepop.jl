@@ -2,6 +2,8 @@
 This file handles the import/export of Genepop file format
 =#
 
+export genepop
+
 """
     genepop(infile::String; kwargs...)
 Load a Genepop format file into memory as a PopData object.

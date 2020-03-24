@@ -1,3 +1,5 @@
+export PopObj, PopData, show
+
 """
     AbstractType PopObj
 Generic AbstractType for use in PopGen.jl
