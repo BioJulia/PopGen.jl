@@ -2,15 +2,15 @@ export ishom, ishet, heterozygosity, het,
 
 """
 ```
-ishom(locus::T) where T<:AbstractVector
-ishom(locus::NTuple{N,T} where N where T <: Signed)
+ishom(locus::T) where T <: GenotypeArray
+ishom(locus::Genotype)
 ishom(locus::Missing)
 ```
 A series of methods to test if a locus or loci are homozygous and return `true` if
 it is, `false` if it isn't. The vector version simply broadcasts the function over the
 elements.
 """
-@inline function ishom(locus::NTuple{N,T} where N where T <: Signed)
+@inline function ishom(locus::Genotype)
     # if allele 1 equels all others, return true
     return @inbounds all(locus[1] .== locus)
 end
@@ -20,22 +20,22 @@ end
     return missing
 end
 
-@inline function ishom(locus::T) where T<:AbstractVector
+@inline function ishom(locus::T) where T<:GenotypeArray
     return @inbounds ishom.(locus)
 end
 
 
 """
 ```
-ishet(locus::T) where T<:AbstractVector
-ishet(locus::NTuple{N,T} where N where T <: Signed)
+ishet(locus::T) where T <: GenotypeArray
+ishet(locus::Genotype)
 ishet(locus::Missing)
 ```
 A series of methods to test if a locus or loci are heterozygous and return `true` if
 it is, `false` if it isn't. The vector version simply broadcasts the function over the
 elements. Under the hood, this function is simply `!ishom`.
 """
-@inline function ishet(locus::NTuple{N,T} where N where T <: Signed)
+@inline function ishet(locus::Genotype)
     return @inbounds !ishom(locus)
 end
 
@@ -44,30 +44,30 @@ end
     return missing
 end
 
-@inline function ishet(locus::T) where T<:AbstractVector
+@inline function ishet(locus::T) where T<:GenotypeArray
     return @inbounds ishet.(locus)
 end
 
 
 """
-    hetero_o(data::T) where T <: AbstractVector
+    hetero_o(data::T) where T <: GenotypeArray
 Returns observed heterozygosity as a mean of the number of heterozygous genotypes, defined
 as genotypes returning `true` for `ishet()`. This is numerically feasible because
 `true` values are mathematically represented as `1`, whereas `false` are represented
 as `0`.
 """
-@inline function hetero_o(data::T) where T <: AbstractVector
+@inline function hetero_o(data::T) where T <: GenotypeArray
     adjusted_vector = ishet(data) |> skipmissing
     isempty(adjusted_vector) ? missing : mean(adjusted_vector)
 end
 
 
 """
-    hetero_e(allele_freqs::Vector{T}) where T <: AbstractFloat
+    hetero_e(allele_freqs::Vector{T}) where T <: GenotypeArray
 Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
-function hetero_e(data::T) where T <: AbstractVector
+function hetero_e(data::T) where T <: GenotypeArray
     1 - sum(allele_freq_vec(data) .^ 2)
 end
 
@@ -84,12 +84,12 @@ end
 """
     heterozygosity(data::PopData, mode::String = "locus")
 Calculate observed and expected heterozygosity in a `PopData` object.
-## Example
-heterozygosity(nancycats(), "population" )
 ### Modes
 - `"locus"` or `"loci"` : heterozygosity per locus (default)
 - `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
 - `"population"` or `"pop"` : heterozygosity per population
+## Example
+heterozygosity(nancycats(), "population" )
 """
 function heterozygosity(data::PopData, mode::String = "locus")
     if mode ∈ ["locus", "loci"]

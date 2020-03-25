@@ -42,9 +42,9 @@ locus by population.
 """
 function richness(data::PopData; populations::Bool = false)
     if !populations
-        @groupby data.loci :locus {richness = length(unique(alleles(:genotype)))}
+        @groupby data.loci :locus {richness = length(unique_alleles(:genotype))}
     else
-        @groupby data.loci (:locus, :population) {richness =  length(unique(alleles(:genotype)))}
+        @groupby data.loci (:locus, :population) {richness =  length(unique_alleles(:genotype))}
     end
 end
 

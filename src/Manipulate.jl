@@ -2,7 +2,7 @@
 These are commands that are for the general manipulation and viewing of the
 PopData type. The appear in alphabetical order.
 =#
-export locations, locations!, loci, locus, missing, populations, population, populations!, population!, reindex, exclude_loci, remove_loci, omit_loci, exclude_samples, remove_samples, omit_samples, samples
+export locations, locations!, loci, locus, get_genotypes, get_sample_genotypes, missing, populations, population, populations!, population!, reindex, exclude_loci, remove_loci, omit_loci, exclude_samples, remove_samples, omit_samples, samples
 
 """
     locations(data::PopData)
@@ -233,8 +233,47 @@ function loci(data::IndexedTable)
     levels(data.columns.locus)
 end
 
+
 """
-    locus(::PopData, ::Union{String, Symbol})
+    get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
+Return the genotype(s) of one or more `samples` for one or more
+specific `loci` (both as keywords) in a `PopData` object.
+### Examples
+```
+cats = nancycats();
+get_genotype(cats, samples = "N115" , loci = "fca8")
+get_genotypes(cats, samples = ["N1", "N2"] , loci = "fca8")
+get_genotype(cats, samples = "N115" , loci = ["fca8", "fca37"])
+get_genotype(cats, samples = ["N1", "N2"] , loci = ["fca8", "fca37"])
+```
+
+"""
+function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
+    if typeof(sample) == String
+        sample = [sample]
+    end
+    if typeof(locus) == String
+        locus = [locus]
+    end
+    @where data.loci :name in sample && :locus in locus
+end
+
+"""
+    get_sample_genotypes(data::PopData, sample::String)
+Return all the genotypes of a specific sample in a `PopData` object.
+This is an extension for the internal function `get_genotypes`.
+```
+cats = nancycats()
+get_sample_genotypes(cats, "N115")
+```
+"""
+function get_sample_genotypes(data::PopObj, sample::String)
+    @where data.loci :name == sample
+end
+
+
+"""
+    locus(data::PopData, locus::Union{String, Symbol})
 Convenience wrapper to return a vector of all the genotypes of a single locus
 
 ### Example
@@ -248,11 +287,6 @@ function locus(data::PopData, locus::String)
     return select(tmp, :genotype)
 end
 
-function meta(data::PopData)
-    data.meta
-end
-
-const metadata = meta
 
 #### Find missing ####
 """

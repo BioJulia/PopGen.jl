@@ -24,6 +24,7 @@ nav:
     PopData and Types:
         PopData and PopObj: getting_started/popobj_type.md
         Accessing parts of PopData: getting_started/accessing_popdata.md
+        Other Types: getting_started/other_types.md
     Benchmarks: getting_started/comparison.md
 - Importing Data:
     Datasets: io/datasets.md
