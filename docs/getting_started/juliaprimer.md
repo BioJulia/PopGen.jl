@@ -56,7 +56,7 @@ julia> x = [1,2] ; y = [3,4]
 that's a Julia short-hand for making two short lines of code appear on a single line. It's the equivalent of doing:
 
 ```julia
-julia> x = [1,2] ;
+julia> x = [1,2]
 julia> y = [3,4]
 ```
 
@@ -73,7 +73,7 @@ help?>population
 ```
 search: population populations population! populations!
 
-  population(x::PopObj; listall::Bool = false)
+  population(data::PopData; listall::Bool = false)
 
   View unique population ID's in a PopObj.
 
@@ -89,10 +89,10 @@ Julia encourages strong typing of variables, and the functions in `PopGen` are n
 You'll notice types follow a specific format, which is `object::type`. This format is a type declaration, so in the function `population`, which looks like: 
 
 ```julia
-population(x::PopData; listall::Bool = false)
+population(data::PopData; listall::Bool = false)
 ```
 
-- `x` is a variable of type `PopData` 
+- `data` is a variable of type `PopData` 
 - `listall` is a variable of type `Bool` (Boolean) meaning it only takes `true` or `false` without quotes, and the default value is set to `false`
 
 ### Type Unions
@@ -122,10 +122,10 @@ With the constraint above, it will generate methods for all cases where `thing1`
 You can also use this type of notation to clean up a method definition where multiple arguments have the same Type specification:
 
 ```julia
-function funct3(data::PopData, thing1::T, thing2::T, thing3::T) where T::Float64
+function funct3(data::PopData, thing1::T, thing2::T, thing3::T) where T<:AbstractFloat
 ```
 
-So, instead of writing `thing1::Float64, thing2::Float64, thing3::Float64`, we just use `T` as a placeholder and assign it a strict Type at the end.  It ends up being pretty handy!
+So, instead of writing `thing1::Float64, thing2::Float64, thing3::Float64`, we just use `T` as a placeholder and assign it as a subtype of something at the end.  It ends up being pretty handy!
 
 
 

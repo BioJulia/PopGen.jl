@@ -1,7 +1,3 @@
-#=
-This file handles the import/export of Genepop file format
-=#
-
 export genepop
 
 """
@@ -22,24 +18,26 @@ Load a Genepop format file into memory as a PopData object.
 - Sample name is immediately followed by a *comma*
 - File is *tab or space delimted* (but not both!)
 
-## Example
-```
-waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "POP")
-```
 ### Genepop file example:
-Wasp populations in New York \n
+wasp_hive.gen: Wasp populations in New York \n
 Locus1\n
 Locus2\n
 Locus3\n
-POP\n
+pop\n
 Oneida_01,  250230  564568  110100\n
 Oneida_02,  252238  568558  100120\n
 Oneida_03,  254230  564558  090100\n
-POP\n
+pop\n
 Newcomb_01, 254230  564558  080100\n
 Newcomb_02, 000230  564558  090080\n
 Newcomb_03, 254230  000000  090100\n
 Newcomb_04, 254230  564000  090120\n
+
+## Example
+```
+waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
+```
+
 """
 function genepop(
     infile::String;

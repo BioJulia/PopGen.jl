@@ -74,19 +74,17 @@ function locations!(data::PopData, long::Vector{Union{Missing,String}}, lat::Vec
     length(lat) != length(data.meta.columns.name) && error("lat/long array length ($(length(lat))) and number of samples in PopData $(length(long)) are not equal")
     @info "Converting decimal minutes to decimal degrees"
     # convert coordinates to decimal degrees
-    latConverted = Vector{Union{Missing,Float32}}()
-    longConverted = Vector{Union{Missing,Float32}}()
     @inbounds for idx in 1:length(lat)
         # check for missing as strings
         if lat[idx] == "missing" | long[idx] == "missing"
-            push!(lat_Converted, missing)
-            push!(long_Converted, missing)
+            data.meta.columns.latitude[idx] = missing
+            data.meta.columns.longitude[idx] = missing
             continue
         end
         # check for missing as Missing
         if ismissing(lat[idx]) | ismissing(long[idx])
-            push!(lat_Converted, missing)
-            push!(long_Converted, missing)
+            data.meta.columns.latitude[idx] = missing
+            data.meta.columns.longitude[idx] = missing
             continue
         end
         tmpLat = split(lat[idx], " ")
@@ -95,22 +93,18 @@ function locations!(data::PopData, long::Vector{Union{Missing,String}}, lat::Vec
         long_deg = parse(Float32,tmpLong[1]) ; long_min = round(parse(Float32,tmpLong[2])/60, digits = 4)
         if lat_deg < 0
             # if negative, subtract
-            push!(latConverted, lat_deg - lat_min)
+            data.meta.columns.latitude[idx] = lat_deg - lat_min
         else
             # if positive, add
-            push!(latConverted, lat_deg + lat_min)
+            data.meta.columns.latitude[idx] = lat_deg + lat_min
         end
         if long_deg < 0
             # if negative, subtract
-            push!(longConverted, long_deg - long_min)
+            data.meta.columns.longitude[idx] = long_deg - long_min
         else
             # if positive, add
-            push!(longConverted, long_deg + long_min)
+            data.meta.columns.longitude[idx] = long_deg + long_min
         end
-    end
-    for i in 1:length(latConverted)
-        data.meta.columns.longitude[i] = latConverted[i]
-        data.meta.columns.latitude[i] = longConverted[i]
     end
 end
 
@@ -130,32 +124,25 @@ function locations!(
 
     @info "Converting decimal minutes to decimal degrees"
     # convert coordinates to decimal degrees
-    latConverted = Vector{Union{Missing,Float32}}()
-    longConverted = Vector{Union{Missing,Float32}}()
-    @inbounds for i = 1:length(lat_deg)
-        if lat_deg[i] === missing
-            push!(latConverted, missing)
-            push!(longConverted, missing)
+    @inbounds for idx = 1:length(lat_deg)
+        if lat_deg[idx] === missing
+            data.meta.columns.latitude[idx] = missing
+            data.meta.columns.longitude[idx] = missing
             continue
-        elseif lat_deg[i] < 0
+        elseif lat_deg[idx] < 0
             # if negative, subtract
-            push!(latConverted, lat_deg[i] - lat_min[i])
+            data.meta.columns.latitude[idx] = lat_deg[idx] - lat_min[idx]
         else
             # if positive, add
-            push!(latConverted, lat_deg[i] + lat_min[i])
+            data.meta.columns.latitude[idx] = lat_deg[idx] + lat_min[idx]
         end
         if long_deg < 0
             # if negative, subtract
-            push!(longConverted, long_deg[i] - long_min[i])
+            data.meta.columns.longitude[idx] = long_deg[idx] - long_min[idx]
         else
             # if positive, add
-            push!(longConverted, long_deg[i] + long_min[i])
+            data.meta.columns.longitude[idx] = long_deg[i] + long_min[i]
         end
-    end
-
-    @inbounds for i = 1:length(latConverted)
-        data.meta.columns.longitude[i] = latConverted[i]
-        data.meta.columns.latitude[i] = longConverted[i]
     end
 end
 
