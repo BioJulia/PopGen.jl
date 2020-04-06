@@ -18,7 +18,7 @@ So, we'd like to prove that Julia and PopGen.jl actually achieves that by showin
 
 To make this a practical comparison, we're going to use the `gulfsharks` data because it is considerably larger (212 samples x 2213 loci) than `nancycats` (237 x 9) and a bit more of a "stress test".  All benchmarks in R are performed using the `microbenchmark` package, and  `BenchmarkTools` are used for Julia. 
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab load R packages
 ```r
 library(adegenet)
@@ -41,7 +41,7 @@ As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux
 
 Since `gulfsharks` is shamelessly provided in PopGen.jl, we simply invoke the `gulfsharks()` command in Julia. If you would like to try this yourself in R, find the `gulfsharks.gen` file in the package repository under `/data/data/gulfsharks.gen`. It will print out the input filename several times, which is omitted below for clarity. Since the file importer now uses CSV.jl to read in the file, there are two steps of the genepop parser that are multithreaded. However, the majority of the data parsing (formatting the raw data into a correct PopObj structure) occurs using a single thread. This R benchmark will take a few minutes. Consider making some tea while you wait.
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab Julia
 ```julia
 julia> @btime x = gulfsharks() ; # hide the output
@@ -69,7 +69,7 @@ Julia  :rocket:   |    R  :snail:
 It was pretty tricky to come up with a sensible/efficient/convenient data structure for PopGen.jl, and the original attempt was a Julian variant to a `genind`, which itself is something known as an `S4 class object`. While the two-IndexedTables design might not seem like it took a lot of effort, we ultimately decided that the column-major style and available tools, combined with careful genotype Typing was a decent "middle-ground" of ease-of-use vs performance. Plus, we are suckers for consistent syntax, which `genind`'s don't have compared to standard R syntax (looking at you too, Tidyverse/ggplot!). 
 
 *Anyway*, it's important to understand how much space your data will take up in memory (your RAM) when you load it in, especially since data's only getting bigger! Keep in mind that `gulfsharks()` in PopGen.jl also provides lat/long data, which _should_ inflate the size of the object somewhat compared to the `genind`, which we won't add any location data to.
-:::: tabs card true
+:::: tabs card stretch
 ::: tab Julia
 ```julia
 julia> Base.summarysize(x)
@@ -96,7 +96,7 @@ Julia  :house_with_garden: ​   |    R  :european_castle:
 ### Chi-squared test for HWE
 
 This is a classic population genetics test and a relatively simple one. The R benchmark will take a while again, so if you're following along, this would be a good time to reconnect with an old friend.
-:::: tabs card true
+:::: tabs card stretch
 ::: tab Julia
 ```julia
 julia> @btime hwe_test(x, correction = "bh") ;

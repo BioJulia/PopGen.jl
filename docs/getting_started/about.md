@@ -7,19 +7,19 @@ PopGen.jl is an attempt to shift population genetics analyses away from the patc
 
 To be a comprehensive package for population genetics analyses and visualization that's fast and user friendly. This project is developed with a particular mantra: *Sanity, Sensibility, Accessibility*.
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab Sanity
 Functions are written in a way such that their use is sane and natural. When possible (or sensible), we use full words for input variables or other components of input/output. The first argument for all functions is the input data without keywords. Always. If a function has a very obvious name, then it likely it won't need keyword arguments.
 :::
 ::::
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab Sensibility
 Functions need to be sensible, both in what they do and how they do it. This means they should include only the most relevant arguments and the most practical defaults. It also means the outputs need to be flexible enough to use with other Julia packages, such as `Query.jl`, or `Plots`.
 :::
 ::::
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab Accessibility
 Documentation is everything! Julia is a comparatively young language and we *want* you to be comfortable using PopGen.jl. That means investing **a lot** of time into writing thorough documentation intended for users across a wide spectrum of proficiency. We also recognize that you (the reader) might not be very familiar with Julia, so we've written [a section](/guide/) on clarifying some Julia concepts/conventions that will make reading this documentation a whole lot clearer.
 :::

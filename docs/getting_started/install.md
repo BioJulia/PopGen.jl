@@ -4,7 +4,7 @@
 
 The package is currently unregistered while it's under active early development. However, installation is still simple!
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab in the REPL or Juno
 Invoke the package manager with `]` in the REPL and use
 

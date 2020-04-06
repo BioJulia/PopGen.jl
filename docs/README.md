@@ -5,7 +5,7 @@ title: null
 heroText: null
 heroDescription: null
 actionText: Get Started →
-actionLink: /guide/about
+actionLink: /getting_started/about
 features:
 - title: Fast
   details: Python/MATLAB like syntax, with C-like speed.

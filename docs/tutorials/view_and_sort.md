@@ -11,7 +11,7 @@ samples(data::PopData)
 ```
 
 View individual/sample names in a `PopData`. 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab samples
 ``` julia
 julia> samples(sharks)
@@ -53,7 +53,7 @@ reindex(data::PopData, col::Union{String, Symbol})
 
 By default, the `loci` table of `PopData` is sorted by the `name` column. For performance or convenience reasons, you can sort it using any column you want. This will sort the `loci` table of a `PopData` object by column `col` and return new `PopData` object, keeping the original intact. The column names can be Strings or Symbols.
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab sort
 ```julia
 sorted_sharks = reindex(sharks, :population)
@@ -71,7 +71,7 @@ loci(data::PopData)
 ```
 
 Returns a vector of strings of the loci names in a `PopData`
-:::: tabs card true
+:::: tabs card stretch
 ::: tab loci
 ```julia
 julia> loci(sharks)
@@ -109,7 +109,7 @@ locus(data::PopData, locus::String)
 ```
 
 Default shows all genotypes for all individuals. Returns a Vector.
-:::: tabs card true
+:::: tabs card stretch
 ::: tab all loci
 ``` julia
 julia> locus(sharks, "contig_2784")
@@ -145,7 +145,7 @@ The `locus` function gives a `view` into the genotype section of the `loci` tabl
 ## View genotypes by sample (or anything)
 
 This can be done fairly easily using JuliaDBMeta macro `@where`
-:::: tabs card true
+:::: tabs card stretch
 ::: tab single sample
 ```julia
 julia> @where sharks.loci :name == "cc_001"
@@ -222,7 +222,7 @@ Get missing genotype information in a `PopData`. Specify a `mode` of operation t
 | `"locus"`  | `"loci"`           | returns a count of missing genotypes per locus               |
 | `"full"`   | `"detailed"`       | returns a count of missing genotypes per locus per population |
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab sample
 ```
 julia> missing(sharks)
@@ -285,7 +285,7 @@ locus           missing
 ```
 :::
 ::: tab full
-```tab
+```
 julia> missing(sharks, mode = "full")
 Table with 15491 rows, 3 columns:
 locus           population        missing

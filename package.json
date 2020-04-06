@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@vuepress/plugin-back-to-top": "^1.4.0",
+    "@vuepress/plugin-medium-zoom": "^1.4.0",
     "vue-tabs-component": "^1.5.0",
     "vuepress": "^1.4.0",
     "vuepress-plugin-clean-urls": "^1.1.1",
@@ -8,6 +9,7 @@
     "vuepress-plugin-flexsearch": "^0.0.3",
     "vuepress-plugin-mathjax": "^1.2.8",
     "vuepress-plugin-tabs": "^0.3.0",
+    "vuepress-theme-cool": "^1.3.0",
     "vuepress-theme-default-prefers-color-scheme": "^1.0.6"
   },
   "scripts": {

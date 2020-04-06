@@ -45,7 +45,7 @@ Calculate chi-squared test of HWE for each locus and returns observed and expect
 :thinking: For more information on multiple testing adjustments, see [MultipleTesting.jl](https://juliangehring.github.io/MultipleTesting.jl/stable/)
 
 ### example
-:::: tabs card true
+:::: tabs card stretch
 ::: tab HWE Chi-Squared example
 ```julia
 hwe_test(gulfsharks(), correction = "bh")

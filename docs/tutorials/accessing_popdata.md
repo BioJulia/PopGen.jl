@@ -10,7 +10,7 @@ There are specific relationships between the record entries in `PopData` objects
 Let's keep things simple by loading in the nancycats data and calling it `ncats`.
 
 
-:::: tabs card true
+:::: tabs card stretch
 
 ::: tab load nancycats
 ``` julia
@@ -41,7 +41,7 @@ Now that we have nancycats loaded in, we can use standard Julia accessor convent
 
 To view the entire `meta` table.
 
-:::: tabs card true
+:::: tabs card stretch
 
 ::: tab PopData meta field
 ```julia
@@ -80,7 +80,7 @@ name    population  ploidy  latitude  longitude
 This will access the names of the samples.
 
 
-:::: tabs card true
+:::: tabs card stretch
 
 ::: tab meta .name field
 ``` julia
@@ -116,7 +116,7 @@ julia> ncats.meta.columns.name
 This will access the names of the populations associated with each sample, in the same order as the  samples.
 
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab meta .population field
 ``` julia
 julia> ncats.meta.columns.population
@@ -153,7 +153,7 @@ These ID's aren't super informative. Later, we'll change them using the `popid!`
 
 This shows you the ploidy of the data per individual
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab meta .ploidy
 ``` julia
 julia> ncats.meta.columns.ploidy
@@ -187,7 +187,7 @@ julia> ncats.meta.columns.ploidy
 
 This accesses the latitude information of the PopObj. If there is none, like in the nancycats data, it returns a vector of `missing`.
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab meta .latitude field
 ```julia
 julia> ncats.meta.columns.latitude
@@ -221,7 +221,7 @@ julia> ncats.meta.columns.latitude
 
 This accesses the longitude information of the PopObj. Like before, if there is none, like in the nancycats data, it returns an array of `missing`.
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab meta .longitude field
 ```julia
 julia> ncats.meta.columns.longitude
@@ -251,7 +251,7 @@ julia> ncats.meta.columns.longitude
 :::
 ::::
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab actually seeing some location info 
 The nancycats data has some weird coordinate system for information, so those data were omitted. If you want a proof of concept for `.longitude` and `.latitude`, load in `gulfsharks` and try it out. We'll use `hcat` (horizontal concatination) to horizontally bind the individual names, their latitude, and longitude. Later, you'll see that the `locations` command does this.
 :::    
@@ -294,7 +294,7 @@ julia> hcat(sharks.meta.columns.name, sharks.meta.columns.latitude, sharks.meta.
 
 This will show you the entire `loci` table.
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab PopData loci field 
 ```julia
 julia> ncats.loci
@@ -329,7 +329,7 @@ name    population  locus    genotype
 
 This will access the names of the loci as they appear in the data. Since everything but the genotypes in `.loci` are coded as Categorical, we need to use `levels()` from `CategoricalArrays.jl` or `unique()` from Base to pull out the unique loci. 
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab loci .locus
 ```julia
 julia> levels(ncats.loci.columns.locus)
@@ -358,7 +358,7 @@ julia> unique(ncats.loci.columns.locus)
 
 Because the genotype data is in "tidy" format, accessing genotypes in a meaningful way is not immediately obvious. We can of course follow the same convention of `data.loci.genotype` as we have above, but a list of all the genotypes across all individuals, loci, and populations isn't terribly useful. Instead, we can use the JuliaDB or JuliaDBMeta interfaces to retrieve this information. Here is an example using `@where` from JuliaDBMeta:
 
-:::: tabs card true
+:::: tabs card stretch
 ::: tab single locus
 ```julia
 julia> @where ncats.loci :locus == "fca8"

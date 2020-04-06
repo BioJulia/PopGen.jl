@@ -43,7 +43,7 @@ pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verb
 *****
 
 ### example
-:::: tabs card true
+:::: tabs card stretch
 ::: tab Queller-Goodnight relatedness
 ```julia
 cats = nancycats() ;
