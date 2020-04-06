@@ -3,3 +3,7 @@
 /dev/
 /node_modules/
 /src/playtest/
+yarn-error.log
+yarn.lock
+/docs/yarn-error.log
+/docs/yarn.lock
