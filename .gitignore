@@ -2,6 +2,4 @@
 /Manifest.toml
 /dev/
 /docs/node_modules/
-/docs/docs/.vuepress/dist/
-site/
 /src/playtest/
