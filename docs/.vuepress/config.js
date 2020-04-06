@@ -11,6 +11,7 @@ module.exports = {
         '@vuepress/active-header-links',
         '@vuepress/plugin-nprogress',
         '@vuepress/medium-zoom',
+        '@vuepress/last-updated',
         [
          'vuepress-plugin-mathjax', {
             target: 'svg',
