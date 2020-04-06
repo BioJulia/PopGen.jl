@@ -1,0 +1,36 @@
+{
+  "name": "vuepress-plugin-element-tabs",
+  "version": "0.2.8",
+  "description": "Vuepress plugin - Tabs Container for Vuepress",
+  "author": "superbiger",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vuepress dev docs --temp .temp",
+    "build": "vuepress build docs",
+    "ghpages": "gh-pages -d docs/.vuepress/dist",
+    "release": "release-it"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superbiger/vuepress-plugin-tabs.git"
+  },
+  "keywords": [
+    "vuepress-plugin",
+    "tabs",
+    "component"
+  ],
+  "bugs": {
+    "url": "https://github.com/superbiger/vuepress-plugin-tabs/issues"
+  },
+  "homepage": "https://github.com/superbiger/vuepress-plugin-tabs#readme",
+  "devDependencies": {
+    "gh-pages": "^2.0.1",
+    "release-it": "^10.3.1",
+    "vuepress": "^1.0.1"
+  },
+  "dependencies": {
+    "node-sass": "^4.11.0",
+    "resize-observer-polyfill": "^1.5.1",
+    "sass-loader": "^7.1.0"
+  }
+}

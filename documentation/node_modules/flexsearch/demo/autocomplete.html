@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1, maximum-scale=1.0, user-scalable=no">
+    <title>Demo: Auto-Complete</title>
+    <script src="../dist/flexsearch.compact.js"></script>
+    <script src="../data/movies.js"></script>
+    <style>
+        body{
+            padding:0;
+            margin:0 10px;
+        }
+        table{
+            width: 300px;
+            table-layout: fixed;
+            position: fixed;
+            top: 0;
+            padding-top: 10px;
+            background-color: #fff;
+            z-index: 1;
+        }
+        td, tr{
+            width: 300px;
+            border: none;
+        }
+        input{
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+            background-color: transparent;
+            position: absolute;
+            -webkit-appearance: none;
+        }
+        #autocomplete{
+            color: #999;
+            background-color: #f5f5f5;
+        }
+        input{
+            padding:7px 5px;
+            box-sizing: border-box;
+        }
+        #suggestions{
+            position: relative;
+            top: 50px;
+        }
+        #suggestions div{
+            padding: 10px 0;
+            margin: 0 8px;
+            border-bottom: 1px solid #ddd;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        @media only screen and (max-width: 600px) {
+            table,
+            td,
+            tr,
+            input{
+                width: 97%;
+            }
+        }
+    </style>
+</head>
+<body>
+<table>
+    <tr>
+        <td style="position: relative">
+            <input type="text" id="autocomplete">
+            <input type="text" id="userinput" placeholder="Search by movie title ...">
+        </td>
+    </tr>
+</table>
+<div id="suggestions"></div>
+<script>
+    (function(){
+
+        var index = new FlexSearch({
+
+            encode: "advanced",
+            tokenize: "reverse",
+            suggest: true,
+            cache: true
+        });
+
+        for(var i = 0; i < data.length; i++){
+
+            index.add(i, data[i]);
+        }
+
+        var suggestions = document.getElementById("suggestions");
+        var autocomplete = document.getElementById("autocomplete");
+        var userinput = document.getElementById("userinput");
+
+        userinput.addEventListener("input", show_results, true);
+        userinput.addEventListener("keyup", accept_autocomplete, true);
+        suggestions.addEventListener("click", accept_suggestion, true);
+
+        function show_results(){
+
+            var value = this.value;
+            var results = index.search(value, 25);
+            var entry, childs = suggestions.childNodes;
+            var i = 0, len = results.length;
+
+            for(; i < len; i++){
+
+                entry = childs[i];
+
+                if(!entry){
+
+                    entry = document.createElement("div");
+                    suggestions.appendChild(entry);
+                }
+
+                entry.textContent = data[results[i]];
+            }
+
+            while(childs.length > len){
+
+                suggestions.removeChild(childs[i])
+            }
+
+            var first_result = data[results[0]];
+            var match = first_result && first_result.toLowerCase().indexOf(value.toLowerCase());
+
+            if(first_result && (match !== -1)){
+
+                autocomplete.value = value + first_result.substring(match + value.length);
+                autocomplete.current = first_result;
+            }
+            else{
+
+                autocomplete.value = autocomplete.current = value;
+            }
+        }
+
+        function accept_autocomplete(event){
+
+            if((event || window.event).keyCode === 13) {
+
+                this.value = autocomplete.value = autocomplete.current;
+            }
+        }
+
+        function accept_suggestion(event){
+
+            var target = (event || window.event).target;
+
+            userinput.value = autocomplete.value = target.textContent;
+
+            while(suggestions.lastChild){
+
+                suggestions.removeChild(suggestions.lastChild);
+            }
+
+            return false;
+        }
+    }());
+</script>
+</body>
+</html>
