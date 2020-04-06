@@ -14,7 +14,7 @@ exclude_samples(data::PopObj, samp_id::Union{String, Vector{String}})
 
 Returns a new `PopData` object without the sample or samples provided. Input can be a single sample, or an array of samples. Will output an entire `PopData`, so use a semicolon after the command if you don't want the entire object printed to your screen. Use `summary`  if you want to confirm that the samples were removed. This command will inform you if samples were not found in the data. 
 
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab single individual
 ``` julia
 julia> fewer_sharks = exclude_samples(sharks, "cc_001") ;
@@ -59,7 +59,7 @@ exclude_loci(data::PopObj, loci::Union{String, Vector{String}})
 
 Returns a new `PopData` object without the locus or loci provided. Input can be a single locus, or an array of loci, all as Strings. Will output an entire `PopData`, so use a semicolon after the command if you don't want the entire object printed to your screen. Use `summary`  if you want to confirm that the loci were removed. This command will inform you if loci were not found in the data.
 
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab single locus
 ``` julia
 julia> fewer_shark_loci = exclude_loci(sharks, "contig_475") ;

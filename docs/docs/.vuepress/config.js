@@ -1,4 +1,7 @@
 module.exports = {
+    router: {
+    base: '/PopGen.jl/'
+    },
     theme: 'default-prefers-color-scheme',
     title: 'PopGen.jl',
     description: 'Population Genetics in Julia',
@@ -8,7 +11,6 @@ module.exports = {
         'vuepress-plugin-smooth-scroll',
         '@vuepress/plugin-back-to-top',
         '@vuepress/active-header-links',
-    //'vuepress-plugin-reading-time',
         '@vuepress/plugin-nprogress',
         ['@vuepress/medium-zoom', {
           selector: '.theme-default-content :not(a) > img'

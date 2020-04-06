@@ -12,7 +12,7 @@ locations(data::PopData)
 
 View location data (`.longitude` and `.latitude`) in a `PopData`,  returning a table the longitude and latitude information in `meta`. 
 
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab locations
 ```julia
 julia> locations(sharks)
@@ -53,7 +53,7 @@ Your data **must** use the minus sign `-` (if appropriate) instead of cardinal d
 :::
 
 There are three main ways of adding location data:
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab Already in decimal degrees
 ```julia
 locations!(data::PopObj, long::Vector{T}, lat::Vector{T}) where T<:AbstractFloat
@@ -132,7 +132,7 @@ populations(data::PopData; listall::Bool = false)
 
 Just as you can view population names with `PopData.meta.columns.population`, you can also view them with the `populations` command, which by default shows you a summary of the number of individuals in each population.  
 
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab populations
 ``` julia
 julia> populations(sharks)
@@ -155,7 +155,7 @@ population        count
 ::::
 
 You can use the keyword `listall=true` to display each individual and their associated population as a table. 
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab listall = true
 ``` julia
 julia> populations(sharks, listall=true)
@@ -195,7 +195,7 @@ There are a handful of methods to alter `PopData` population names depending on 
 
 #### Replace by matching
 These methods require that some kind of population information is already present, in the sense that the samples in `PopData` aren't all in one population.
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab using a Dictionary
 ```julia
 populations!(data::PopData, rename::Dict)
@@ -286,7 +286,7 @@ popnames = ["Cape Canaveral", "Florida Keys", "Georgia", "Mideast Gulf", "Northe
 ```
 
 Now we can combine them with `populations!` to restore the population names to how they were originally
-::::: tabs board-card stretch
+::::: tabs card true
 ::: tab Replace using a NamedTuple
 ```julia
 julia> populations!(sharks, (counts = counts, names = popnames))

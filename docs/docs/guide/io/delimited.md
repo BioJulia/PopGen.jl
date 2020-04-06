@@ -44,7 +44,7 @@ Missing genotypes can be formatted as all-zeros (ex.`000000`) or negative-nine `
 If location data is missing for a sample (which is ok!), make sure the value is written
 as `0`, otherwise there will be transcription errors!
 
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab formatting example
 ```
 name,population,long,lat,Locus1,Locus2,Locus3

@@ -198,7 +198,7 @@ Reading these docs, pay attention to semicolons in the function argument lists.
 
 Broadly speaking, there are two types of function declarations in Julia: ones with keywords and ones without keywords. The term "keywords" refers to an input argument that has the format `argument = value`. This format is present in many of the functions in this and other packages, however there are some specifics to understand when functions use keywords and when they don't. 
 
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab 1. No semicolon in argument list
 ```julia
 function function_name(var1::type, var2::type, var3::type)

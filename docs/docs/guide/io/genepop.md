@@ -38,7 +38,7 @@ Files must follow standard Genepop formatting:
 - **Must** be the same word each time and not a unique population name
 - File is **tab** delimited or **space** delimited, but not both
 
-:::: tabs board-card stretch
+:::: tabs card true
 ::: tab genepop w/loci stacked vertically
 ```
 Wasp populations in New York
