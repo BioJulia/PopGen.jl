@@ -1,8 +1,8 @@
 .DS_Store
 /Manifest.toml
 /dev/
-/docs/build/
-/docs/site/
+/docs/node_modules
+/docs/.vuepress/dist
 site/
 /src/playtest/
 /docs/node_modules
