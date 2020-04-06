@@ -1,5 +1,5 @@
 .DS_Store
 /Manifest.toml
 /dev/
-/docs/node_modules/
+/node_modules/
 /src/playtest/
