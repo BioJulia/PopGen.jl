@@ -1,8 +1,6 @@
 module.exports = {
-    router: {
-    base: '/PopGen.jl/'
-    },
-    theme: 'default-prefers-color-scheme',
+    base: '/PopGen.jl/',
+    theme: 'vuepress-theme-default-prefers-color-scheme',
     title: 'PopGen.jl',
     description: 'Population Genetics in Julia',
     plugins: [
