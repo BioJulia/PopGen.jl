@@ -45,7 +45,7 @@ Since `gulfsharks` is shamelessly provided in PopGen.jl, we simply invoke the `g
 ::: tab Julia
 ```julia
 julia> @btime x = gulfsharks() ; # hide the output
-1.049 s (2472280 allocations: 166.30 MiB)
+  1.445 s (9342559 allocations: 386.67 MiB)
 ```
 :::
 ::: tab R
@@ -59,9 +59,10 @@ Unit: seconds
 :::
 ::::
 
+![import plot](/PopGen.jl/images/speedplot.png)
+
 Comparing averages, PopGen.jl clocks in at `1.049s` versus adegenet's `6.745s` , so ~6.4x faster.
 
-Julia  :rocket:   |    R  :snail:
 
 
 ### `PopData` vs `genind` size
@@ -73,7 +74,7 @@ It was pretty tricky to come up with a sensible/efficient/convenient data struct
 ::: tab Julia
 ```julia
 julia> Base.summarysize(x)
-1612428
+ 3498172
 #bytes
 ```
 :::
@@ -84,13 +85,10 @@ julia> Base.summarysize(x)
 ```
 :::
 ::::
-![clutches pearls](/images/clutches_pearls_cactus.png)
 
-What sorcery is this?! Well, it's all in the Typing of the genotypes. Each genotype for each locus is encoded as a `Tuple` of either `Int8` (if SNPs) or `Int16` (if msats) to absolutely minimize their footprint without further going into byte-level encoding (so you can still see human-readable alleles). An `Int8` is a signed integer that occupies 8bits of memory, whereas an `Int16` occupies 16bits (as compared to a standard `Int64`). 
+![data structure plot](/PopGen.jl/images/objectplot.png)
 
-The original file is `3.2mb`, and our `PopObj`takes up ~`1.6mb` in memory (half as big as the source file!) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file and ~3.3x larger than the `PopData`. That's quite a big difference!
-
-Julia  :house_with_garden: ​   |    R  :european_castle:
+The original file is `3.2mb`, and our `PopData` object takes up ~`3.5mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
 
 
 ### Chi-squared test for HWE
@@ -99,8 +97,8 @@ This is a classic population genetics test and a relatively simple one. The R be
 :::: tabs card stretch
 ::: tab Julia
 ```julia
-julia> @btime hwe_test(x, correction = "bh") ;
-  392.527 ms (1599668 allocations: 57.20 MiB)
+julia> @btime hwe_test(x) ;
+  583.094 ms (962359 allocations: 39.88 MiB)
 ```
 :::
 ::: tab R
@@ -112,8 +110,7 @@ Unit: seconds
 ```
 :::
 ::::
-Comparing averages, PopGen.jl clocks in at ~`400ms` versus adegenet's `6.3s`, so ~15x faster.
 
-Julia  :rocket:  |   R  :snail:
+![chi squared plot](/PopGen.jl/images/chisqplot.png)
 
- 
+Comparing averages, PopGen.jl clocks in at ~`580ms` versus adegenet's `6.3s`, so ~15x faster. 

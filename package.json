@@ -8,6 +8,7 @@
     "vuepress-plugin-element-tabs": "^0.2.8",
     "vuepress-plugin-flexsearch": "^0.0.3",
     "vuepress-plugin-mathjax": "^1.2.8",
+    "vuepress-plugin-nprogress": "^1.1.6",
     "vuepress-plugin-tabs": "^0.3.0",
     "vuepress-theme-cool": "^1.3.0",
     "vuepress-theme-default-prefers-color-scheme": "^1.0.6"

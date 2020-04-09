@@ -1,4 +1,4 @@
-export ishom, ishet, heterozygosity, het,
+#export ishom, ishet, heterozygosity, het
 
 """
 ```
@@ -127,7 +127,7 @@ end
 
 
 
-const hwe = hwe_test
+#const hwe = hwe_test
 
 #TODO
 

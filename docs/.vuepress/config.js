@@ -3,13 +3,19 @@ module.exports = {
     //theme: 'vuepress-theme-cool',
     title: 'PopGen.jl',
     description: 'Population Genetics in Julia',
+    head: [
+        ['link', { rel: "apple-touch-icon", sizes: "180x180", href: "PopGen.jl/images/logo_icon.png"}],
+        ['link', { rel: "icon", type: "image/png", sizes: "32x32", href: "PopGen.jl/favicon.ico"}],
+        ['link', { rel: "icon", type: "image/png", sizes: "16x16", href: "PopGen.jl/favicon.ico"}]
+    ],
     plugins: [
         'flexsearch',
         'vuepress-plugin-element-tabs',
         'vuepress-plugin-smooth-scroll',
         '@vuepress/plugin-back-to-top',
         '@vuepress/active-header-links',
-        '@vuepress/plugin-nprogress',
+        'vuepress-plugin-nprogress',
+        //'@vuepress/plugin-nprogress',
         '@vuepress/medium-zoom',
         '@vuepress/last-updated',
         [
@@ -19,12 +25,25 @@ module.exports = {
                 '*': '\\times',
             },
         },
-      ]
+      ],
+      [
+        'vuepress-plugin-container',
+        {
+          type: 'right',
+          defaultTitle: '',
+        },
+      ],
+      [
+        'vuepress-plugin-container',
+        {
+          type: 'refbox',
+          before: info => `<div class="refbox"><p class="title">${info}</p>`,
+          after: '</div>',
+        },
+      ],
     ],
     themeConfig: {
         logo: '/images/logo_icon.png',
-        flexSearchOptions: {
-          },
         nav: [
             { text: 'Home', link: '/' },
             { text: 'About', link: '/getting_started/about' },
@@ -50,11 +69,11 @@ module.exports = {
             //collapsable: true, // optional, defaults to true
             sidebarDepth: 2,    // optional, defaults to 1
             children: [
-                '/guide/io/file_import',
-                '/guide/io/delimited',
-                '/guide/io/genepop',
-                '/guide/io/variantcall',
-                '/guide/io/datasets',
+                '/getting_started/io/file_import',
+                '/getting_started/io/delimited',
+                '/getting_started/io/genepop',
+                '/getting_started/io/variantcall',
+                '/getting_started/io/datasets',
             ]
         },
         {
@@ -77,11 +96,19 @@ module.exports = {
                 '/analyses/hardyweinberg',
                 '/analyses/relatedness',
             ]
+        },
+        {
+            title: 'API',
+            //collapsable: true,
+            //sidebarDepth: 1,
+            children: [
+                '/api/api'
+            ]
         }
         ],
         docsRepo: 'pdimens/popgen.jl',
         // if your docs are not at the root of the repo:
-        docsDir: 'docs',
+        //docsDir: '/docs/',
         // if your docs are in a specific branch (defaults to 'master'):
         docsBranch: 'gh-pages',
         // defaults to false, set to true to enable

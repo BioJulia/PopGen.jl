@@ -33,9 +33,6 @@ function chisq_locus(locus::T) where T <: GenotypeArray
     return (chisq_stat, df, p_val)
 end
 
-#TODO
-a = @where x.loci :locus == "contig_2784"
-a = a.columns.genotype |> collect
 
 """
     multitest_missing(pvals::Array{Float64,1}, correction::String)
@@ -58,7 +55,7 @@ positions. See MultipleTesting.jl docs for full more detailed information.
 - `"forward stop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` or `"b-c"` : Barber-Candès adjustment
 """
-@inline function multitest_missing(pvals::Vector{T}}, correction::String) where T <: Union{Missing, <:AbstractFloat}
+@inline function multitest_missing(pvals::Vector{T}, correction::String) where T <: Union{Missing, <:AbstractFloat}
     # get indices of where original missing are
     miss_idx = findall(i -> i === missing, pvals)
     # make seperate array for non-missing P vals
@@ -123,6 +120,8 @@ correction method for multiple testing.
     if !by_pop
         tmp = @groupby data.loci :locus {chisq = chisq_locus(:genotype)}
         @map tmp {:locus, chisq = getindex(:chisq, 1), df = getindex(:chisq, 2), P =  getindex(:chisq, 3)}
+        #if correction != "none"
+        #    @transform
     else
 
     end
@@ -155,7 +154,7 @@ function het_obstest(data::PopObj)
     return het_vals
 end
 
-
+#=
 @inline function hwe_test(data::PopData; by_pop::Bool = false, correction::String = "none")
     if !by_pop
         tmp = @groupby data.loci :locus {chisq = locus_chi_sq(:genotype)}
@@ -167,3 +166,4 @@ end
 
 jdb = hwe_test(x)
 df = by(y, :locus, :genotype => locus_chi_sq)
+=#

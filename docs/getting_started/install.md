@@ -12,15 +12,16 @@ Invoke the package manager with `]` in the REPL and use
 add "https://github.com/pdimens/PopGen.jl"
 ```
 
-![install](/images/install_repl.gif)
+![install](/PopGen.jl/images/install_repl.gif)
 :::
 ::: tab with Jupyter Notebooks or nteract
+
 ```julia
 using Pkg
 Pkg.add(PackageSpec(url="https://github.com/pdimens/PopGen.jl", rev="master"))
 ```
 
-![install](/images/install_jupyter.gif)
+![install](/PopGen.jl/images/install_jupyter.gif)
 :::
 ::::
 

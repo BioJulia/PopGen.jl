@@ -21,7 +21,7 @@ Functions need to be sensible, both in what they do and how they do it. This mea
 
 :::: tabs card stretch
 ::: tab Accessibility
-Documentation is everything! Julia is a comparatively young language and we *want* you to be comfortable using PopGen.jl. That means investing **a lot** of time into writing thorough documentation intended for users across a wide spectrum of proficiency. We also recognize that you (the reader) might not be very familiar with Julia, so we've written [a section](/guide/) on clarifying some Julia concepts/conventions that will make reading this documentation a whole lot clearer.
+Documentation is everything! Julia is a comparatively young language and we *want* you to be comfortable using PopGen.jl. That means investing **a lot** of time into writing thorough documentation intended for users across a wide spectrum of proficiency. We also recognize that you (the reader) might not be very familiar with Julia, so we've written [a section](/getting_started/julia_primer.md) on clarifying some Julia concepts/conventions that will make reading this documentation a whole lot clearer.
 :::
 ::::
 
@@ -29,7 +29,7 @@ Documentation is everything! Julia is a comparatively young language and we *wan
 
 #### Speed and syntax
 
-The speed is comparable to C when coded correctly. Also, has Python-like syntax with **optional** tabs. We are also fans of 1-indexing, but that's more of a perk. Not convinced? Check out our [comparison benchmarks](getting_started/comparison.md).
+The speed is comparable to C when coded correctly. Also, has Python-like syntax with **optional** tabs. We are also fans of 1-indexing, but that's more of a perk. Not convinced? Check out our [comparison benchmarks](/getting_started/comparison.md).
 
 #### A modern language for modern problems
 
@@ -37,12 +37,12 @@ Julia has native support for: parallelization, distributed computing, GPU proces
 
 #### Community & contribution
 
-Julia's internals solve what's know as the "two language problem". That is, languages that are easy to write in (e.g. Python, R, Ruby) are slow compared to languages that are more difficult to write in, which are fast (e.g. C, C++, Fortran). For languages that are easier to write in, many of the commonly used packages and functions in those languages are written in another, faster language under the hood for performance reasons. On the whole, that's not really a problem for end-users, because things work and they are easy to use. **But**, it does become a problem when you want to investigate the code and implementation of a function. This means that, even as an R power-user, you are kind of helpless to investigate the implementation of something you are using in R if it's actually written in C++ under the hood. In a sense, it makes the publications of those methods less reproducible, because the users of it may be familiar with the language it's deployed in (like R), but not the language it's written in, (like C++). What if there are bugs?! What if the code implementation doesn't match the formulations in the publication?! **Yikes!**
+Julia's internals attempt to solve what's known as the "two language problem". That is, languages that are easy to write in (e.g. Python, R, Ruby) are slow compared to languages that are more difficult to write in, which are fast (e.g. C, C++, Fortran). For languages that are easier to write in, many of the commonly used packages and functions in those languages are written in another, faster language under the hood for performance reasons. On the whole, that's not really a problem for end-users, because things work and they are easy to use. **But**, it does become a problem when you want to investigate the code and implementation of a function. This means that, even as an R power-user, you are kind of helpless to investigate the implementation of something you are using in R if it's actually written in C++ under the hood. In a sense, it makes the publications of those methods less reproducible, because the users of it may be familiar with the language it's deployed in (like R), but not the language it's written in, (like C++). What if there are bugs?! What if the code implementation doesn't match the formulations in the publication?! **Yikes!**
 
 So, if we write everything in Julia, and you use everything in Julia, users can themselves diagnose these things if they so choose. This means users can contribute to the overall health and accuracy of this package. Yes, that means that we might be getting more Issues opened up (*ugh*), but a bug found is a lot better than a bug overlooked!
 
-Like most Julia packages, PopGen.jl is written entirely in Julia, meaning the community using it need not learn another language if they wanted to contribute! Have you written a clever Julia function to calculate SAMOVA using `PopData`? Send us a pull request (please!)! Or [join the Slack!](community.md)
+Like most Julia packages, PopGen.jl is written entirely in Julia, meaning the community using it need not learn another language if they wanted to contribute! Have you written a clever Julia function to calculate SAMOVA using `PopData`? Send us a pull request (please!)! Or [join the Slack group!](https://join.slack.com/t/popgenjl/shared_invite/zt-deam65n8-DuBs2z1oDtsbBuRplJW~Pg)
 
 #### Package manager
 
-Which, let's be honest, is such a delight to use. [Installing PopGen.jl](getting_started/install.md) should be simple, consistent, and effortless thanks to the brilliant built-in package manager in Julia. 
+Which, let's be honest, is such a delight to use. [Installing PopGen.jl](/getting_started/install.md) should be simple, consistent, and effortless thanks to the brilliant built-in package manager in Julia. 
