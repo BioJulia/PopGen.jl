@@ -8,3 +8,5 @@ yarn.lock
 /docs/yarn-error.log
 /docs/yarn.lock
 /docs/.vuepress/dist
+package.json
+package-lock.json
