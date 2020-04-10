@@ -1,4 +1,4 @@
-![logo](docs/img/logo.png)
+![logo](docs/.vuepress/public/images/logo_banner.png)
 
 Population Genetics in Julia. This is a fork of `PopGen.jl` in `BioJulia` with the goal of merging with it.
 
