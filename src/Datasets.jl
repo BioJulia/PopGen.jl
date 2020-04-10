@@ -1,4 +1,22 @@
 ## test data available for use in PopGen
+export dataset, nancycats, gulfsharks
+
+"""
+    dataset(::String)
+Load an example dataset from either `"gulfsharks"` (SNP) or `"nancycats"` (microsatellite). Can also use `"sharks"` and `"cats"`
+as shorthands. Use `?nancycats` and `?gulfsharks` to learn more about
+these datasets.
+
+### Example
+```
+ncats = dataset("nancycats")
+gsharks = dataset("sharks")
+```
+"""
+function dataset(name::String)
+    lowercase(name) in ["gulfsharks", "sharks"] && return gulfsharks()
+    lowercase(name) in ["nancycats", "cats"] && return nancycats()
+end
 
 """
     nancycats()
@@ -7,13 +25,13 @@ the R package `adegenet`. This is microsatellite data of 9 loci in 237
 individuals across 17 populations.
 
 Example:
-
-`nancy = nancycats()`
+```
+ncats = nancycats()
+```
 """
 function nancycats()
     filename = normpath(joinpath(@__DIR__,"..","data", "data", "nancycats.gen"))
-    gen = genepop(filename,  digits = 2, popsep = "Pop", marker = "msat")
-    gen.samples.name = string.(collect(1:237))
+    gen = genepop(filename,  digits = 2, popsep = "Pop", silent = true)
     return gen
 end
 
@@ -26,7 +44,9 @@ individuals, across 7 populations.
 
 Example:
 
-`sharks = gulfsharks()`
+```
+sharks = gulfsharks()
+```
 """
 function gulfsharks()
     filename = normpath(joinpath(@__DIR__,"..","data", "data", "gulfsharks.gen"))
@@ -456,21 +476,24 @@ function gulfsharks()
             29.82344
             29.82344
             ]
-    data = genepop(filename)
-    data.samples.latitude = yloc ; data.samples.longitude = xloc
+    data = genepop(filename, silent = true)
+    locations!(data, lat = yloc, long = xloc)
+
+#    data.meta.columns.latitude = yloc ; data.meta.name.longitude = xloc
     renames = Dict(
-        1 => "Cape Canaveral",
-        2 => "Georgia",
-        3 => "South Carolina",
-        4 => "Florida Keys",
-        5 => "Mideast Gulf",
-        6 => "Northeast Gulf",
-        7 => "Southeast Gulf"
+        "1" => "Cape Canaveral",
+        "2" => "Georgia",
+        "3" => "South Carolina",
+        "4" => "Florida Keys",
+        "5" => "Mideast Gulf",
+        "6" => "Northeast Gulf",
+        "7" => "Southeast Gulf"
     )
-    # manually rename things so as to not trigger @info prompt in populations!()
     for eachkey in keys(renames)
-        replace!(data.samples.population, eachkey => renames[eachkey])
+        replace!(data.meta.columns.population, eachkey => renames[eachkey])
     end
+
+    recode!(data.loci.columns.population,renames...)
 
     return data
 end

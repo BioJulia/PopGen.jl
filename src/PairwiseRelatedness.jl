@@ -1,4 +1,6 @@
-#= Steps to finish:
+export relatedness, pairwise_relatedness, kinship
+
+#=TODO
 
     Solve dyadic optimization issues
         combined backtracking failure - need to isolate and find cause
@@ -233,6 +235,20 @@ function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = t
     # converge and/or use multiple random starts to confirm not a local maxima
 end
 
+# JuMP variant
+function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = true)
+    #Δ is what needs to be optimized
+    #consist of 9 values between 0 and 1 which must also sum to 1
+    #is then used to calculate relatedness
+
+    jacquard = Model(with_optimizer(ECOS.Optimizer))
+    @variable(jacquard, Δ[i=1:9])
+    @objective(jacquard, Max, sum(log(Pr_L_S * Δ)))
+    @constraint(jacquard, con, sum(Δ) == 1)
+    @constraint(jacquard, con_low, Δ .>= 0)
+    @constraint(jacquard, con_high, Δ .<= 1)
+
+end
 ## Calculate theta and r
 """
     relatedness_dyadicML(Δ::Array{Float64,2})

@@ -19,29 +19,34 @@ extra_javascript:
 nav:
 - Home: index.md
 - Getting started: 
-    A Julia primer: juliaprimer.md
-    How to Install: install.md
-    The PopGen 'PopObj':
-        What's a PopObj: popobj_type.md
-        Accessing parts of a PopObj: PopObj_accessing.md
-    Benchmarks: comparison.md
+    A Julia primer: getting_started/juliaprimer.md
+    How to Install: getting_started/install.md
+    PopData and Types:
+        PopData and PopObj: getting_started/popobj_type.md
+        Accessing parts of PopData: getting_started/accessing_popdata.md
+        Other Types: getting_started/other_types.md
+    Benchmarks: getting_started/comparison.md
 - Importing Data:
-    Example Data: example_data.md
-    Reading in Data: file_import.md
-    Delimited: delimited.md
-    Genepop: genepop.md
-    Variant Call Format: vcf.md
-- Manipulating a PopObj: commands.md
+    Datasets: io/datasets.md
+    Reading in Data: io/file_import.md
+    Delimited: io/delimited.md
+    Genepop: io/genepop.md
+    Variant Call Format: io/variantcall.md
+- Manipulating PopData: 
+    Getting Started: manipulate/manipulate.md
+    Viewing and Sorting: manipulate/view_and_sort.md
+    Remove Samples/Loci: manipulate/exclusion.md
+    Location and Population Data: manipulate/location_and_pop.md
 - Types of Analyses:
-    Hardy-Weinberg Equilibrium: hardyweinberg.md
-    Relatedness: relatedness.md
+    Hardy-Weinberg Equilibrium: analyses/hardyweinberg.md
+    Relatedness: analyses/relatedness.md
 - Community: community.md
 - Other:
     API:
-        Under the hood functions: hidden_api.md
-    Logo Graveyard: logo_graveyard.md
+        Under the hood functions: other/api/hidden_api.md
+    Logo Graveyard: other/logo_graveyard.md
     Misc:
-        Genepop IBD Conversion: genepopIBD.md
+        Genepop IBD Conversion: other/misc/genepopIBD.md
 
 markdown_extensions:
   - admonition

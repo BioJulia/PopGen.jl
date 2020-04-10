@@ -1,67 +1,85 @@
+export allele_table, allele_avg, richness, summary
 """
-    allele_avg(data::PopObj, rounding::Bool = true)
-Returns a NamedTuple of the average number of alleles ('avg') and standard
-deviation (`stdev`) of a `PopObj`. Use `false` as second argument (no keyword)
-to not round results. Default (`true`) rounds to 4 digits.
+    allele_table(data::PopData)
+Return a "tidy" IndexedTable of the loci, their alleles, and their alleles' frequencies.
 """
-function allele_avg(data::PopObj, rounding::Bool = true)
-    num_alleles = map(i -> Iterators.flatten(i |> skipmissing) |> collect |> unique |> length, eachcol(data.loci, false))
-    avg = mean(num_alleles)
-    sd = std(num_alleles)
-    if rounding == true
-        return (avg = round(avg, digits = 4), stdev = round(sd, digits = 4))
+@inline function allele_table(data::PopData)
+    tmp = @groupby data.loci :locus flatten = true {allele = unique_alleles(:genotype)}
+    frq = @groupby data.loci :locus flatten = true {freq = allele_freq(:genotype)}
+    transform(tmp, :frequency => frq.columns.freq)
+end
+
+
+"""
+    allele_avg(data::PopData, rounding::Bool = true)
+Returns a NamedTuple of the average number of alleles ('mean') and
+standard deviation (`stdev`) of a `PopData`. Use `rounding = false` to
+not round results. Default (`true`) roundsto 4 digits.
+"""
+function allele_avg(data::PopData; rounding::Bool = true, populations = false)
+    tmp = richness(data)
+    if !populations
+        if rounding
+            @with tmp {mean = round(mean(:richness), digits = 4), stdev = round(variation(:richness), digits = 4)}
+        else
+            @with tmp {mean = mean(:richness), stdev = variation(:richness)}
+        end
     else
-        return (avg = avg, stdev = sd)
+        if rounding
+            @groupby tmp (:locus, :population) {mean = mean(:richness), stdev = round(variation(:richness), digits = 4)}
+        else
+            @groupby tmp (:locus, :population) {mean = mean(:richness), stdev = variation(:richness)}
+        end
     end
 end
 
 
 """
-    richness(data::PopObj)
-Calculates various allelic richness and returns vector of per-locus allelic richness.
-To be called internally by functions calculating overall or per-population richness
-either rarefied or not.
+    richness(data::PopData)
+Calculates various allelic richness and returns a table of per-locus
+allelic richness. Use `populations = true` to calculate richness by
+locus by population.
 """
-function richness(data::PopObj)
-    # collapse genotypes into array of alleles |> count number of unique alleles
-    rich = map(eachcol(data.loci, false)) do i
-        Iterators.flatten(i |> skipmissing) |> collect |> unique |> length
+function richness(data::PopData; populations::Bool = false)
+    if !populations
+        @groupby data.loci :locus {richness = length(unique_alleles(:genotype))}
+    else
+        @groupby data.loci (:locus, :population) {richness =  length(unique_alleles(:genotype))}
     end
-    return DataFrame(locus = names(data.loci), richness = rich)
 end
 
 
 """
-    summary(data::PopObj)
-Prints a summary of the information contained in a PopObj
+    summary(data::PopData)
+Prints a summary of the information contained in a PopData
 """
-function Base.summary(data::PopObj)
-
-    println(" Object of type PopObj")
-    if typeof(skipmissing(data.loci[!, :1])[1][1]) == Int16
+function Base.summary(data::PopData)
+    println("PopData Object")
+    if occursin("Int16", string(eltype(data.loci.columns.genotype)))
         marker = "Microsatellite"
     else
         marker = "SNP"
     end
-    println(" Marker type: ", marker)
-    ploidy = unique(data.samples.ploidy) |> sort
-    length(ploidy) == 1 && println(" Ploidy: ", ploidy |> join)
-    if length(ploidy) != 1
-        print(" Ploidy (varies): ")
+    print("  Marker type: "); printstyled(marker, "\n", bold = true)
+    ploidy = unique(data.meta.columns.ploidy) |> sort
+    if length(ploidy) == 1
+        print("  Ploidy: ") ; printstyled(ploidy |> join, "\n", bold = true)
+    else
+        print("  Ploidy (varies): ")
         print(ploidy[1]), [print(", $i") for i in ploidy[2:end]]
     end
-    println("\n Number of individuals: ", length(data.samples.name))
-    println(" Number of loci: ", size(data.loci,2))
-    if ismissing.(data.samples.longitude) |> all == true
-        print(" Longitude:") ; printstyled(" absent\n", color = :yellow)
+    print("  Number of individuals: ") ; printstyled(length(data.meta.columns.name), "\n", bold = true)
+    print("  Number of loci: ") ; printstyled(length(levels(data.loci.columns.locus)), "\n", bold = true)
+    print("  Populations: ") ; printstyled(length(unique(data.meta.columns.population)), "\n", bold = true)
+
+    if ismissing.(data.meta.columns.longitude) |> all == true
+        print("  Longitude:") ; printstyled(" absent\n", color = :yellow)
     else
-        println(" Longitude: present with ", count(i -> i === missing, data.samples.longitude), " missing")
+        println("  Longitude: present with ", count(i -> i === missing, data.meta.columns.longitude), " missing")
     end
-    if ismissing.(data.samples.longitude) |> all == true
-        print(" Latitude:") ; printstyled(" absent\n", color = :yellow)
+    if ismissing.(data.meta.columns.longitude) |> all == true
+        print("  Latitude:") ; printstyled(" absent\n", color = :yellow)
     else
-        println(" Latitude: present with ", count(i -> i === missing, data.samples.latitude), " missing")
+        println("  Latitude: present with ", count(i -> i === missing, data.meta.columns.latitude), " missing")
     end
-    print("\n Population names and counts:")
-    DataFrames.show(populations(data), summary = false, rowlabel = :num, allrows = true)
 end

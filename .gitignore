@@ -1,7 +1,10 @@
 .DS_Store
 /Manifest.toml
 /dev/
-/docs/build/
-/docs/site/
-site/
+/node_modules/
 /src/playtest/
+yarn-error.log
+yarn.lock
+/docs/yarn-error.log
+/docs/yarn.lock
+/docs/.vuepress/dist
