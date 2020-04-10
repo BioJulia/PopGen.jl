@@ -61,7 +61,7 @@ Unit: seconds
 
 ![import plot](/PopGen.jl/images/speedplot.png)
 
-Comparing averages, PopGen.jl clocks in at `1.049s` versus adegenet's `6.745s` , so ~6.4x faster.
+Comparing averages, PopGen.jl clocks in at `1.445s` versus adegenet's `6.745s` , so ~6.4x faster.
 
 
 
@@ -113,4 +113,4 @@ Unit: seconds
 
 ![chi squared plot](/PopGen.jl/images/chisqplot.png)
 
-Comparing averages, PopGen.jl clocks in at ~`580ms` versus adegenet's `6.3s`, so ~15x faster. 
+Comparing averages, PopGen.jl clocks in at ~`580ms` versus adegenet's `6.3s`, so ~11x faster. 
