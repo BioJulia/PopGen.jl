@@ -1,4 +1,4 @@
-#export ishom, ishet, heterozygosity, het
+export ishom, ishet, heterozygosity, het
 
 """
 ```
@@ -73,18 +73,10 @@ end
 
 
 """
-    het_expected(data::PopData)
-    Returns the expected heterozygosity of loci in a PopData object.
-"""
-function het_expected(data::PopData)
-    tmp = @groupby data.loci (:locus, :population) {het_exp = hetero_e(:genotype)}
-    @groupby tmp :loci {het_exp = mean(:het_exp |> skipmissing)}
-end
-
-
-"""
     heterozygosity(data::PopData, mode::String = "locus")
-Calculate observed and expected heterozygosity in a `PopData` object.
+Calculate observed and expected heterozygosity in a `PopData` object. For loci,
+heterozygosity is calculated in the Nei fashion, such that heterozygosity is
+calculated as the average over heterozygosity per locus per population.
 ### Modes
 - `"locus"` or `"loci"` : heterozygosity per locus (default)
 - `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
@@ -94,23 +86,21 @@ heterozygosity(nancycats(), "population" )
 """
 function heterozygosity(data::PopData, mode::String = "locus")
     if mode ∈ ["locus", "loci"]
-        tmp = @groupby data.loci (:locus, :population) {het_obs = hetero_o(:genotype), het_exp = hetero_e(:genotype)}
-        return @groupby tmp :loci {het_obs = mean(:het_obs |> skipmissing), het_exp = mean(:het_exp |> skipmissing)}
+        tmp = @groupby data.loci (:locus, :population) {het_pop_obs = hetero_o(:genotype), het_pop_exp = hetero_e(:genotype)}
+        @groupby tmp :locus {het_obs = mean(skipmissing(:het_pop_obs)), het_exp = mean(skipmissing(:het_pop_exp))}
 
     elseif lowercase(mode) ∈  ["sample", "ind", "individual"]
         return @groupby data.loci :name {het_obs = hetero_o(:genotype)}
 
     elseif lowercase(mode) ∈  ["pop", "population"]
-        #TODO fix this
-        return @groupby data.loci :population {het_obs = hetero_o(:genotype), het_exp = hetero_e(allele_freq_vec(:genotype))}
+        return @groupby data.loci :population {het_obs = hetero_o(:genotype), het_exp = hetero_e(:genotype)}
+
     else
         error("please specify mode \"locus\", \"sample\", or \"population\"")
     end
 end
 
 const het = heterozygosity
-const He = heterozygosity
-
 
 """
     het_sample(data::PopData, individual::String)
@@ -120,26 +110,7 @@ Returns an array of heterozygosity values.
 function het_sample(data::PopData, individual::String)
     # calculate observed heterozygosity for an individual
     @apply data.loci begin
-        @where data.loci :name == individual
-        @with {het = hetero_o(:genotype)}
+        @where :name == individual
+        @with hetero_o(:genotype)
     end
-end
-
-
-
-#const hwe = hwe_test
-
-#TODO
-
-"""
-Heterozygosity with uneven population size adjustments
-"""
-function het_ot(data::PopData)
-    tmp = @groupby data.loci (:locus, :population) {het_pop_obs = hetero_o(:genotype)}
-    @groupby tmp :locus {het_obs = mean(skipmissing(:het_pop_obs))}
-end
-
-
-function het_ott(data::PopData)
-    @groupby data.loci :locus {het_obs = hetero_o(:genotype)}
 end

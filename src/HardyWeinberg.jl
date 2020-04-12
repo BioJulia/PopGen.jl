@@ -131,4 +131,4 @@ adjustment method for multiple testing.
     end
 end
 
-const hwe = hwe_test()
+const hwe = hwe_test
