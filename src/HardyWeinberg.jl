@@ -47,17 +47,18 @@ positions. See MultipleTesting.jl docs for full more detailed information.
 - `"bonferroni"` : Bonferroni adjustment
 - `"holm"` : Holm adjustment
 - `"hochberg"` : Hochberg adjustment
-- `"bh"` or `"b-h"` : Benjamini-Hochberg adjustment
-- `"by"` or `"b-y"`: Benjamini-Yekutieli adjustment
-- `"bl"` or `"b-l"` : Benjamini-Liu adjustment
+- `"bh"` : Benjamini-Hochberg adjustment
+- `"by"` : Benjamini-Yekutieli adjustment
+- `"bl"` : Benjamini-Liu adjustment
 - `"hommel"` : Hommel adjustment
 - `"sidak"` : Šidák adjustment
 - `"forward stop"` or `"fs"` : Forward-Stop adjustment
-- `"bc"` or `"b-c"` : Barber-Candès adjustment
+- `"bc"` : Barber-Candès adjustment
 """
 @inline function multitest_missing(pvals::Vector{T}, correction::String) where T <: Union{Missing, <:AbstractFloat}
     # get indices of where original missing are
     miss_idx = findall(i -> i === missing, pvals)
+
     # make seperate array for non-missing P vals
     p_no_miss = skipmissing(pvals) |> collect
 
@@ -67,17 +68,13 @@ positions. See MultipleTesting.jl docs for full more detailed information.
         "holm" => Holm(),
         "hochberg" => Hochberg(),
         "bh" => BenjaminiHochberg(),
-        "b-h" => BenjaminiHochberg(),
         "by" => BenjaminiYekutieli(),
-        "b-y" => BenjaminiYekutieli(),
         "bl" => BenjaminiLiu(),
-        "b-l" => BenjaminiLiu(),
         "hommel" => Hommel(),
         "sidak" => Sidak(),
         "forward stop" => ForwardStop(),
         "fs" => ForwardStop(),
         "bc" => BarberCandes(),
-        "b-c" => BarberCandes(),
     )
 
     correct = adjust(p_no_miss, d[lowercase(correction)]) |> Vector{Union{Missing, Float64}}
@@ -97,7 +94,7 @@ expected heterozygosity with chi-squared, degrees of freedom and p-values for
 each locus. Use `by_pop = true` to perform this separately for each population
 (default: by_pop = false) and return a NamedTuple of DataFrames with the names
 corresponding to the population names. Use `correction =` to specify a P-value
-correction method for multiple testing.
+adjustment method for multiple testing.
 
 #### example
 `hwe_test(gulfsharks(), correction = "bh")` \n
@@ -108,62 +105,30 @@ correction method for multiple testing.
 - `"bonferroni"` : Bonferroni adjustment
 - `"holm"` : Holm adjustment
 - `"hochberg"` : Hochberg adjustment
-- `"bh"` or `"b-h"` : Benjamini-Hochberg adjustment
-- `"by"` or `"b-y"`: Benjamini-Yekutieli adjustment
-- `"bl"` or `"b-l"` : Benjamini-Liu adjustment
+- `"bh"` : Benjamini-Hochberg adjustment
+- `"by"` : Benjamini-Yekutieli adjustment
+- `"bl"`  : Benjamini-Liu adjustment
 - `"hommel"` : Hommel adjustment
 - `"sidak"` : Šidák adjustment
 - `"forward stop"` or `"fs"` : Forward-Stop adjustment
-- `"bc"` or `"b-c"` : Barber-Candès adjustment
+- `"bc"` : Barber-Candès adjustment
 """
 @inline function hwe_test(data::PopData; by_pop::Bool = false, correction::String = "none")
     if !by_pop
         tmp = @groupby data.loci :locus {chisq = chisq_locus(:genotype)}
-        @map tmp {:locus, chisq = getindex(:chisq, 1), df = getindex(:chisq, 2), P =  getindex(:chisq, 3)}
-        #if correction != "none"
-        #    @transform
+        out_table = @map tmp {:locus, chisq = getindex(:chisq, 1), df = getindex(:chisq, 2), P =  getindex(:chisq, 3)}
     else
-
+        tmp = @groupby data.loci (:locus, :population) {chisq = chisq_locus(:genotype)}
+        out_table = @map tmp {:locus, :population, chisq = getindex(:chisq, 1), df = getindex(:chisq, 2), P =  getindex(:chisq, 3)}
     end
-end
-
-const hwe = hwe_test
-
-## JASON LOOK AT ME PLEEEEEASE
-
-function het_obstest(data::PopObj)
-    het_vals = Vector{Float64}()
-    for locus in eachcol(data.loci, false)
-        # get genotype freqs at locus
-        a = geno_freq(locus)
-        tmp = 0
-        # total number of non-missing samples per locus
-        n = skipmissing(locus) |> collect |> length
-        genos = keys(a) |> collect
-        for geno in genos
-            if length(unique(geno)) != 1
-                # if true, add freq to total in tmp
-                tmp += a[geno]
-            end
-        end
-        # include het correction
-        het_adjust = tmp * (n/ (n-1))
-        push!(het_vals, het_adjust)
-    end
-
-    return het_vals
-end
-
-#=
-@inline function hwe_test(data::PopData; by_pop::Bool = false, correction::String = "none")
-    if !by_pop
-        tmp = @groupby data.loci :locus {chisq = locus_chi_sq(:genotype)}
-        @map tmp {:locus, chisq = getindex(:chisq,1), df = getindex(:chisq,2), P =  getindex(:chisq,3)}
+    if correction == "none"
+        return out_table
     else
-
+        # remove any spaces from the corection method and create the adjustment columname
+        # the whitespace removal is really just for "forward stop"
+        column_name = Symbol("P_"*filter(i -> !isspace(i), correction))
+        transform(out_table, column_name => multitest_missing(out_table.columns.P, correction))
     end
 end
 
-jdb = hwe_test(x)
-df = by(y, :locus, :genotype => locus_chi_sq)
-=#
+const hwe = hwe_test()
