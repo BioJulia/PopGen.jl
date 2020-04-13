@@ -3,11 +3,6 @@ module.exports = {
     //theme: 'vuepress-theme-cool',
     title: 'PopGen.jl',
     description: 'Population Genetics in Julia',
-    head: [
-        ['link', { rel: "apple-touch-icon", sizes: "180x180", href: "PopGen.jl/images/logo_icon.png"}],
-        ['link', { rel: "icon", type: "image/png", sizes: "32x32", href: "PopGen.jl/favicon.ico"}],
-        ['link', { rel: "icon", type: "image/png", sizes: "16x16", href: "PopGen.jl/favicon.ico"}]
-    ],
     plugins: [
         'flexsearch',
         'vuepress-plugin-element-tabs',
@@ -102,10 +97,10 @@ module.exports = {
             //collapsable: true,
             //sidebarDepth: 1,
             children: [
-                '/api/api'
+                '/api/API'
             ]
-        }
-        ],
+        },
+    ],
         docsRepo: 'pdimens/popgen.jl',
         // if your docs are not at the root of the repo:
         //docsDir: '/docs/',

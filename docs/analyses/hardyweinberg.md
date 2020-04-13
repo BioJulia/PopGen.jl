@@ -50,7 +50,7 @@ Calculate chi-squared test of HWE for each locus and returns observed and expect
 ::: tab HWE Chi-Squared
 
 ```
-hwe_test(gulfsharks())
+julia> hwe_test(gulfsharks())
 Table with 2213 rows, 4 columns:
 locus           chisq      df  P
 ───────────────────────────────────────
@@ -167,12 +167,14 @@ locus    population  chisq    df  P
 "fca37"  "8"         33.5111  21  0.0408481
 ```
 
-### Visualizing the resutls
-While not strictly necessary, it might sometimes make sense to make of heatmap of the results for easier visualization. This is feasible for the `nancycats` data, but when loci are in the hundreds or thousands, this method quickly becomes counterproductive. In any case, here is a simple example of the HWE results for `nancycats` plotted as a heatmap using [VegaLite.jl](https://github.com/queryverse/VegaLite.jl):
+### Visualizing the results
+While not strictly necessary, it might sometimes make sense to generate of heatmap of the results for easier visualization. This is feasible for the `nancycats` data, but when loci are in the hundreds or thousands, this method quickly becomes counterproductive. In any case, here is a simple example of the HWE results for `nancycats` plotted as a heatmap using [VegaLite.jl](https://github.com/queryverse/VegaLite.jl):
 ```julia
-julia> ncats_hwe = hwe_test(x ,by_pop = true, correction = "bonferroni");
+using VegaLite
+
+julia> ncats_hwe = hwe_test(nancycats() ,by_pop = true, correction = "bonferroni");
 
 julia> ncats |> @vlplot(:rect, :locus, :population, color=:P_bonferroni)
 ```
-![hwe_test](PopGen.jl/images/hwe_test.png)
+![hwe_test](/PopGen.jl/images/hwe_test.png)
 
