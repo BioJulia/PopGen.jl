@@ -512,7 +512,7 @@ const omit_loci = exclude_loci
 const remove_loci = exclude_loci
 
 """
-    exclude_samples!(data::PopData, samp_id::Union{Vector{String}})
+    exclude_samples(data::PopData, samp_id::Union{Vector{String}})
 Exclude selected samples from a `PopData` object. Returns a new `PopData` object,
 leaving the original intact. Synonymous with `omit_samples` and `remove_samples`.
 
