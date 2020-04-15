@@ -86,14 +86,14 @@ heterozygosity(nancycats(), "population" )
 """
 function heterozygosity(data::PopData, mode::String = "locus")
     if mode ∈ ["locus", "loci"]
-        tmp = @groupby data.loci (:locus, :population) {het_pop_obs = hetero_o(:genotype), het_pop_exp = hetero_e(:genotype)}
-        @groupby tmp :locus {het_obs = mean(skipmissing(:het_pop_obs)), het_exp = mean(skipmissing(:het_pop_exp))}
+        tmp = @groupby data.loci (:locus, :population) {n_tmp = get_N(:genotype), het_pop_obs = hetero_o(:genotype), het_pop_exp = hetero_e(:genotype)}
+        @groupby tmp :locus {n = sum(:n_tmp), het_obs = mean(skipmissing(:het_pop_obs)), het_exp = mean(skipmissing(:het_pop_exp))}
 
     elseif lowercase(mode) ∈  ["sample", "ind", "individual"]
-        return @groupby data.loci :name {het_obs = hetero_o(:genotype)}
+        return @groupby data.loci :name {n = get_N(:genotype), het_obs = hetero_o(:genotype)}
 
     elseif lowercase(mode) ∈  ["pop", "population"]
-        return @groupby data.loci :population {het_obs = hetero_o(:genotype), het_exp = hetero_e(:genotype)}
+        return @groupby data.loci :population {n = get_N(:genotype), het_obs = hetero_o(:genotype), het_exp = hetero_e(:genotype)}
 
     else
         error("please specify mode \"locus\", \"sample\", or \"population\"")

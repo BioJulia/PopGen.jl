@@ -38,7 +38,10 @@ module.exports = {
       ],
     ],
     themeConfig: {
-        logo: '/images/logo_icon.png',
+        algolia: {
+            apiKey: '<API_KEY>',
+            indexName: 'vuepress'
+          },
         nav: [
             { text: 'Home', link: '/' },
             { text: 'About', link: '/getting_started/about' },

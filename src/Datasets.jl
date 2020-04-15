@@ -31,7 +31,7 @@ ncats = nancycats()
 """
 function nancycats()
     filename = normpath(joinpath(@__DIR__,"..","data", "data", "nancycats.gen"))
-    gen = genepop(filename,  digits = 2, popsep = "Pop", silent = true)
+    gen = genepop(filename,  digits = 3, popsep = "POP", silent = true)
     return gen
 end
 

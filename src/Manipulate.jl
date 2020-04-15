@@ -295,19 +295,19 @@ missing(gulfsharks(), mode = "pop")
 @inline function Base.missing(data::PopData; mode::String = "sample")
     if mode == "sample" || mode == "individual"
 
-        return @groupby data.loci :name {missing = sum(ismissing.(:genotype))}
+        return @groupby data.loci :name {missing = count(ismissing,:genotype)}
 
     elseif mode == "pop" || mode == "population"
 
-        return @groupby data.loci :population {missing = sum(ismissing.(:genotype))}
+        return @groupby data.loci :population {missing = count(ismissing, :genotype)}
 
     elseif mode == "locus" || mode == "loci"
 
-        return @groupby data.loci :locus {missing = sum(ismissing.(:genotype))}
+        return @groupby data.loci :locus {missing = count(ismissing, :genotype)}
 
     elseif mode == "detailed" || mode == "full"
 
-        return @groupby data.loci (:locus, :population) {missing = sum(ismissing.(:genotype))}
+        return @groupby data.loci (:locus, :population) {missing = count(ismissing, :genotype)}
 
     else
         @error "Mode \"$mode\" not recognized. Please specify one of: sample, pop, locus, or full"
@@ -463,7 +463,7 @@ Re-index and sort the `loci` table of a `PopData` object by column
 sharks = gulfsharks()
 reindex(sharks, :population)
 """
-function JuliaDB.reindex(data::PopData, col::Union{String, Symbol})
+function IndexedTables.reindex(data::PopData, col::Union{String, Symbol})
     if typeof(col) == String
         col = Symbol(col)
     end

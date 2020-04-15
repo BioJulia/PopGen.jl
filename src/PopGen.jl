@@ -6,8 +6,7 @@ module PopGen
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-using CategoricalArrays, CSV, Distributions, JuliaDB, JuliaDBMeta, MultipleTesting, Random, StatsBase
-#import IndexedTables: reindex
+using CategoricalArrays, CSV, Distributions, IndexedTables, JuliaDBMeta, MultipleTesting, Random, StatsBase
 
 #=
 using Convex,
@@ -40,6 +39,8 @@ include("io/Delimited.jl")
 include("io/Genepop.jl")
 include("io/Read.jl")
 #include("io/VariantCall.jl")
+# utility functions
+include("Utils.jl")
 # example data
 include("Datasets.jl")
 # manipulation commands
