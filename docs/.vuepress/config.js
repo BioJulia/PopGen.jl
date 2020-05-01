@@ -1,16 +1,12 @@
 module.exports = {
     base: '/PopGen.jl/',
-    //theme: 'vuepress-theme-cool',
     title: 'PopGen.jl',
     description: 'Population Genetics in Julia',
     plugins: [
-        'flexsearch',
         'vuepress-plugin-element-tabs',
         'vuepress-plugin-smooth-scroll',
         '@vuepress/plugin-back-to-top',
         '@vuepress/active-header-links',
-        'vuepress-plugin-nprogress',
-        //'@vuepress/plugin-nprogress',
         '@vuepress/medium-zoom',
         '@vuepress/last-updated',
         [
@@ -39,8 +35,8 @@ module.exports = {
     ],
     themeConfig: {
         algolia: {
-            apiKey: '<API_KEY>',
-            indexName: 'vuepress'
+            apiKey: 'f6d1b3005e55708c6b33b80157908b05',
+            indexName: 'popgen_jl'
           },
         nav: [
             { text: 'Home', link: '/' },
@@ -76,8 +72,6 @@ module.exports = {
         },
         {
             title: 'Tutorials',
-            //collapsable: true,
-            //sidebarDepth: 1,
             children: [
                 '/tutorials/manipulate',
                 '/tutorials/accessing_popdata',
@@ -88,8 +82,6 @@ module.exports = {
         },
         {
             title: 'Analyses',
-            //collapsable: true,
-            //sidebarDepth: 1,
             children: [
                 '/analyses/hardyweinberg',
                 '/analyses/relatedness',
@@ -97,8 +89,6 @@ module.exports = {
         },
         {
             title: 'API',
-            //collapsable: true,
-            //sidebarDepth: 1,
             children: [
                 '/api/API'
             ]

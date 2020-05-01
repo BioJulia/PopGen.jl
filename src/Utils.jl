@@ -1,11 +1,21 @@
 # TODO add to API docs
 """
-    get_N(vec::T) where T<:AbstractArray
+    nonmissing(vec::T) where T<:AbstractArray
 Convenience function to count the number of non-`missing` values
 in a vector.
 """
-function get_N(vec::T) where T<:AbstractArray
+function nonmissing(vec::T) where T<:AbstractArray
     count(!ismissing, vec)
+end
+
+# TODO add to API docs
+"""
+    reciprocal(num::T) where T <: Signed
+Returns the reciprocal (1/number) of a number. Will return `0` when
+the number is `0` instead of returning `Inf`.
+"""
+function reciprocal(num::T) where T <: Real
+    num != 0 ? 1/num : 0
 end
 
 

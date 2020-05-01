@@ -165,7 +165,7 @@ function genepop(
         population = categorical(popid_array, true),
         locus = categorical(loci, true),
         genotype = genotype,
-    ))
+    ), pkey = :locus)
 
     # make sure levels are sorted by order of appearance
     levels!(loci_table.columns.locus, unique(loci_table.columns.locus))
@@ -188,7 +188,7 @@ function genepop(
         longitude =
                 fill(missing, length(levels(loci_table.columns.name))) |>
                 Vector{Union{Missing,Float32}},
-    ))
+    ), pkey= :population)
 
     PopData(sample_table, loci_table)
 end

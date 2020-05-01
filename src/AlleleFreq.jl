@@ -72,6 +72,26 @@ function allele_freq(data::PopData, locus::String, population::Bool=false)
     end
 end
 
+#TODO add to docs (API)
+"""
+    allele_freq(allele::Int, genos::T) where T<:GenotypeArray
+Return the frequency of an `allele` from a vector of `genotypes`
+
+### Example
+```
+using JuliaDBMeta
+ncats = nancycats();
+ncats_sub = @where ncats.loci :locus =="fca23"
+@apply ncats.loci begin
+    @where :locus == "fca23"
+    @groupby :population {freq = allele_freq(146, :genotype)}
+end
+```
+"""
+
+function allele_freq(allele::Int, genos::T) where T<:GenotypeArray
+    count(allele .== Base.Iterators.flatten(genos))/(2*nonmissing(genos))
+end
 
 """
     geno_count_observed(locus::T) where T<:GenotypeArray

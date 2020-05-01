@@ -112,7 +112,7 @@ function delimited(
         population = categorical(popid_loci, true),
         locus = categorical(loci, true),
         genotype = genotype
-    ))
+    ), pkey = :locus)
 
     # make sure levels are sorted by order of appearance
     levels!(loci_table.columns.locus, unique(loci_table.columns.locus))
@@ -129,7 +129,7 @@ function delimited(
         ploidy = ploidy,
         longitude = replace(long_array, 0.0 => missing),
         latitude = replace(lat_array, 0.0 => missing)
-    ))
+    ), pkey = :population)
 
         return PopData(sample_table, loci_table)
 end
