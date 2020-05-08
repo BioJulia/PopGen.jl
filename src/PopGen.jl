@@ -6,7 +6,7 @@ module PopGen
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-using CategoricalArrays, CSV, Distributions, IndexedTables, JuliaDBMeta, LoopVectorization, MultipleTesting, Random, StatsBase
+using CategoricalArrays, CSV, Distributions, JuliaDB, JuliaDBMeta, LoopVectorization, MultipleTesting, Random, StatsBase
 
 #=
 using Convex,
