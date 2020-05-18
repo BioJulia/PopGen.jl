@@ -52,6 +52,6 @@ const GenotypeArray = AbstractVector{S} where S<:Union{Missing,Genotype}
 
 
 # pretty printing of CategoricalStrings
-function Base.show(io::IO, cat_st::T) where T<:CategoricalString
+function Base.show(io::IO, cat_st::T) where T<:CategoricalValue{String, R} where R<:Unsigned
     print(io, "\"$(cat_st)\"")
 end

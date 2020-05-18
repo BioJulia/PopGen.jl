@@ -463,7 +463,7 @@ Re-index and sort the `loci` table of a `PopData` object by column
 sharks = gulfsharks()
 reindex(sharks, :population)
 """
-function IndexedTables.reindex(data::PopData, col::Union{String, Symbol})
+function JuliaDB.reindex(data::PopData, col::Union{String, Symbol})
     if typeof(col) == String
         col = Symbol(col)
     end

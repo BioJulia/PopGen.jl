@@ -1,45 +1,4 @@
-export genepop
-
-"""
-    genepop(infile::String; kwargs...)
-Load a Genepop format file into memory as a PopData object.
-- `infile::String` : path to Genepop file
-
-### Keyword Arguments
-- `digits::Integer`: number of digits denoting each allele (default: `3`)
-- `popsep::String` : word that separates populations in `infile` (default: "POP")
-- `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
-- `silent::Bool`   : whether to print file information during import (default: `true`)
-
-### File must follow standard Genepop formatting:
-- First line is a comment (and skipped)
-- Loci are listed after first line as one-per-line without commas or in single comma-separated row
-- A line with a particular keyword (default `POP`) must delimit populations
-- Sample name is immediately followed by a *comma*
-- File is *tab or space delimted* (but not both!)
-
-### Genepop file example:
-wasp_hive.gen: Wasp populations in New York \n
-Locus1\n
-Locus2\n
-Locus3\n
-pop\n
-Oneida_01,  250230  564568  110100\n
-Oneida_02,  252238  568558  100120\n
-Oneida_03,  254230  564558  090100\n
-pop\n
-Newcomb_01, 254230  564558  080100\n
-Newcomb_02, 000230  564558  090080\n
-Newcomb_03, 254230  000000  090100\n
-Newcomb_04, 254230  564000  090120\n
-
-## Example
-```
-waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
-```
-
-"""
-function genepop(
+function genepop_debug(
     infile::String;
     digits::Int = 3,
     popsep::String = "POP",
@@ -101,7 +60,7 @@ function genepop(
     end
 
     if !silent
-        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nloci format: $(format)\n$(sum(popcounts)) samples detected\n$(length(locinames)) loci detected"
+        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nloci formatting: $(format)\n$(sum(popcounts)) samples detected\n$(length(locinames)) loci detected"
     end
 
     # load in samples and genotypes
@@ -160,13 +119,8 @@ function genepop(
         ] |> Base.Iterators.flatten |> collect
 
     # add population names to genotype table
-    loci_table = table((
-        name = categorical(name, compress = true),
-        population = categorical(popid_array, compress = true),
-        locus = categorical(loci, compress = true),
-        genotype = genotype,
-    ), pkey = :locus)
-
+    #=
+    return debug_snoop
     # make sure levels are sorted by order of appearance
     levels!(loci_table.columns.locus, unique(loci_table.columns.locus))
     levels!(loci_table.columns.name, unique(loci_table.columns.name))
@@ -191,4 +145,5 @@ function genepop(
     ), pkey= :population)
 
     PopData(sample_table, loci_table)
+    =#
 end

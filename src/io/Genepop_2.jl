@@ -37,9 +37,11 @@ Newcomb_04, 254230  564000  090120\n
 ```
 waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
 ```
-
 """
-function genepop(
+
+infile = "data/data/gulfsharks.gen"
+
+function genepop2(
     infile::String;
     digits::Int = 3,
     popsep::String = "POP",
@@ -84,8 +86,8 @@ function genepop(
         # second line should have all the loci
         locus_name_raw = readline(gpop) ; close(gpop)
         locinames = strip.(split(locus_name_raw |> join, ","))
-        map(i -> replace!(i, "." => "_"), locinames)
-        format = "vertical"
+        categorical(map(i -> replace!(i, "." => "_"), locinames), compress = true)
+        horizontal = true
     else
         #standard  vertical formatting
         locinames = CSV.read(
@@ -96,69 +98,45 @@ function genepop(
             limit = pop_idx[1] - 2,
             type = String,
         )
-        locinames = String.(locinames.Column1)
-        format = "horizontal"
+        locinames = categorical(locinames.Column1, compress = true)
+        horizontal = false
     end
 
     if !silent
-        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nloci format: $(format)\n$(sum(popcounts)) samples detected\n$(length(locinames)) loci detected"
+        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nhorizontal formatting: $(horizontal)\n$(sum(popcounts)) samples detected\n$(length(locinames)) loci detected"
     end
 
     # load in samples and genotypes
     coln = append!(["name"], locinames)
-    if diploid == true
-        geno_parse = CSV.File(
-            infile,
-            delim = delim,
-            header = coln,
-            datarow = pop_idx[1] + 1,
-            comment = popsep,
-        )
-    else
-        geno_parse = CSV.File(
-            infile,
-            delim = delim,
-            header = coln,
-            datarow = pop_idx[1] + 1,
-            comment = popsep,
-            type = String,
-        )
-    end
+    geno_parse = CSV.read(
+        infile,
+        delim = delim,
+        header = coln,
+        datarow = pop_idx[1] + 1,
+        comment = popsep,
+        type = String
+    )
 
-    geno_type = determine_marker(infile, geno_parse, digits)
-
-    # initiate with empty vectors for samplename, locus, and geno
-    name = Vector{String}()
-    loci = Vector{String}()
-    if diploid == true
-        geno_raw = Vector{Int32}()
-    else
-        geno_raw = Vector{String}()
-    end
-
-    @inbounds for samplerow in geno_parse
-        vals = values(samplerow)
-        corr_name = replace(vals[1], "," => "")
-        append!(name, fill(corr_name, length(locinames)))
-        append!(loci, locinames)
-        append!(geno_raw, vals[2:end])
-    end
-
-    ## phase the genotypes
-    if diploid == true
-        genotype = map(i -> phase_dip.(i, geno_type, digits), geno_raw)
-    else
-        genotype = map(i -> phase.(i, geno_type, digits), geno_raw)
-    end
-
-    ## create population vector for loci table
     popnames = string.(collect(1:length(popcounts)))
-    popid_array =
-        [
-            fill(i, j)
-            for (i, j) in zip(popnames, popcounts .* length(locinames))
-        ] |> Base.Iterators.flatten |> collect
+    popnames = fill.(popnames,popcounts) |> Base.Iterators.flatten |> collect
+    insertcols!(geno_parse, 2, :population => categorical(popnames, compress = true))
+    geno_parse = DataFrames.stack(geno_parse, DataFrames.Not([:name, :population]))
+    geno_parse.name = categorical(map(i -> replace(i, "," => ""), geno_parse.name), compress = true)
 
+    #geno_type = determine_marker(infile, geno_parse, digits)
+    geno_type = Int8
+    geno_parse.value = map(i -> phase.(i, geno_type, digits), geno_parse.value)
+    return geno_parse
+    #=
+    loci_table = table(
+                    (name = geno_parse.name,
+                    population = geno_parse.population,
+                    locus = geno_parse.variable,
+                    genotype = geno_parse.value),
+                    pkey = [:name, :population]
+                )
+
+                =#    #=
     # add population names to genotype table
     loci_table = table((
         name = categorical(name, compress = true),
@@ -191,4 +169,5 @@ function genepop(
     ), pkey= :population)
 
     PopData(sample_table, loci_table)
+=#
 end
