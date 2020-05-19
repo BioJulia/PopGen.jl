@@ -47,39 +47,3 @@ function richness(data::PopData; populations::Bool = false)
         @groupby data.loci (:locus, :population) {richness =  length(unique_alleles(:genotype))}
     end
 end
-
-
-"""
-    summary(data::PopData)
-Prints a summary of the information contained in a PopData
-"""
-function Base.summary(data::PopData)
-    println("PopData Object")
-    if occursin("Int16", string(eltype(data.loci.columns.genotype)))
-        marker = "Microsatellite"
-    else
-        marker = "SNP"
-    end
-    print("  Marker type: "); printstyled(marker, "\n", bold = true)
-    ploidy = unique(data.meta.columns.ploidy) |> sort
-    if length(ploidy) == 1
-        print("  Ploidy: ") ; printstyled(ploidy |> join, "\n", bold = true)
-    else
-        print("  Ploidy (varies): ")
-        print(ploidy[1]), [print(", $i") for i in ploidy[2:end]]
-    end
-    print("  Number of individuals: ") ; printstyled(length(data.meta.columns.name), "\n", bold = true)
-    print("  Number of loci: ") ; printstyled(length(levels(data.loci.columns.locus)), "\n", bold = true)
-    print("  Populations: ") ; printstyled(length(unique(data.meta.columns.population)), "\n", bold = true)
-
-    if ismissing.(data.meta.columns.longitude) |> all == true
-        print("  Longitude:") ; printstyled(" absent\n", color = :yellow)
-    else
-        println("  Longitude: present with ", count(i -> i === missing, data.meta.columns.longitude), " missing")
-    end
-    if ismissing.(data.meta.columns.longitude) |> all == true
-        print("  Latitude:") ; printstyled(" absent\n", color = :yellow)
-    else
-        println("  Latitude: present with ", count(i -> i === missing, data.meta.columns.latitude), " missing")
-    end
-end

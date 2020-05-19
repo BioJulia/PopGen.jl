@@ -9,8 +9,8 @@ abstract type PopObj end
 """
 ```
 PopData
-    meta::IndexedTable
-    loci::IndexedTable
+    meta::DataFrame
+    loci::DataFrame
 ```
 The data struct used for the PopGen population genetics ecosystem. You are
 STRONGLY discouraged from manually creating tables to pass into a PopObj,
@@ -29,8 +29,8 @@ and instead should use the provided genepop, csv, or vcf file importers.
     - `genotype` Tuple of Int8 or Int16 depending on SNP or microsatellite
 """
 struct PopData <: PopObj
-    meta::IndexedTable
-    loci::IndexedTable
+    meta::DataFrame
+    loci::DataFrame
 end
 
 """
@@ -50,8 +50,38 @@ cases.
 """
 const GenotypeArray = AbstractVector{S} where S<:Union{Missing,Genotype}
 
+"""
+    Base.show(io::IO, data::PopData)
+Overloads `Base.show` for concise summary printing of a PopData object.
+"""
+function Base.show(io::IO, data::PopData)
+    println(io, "PopData Object")
+    if occursin("Int16", string(eltype(data.loci.genotype)))
+        marker = "Microsatellite"
+    else
+        marker = "SNP"
+    end
+    print(io,"  Marker type: "); printstyled(io, marker, "\n", bold = true)
+    ploidy = unique(data.meta.ploidy) |> sort
+    if length(ploidy) == 1
+        print(io, "  Ploidy: ") ; printstyled(io, ploidy |> join, "\n", bold = true)
+    else
+        print(io, "  Ploidy (varies): ")
+        print(io, ploidy[1]); [print(io, ", $i") for i in ploidy[2:end]]
+        print(io, "\n")
+    end
+    print(io, "  Number of individuals: ") ; printstyled(io, length(data.meta.name), "\n", bold = true)
+    print(io, "  Number of loci: ") ; printstyled(io, length(levels(data.loci.locus)), "\n", bold = true)
+    print(io, "  Populations: ") ; printstyled(io, length(unique(data.meta.population)), "\n", bold = true)
 
-# pretty printing of CategoricalStrings
-function Base.show(io::IO, cat_st::T) where T<:CategoricalValue{String, R} where R<:Unsigned
-    print(io, "\"$(cat_st)\"")
+    if ismissing.(data.meta.longitude) |> all == true
+        print(io, "  Longitude:") ; printstyled(io, " absent\n", color = :yellow)
+    else
+        println(io, "  Longitude: present with ", count(i -> i === missing, data.meta.longitude), " missing")
+    end
+    if ismissing.(data.meta.longitude) |> all == true
+        print(io, "  Latitude:") ; printstyled(io, " absent\n", color = :yellow)
+    else
+        println(io, "  Latitude: present with ", count(i -> i === missing, data.meta.latitude), " missing")
+    end
 end

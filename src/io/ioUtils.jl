@@ -36,21 +36,25 @@ function determine_marker(infile::String, geno_parse::CSV.File{false}, digits::I
     end
 end
 
-function determine_marker(infile::String, geno_parse::CSV.File{true}, digits::Int)
-    test_genotypes = Vector{Union{Missing,NTuple{N, Int16} where N}}()
-    if (countlines(infile) - 1) < 10
-        no_test_samples = countlines(infile) - 1
+function determine_marker(infile::String, geno_parse::T, digits::Int) where T<:AbstractDataFrame
+    # get the total # columns
+    total_col = size(geno_parse,2)
+    # find the 25% cutoff
+    if total_col > 11
+        num_test_loc = (total_col - 2) ÷ 8
     else
-        no_test_samples = 10
+        num_test_loc = total_col - 2
     end
+    # remove everything else
+    test_df = @view geno_parse[!, 3:num_test_loc]
 
-    for idx in 1:no_test_samples
-        vals = values(geno_parse[idx])
-        genotypes = map(i -> phase.(i, Int16, digits), vals[5:end])
-        append!(test_genotypes, genotypes)
-    end
+    # isolate the largest allele value
+    max_allele = map(eachcol(test_df)) do i
+        phase.(i, Int16, digits)  |>
+        skipmissing |> Base.Iterators.flatten |> maximum
+    end |> maximum
 
-    if maximum(collect(Base.Iterators.flatten(test_genotypes |> skipmissing))) <= 10
+    if max_allele <= 10
         return Int8
     else
         return Int16
@@ -63,9 +67,7 @@ Used internally in the `genepop` and `delimited` file parsers to scan the genoty
 of a sample and return the ploidy of the first non-missing locus.
 """
 @inline function find_ploidy(genotypes::T) where T<:GenotypeArray
-    @inbounds for i in genotypes
-        i !== missing && return Int8(length(i))
-    end
+    return Int8(length(genotypes[1]))
 end
 
 """

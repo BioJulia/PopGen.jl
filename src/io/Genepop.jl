@@ -52,9 +52,7 @@ function genepop(
     # find the #samples per population
     pop_idx = Vector{Int}()
     for (line, gtext) in enumerate(gpop_readlines)
-        if gtext == popsep
-            push!(pop_idx, line)
-        end
+        gtext == popsep && push!(pop_idx, line)
     end
     length(pop_idx) == 0 &&
     error("No populations found in $infile using separator \"$popsep\". Please check the spelling and try again.")
@@ -79,116 +77,57 @@ function genepop(
 
     # check for horizontal formatting, where popsep would appear on the third line
     if pop_idx[1] <= 3
-
-        gpop = open(infile, "r") ; readline(gpop)  # skip first line
         # second line should have all the loci
-        locus_name_raw = readline(gpop) ; close(gpop)
+        locus_name_raw = replace(gpop_readlines[2], "." => "_")
         locinames = strip.(split(locus_name_raw |> join, ","))
-        map(i -> replace!(i, "." => "_"), locinames)
-        format = "vertical"
+        format = "horizontal"
     else
         #standard  vertical formatting
-        locinames = CSV.read(
-            infile,
-            header = 0,
-            datarow = 2,
-            copycols = false,
-            limit = pop_idx[1] - 2,
-            type = String,
-        )
-        locinames = String.(locinames.Column1)
-        format = "horizontal"
+        locinames = gpop_readlines[2:pop_idx[1]-1]
+        format = "vertical"
     end
 
     if !silent
-        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nloci format: $(format)\n$(sum(popcounts)) samples detected\n$(length(locinames)) loci detected"
+        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nloci formatting: $(format)\n$(sum(popcounts)) samples detected\n$(length(locinames)) loci detected"
     end
 
     # load in samples and genotypes
     coln = append!(["name"], locinames)
-    if diploid == true
-        geno_parse = CSV.File(
-            infile,
-            delim = delim,
-            header = coln,
-            datarow = pop_idx[1] + 1,
-            comment = popsep,
-        )
-    else
-        geno_parse = CSV.File(
-            infile,
-            delim = delim,
-            header = coln,
-            datarow = pop_idx[1] + 1,
-            comment = popsep,
-            type = String,
-        )
-    end
+    geno_parse = CSV.read(
+        infile,
+        delim = delim,
+        header = coln,
+        datarow = pop_idx[1] + 1,
+        comment = popsep
+    ) |> DataFrame
 
-    geno_type = determine_marker(infile, geno_parse, digits)
-
-    # initiate with empty vectors for samplename, locus, and geno
-    name = Vector{String}()
-    loci = Vector{String}()
-    if diploid == true
-        geno_raw = Vector{Int32}()
-    else
-        geno_raw = Vector{String}()
-    end
-
-    @inbounds for samplerow in geno_parse
-        vals = values(samplerow)
-        corr_name = replace(vals[1], "," => "")
-        append!(name, fill(corr_name, length(locinames)))
-        append!(loci, locinames)
-        append!(geno_raw, vals[2:end])
-    end
-
-    ## phase the genotypes
-    if diploid == true
-        genotype = map(i -> phase_dip.(i, geno_type, digits), geno_raw)
-    else
-        genotype = map(i -> phase.(i, geno_type, digits), geno_raw)
-    end
-
-    ## create population vector for loci table
     popnames = string.(collect(1:length(popcounts)))
-    popid_array =
-        [
-            fill(i, j)
-            for (i, j) in zip(popnames, popcounts .* length(locinames))
-        ] |> Base.Iterators.flatten |> collect
-
-    # add population names to genotype table
-    loci_table = table((
-        name = categorical(name, compress = true),
-        population = categorical(popid_array, compress = true),
-        locus = categorical(loci, compress = true),
-        genotype = genotype,
-    ), pkey = :locus)
+    popnames = fill.(popnames,popcounts) |> Base.Iterators.flatten |> collect
+    insertcols!(geno_parse, 2, :population => popnames)
+    geno_parse.name .= replace.(geno_parse.name, "," => "")
+    geno_type = determine_marker(infile, geno_parse, digits)
+    # wide to long format
+    geno_parse = DataFrames.stack(geno_parse, DataFrames.Not([:name, :population]))
+    rename!(geno_parse, [:name, :population, :locus, :genotype])
+    categorical!(geno_parse, [:name, :population, :locus], compress = true)
+    geno_parse.genotype = map(i -> phase.(i, geno_type, digits), geno_parse.genotype)
+    #return geno_parse
 
     # make sure levels are sorted by order of appearance
-    levels!(loci_table.columns.locus, unique(loci_table.columns.locus))
-    levels!(loci_table.columns.name, unique(loci_table.columns.name))
+    levels!(geno_parse.locus, unique(geno_parse.locus))
+    levels!(geno_parse.name, unique(geno_parse.name))
 
-    ploidy = (@groupby loci_table :name {
-        ploidy = find_ploidy(:genotype),
-    }).columns.ploidy
+    ploidy = @by(geno_parse[geno_parse.genotype .!== missing, :], :name, ploidy = find_ploidy(:genotype)).ploidy
 
     # take a piece of the genotype table out and create a new table with the ploidy
-    sample_table = table((
-        name = levels(loci_table.columns.name),
-        population =
-                [fill(i, j) for (i, j) in zip(popnames, popcounts)] |>
-                Base.Iterators.flatten |> collect,
+    sample_table = DataFrame(
+        name = levels(geno_parse.name),
+        population = popnames,
         ploidy = ploidy,
-        latitude =
-                fill(missing, length(levels(loci_table.columns.name))) |>
-                Vector{Union{Missing,Float32}},
-        longitude =
-                fill(missing, length(levels(loci_table.columns.name))) |>
-                Vector{Union{Missing,Float32}},
-    ), pkey= :population)
+        latitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts)),
+        longitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts))
+    )
 
-    PopData(sample_table, loci_table)
+    PopData(sample_table, geno_parse)
+
 end
