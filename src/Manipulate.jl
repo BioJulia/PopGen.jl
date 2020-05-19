@@ -13,13 +13,13 @@ derived from the PopData. Changes made to this table will not alter the source
 Use `locations!` to add spatial data to a `PopData` object.
 """
 function locations(data::PopData)
-    select(data.meta, (:longitude, :latitude))
+    @view data.meta[!, [:longitude, :latitude]]
 end
 
 
 """
-    locations!(data::PopData; lat::Vector{Float64}, long::Vector{Float64})
-Replaces existing `PopData` location data (latitude `lat`, longitude `long`).
+    locations!(data::PopData; long::Vector{Float64}, lat::Vector{Float64})
+Replaces existing `PopData` location data (longitude `long`, latitude `lat`).
 Takes decimal degrees as a `Vector` of any `AbstractFloat`.
 ## Formatting requirements
 - Decimal Degrees format: `-11.431`
@@ -33,17 +33,18 @@ x = rand(237) ; y = rand(237)
 locations!(ncats, long = x, lat = y)
 ```
 """
-function locations!(data::PopData, lat::Vector{Union{Missing,T}}, long::Vector{Union{Missing,T}}) where T <: AbstractFloat
-    length(lat) != length(long) && error("latitude ($(length(lat))) and longitude ($(length(long))) arrays not equal in length")
-    length(lat) != length(data.meta.columns.name) && error("lat/long array length ($(length(lat))) and number of samples in PopData $(length(long)) are not equal")
+function locations!(data::PopData, long::Vector{Union{Missing,T}}, lat::Vector{Union{Missing,T}}) where T <: AbstractFloat
+    long_len = length(long)
+    lat_len = length(lat)
+    long_len != lat_len && error("latitude ($lat_len) and longitude ($long_len) arrays not equal in length")
+    long_len != length(data.meta.name) && error("lat/long array length ($long_len) and number of samples in PopData ($long_len) are not equal")
 
-    for i in 1:length(lat)
-        data.meta.columns.longitude[i] = lat[i]
-        data.meta.columns.latitude[i] = long[i]
-    end
+    data.meta.longitude .= long
+    data.meta.latitude .= lat
+    return
 end
 
-function locations!(data::PopData, lat::Vector{T}, long::Vector{T}) where T <: AbstractFloat
+function locations!(data::PopData, long::Vector{T}, lat::Vector{T}) where T <: AbstractFloat
     # convert to the right type and use locations!()
     lat_adjust = lat |> Vector{Union{Missing, Float32}}
     long_adjust = long |> Vector{Union{Missing, Float32}}
@@ -51,17 +52,16 @@ function locations!(data::PopData, lat::Vector{T}, long::Vector{T}) where T <: A
 end
 
 
-#TODO HANDLE MISSING
 """
-    locations!(data::PopData; lat::Vector{String}, long::Vector{String})
-Replaces existing `PopData` location data (latitude `lat`, longitude `long`). Takes
+    locations!(data::PopData; long::Vector{String}, lat::Vector{String})
+Replaces existing `PopData` location data (longitude `long`, latitude `lat`). Takes
 decimal minutes format as a `Vector` of `String`. Recommended to use `CSV.read`
 from `CSV.jl` to import your spatial coordinates from a text file.
 ## Formatting requirements
 - Decimal Minutes: `"-11 43.11"` (must use space and be a `String`)
 - **Must** use negative sign `-` instead of cardinal directions
 - Location data must be in the order that samples appear in your `PopData`
-- Missing data should be coded as `missing` values of type `Missing` (can be accomplished with `replace!()`)
+- Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
 ### Example
 ```
 ncats = nancycats();
@@ -69,90 +69,49 @@ x = fill("-11 22.33", 237) ; y = fill("-41 31.52", 237)
 locations!(ncats, long = x, lat = y)
 ```
 """
-function locations!(data::PopData, long::Vector{Union{Missing,String}}, lat::Vector{Union{Missing,String}})
-    length(lat) != length(long) && error("latitude ($(length(lat))) and longitude $(length(long)) arrays not equal in length")
-    length(lat) != length(data.meta.columns.name) && error("lat/long array length ($(length(lat))) and number of samples in PopData $(length(long)) are not equal")
+function locations!(data::PopData, long::Vector{String}, lat::Vector{String})
+    long_len = length(long)
+    lat_len = length(lat)
+    lat_len != long_len && error("latitude ($lat_len) and longitude ($long_len) arrays not equal in length")
+    lat_len != length(data.meta.name) && error("lat/long array length ($lat_len) and number of samples in PopData ($long_len) are not equal")
     @info "Converting decimal minutes to decimal degrees"
     # convert coordinates to decimal degrees
-    @inbounds for idx in 1:length(lat)
-        # check for missing as strings
-        if lat[idx] == "missing" | long[idx] == "missing"
-            data.meta.columns.latitude[idx] = missing
-            data.meta.columns.longitude[idx] = missing
-            continue
-        end
-        # check for missing as Missing
-        if ismissing(lat[idx]) | ismissing(long[idx])
-            data.meta.columns.latitude[idx] = missing
-            data.meta.columns.longitude[idx] = missing
-            continue
-        end
-        tmpLat = split(lat[idx], " ")
-        tmpLong = split(long[idx], " ")
-        lat_deg = parse(Float32,tmpLat[1]) ; lat_min = round(parse(Float32,tmpLat[2])/60, digits = 4)
-        long_deg = parse(Float32,tmpLong[1]) ; long_min = round(parse(Float32,tmpLong[2])/60, digits = 4)
-        if lat_deg < 0
-            # if negative, subtract
-            data.meta.columns.latitude[idx] = lat_deg - lat_min
-        else
-            # if positive, add
-            data.meta.columns.latitude[idx] = lat_deg + lat_min
-        end
-        if long_deg < 0
-            # if negative, subtract
-            data.meta.columns.longitude[idx] = long_deg - long_min
-        else
-            # if positive, add
-            data.meta.columns.longitude[idx] = long_deg + long_min
-        end
-    end
+    data.meta.longitude .= convert_coord.(long)
+    data.meta.latitude .= convert_coord.(lat)
+    return
 end
-
 
 function locations!(
     data::PopData,
     lat_deg::Vector{Union{Missing,Int}},
     lat_min::Vector{Union{Missing,Float64}},
     long_deg::Vector{Union{Missing,Int}},
-    long_min::Vector{Union{Missing,Float64}},
+    long_min::Vector{Union{Missing,Float64}}
 )
-    if any(length(lat_deg) .!= length.([long_deg, long_min, lat_min]))
-        error("input array lengths do not match each other\n  lat_deg: $(length(lat_deg))\n  lat_min: $(length(lat_min))\n  long_deg: $(length(long_deg))\n  long_min: $(length(long_min))")
-    elseif length(lat_deg) != length(data.meta.columns.name)
-        error("lat/long array length ($(length(lat))) and number of samples in PopData $(length(long)) are not equal")
-    end
+    long_string = string.(lat_deg, " ", lat_min)
+    lat_string = string.(long_deg, " ", long_min)
+    locations!(data, long_string, lat_string)
+end
 
-    @info "Converting decimal minutes to decimal degrees"
-    # convert coordinates to decimal degrees
-    @inbounds for idx = 1:length(lat_deg)
-        if lat_deg[idx] === missing
-            data.meta.columns.latitude[idx] = missing
-            data.meta.columns.longitude[idx] = missing
-            continue
-        elseif lat_deg[idx] < 0
-            # if negative, subtract
-            data.meta.columns.latitude[idx] = lat_deg[idx] - lat_min[idx]
-        else
-            # if positive, add
-            data.meta.columns.latitude[idx] = lat_deg[idx] + lat_min[idx]
-        end
-        if long_deg < 0
-            # if negative, subtract
-            data.meta.columns.longitude[idx] = long_deg[idx] - long_min[idx]
-        else
-            # if positive, add
-            data.meta.columns.longitude[idx] = long_deg[i] + long_min[i]
-        end
-    end
+function locations!(
+    data::PopData,
+    lat_deg::Vector{Int},
+    lat_min::Vector{Float64},
+    long_deg::Vector{Int},
+    long_min::Vector{Float64}
+)
+    long_string = string.(lat_deg, " ", lat_min)
+    lat_string = string.(long_deg, " ", long_min)
+    locations!(data, long_string, lat_string)
 end
 
 
 """
     locations!(data::PopData; kwargs...)
-Replaces existing `PopData` location data (latitude, longitude). Requires all four
+Replaces existing `PopData` location data (longitude, latitude). Requires all four
 keyword arguments. Takes decimal minutes format as vectors of degrees (`Int`) and
-decimal minutes (`Float`). Recommended
-to use `CSV.read` from `CSV.jl` to import your spatial coordinates from a text file.
+decimal minutes (`Float`). Recommended to use `CSV.read` from `CSV.jl` to import
+your spatial coordinates from a text file.
 ### Keyword Arguments:
 - `lat_deg::Vector{Int}` a vector of postive or negative integers denoting the latitude degrees
     - example: `[11, -12, 15, 11]`
@@ -208,19 +167,10 @@ end
 Returns an array of strings of the loci names in a `PopData` object.
 """
 function loci(data::PopData)
-    levels(data.loci.columns.locus)
+    levels(data.loci.locus)
 end
 
-"""
-    loci(data::IndexedTable)
-Convenience wrapper to return an array of column names as string in the `loci`
-Table of a `PopData` object.
-"""
-function loci(data::IndexedTable)
-    levels(data.columns.locus)
-end
-
-
+# TODO all the manipulation functions below this
 """
     get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
 Return the genotype(s) of one or more `samples` for one or more

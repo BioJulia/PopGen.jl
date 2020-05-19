@@ -34,7 +34,7 @@ using Convex,
 include("Types.jl")
 # file io
 include("io/ioUtils.jl")
-include("io/Delimited.jl")
+#include("io/Delimited.jl")
 include("io/Genepop.jl")
 include("io/Read.jl")
 #include("io/VariantCall.jl")

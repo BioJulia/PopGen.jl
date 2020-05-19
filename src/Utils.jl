@@ -1,4 +1,38 @@
-# TODO add to API docs
+#TODO add to docs
+"""
+    convert_coord(coordinate::string)
+Takes a decimal minute format as a `String` and returns it as a decimal degree
+`Float32`. Can be broadcasted over an array of decimal-minute strings to convert them.
+## Formatting requirements
+- Decimal Minutes: `"-11 43.11"` (must use space and be a `String`)
+- **Must** use negative sign `-` instead of cardinal directions
+- Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
+
+### Example
+```
+julia> convert_coord("-41 31.52")
+-41.5253f0
+
+julia> convert_coord.(["-41 31.52", "25 11.54"])
+2-element Array{Float32,1}:
+ -41.5253
+  25.1923
+```
+"""
+function convert_coord(coordinate::String)
+    lowercase(coordinate) == "missing" && return missing
+    split_coord = split(coordinate, " ")
+    coord_degree = parse(Float32, split_coord[1]) ;
+    coord_minute = round(parse(Float32, split_coord[2])/60, digits = 4)
+    if coord_degree < 0
+        # if negative, subtract
+        return coord_degree - coord_minute
+    else
+        # if positive, add
+        return coord_degree +  coord_minute
+    end
+end
+
 """
     nonmissing(vec::T) where T<:AbstractArray
 Convenience function to count the number of non-`missing` values
@@ -8,18 +42,16 @@ function nonmissing(vec::T) where T<:AbstractArray
     count(!ismissing, vec)
 end
 
-# TODO add to API docs
 """
     reciprocal(num::T) where T <: Signed
 Returns the reciprocal (1/number) of a number. Will return `0` when
 the number is `0` instead of returning `Inf`.
 """
 function reciprocal(num::T) where T <: Real
-    num != 0 ? 1/num : 0
+    iszero(num) ? 1.0/Float64(num) : 0
 end
 
 
-# TODO replace location in docs
 """
     multitest_missing(pvals::Array{Float64,1}, correction::String)
 Modification to `MultipleTesting.adjust` to include `missing` values in the

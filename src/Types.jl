@@ -14,15 +14,15 @@ PopData
 ```
 The data struct used for the PopGen population genetics ecosystem. You are
 STRONGLY discouraged from manually creating tables to pass into a PopObj,
-and instead should use the provided genepop, csv, or vcf file importers.
+and instead should use the provided file importers.
 
-- `meta` ::IndexedTable individual/sample data with the columns:
+- `meta` ::DataFrame individual/sample data with the columns:
     - `name` ::String the individual/sample names
     - `population` ::String population names
     - `ploidy` ::Int8 ploidy in order of `ind`
     - `longitude` ::Float64 longitude values
     - `latitude` ::Float64 latitude values
-- `loci` ::IndexedTable Long-format table of sample genotype records
+- `loci` ::DataFrame Long-format table of sample genotype records
     - name` ::CategoricalString the individual/sample names
     - `population`::CategoricalString population name
     - `locus` ::CategoricalString of locus name
@@ -35,16 +35,16 @@ end
 
 """
     Genotype::DataType
-For convenience purposes, an alias for `NTuple{N, <:Signed} where N`, which is the type describing individual
-genotypes in PopData.
+For convenience purposes, an alias for `NTuple{N, <:Signed} where N`, which is
+the type describing individual genotypes in PopData.
 """
 const Genotype = NTuple{N, <:Signed} where N
 
 
 """
     GenotypeArray::DataType
-For convenience purposes, an alias for an `AbstractVector` of elements `Missing` and
-`Genotype`, which itself is of type `NTuple{N, <:Signed} where N`.
+For convenience purposes, an alias for an `AbstractVector` of elements `Missing`
+and `Genotype`, which itself is of type `NTuple{N, <:Signed} where N`.
 The definition as an `AbstractVector` adds flexibility for `SubArray`
 cases.
 """
