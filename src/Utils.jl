@@ -21,10 +21,12 @@ julia> convert_coord.(["-41 31.52", "25 11.54"])
 """
 function convert_coord(coordinate::String)
     lowercase(coordinate) == "missing" && return missing
-    split_coord = split(coordinate, " ")
-    coord_degree = parse(Float32, split_coord[1]) ;
-    coord_minute = round(parse(Float32, split_coord[2])/60, digits = 4)
-    if coord_degree < 0
+    coord_strip = replace(uppercase(coordinate), r"[NSEW]" => "")
+    split_coord = split(coord_strip, " ")
+    coord_degree = parse(Float32, split_coord[1])
+    coord_minute = round(parse(Float32, split_coord[2])/60.0, digits = 4)
+    # N + E are positive | S + W are negative
+    if coord_degree < 0 || occursin(r"[SW]", coordinate)
         # if negative, subtract
         return coord_degree - coord_minute
     else

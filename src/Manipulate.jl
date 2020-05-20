@@ -20,7 +20,7 @@ end
 """
     locations!(data::PopData; long::Vector{Float64}, lat::Vector{Float64})
 Replaces existing `PopData` location data (longitude `long`, latitude `lat`).
-Takes decimal degrees as a `Vector` of any `AbstractFloat`.
+Takes **decimal degrees** as a `Vector` of any `AbstractFloat`.
 ## Formatting requirements
 - Decimal Degrees format: `-11.431`
 - **Must** use negative sign `-` instead of cardinal directions
@@ -55,17 +55,27 @@ end
 """
     locations!(data::PopData; long::Vector{String}, lat::Vector{String})
 Replaces existing `PopData` location data (longitude `long`, latitude `lat`). Takes
-decimal minutes format as a `Vector` of `String`. Recommended to use `CSV.read`
+**decimal minutes** format as a `Vector` of `String`. Recommended to use `CSV.read`
 from `CSV.jl` to import your spatial coordinates from a text file.
 ## Formatting requirements
 - Decimal Minutes: `"-11 43.11"` (must use space and be a `String`)
-- **Must** use negative sign `-` instead of cardinal directions
+- **Must** use negative sign `-` or single-letter cardinal directions like "11 43.11W"
 - Location data must be in the order that samples appear in your `PopData`
 - Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
+### NOTE
+If you read in the coordinate data as 4 vectors (longitude degrees, longitude minutes, latitude degrees, latitude minutes),
+then the easiest course of action would be to merge them into two vectors of strings
+(one for longitude, one for latitude):
+```
+long_string = string.(lat_deg, " ", lat_min)
+lat_string = string.(long_deg, " ", long_min)
+```
+and use these as inputs into `locations!`
+
 ### Example
 ```
 ncats = nancycats();
-x = fill("-11 22.33", 237) ; y = fill("-41 31.52", 237)
+x = fill("11 22.33W", 237) ; y = fill("-41 31.52", 237)
 locations!(ncats, long = x, lat = y)
 ```
 """
@@ -81,63 +91,6 @@ function locations!(data::PopData, long::Vector{String}, lat::Vector{String})
     return
 end
 
-function locations!(
-    data::PopData,
-    lat_deg::Vector{Union{Missing,Int}},
-    lat_min::Vector{Union{Missing,Float64}},
-    long_deg::Vector{Union{Missing,Int}},
-    long_min::Vector{Union{Missing,Float64}}
-)
-    long_string = string.(lat_deg, " ", lat_min)
-    lat_string = string.(long_deg, " ", long_min)
-    locations!(data, long_string, lat_string)
-end
-
-function locations!(
-    data::PopData,
-    lat_deg::Vector{Int},
-    lat_min::Vector{Float64},
-    long_deg::Vector{Int},
-    long_min::Vector{Float64}
-)
-    long_string = string.(lat_deg, " ", lat_min)
-    lat_string = string.(long_deg, " ", long_min)
-    locations!(data, long_string, lat_string)
-end
-
-
-"""
-    locations!(data::PopData; kwargs...)
-Replaces existing `PopData` location data (longitude, latitude). Requires all four
-keyword arguments. Takes decimal minutes format as vectors of degrees (`Int`) and
-decimal minutes (`Float`). Recommended to use `CSV.read` from `CSV.jl` to import
-your spatial coordinates from a text file.
-### Keyword Arguments:
-- `lat_deg::Vector{Int}` a vector of postive or negative integers denoting the latitude degrees
-    - example: `[11, -12, 15, 11]`
-- `lat_min::Vector{Float64}` a vector of positive floating point numbers denoting the latitude decimal minutes
-    - example: `[43.12, 41.32, 36.53, 22.41]`
-- `long_deg::Vector{Int}` same as `lat_deg` but for longitude degrees
-- `long_min::Vector{Float64}` same as `lat_min` but for longitude minutes
-
-## Formatting requirements
-- **Must** use negative sign `-` instead of cardinal directions
-- Location data must be in the order that samples appear in your `PopData`
-- Missing data should be coded as `missing` values of type `Missing` (can be accomplished with `replace!()`)
-
-### Example
-If you have decimal-minutes coordinates for two samples:
-- Sample 1  _Long:_ 11 43.12  _Lat:_ 15 36.53
-- Sample 2  _Long:_ -12 41.32 _Lat:_ 11 22.41
-\n then your inputs would be:
-```
-lo_deg = [11, -12]
-lo_min = [43.12, 41.32]
-la_deg  = [15, 11]
-la_min  = [36.53, 22.41]
-locations!(data, long_deg = lo_deg, long_min = lo_min, lat_deg = la_deg, lat_min = la_min)
-```
-"""
 function locations!(data::PopData; kwargs...)
     kwargs = Dict(kwargs)
     # vectors as strings mode
@@ -147,16 +100,6 @@ function locations!(data::PopData; kwargs...)
             locations!(data, kwargs[:lat], kwargs[:long])
         else
             error("keyword arguments \"lat\" and \"long\" must be supplied together")
-        end
-    end
-
-    # split-numeric vector mode
-    if any([haskey(kwargs, :lat_deg), haskey(kwargs, :lat_min), haskey(kwargs, :long_deg), haskey(kwargs, :long_min)])
-        # check for matching lat/long deg/min
-        if all([haskey(kwargs, :lat_deg), haskey(kwargs, :lat_min), haskey(kwargs, :long_deg), haskey(kwargs, :long_min)])
-            locations!(data, kwargs[:lat_deg], kwargs[:lat_min], kwargs[:long_deg], kwargs[:long_min])
-        else
-            error("keyword arguments \"lat_deg\", \"lat_min\", \"long_deg\", and \"long_min\" must be supplied together")
         end
     end
 end
@@ -170,7 +113,6 @@ function loci(data::PopData)
     levels(data.loci.locus)
 end
 
-# TODO all the manipulation functions below this
 """
     get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
 Return the genotype(s) of one or more `samples` for one or more
@@ -178,23 +120,22 @@ specific `loci` (both as keywords) in a `PopData` object.
 ### Examples
 ```
 cats = nancycats();
-get_genotype(cats, samples = "N115" , loci = "fca8")
-get_genotypes(cats, samples = ["N1", "N2"] , loci = "fca8")
-get_genotype(cats, samples = "N115" , loci = ["fca8", "fca37"])
-get_genotype(cats, samples = ["N1", "N2"] , loci = ["fca8", "fca37"])
+get_genotype(cats, sample = "N115" , locus = "fca8")
+get_genotypes(cats, sample = ["N1", "N2"] , locus = "fca8")
+get_genotype(cats, sample = "N115" , locus = ["fca8", "fca37"])
+get_genotype(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
 ```
 """
-#TODO remove?
-function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
+function get_genotype(data::PopData, sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
     if typeof(sample) == String
         sample = [sample]
     end
     if typeof(locus) == String
         locus = [locus]
     end
-    @where(data.loci, :name .∈ sample, :locus .∈ locus)
-    #@where data.loci :name in sample && :locus in locus
+    @where(data.loci, :name .∈ Ref(sample), :locus .∈ Ref(locus))
 end
+
 
 """
     get_sample_genotypes(data::PopData, sample::String)
@@ -280,7 +221,7 @@ View unique population ID's and their counts in a `PopData`.
     end
 end
 
-
+#TODO all the populations! functions
 """
 ```
 # Replace by matching
@@ -435,8 +376,9 @@ function exclude_loci(data::PopData, exloci::Vector{String})
             msg *= "\n  locus \"$each\" not found"
         end
     end
-    new_table =  @where data.loci :locus ∉ exloci
+    new_table =  @where data.loci :locus .∉ Ref(exloci)
     msg != "" && printstyled("Warnings:", color = :yellow) ; println(msg)
+    droplevels!(new_table.locus)
     return PopData(data.meta, new_table)
 end
 
@@ -456,8 +398,9 @@ exclude_samples(nancycats, ["N100", "N102", "N211"])
 """
 function exclude_samples(data::PopData, samp_id::String)
     samp_id ∉ samples(data) && error("Sample \"$samp_id\" not found")
-    new_loc_table = @where data.loci :name != samp_id
-    new_meta_table = @where data.meta :name != samp_id
+    new_loc_table = @where(data.loci, :name .!= samp_id)
+    new_meta_table = @where(data.meta, :name .!= samp_id)
+    droplevels!(new_loc_table.locus)
     return PopData(new_meta_table, new_loc_table)
 end
 
@@ -470,9 +413,10 @@ function exclude_samples(data::PopData, samp_ids::Vector{String})
             msg *= "\n  Sample \"$each\" not found"
         end
     end
-    new_loc_table = @where data.loci :name ∉ samp_ids
-    new_meta_table = @where data.meta :name ∉ samp_ids
+    new_loc_table = @where(data.loci, :name .∉  Ref(samp_ids))
+    new_meta_table = @where(data.meta, :name .∉  Ref(samp_ids))
     msg != "" && printstyled("Warnings:", color = :yellow) ; println(msg)
+    droplevels!(new_loc_table.locus)
     return PopData(new_meta_table, new_loc_table)
 end
 
@@ -484,5 +428,5 @@ const remove_samples = exclude_samples
 View individual/sample names in a `PopData`
 """
 function samples(data::PopData)
-    select(data.meta, :name)
+    data.meta.name
 end
