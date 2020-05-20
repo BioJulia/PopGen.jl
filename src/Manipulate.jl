@@ -183,8 +183,8 @@ get_genotypes(cats, samples = ["N1", "N2"] , loci = "fca8")
 get_genotype(cats, samples = "N115" , loci = ["fca8", "fca37"])
 get_genotype(cats, samples = ["N1", "N2"] , loci = ["fca8", "fca37"])
 ```
-
 """
+#TODO remove?
 function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
     if typeof(sample) == String
         sample = [sample]
@@ -192,20 +192,20 @@ function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, loc
     if typeof(locus) == String
         locus = [locus]
     end
-    @where data.loci :name in sample && :locus in locus
+    @where(data.loci, :name .∈ sample, :locus .∈ locus)
+    #@where data.loci :name in sample && :locus in locus
 end
 
 """
     get_sample_genotypes(data::PopData, sample::String)
 Return all the genotypes of a specific sample in a `PopData` object.
-This is an extension for the internal function `get_genotypes`.
 ```
 cats = nancycats()
 get_sample_genotypes(cats, "N115")
 ```
 """
 function get_sample_genotypes(data::PopObj, sample::String)
-    @where data.loci :name == sample
+    @where(data.loci, :name .== sample)[! , :genotype]
 end
 
 
@@ -219,9 +219,7 @@ locus(gulfsharks(), "contig_475")
 ```
 """
 function locus(data::PopData, locus::String)
-    tmp = select(data.loci, (:locus, :genotype)) |>
-        @where :locus == locus
-    return select(tmp, :genotype)
+    @where(data.loci, :locus .== locus)[! , :genotype]
 end
 
 
@@ -242,27 +240,26 @@ to return a DataFrame corresponding with that missing information.
 missing(gulfsharks(), mode = "pop")
 ```
 """
-@inline function Base.missing(data::PopData; mode::String = "sample")
+@inline function Base.missing(data::PopData; mode::String)
     if mode == "sample" || mode == "individual"
-
-        return @groupby data.loci :name {missing = count(ismissing,:genotype)}
+        return @by(data.loci, :name, missing = count(ismissing, :genotype))
 
     elseif mode == "pop" || mode == "population"
-
-        return @groupby data.loci :population {missing = count(ismissing, :genotype)}
+        return @by(data.loci, :population, missing = count(ismissing, :genotype))
 
     elseif mode == "locus" || mode == "loci"
-
-        return @groupby data.loci :locus {missing = count(ismissing, :genotype)}
+        return @by(data.loci, :locus, missing = count(ismissing, :genotype))
 
     elseif mode == "detailed" || mode == "full"
-
-        return @groupby data.loci (:locus, :population) {missing = count(ismissing, :genotype)}
-
+        return @by(data.loci, [:locus, :population], missing = count(ismissing, :genotype))
     else
         @error "Mode \"$mode\" not recognized. Please specify one of: sample, pop, locus, or full"
         missing(data)
     end
+end
+
+@inline function Base.missing(data::PopData, mode::String = "sample")
+    missing(data, mode = mode)
 end
 
 """
@@ -273,13 +270,13 @@ View unique population ID's and their counts in a `PopData`.
 """
 @inline function populations(data::PopData; listall::Bool = false)
     if listall == true
-        return select(data.meta, (:name, :population))
+        return @select(data.meta, :name, :population)
     else
-        if all(ismissing.(data.meta.columns.population)) == true
+        if all(ismissing.(data.meta.population)) == true
             @info "no population data present in PopData"
             return populations(data, listall = true)
         end
-        return @groupby data.meta :population {count = length(:population)}
+        return @by(data.meta, :population, count = length(:population))
     end
 end
 
@@ -404,22 +401,6 @@ const population = populations
 const population! = populations!
 const popnames! = populations!
 
-"""
-    reindex(data::PopData, col::Union{String, Symbol})
-Re-index and sort the `loci` table of a `PopData` object by column
-`col`. Returns a new `PopData` object.
-
-### Example
-sharks = gulfsharks()
-reindex(sharks, :population)
-"""
-function JuliaDB.reindex(data::PopData, col::Union{String, Symbol})
-    if typeof(col) == String
-        col = Symbol(col)
-    end
-    return PopData(data.meta, reindex(data.loci, col))
-end
-
 ##### Exclusion #####
 #=
 To have a built-in "undo button", exclusion functions return new PopData objects
@@ -441,7 +422,8 @@ very_new_cats = exclude_loci(nancycats(), ["fca8", "fca23"])
 """
 function exclude_loci(data::PopData, locus::String)
     locus ∉ loci(data) && error("Locus \"$locus\" not found")
-    new_table = @where data.loci :locus != locus
+    new_table = @where(data.loci, :locus .!= locus)
+    droplevels!(new_table.locus)
     return PopData(data.meta, new_table)
 end
 
