@@ -7,6 +7,8 @@ Takes a decimal minute format as a `String` and returns it as a decimal degree
 - Decimal Minutes: `"-11 43.11"` (must use space and be a `String`)
 - **Must** use negative sign `-` instead of cardinal directions
 - Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
+If you require more nuanced conversion, such as degrees:minutes:seconds, use the `ten` command
+from the `AstroLib.jl` library. http://juliaastro.github.io/AstroLib.jl/stable/ref.html#AstroLib.ten
 
 ### Example
 ```
