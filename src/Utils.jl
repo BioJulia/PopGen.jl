@@ -25,13 +25,14 @@ function convert_coord(coordinate::String)
     split_coord = split(coord_strip, " ")
     coord_degree = parse(Float32, split_coord[1])
     coord_minute = round(parse(Float32, split_coord[2])/60.0, digits = 4)
+    conv = abs(coord_degree) + coord_minute
     # N + E are positive | S + W are negative
-    if coord_degree < 0 || occursin(r"[SW]", coordinate)
+    if coord_degree < 0 || occursin(r"[SW]", uppercase(coordinate))
         # if negative, subtract
-        return coord_degree - coord_minute
+        return conv * -1
     else
         # if positive, add
-        return coord_degree +  coord_minute
+        return conv
     end
 end
 
