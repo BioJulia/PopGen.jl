@@ -4,9 +4,7 @@ export allele_table, allele_avg, richness, summary
 Return a "tidy" IndexedTable of the loci, their alleles, and their alleles' frequencies.
 """
 @inline function allele_table(data::PopData)
-    #@groupby data.loci (:locus, :population) flatten = true {allele = unique_alleles(:genotype)}
     frq = @groupby data.loci :locus flatten = true {freq = allele_freq(:genotype)}
-    #transform(tmp, :frequency => frq.columns.freq)
 end
 
 
@@ -37,13 +35,19 @@ end
 """
     richness(data::PopData)
 Calculates various allelic richness and returns a table of per-locus
-allelic richness. Use `populations = true` to calculate richness by
+allelic richness. Use `population = true` to calculate richness by
 locus by population.
 """
-function richness(data::PopData; populations::Bool = false)
-    if !populations
-        @groupby data.loci :locus {richness = length(unique_alleles(:genotype))}
+function richness(data::PopData; population::Bool = false)
+    if !population
+        DataFrames.combine(
+            groupby(data.loci, :locus),
+            :genotype => (geno -> length(unique_alleles(geno))) => :richness
+        )
     else
-        @groupby data.loci (:locus, :population) {richness =  length(unique_alleles(:genotype))}
+        DataFrames.combine(
+            groupby(data.loci, [:locus, :population]),
+            :genotype => (geno -> length(unique_alleles(geno))) => :richness
+        )
     end
 end
