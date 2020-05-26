@@ -6,7 +6,7 @@ export allele_table, allele_avg, richness, summary
 Return a "tidy" IndexedTable of the loci, their alleles, and their alleles' frequencies.
 """
 @inline function allele_table(data::PopData)
-    frq = @groupby data.loci :locus flatten = true {freq = allele_freq(:genotype)}
+    #frq = @groupby data.loci :locus flatten = true {freq = allele_freq(:genotype)}
 end
 
 """
