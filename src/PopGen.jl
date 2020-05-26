@@ -6,7 +6,7 @@ module PopGen
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-using CSV, Distributions, DataFrames, DataFramesMeta, FileIO, LoopVectorization, MultipleTesting, Random, StatsBase
+using CSV, Distributions, DataFrames, DataFramesMeta, FileIO, JLD2, LoopVectorization, MultipleTesting, Random, StatsBase
 #=
 using Convex,
       CSV,

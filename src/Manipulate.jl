@@ -227,13 +227,9 @@ end
 # Replace by matching
 populations!(data::PopData, rename::Dict)
 populations!(data::PopData, rename::Vector{String})
-populations!(data::PopData, oldnames::Vector{String}, newnames::Vector{String})
-
-# Generate new population information
-populations!(data::PopData, rename::Vector{String}, counts::Vector{T}) where T<:Signed
-populations!(data::PopData, rename::NamedTuple)
+populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
 ```
-Multiple methods to assign or reassign population names to a `PopData`.
+Multiple methods to rename or reassign population names to a `PopData`.
 
 ## Rename using a Dictionary
 Rename existing population ID's of `PopData` using a `Dict` of
@@ -251,90 +247,46 @@ populations!(potatoes, potatopops)
 potatopops = ["Idaho", "Russet"]
 populations!(potatoes, potatopops)
 ```
-## Rename using two Vectors of Strings
-Similar to the `Dict` method, except instead of creating a dictionary of "oldname" => "newname"
-you input a Vector{String} of `oldnames` followed by another of `newnames`. Logically, the
-new names will replace the old names in the same order as they appear in PopData.meta(e.g. the first newname replaces the first oldname, etc.).
+## Reassign using samples and new population assignments
+Completely reassign populations for each individual. Takes two vectors of strings
+as input: one of the sample names, and the other with their new corresponding
+population name.
 
 \n**Example**
 ```
-populations!(potatoes, ["russet1", "russet2"], ["north_russet", "south_russet"])
-```
-## Replace using a NamedTuple
-Generate new population names for a `PopData`, overwriting everthing/anything currently
-there. Will generate an array of population names from a NamedTuple of
-`(names = , counts = )` where `names` is an array of the names of the populations and
-`counts` is an array of the number of samples per population.
-\n**Example**
-\nTo assign names for three populations in a `PopData` named "Starlings" where new
-population names are "North", "South", "East" and their sizes are 15, 32, 11:
-```
-populations!(Starlings, (names = ["North","South", "East"], counts = [15,32,11]))
+populations!(potatoes, ["potato_1", "potato_2"], ["north_russet", "south_russet"])
 ```
 
-## Replace using a Vector of Strings and Vector of Integers
-Just like the NamedTuple method, except without the NamedTuple. Use an Array of Strings
-as the second argument to denote population names, and an Array of Integers as the third
-argument to denote the number of samples per population.
-\n**Example**
-```
-populations!(Starlings, ["North","South", "East"], [15,32,11])
-```
 """
 function populations!(data::PopData, rename::Dict)
     msg = ""
     @inbounds for key in keys(rename)
-        if key ∉ levels(data.loci.columns.population)
+        if key ∉ levels(data.loci.population)
             msg *= "  Population \"$key\" not found in PopData\n"
         else
-            replace!(data.meta.columns.population, key => rename[key])
+            replace!(data.meta.population, key => rename[key])
         end
     end
     msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
-    recode!(data.loci.columns.population,rename...)
+    recode!(data.loci.population,rename...)
     show(populations(data))
     return
 end
 
 function populations!(data::PopData, rename::Vector{String})
-    current_popnames = unique(data.meta.columns.population)
-    rn_dict = Dict()
-    [rn_dict[i] = j for (i,j) in zip(current_popnames, rename)]
+    current_popnames = unique(data.meta.population)
+    rn_dict = Dict{String, String}()
+    [rn_dict[string(i)] = j for (i,j) in zip(current_popnames, rename)]
     populations!(data, rn_dict)
     return
 end
 
-
-function populations!(data::PopData, rename::NamedTuple)
-    tidy_len = length(levels(data.loci.columns.locus))
-    popid_array = [fill(i, j) for (i,j) in zip(rename.names, rename.counts)] |>
-        Iterators.flatten |> collect
-    loci_array = [fill(i, j) for (i,j) in zip(rename.names, rename.counts .* tidy_len)] |>
-        Iterators.flatten |> collect
-    length(popid_array) != length(data.meta.columns.name) && error("length of names ($(length(popid_array))) does not match sample number ($(length(data.meta.columns.name)))")
-    for i in 1:length(data.meta.columns.population)
-        data.meta.columns.population[i] = popid_array[i]
+function populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
+    for (i,j) in zip(samples, populations)
+        data.meta[data.meta.name .== i, :population] .= j
+        data.loci[data.loci.name .== i, :population] .= j
     end
-
-    for i in 1:length(data.loci.columns.population)
-        data.loci.columns.population[i] = loci_array[i]
-    end
-
-    droplevels!(data.loci.columns.population)
-    show(populations(data))
-    return
-end
-
-function populations!(data::PopData, rename::Vector{String}, counts::Vector{T}) where T<:Signed
-    populations!(data, (names = rename, counts = counts))
-    return
-end
-
-function populations!(data::PopData, oldnames::Vector{String}, newnames::Vector{String})
-    length(newnames) != length(oldnames) && error("number of current names and new names must match \n\t current: $(length(oldnames))  new: $(length(newnames))")
-    rn_dict = Dict()
-    [rn_dict[i] = j for (i,j) in zip(oldnames, newnames)]
-    populations!(data, rn_dict)
+    droplevels!(data.loci.population)
     return
 end
 
