@@ -57,33 +57,22 @@ function delimited(
     )
 
     if delim == "auto"
-        geno_parse = CSV.File(infile)
+        #geno_parse = CSV.File(infile)
+        geno_parse = CSV.read(infile) |> DataFrame
     else
-        geno_parse = CSV.File(infile, delim = delim)
+        geno_parse = CSV.read(infile, delim = delim) |> DataFrame
     end
 
-    locinames = string.(keys(geno_parse[1])[5:end])
+    locinames = names(geno_parse)[5:end]
 
-    # initiate with empty vectors for samplename, locus, and geno
-    name = Vector{String}()
-    loci = Vector{String}()
-    popid_meta = Vector{String}()
-    popid_loci = Vector{String}()
-    long_array = Vector{Union{Missing,Float32}}()
-    lat_array = Vector{Union{Missing,Float32}}()
-    if diploid == true
-        geno_raw = Vector{Int32}()
-    else
-        geno_raw = Vector{String}()
-    end
+    geno_type = determine_marker(geno_parse, digits)
 
-    geno_type = determine_marker(infile, geno_parse, digits)
-
-    if geno_type == Int16
-        marker_txt = "Microsatellite"
-    else
-        marker_txt = "SNP"
-    end
+    #TODO wide to long format
+    geno_parse = DataFrames.stack(geno_parse, DataFrames.Not([:name, :population]))
+    rename!(geno_parse, [:name, :population, :locus, :genotype])
+    categorical!(geno_parse, [:name, :population, :locus], compress = true)
+    geno_parse.genotype = map(i -> phase.(i, geno_type, digits), geno_parse.genotype)
+    #return geno_parse
 
     @inbounds for samplerow in geno_parse
         vals = values(samplerow)

@@ -4,9 +4,9 @@ of various file formats.
 =#
 
 """
-    determine_marker(infile::String, geno_parse::CSV.File{}, digits::Int)
+    determine_marker(geno_parse::T, digits::Int) where T<:AbstractDataFrame
 Return either `Int8` or `Int16` depending on largest allelic value in all genotypes
-in the first 10 samples of an input file (or all the samples if less than 10 samples).
+in the first 10 samples of an input DataFrame (or all the samples if less than 10 samples).
 If the largest allele is 11 or greater, the marker will be considered a Microsatellite
 and coded in `PopData` as `Int16`, and the opposite is true for SNPs. There's no
 specific reason 10 was chosen other than it being a reasonable buffer for edge
@@ -15,28 +15,7 @@ microsatellite markers are coded incorrectly, there will be zero impact to perfo
 and considering how few microsatellite markers are used in typical studies, the
 effect on in-memory size should be negligible (as compared to SNPs).
 """
-function determine_marker(infile::String, geno_parse::CSV.File{false}, digits::Int)
-    test_genotypes = Vector{Union{Missing,NTuple{N, Int16} where N}}()
-    if (countlines(infile) - 1) < 10
-        no_test_samples = countlines(infile) - 1
-    else
-        no_test_samples = 10
-    end
-
-    for idx in 1:no_test_samples
-        vals = values(geno_parse[idx])
-        genotypes = map(i -> phase.(i, Int16, digits), vals[5:end])
-        append!(test_genotypes, genotypes)
-    end
-
-    if maximum(collect(Base.Iterators.flatten(test_genotypes |> skipmissing))) <= 10
-        return Int8
-    else
-        return Int16
-    end
-end
-
-function determine_marker(infile::String, geno_parse::T, digits::Int) where T<:AbstractDataFrame
+function determine_marker(geno_parse::T, digits::Int) where T<:AbstractDataFrame
     # get the total # columns
     total_col = size(geno_parse,2)
     # find the 25% cutoff
