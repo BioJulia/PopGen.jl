@@ -44,7 +44,6 @@ end
     return missing
 end
 
-
 @inline function ishet(locus::T) where T<:GenotypeArray
     return @inbounds ishet.(locus)
 end
@@ -129,9 +128,5 @@ Calculate the observed heterozygosity for an individual in a `PopData` object.
 Returns an array of heterozygosity values.
 """
 function het_sample(data::PopData, individual::String)
-    # calculate observed heterozygosity for an individual
-    @apply data.loci begin
-        @where :name == individual
-        @with hetero_o(:genotype)
-    end
+    data.loci[data.loci.name .== individual, :genotype] |> hetero_o
 end
