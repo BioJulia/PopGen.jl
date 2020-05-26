@@ -1,42 +1,43 @@
 #TODO add to docs
 """
     convert_coord(coordinate::string)
-Takes a decimal minute format as a `String` and returns it as a decimal degree
-`Float32`. Can be broadcasted over an array of decimal-minute strings to convert them.
+Takes non-decimal-degree format as a `String` and returns it as a decimal degree
+`Float32`. Can be broadcasted over an array of coordinate strings to convert them.
 ## Formatting requirements
-- Decimal Minutes: `"-11 43.11"` (must use space and be a `String`)
-- **Must** use negative sign `-` instead of cardinal directions
+- Coordinates as a `String` separated by spaces (`"11 43 41"`) or colons (`"11:43:41"`)
+- Must use negative sign (`"-11 43.52"`) or single-letter cardinal direction (`"11 43.52W"`)
 - Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
-If you require more nuanced conversion, such as degrees:minutes:seconds, use the `ten` command
-from the `AstroLib.jl` library. http://juliaastro.github.io/AstroLib.jl/stable/ref.html#AstroLib.ten
-
+- Can mix colons and spaces (although it's bad practice)
 ### Example
 ```
 julia> convert_coord("-41 31.52")
 -41.5253f0
 
-julia> convert_coord.(["-41 31.52", "25 11.54"])
+julia> convert_coord.(["-41 31.52", "25 11:54S"])
 2-element Array{Float32,1}:
- -41.5253
-  25.1923
+-41.5253
+-25.1983
 ```
 """
 function convert_coord(coordinate::String)
     lowercase(coordinate) == "missing" && return missing
     coord_strip = replace(uppercase(coordinate), r"[NSEW]" => "")
-    split_coord = split(coord_strip, " ")
-    coord_degree = parse(Float32, split_coord[1])
-    coord_minute = round(parse(Float32, split_coord[2])/60.0, digits = 4)
-    conv = abs(coord_degree) + coord_minute
+    split_coord = parse.(Float32, split(coord_strip, r"\s|:"))
+    split_coord[2] /=60.0
+    if length(split_coord) == 3
+        split_coord[3] /=3600.0
+    end
+    conv = sum(abs.(split_coord))
     # N + E are positive | S + W are negative
-    if coord_degree < 0 || occursin(r"[SW]", uppercase(coordinate))
-        # if negative, subtract
-        return conv * -1
+    if split_coord[1] < 0 || occursin(r"[SW]", uppercase(coordinate))
+        # negative
+        return round(conv * -1, digits = 4)
     else
-        # if positive, add
-        return conv
+        # positive
+        return round(conv, digits = 4)
     end
 end
+
 
 """
     nonmissing(vec::T) where T<:AbstractArray
