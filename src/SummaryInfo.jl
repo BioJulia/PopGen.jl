@@ -1,4 +1,6 @@
 export allele_table, allele_avg, richness, summary
+
+#TODO fix this for DataFrames API or delete
 """
     allele_table(data::PopData)
 Return a "tidy" IndexedTable of the loci, their alleles, and their alleles' frequencies.
@@ -7,33 +9,24 @@ Return a "tidy" IndexedTable of the loci, their alleles, and their alleles' freq
     frq = @groupby data.loci :locus flatten = true {freq = allele_freq(:genotype)}
 end
 
-
 """
-    allele_avg(data::PopData, rounding::Bool = true)
+    allele_avg(data::PopData; rounding::Bool = true)
 Returns a NamedTuple of the average number of alleles ('mean') and
 standard deviation (`stdev`) of a `PopData`. Use `rounding = false` to
-not round results. Default (`true`) roundsto 4 digits.
+not round results. Default (`true`) rounds to 4 digits.
 """
-function allele_avg(data::PopData; rounding::Bool = true, populations = false)
+function allele_avg(data::PopData; rounding::Bool = true, population = false)
     tmp = richness(data)
-    if !populations
-        if rounding
-            @with tmp {mean = round(mean(:richness), digits = 4), stdev = round(variation(:richness), digits = 4)}
-        else
-            @with tmp {mean = mean(:richness), stdev = variation(:richness)}
-        end
+    if rounding
+        (mean = round(mean(tmp.richness), digits = 4), stdev = round(variation(tmp.richness), digits = 4))
     else
-        if rounding
-            @groupby tmp (:locus, :population) {mean = mean(:richness), stdev = round(variation(:richness), digits = 4)}
-        else
-            @groupby tmp (:locus, :population) {mean = mean(:richness), stdev = variation(:richness)}
-        end
+        (mean = mean(tmp.richness), stdev = variation(tmp.richness))
     end
 end
 
 
 """
-    richness(data::PopData)
+    richness(data::PopData; population::Bool = false)
 Calculates various allelic richness and returns a table of per-locus
 allelic richness. Use `population = true` to calculate richness by
 locus by population.
