@@ -106,15 +106,37 @@ heterozygosity(nancycats(), "population" )
 """
 function heterozygosity(data::PopData, mode::String = "locus")
     if mode ∈ ["locus", "loci"]
-        tmp = @groupby data.loci (:locus, :population) {n_tmp = nonmissing(:genotype), het_pop_obs = hetero_o(:genotype), het_pop_exp = hetero_e(:genotype)}
-        @groupby tmp :locus {n = sum(:n_tmp), het_obs = mean(skipmissing(:het_pop_obs)), het_exp = mean(skipmissing(:het_pop_exp))}
+        tmp = groupby(data.loci, [:locus, :population])
+        tmp2 = DataFrames.combine(
+                tmp,
+                :genotype => nonmissing => :n_tmp,
+                :genotype => hetero_o => :het_pop_obs,
+                :genotype => hetero_e => :het_pop_exp
+            )
+        tmp3 = groupby(tmp2, :locus)
+        return DataFrames.combine(
+                tmp3,
+                :n_tmp => sum => :n,
+                :het_pop_obs => (h_o -> mean(skipmissing(h_o))) => :het_obs,
+                :het_pop_exp => (h_e -> mean(skipmissing(h_e))) => :het_exp
+            )
 
     elseif lowercase(mode) ∈  ["sample", "ind", "individual"]
-        return @groupby data.loci :name {n = nonmissing(:genotype), het_obs = hetero_o(:genotype)}
+        tmp = groupby(data.loci, :name)
+        return DataFrames.combine(
+                tmp,
+                :genotype => nonmissing => :n,
+                :genotype => hetero_o => :het_obs
+            )
 
     elseif lowercase(mode) ∈  ["pop", "population"]
-        return @groupby data.loci :population {n = nonmissing(:genotype), het_obs = hetero_o(:genotype), het_exp = hetero_e(:genotype)}
-
+        tmp = groupby(data.loci, :population)
+        return DataFrames.combine(
+                tmp,
+                :genotype => nonmissing => :n,
+                :genotype => hetero_o => :het_obs,
+                :genotype => hetero_e => :het_exp
+            )
     else
         error("please specify mode \"locus\", \"sample\", or \"population\"")
     end
@@ -125,7 +147,6 @@ const het = heterozygosity
 """
     het_sample(data::PopData, individual::String)
 Calculate the observed heterozygosity for an individual in a `PopData` object.
-Returns an array of heterozygosity values.
 """
 function het_sample(data::PopData, individual::String)
     data.loci[data.loci.name .== individual, :genotype] |> hetero_o
