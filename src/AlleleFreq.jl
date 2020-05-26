@@ -40,10 +40,10 @@ without the allele names, meaning they can be in any order. This is useful
 for getting the expected genotype frequencies.
 """
 @inline function allele_freq_vec(locus::GenotypeArray)
-        flat_alleles = alleles(locus)
-        len = length(flat_alleles)
-        d = [count(i -> i == j, flat_alleles) for j in unique(flat_alleles)]
-        return d ./ len
+    flat_alleles = alleles(locus)
+    len = length(flat_alleles)
+    d = [count(i -> i == j, flat_alleles) for j in unique(flat_alleles)]
+    return d ./ len
 end
 
 """
@@ -60,17 +60,13 @@ allele_freq(cats, "fca8", population = true)
 """
 function allele_freq(data::PopData, locus::String, population::Bool=false)
     if !population
-        @apply data.loci begin
-            @where :locus == locus
-            @with allele_freq(:genotype)
-        end
+        data.loci[data.loci.locus .== locus, :genotype] |> allele_freq
     else
-        @apply data.loci :population begin
-            @where :locus == locus
-            @with {freq = allele_freq(:genotype)}
-        end
+        tmp = groupby(data.loci[data.loci.locus .== locus, :], :population)
+        DataFrames.combine(tmp, :genotype => allele_freq => :frequency)
     end
 end
+
 
 #TODO add to docs (API)
 """
@@ -79,18 +75,16 @@ Return the frequency of an `allele` from a vector of `genotypes`
 
 ### Example
 ```
-using JuliaDBMeta
+using DataFramesMeta
 ncats = nancycats();
-ncats_sub = @where ncats.loci :locus =="fca23"
-@apply ncats.loci begin
-    @where :locus == "fca23"
-    @groupby :population {freq = allele_freq(146, :genotype)}
-end
+ncats_sub @where(ncats.loci, :locus .== "fca8", :genotype .!== missing)
+pop_grp = groupby(ncats_sub, :population)
+DataFrames.combine(pop_grp, :genotype => (geno,) -> allele_freq(146, geno))
 ```
 """
-
 function allele_freq(allele::Int, genos::T) where T<:GenotypeArray
-    count(allele .== Base.Iterators.flatten(genos))/(2*nonmissing(genos))
+    ploidy = (length.(genos) |> unique)[1]
+    count(allele .== Base.Iterators.flatten(genos))/(ploidy*nonmissing(genos))
 end
 
 """
@@ -117,7 +111,7 @@ allele frequencies multiplied by the number of non-missing genotypes.
 """
 function geno_count_expected(locus::T) where T<:GenotypeArray
     #count number of non-missing genotypes in the locus
-    n = count(i -> i !== missing, locus)
+    n = nonmissing(locus)
 
     # Get expected number of genotypes in a locus
     ## get the observed allele frequencies
@@ -177,15 +171,11 @@ geno_freq(cats, "fca8", population = true)
 """
 function geno_freq(data::PopData, locus::String, population::Bool=false)
     if !population
-        @apply data.loci begin
-            @where :locus == locus
-            @with geno_freq(:genotype)
-        end
+        tmp = data.loci[data.loci.locus .== locus, :genotype]
+        geno_freq(tmp)
     else
-        @apply data.loci :population begin
-            @where :locus == locus
-            @with {freq = geno_freq(:genotype)}
-        end
+        tmp = data.loci[data.loci.locus .== locus, :]
+        DataFrames.combine(groupby(tmp, :population), :genotype => geno_freq => :freq)
     end
 end
 
@@ -235,14 +225,10 @@ geno_freq_expected(cats, "fca8", population = true)
 """
 function geno_freq_expected(data::PopData, locus::String, population::Bool=false)
     if !population
-        @apply data.loci begin
-            @where :locus == locus
-            @with geno_freq_expected(:genotype)
-        end
+        tmp = data.loci[data.loci.locus .== locus, :genotype]
+        geno_freq_expected(tmp)
     else
-        @apply data.loci :population begin
-            @where :locus == locus
-            @with {freq = geno_freq_expected(:genotype)}
-        end
+        tmp = data.loci[data.loci.locus .== locus, :]
+        DataFrames.combine(groupby(tmp, :population), :genotype => geno_freq_expected => :freq)
     end
 end
