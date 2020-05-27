@@ -106,33 +106,29 @@ heterozygosity(nancycats(), "population" )
 """
 function heterozygosity(data::PopData, mode::String = "locus")
     if mode ∈ ["locus", "loci"]
-        tmp = groupby(data.loci, [:locus, :population])
-        tmp2 = DataFrames.combine(
-                tmp,
+        tmp = DataFrames.combine(
+                groupby(data.loci, [:locus, :population]),
                 :genotype => nonmissing => :n_tmp,
                 :genotype => hetero_o => :het_pop_obs,
                 :genotype => hetero_e => :het_pop_exp
             )
-        tmp3 = groupby(tmp2, :locus)
         return DataFrames.combine(
-                tmp3,
+                groupby(tmp, :locus),
                 :n_tmp => sum => :n,
                 :het_pop_obs => (h_o -> mean(skipmissing(h_o))) => :het_obs,
                 :het_pop_exp => (h_e -> mean(skipmissing(h_e))) => :het_exp
             )
 
     elseif lowercase(mode) ∈  ["sample", "ind", "individual"]
-        tmp = groupby(data.loci, :name)
         return DataFrames.combine(
-                tmp,
+                groupby(data.loci, :name),
                 :genotype => nonmissing => :n,
                 :genotype => hetero_o => :het_obs
             )
 
     elseif lowercase(mode) ∈  ["pop", "population"]
-        tmp = groupby(data.loci, :population)
         return DataFrames.combine(
-                tmp,
+                groupby(data.loci, :population),
                 :genotype => nonmissing => :n,
                 :genotype => hetero_o => :het_obs,
                 :genotype => hetero_e => :het_exp
