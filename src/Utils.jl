@@ -76,7 +76,7 @@ positions. See MultipleTesting.jl docs for full more detailed information.
 - `"bl"` : Benjamini-Liu adjustment
 - `"hommel"` : Hommel adjustment
 - `"sidak"` : Šidák adjustment
-- `"forward stop"` or `"fs"` : Forward-Stop adjustment
+- `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
 """
 @inline function multitest_missing(pvals::Vector{T}, correction::String) where T <: Union{Missing, <:AbstractFloat}
@@ -96,7 +96,7 @@ positions. See MultipleTesting.jl docs for full more detailed information.
         "bl" => BenjaminiLiu(),
         "hommel" => Hommel(),
         "sidak" => Sidak(),
-        "forward stop" => ForwardStop(),
+        "forwardstop" => ForwardStop(),
         "fs" => ForwardStop(),
         "bc" => BarberCandes(),
     )

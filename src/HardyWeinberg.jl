@@ -21,12 +21,11 @@ function chisq_locus(locus::T) where T <: GenotypeArray
     chisq_stat = values(chisq_stat) |> sum
     n_geno_exp = length(expected)
     n_alleles = length(unique_alleles(locus))
-    #return n_geno_exp, n_alleles
     df = n_geno_exp - n_alleles
 
     if df > 0
         chisq_dist = Distributions.Chisq(df)
-        p_val = 1 - Distributions.cdf(chisq_dist, chisq_stat)
+        p_val = 1.0 - Distributions.cdf(chisq_dist, chisq_stat)
     else
         p_val = missing
     end
@@ -57,24 +56,28 @@ adjustment method for multiple testing.
 - `"bl"`  : Benjamini-Liu adjustment
 - `"hommel"` : Hommel adjustment
 - `"sidak"` : Šidák adjustment
-- `"forward stop"` or `"fs"` : Forward-Stop adjustment
+- `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
 """
 @inline function hwe_test(data::PopData; by_pop::Bool = false, correction::String = "none")
     if !by_pop
-        tmp = @groupby data.loci :locus {chisq = chisq_locus(:genotype)}
-        out_table = @map tmp {:locus, chisq = getindex(:chisq, 1), df = getindex(:chisq, 2), P =  getindex(:chisq, 3)}
+        tmp =DataFrames.combine(
+            groupby(data.loci, :locus),
+            :genotype => chisq_locus => :chisq
+        )
+        out_table = @select(tmp, :locus,  chisq = getindex.(:chisq, 1), df = getindex.(:chisq, 2), P = getindex.(:chisq, 3))
     else
-        tmp = @groupby data.loci (:locus, :population) {chisq = chisq_locus(:genotype)}
-        out_table = @map tmp {:locus, :population, chisq = getindex(:chisq, 1), df = getindex(:chisq, 2), P =  getindex(:chisq, 3)}
+        tmp =DataFrames.combine(
+            groupby(data.loci, [:locus, :population]),
+            :genotype => chisq_locus => :chisq
+        )
+        out_table = @select(tmp, :locus, :population, chisq = getindex.(:chisq, 1), df = getindex.(:chisq, 2), P = getindex.(:chisq, 3))
     end
     if correction == "none"
         return out_table
     else
-        # remove any spaces from the corection method and create the adjustment columname
-        # the whitespace removal is really just for "forward stop"
-        column_name = Symbol("P_"*filter(i -> !isspace(i), correction))
-        transform(out_table, column_name => multitest_missing(out_table.columns.P, correction))
+        column_name = Symbol("P_"*correction)
+        transform!(out_table, :P => (i -> multitest_missing(i, correction)) => column_name)
     end
 end
 
