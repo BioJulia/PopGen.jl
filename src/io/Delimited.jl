@@ -3,7 +3,7 @@ This file handles the import/export of delmited file formats
 =#
 
 export delimited, csv
-
+#TODO update API docs
 """
     delimited(infile::String; delim::Union{Char,String,Regex} = "auto", digits::Int64 = 3, silent::Bool = false)
 Load a delimited-type file into memory as a PopData object. *There should be no empty cells
@@ -16,22 +16,23 @@ in your file*
 - `silent`   : whether to print file information during import (default: `true`)
 
 ### File formatting:
-- First row is column names in this order:
-    1. name
-    2. population
+- The first row is column names (names don't matter)
+- The columns must be in this order:
+    1. sample name
+    2. population name
     3. longitude
     4. latitude
-    5. locus_1_name
-    6. locus_2_name
+    5. locus_1 genotypes
+    6. locus_2 genotypes
     7. etc...
 
 #### Missing data
 ##### Genotypes
-Missing genotypes can be formatted as all-zeros `000000` or negative-nine `-9`
+Missing genotypes can be formatted as all-zeros `000000`, left empty, or negative-nine `-9`
 
 ##### Location data
-If location data is missing for a sample (which is ok!), make sure the value is written
-as *0*, otherwise there will be transcription errors!
+If location data is missing for a sample (which is ok!), make sure the value is
+blank, otherwise there will be transcription errors! (look at line 3 in the example below)
 
 ## Example
 ```
@@ -43,9 +44,9 @@ lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
 name,population,long,lat,Locus1,Locus2,Locus3   \n
 sierra_01,mountain,11.11,-22.22,001001,002002,001001   \n
 sierra_02,mountain,11.12,-22.21,001001,001001,001002   \n
-snbarb_03,coast,0,0,001001,001001,001002 \n
+snbarb_01,coast,,,001001,001001,001002 \n
 snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
-snbarb_03,coast,11.15,0,001002,001001,001001 \n
+snbarb_03,coast,11.15,,001002,001001,001001 \n
 ```
 """
 function delimited(
@@ -56,82 +57,36 @@ function delimited(
     silent::Bool = false
     )
 
-    if delim == "auto"
-        geno_parse = CSV.File(infile)
-    else
-        geno_parse = CSV.File(infile, delim = delim)
-    end
+    diploid ? type = nothing : type = String
+    dlm = delim == "auto" ? nothing : delim
 
-    locinames = string.(keys(geno_parse[1])[5:end])
+    file_parse = CSV.read(infile, delim = dlm, missingstrings = ["-9", ""], type = type) |> DataFrame
 
-    # initiate with empty vectors for samplename, locus, and geno
-    name = Vector{String}()
-    loci = Vector{String}()
-    popid_meta = Vector{String}()
-    popid_loci = Vector{String}()
-    long_array = Vector{Union{Missing,Float32}}()
-    lat_array = Vector{Union{Missing,Float32}}()
-    if diploid == true
-        geno_raw = Vector{Int32}()
-    else
-        geno_raw = Vector{String}()
-    end
+    locinames = names(file_parse)[5:end]
 
-    geno_type = determine_marker(infile, geno_parse, digits)
-
-    if geno_type == Int16
-        marker_txt = "Microsatellite"
-    else
-        marker_txt = "SNP"
-    end
-
-    @inbounds for samplerow in geno_parse
-        vals = values(samplerow)
-        append!(name, fill(vals[1], length(locinames)))
-        append!(popid_loci, fill(vals[2], length(locinames)))
-        append!(popid_meta, fill(vals[2],1))
-        append!(long_array, vals[3])
-        append!(lat_array, vals[4])
-        append!(loci, locinames)
-        append!(geno_raw, vals[5:end])
-    end
+    meta = select(file_parse, 1:4)
+    rename!(meta, [:name, :population, :longitude, :latitude])
+    select!(file_parse, Not(3:4))
+    geno_type = determine_marker(file_parse, digits)
+    geno_parse = DataFrames.stack(file_parse, DataFrames.Not(1:2))
+    rename!(geno_parse, [:name, :population, :locus, :genotype])
+    categorical!(geno_parse, [:name, :population, :locus], compress = true)
+    transform!(geno_parse, :genotype => (i -> phase.(i, geno_type, digits)) => :genotype)
 
     if !silent
-        @info "\n$(abspath(infile))\n$(marker_txt) markers detected\n$(countlines(infile) - 1) samples detected\n$(length(locinames)) loci detected"
+        @info "\n$(abspath(infile))\n$(length(meta[!, 1])) samples across $(length(unique(meta[!,2]))) populations detected\n$(length(locinames)) loci detected"
     end
-
-    ## phase the genotypes
-    if diploid == true
-        genotype = map(i -> phase_dip.(i, geno_type, digits), geno_raw)
-    else
-        genotype = map(i -> phase.(i, geno_type, digits), geno_raw)
-    end
-
-    loci_table = table((
-        name = categorical(name, true),
-        population = categorical(popid_loci, true),
-        locus = categorical(loci, true),
-        genotype = genotype
-    ))
 
     # make sure levels are sorted by order of appearance
-    levels!(loci_table.columns.locus, unique(loci_table.columns.locus))
-    levels!(loci_table.columns.name, unique(loci_table.columns.name))
+    levels!(geno_parse.locus, unique(geno_parse.locus))
+    levels!(geno_parse.name, unique(geno_parse.name))
 
-    ploidy = (@groupby loci_table :name {
-        ploidy = find_ploidy(:genotype),
-    }).columns.ploidy
-
-    # take a piece of the genotype table out and create a new table with the ploidy
-    sample_table = table((
-        name = levels(loci_table.columns.name),
-        population = popid_meta,
-        ploidy = ploidy,
-        longitude = replace(long_array, 0.0 => missing),
-        latitude = replace(lat_array, 0.0 => missing)
-    ))
-
-        return PopData(sample_table, loci_table)
+    ploidy = DataFrames.combine(
+        groupby(dropmissing(geno_parse), :name),
+        :genotype => find_ploidy => :ploidy
+    ).ploidy
+    DataFrames.insertcols!(meta, 3, :ploidy => ploidy)
+    PopData(meta, geno_parse)
 end
 
 const csv = delimited

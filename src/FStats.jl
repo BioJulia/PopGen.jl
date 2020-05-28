@@ -78,6 +78,17 @@ function fst_global(data::PopObj, round::Bool = true)
 end
 
 
+
+
+
+function f_pop(data::PopData)
+    hets = heterozygosity(data, "population")
+    transform(hets, F => (:het_exp - :het_obs)/:het_exp)
+end
+
+
+
+
 function fst_locus(data::PopObj)
     hets = He(data, "pop")
     H_t = het_expected(data) |> mean

@@ -4,35 +4,37 @@ This file handles the import/export of Variant Call Format files
 
 export bcf, vcf
 
+infile = "/home/pdimens/PopGen.jl/data/source/filtered_oyster.vcf"
+
 """
-    bcf(infile::String)
+    bcf(infile::String; silent::Bool = false)
 Load a BCF file into memory as a PopObj object. Population and [optional]
-location information need to be provided separately.
-- `infile` : path to BCF file
+location information need to be provided separately. Use `silent=true` to supress
+printing during file loading.
+- `infile` : path to VCF file
 """
-function bcf(infile::String)
-    bcf_file = BCF.Reader(open(infile, "r"))
+function bcf(infile::String; silent::Bool = false)
+    vcf_file = BCF.Reader(open(infile, "r"))
 
     # get sample names from header
-    sample_names = header(bcf_file).sampleID
+    sample_names = header(vcf_file).sampleID
 
     # fill in pop/lat/long with missing
     population = fill("missing", length(sample_names))
-    loc_xy = Vector{Union{Missing, Float32}}()
-    append!(loc_xy, fill(missing, length(sample_names)))
+    loc_xy = Vector{Union{Missing,Float32}}(undef, length(sample_names))
 
     # get loci names
     locinames = Vector{String}()
 
-    ## array of genotypes
-    locus_array = Vector{Vector{Union{Missing, Tuple{Vararg}}}}()
+    ## genotype dataframe
+    geno_df = DataFrame()
 
     # get genotypes
-    for record in bcf_file
+    for record in vcf_file
         # fix locus names to be syntax-safe
         chr_safe = replace(BCF.chrom(record), r"\.|\-|\=|\/" => "_")
         chr_safer = replace(chr_safe, "|" => "_")
-        pos = BCF.pos(record) |> string
+        pos = VCF.pos(record) |> string
         push!(locinames, chr_safer*"_"*pos)
 
         # get the genotype information
@@ -46,30 +48,34 @@ function bcf(infile::String)
 
         # add 1 to shift genos so 0 is 1 and -1 is 0 etc.
         geno_shift = map(i -> i .+ Int8(1), geno_int)
-        geno_final = [replace(i, 0 => missing) for i in geno_shift]
-        geno_tuple = [Tuple(i) for i in geno_final]
-        push!(locus_array, geno_tuple)
+        geno_out = Vector{Union{Missing, Genotype}}()
+        @inbounds for i in geno_shift
+            if all(iszero.(i)) == true
+                push!(geno_out, missing)
+            else
+                push!(geno_out, Tuple(i))
+            end
+        end
+        insertcols!(geno_df, Symbol(chr_safer*"_"*pos) => geno_out)
     end
     close(vcf_file)
-
-    # intelligently scan for ploidy
-    ploidy = Vector{Int8}()
-    @inbounds for i in 1:length(sample_names)
-        @inbounds for j in 1:length(locinames)
-            locus_array[j][i] === missing && continue   # if missing, go to next locus
-            ploid = length(locus_array[j][i])   # if not, get the # of alleles
-            push!(ploidy, ploid)    # push that to the ploidy vector
-            break   # break out of the loop and begin next sample
-        end
+    if !silent
+        @info "\n$(abspath(infile))\n$(length(sample_names)) samples detected\npopulation info must be added <---\n$(length(locinames)) loci detected"
     end
 
-    @info "\n$(abspath(infile))
-$(length(sample_names)) samples detected
-population info must be added <---
-$(length(locinames)) loci detected"
-
     # create loci dataframe
-    loci_df = DataFrame([j => k for (j,k) in zip(Symbol.(locinames), locus_array)])
+    insertcols!(geno_df, 1, :name => sample_names, :population => population)
+    geno_parse = DataFrames.stack(geno_df, DataFrames.Not(1:2))
+    rename!(geno_parse, [:name, :population, :locus, :genotype])
+    categorical!(geno_parse, [:name, :population, :locus], compress = true)
+
+    # make sure levels are sorted by order of appearance
+    levels!(geno_parse.locus, unique(geno_parse.locus))
+    levels!(geno_parse.name, unique(geno_parse.name))
+    ploidy = DataFrames.combine(
+        groupby(geno_parse, :name),
+        :genotype => (i -> find_ploidy(i[i .!== missing])) => :ploidy
+    ).ploidy
 
     # create samples df
     samples_df = DataFrame(
@@ -79,18 +85,19 @@ $(length(locinames)) loci detected"
         latitude = loc_xy,
         longitude = loc_xy
     )
-    PopObj(samples_df, loci_df)
+    PopData(samples_df, geno_parse)
 end
 
 ### VCF parsing ###
 
 """
-    vcf(infile::String)
+    vcf(infile::String; silent::Bool = false)
 Load a VCF file into memory as a PopObj object. Population and [optional]
-location information need to be provided separately.
+location information need to be provided separately. Use `silent=true` to supress
+printing during file loading.
 - `infile` : path to VCF file
 """
-function vcf(infile::String)
+function vcf(infile::String, silent::Bool)
     vcf_file = VCF.Reader(open(infile, "r"))
 
     # get sample names from header
@@ -98,14 +105,13 @@ function vcf(infile::String)
 
     # fill in pop/lat/long with missing
     population = fill("missing", length(sample_names))
-    loc_xy = Vector{Union{Missing, Float32}}()
-    append!(loc_xy, fill(missing, length(sample_names)))
+    loc_xy = Vector{Union{Missing,Float32}}(undef, length(sample_names))
 
     # get loci names
     locinames = Vector{String}()
 
-    ## array of genotypes
-    locus_array = Vector{Vector{Union{Missing, Tuple{Vararg}}}}()
+    ## genotype dataframe
+    geno_df = DataFrame()
 
     # get genotypes
     for record in vcf_file
@@ -126,30 +132,34 @@ function vcf(infile::String)
 
         # add 1 to shift genos so 0 is 1 and -1 is 0 etc.
         geno_shift = map(i -> i .+ Int8(1), geno_int)
-        geno_final = [replace(i, 0 => missing) for i in geno_shift]
-        geno_tuple = [Tuple(i) for i in geno_final]
-        push!(locus_array, geno_tuple)
+        geno_out = Vector{Union{Missing, Genotype}}()
+        @inbounds for i in geno_shift
+            if all(iszero.(i)) == true
+                push!(geno_out, missing)
+            else
+                push!(geno_out, Tuple(i))
+            end
+        end
+        insertcols!(geno_df, Symbol(chr_safer*"_"*pos) => geno_out)
     end
     close(vcf_file)
-
-    # intelligently scan for ploidy
-    ploidy = Vector{Int8}()
-    @inbounds for i in 1:length(sample_names)
-        @inbounds for j in 1:length(locinames)
-            locus_array[j][i] === missing && continue   # if missing, go to next locus
-            ploid = length(locus_array[j][i])   # if not, get the # of alleles
-            push!(ploidy, ploid)    # push that to the ploidy vector
-            break   # break out of the loop and begin next sample
-        end
+    if !silent
+        @info "\n$(abspath(infile))\n$(length(sample_names)) samples detected\npopulation info must be added <---\n$(length(locinames)) loci detected"
     end
 
-    @info "\n$(abspath(infile))
-$(length(sample_names)) samples detected
-population info must be added <---
-$(length(locinames)) loci detected"
-
     # create loci dataframe
-    loci_df = DataFrame([j => k for (j,k) in zip(Symbol.(locinames), locus_array)])
+    insertcols!(geno_df, 1, :name => sample_names, :population => population)
+    geno_parse = DataFrames.stack(geno_df, DataFrames.Not(1:2))
+    rename!(geno_parse, [:name, :population, :locus, :genotype])
+    categorical!(geno_parse, [:name, :population, :locus], compress = true)
+
+    # make sure levels are sorted by order of appearance
+    levels!(geno_parse.locus, unique(geno_parse.locus))
+    levels!(geno_parse.name, unique(geno_parse.name))
+    ploidy = DataFrames.combine(
+        groupby(geno_parse, :name),
+        :genotype => (i -> find_ploidy(i[i .!== missing])) => :ploidy
+    ).ploidy
 
     # create samples df
     samples_df = DataFrame(
@@ -159,5 +169,5 @@ $(length(locinames)) loci detected"
         latitude = loc_xy,
         longitude = loc_xy
     )
-    PopObj(samples_df, loci_df)
+    PopData(samples_df, geno_parse)
 end

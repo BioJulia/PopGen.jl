@@ -96,9 +96,10 @@ The original file is `3.2mb`, and our `PopData` object takes up ~`3.5mb` in memo
 This is a classic population genetics test and a relatively simple one. The R benchmark will take a while again, so if you're following along, this would be a good time to reconnect with an old friend.
 :::: tabs card stretch
 ::: tab Julia
+
 ```julia
 julia> @btime hwe_test(x) ;
-  583.094 ms (962359 allocations: 39.88 MiB)
+  591.396 ms (962353 allocations: 39.88 MiB)
 ```
 :::
 ::: tab R
@@ -113,4 +114,4 @@ Unit: seconds
 
 ![chi squared plot](/PopGen.jl/images/chisqplot.png)
 
-Comparing averages, PopGen.jl clocks in at ~`580ms` versus adegenet's `6.3s`, so ~11x faster. 
+Comparing averages, PopGen.jl clocks in at ~`591ms` versus adegenet's `6.3s`, so ~10.5x faster. 

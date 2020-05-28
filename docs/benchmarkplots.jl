@@ -59,7 +59,7 @@ objplot = comparison_plot(obj, f_size, "megabytes", "Data structure size")
 objplot |> save("objectplot.png")
 
 #### Χ² test ####
-chitest = [0.583094, 6.2659]
+chitest = [0.591396, 6.2659]
 chiplot = comparison_plot(xaxis, chitest, "Seconds", "Hardy-Weinberg Equilibrium Χ² test")
 chiplot |> save("chisqplot.png")
 

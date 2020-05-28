@@ -1,21 +1,12 @@
 module.exports = {
     base: '/PopGen.jl/',
-    //theme: 'vuepress-theme-cool',
     title: 'PopGen.jl',
     description: 'Population Genetics in Julia',
-    head: [
-        ['link', { rel: "apple-touch-icon", sizes: "180x180", href: "PopGen.jl/images/logo_icon.png"}],
-        ['link', { rel: "icon", type: "image/png", sizes: "32x32", href: "PopGen.jl/favicon.ico"}],
-        ['link', { rel: "icon", type: "image/png", sizes: "16x16", href: "PopGen.jl/favicon.ico"}]
-    ],
     plugins: [
-        'flexsearch',
         'vuepress-plugin-element-tabs',
         'vuepress-plugin-smooth-scroll',
         '@vuepress/plugin-back-to-top',
         '@vuepress/active-header-links',
-        'vuepress-plugin-nprogress',
-        //'@vuepress/plugin-nprogress',
         '@vuepress/medium-zoom',
         '@vuepress/last-updated',
         [
@@ -43,7 +34,10 @@ module.exports = {
       ],
     ],
     themeConfig: {
-        logo: '/images/logo_icon.png',
+        algolia: {
+            apiKey: 'f6d1b3005e55708c6b33b80157908b05',
+            indexName: 'popgen_jl'
+          },
         nav: [
             { text: 'Home', link: '/' },
             { text: 'About', link: '/getting_started/about' },
@@ -78,8 +72,6 @@ module.exports = {
         },
         {
             title: 'Tutorials',
-            //collapsable: true,
-            //sidebarDepth: 1,
             children: [
                 '/tutorials/manipulate',
                 '/tutorials/accessing_popdata',
@@ -90,8 +82,6 @@ module.exports = {
         },
         {
             title: 'Analyses',
-            //collapsable: true,
-            //sidebarDepth: 1,
             children: [
                 '/analyses/hardyweinberg',
                 '/analyses/relatedness',
@@ -99,13 +89,11 @@ module.exports = {
         },
         {
             title: 'API',
-            //collapsable: true,
-            //sidebarDepth: 1,
             children: [
-                '/api/api'
+                '/api/API'
             ]
-        }
-        ],
+        },
+    ],
         docsRepo: 'pdimens/popgen.jl',
         // if your docs are not at the root of the repo:
         //docsDir: '/docs/',
