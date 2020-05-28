@@ -1,20 +1,18 @@
 name = "PopGen"
 uuid = "af524d12-c74b-11e9-22a8-3b091653023f"
 authors = ["Pavel Dimens", "Jason Selwyn"]
-version = "0.1.1"
+version = "0.0.3"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
-Convex = "f65535da-76fb-5f13-bab9-19810c17039a"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-ECOS = "e2685f51-7e38-5353-a97d-a921fd2c8199"
+FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 GeneticVariation = "9bc6ac9d-e6b2-5f70-b0a8-242a01662520"
-JuliaDBMeta = "2c06ca41-a429-545c-b8f0-5ca7dd64ba19"
-LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
 LoopVectorization = "bdcacae8-1622-11e9-2a5c-532679323890"
 MultipleTesting = "f8716d33-7c4a-5097-896f-ce0ecbd3ef6b"
-ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
