@@ -52,14 +52,6 @@ const GenoArray = AbstractVector{S} where S<:Union{Missing,Genotype}
 
 
 """
-    PoolGenoArray::DataType
-For convenience purposes, an alias for an `AbstractVector` of elements `Missing`
-and `Tuple`, which lends flexibility to mixed-ploidy cases such as PoolSeq.
-"""
-const PoolGenoArray = AbstractVector{S} where S<:Union{Missing, Tuple}
-
-
-"""
     Base.show(io::IO, data::PopData)
 Overloads `Base.show` for concise summary printing of a PopData object.
 """
