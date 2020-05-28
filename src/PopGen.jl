@@ -6,7 +6,7 @@ module PopGen
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-using CSV, Distributions, DataFrames, DataFramesMeta, FileIO, JLD2, LoopVectorization, MultipleTesting, Random, StatsBase
+using CSV, Distributions, DataFrames, DataFramesMeta, FileIO, GeneticVariation, JLD2, LoopVectorization, MultipleTesting, Random, StatsBase
 #=
 using Convex,
       CSV,
@@ -37,7 +37,7 @@ using Convex,
 include("Types.jl")
 # file io
 include("io/ioUtils.jl")
-#include("io/Delimited.jl")
+include("io/Delimited.jl")
 include("io/Genepop.jl")
 include("io/Read.jl")
 #include("io/VariantCall.jl")

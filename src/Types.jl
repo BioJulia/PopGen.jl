@@ -42,13 +42,22 @@ const Genotype = NTuple{N, <:Signed} where N
 
 
 """
-    GenotypeArray::DataType
+    GenoArray::DataType
 For convenience purposes, an alias for an `AbstractVector` of elements `Missing`
 and `Genotype`, which itself is of type `NTuple{N, <:Signed} where N`.
 The definition as an `AbstractVector` adds flexibility for `SubArray`
 cases.
 """
-const GenotypeArray = AbstractVector{S} where S<:Union{Missing,Genotype}
+const GenoArray = AbstractVector{S} where S<:Union{Missing,Genotype}
+
+
+"""
+    PoolGenoArray::DataType
+For convenience purposes, an alias for an `AbstractVector` of elements `Missing`
+and `Tuple`, which lends flexibility to mixed-ploidy cases such as PoolSeq.
+"""
+const PoolGenoArray = AbstractVector{S} where S<:Union{Missing, Tuple}
+
 
 """
     Base.show(io::IO, data::PopData)

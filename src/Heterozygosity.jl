@@ -2,7 +2,7 @@ export ishom, ishet, heterozygosity, het
 
 """
 ```
-ishom(locus::T) where T <: GenotypeArray
+ishom(locus::T) where T <: GenoArray
 ishom(locus::Genotype)
 ishom(locus::Missing)
 ```
@@ -20,14 +20,14 @@ end
     return missing
 end
 
-@inline function ishom(locus::T) where T<:GenotypeArray
+@inline function ishom(locus::T) where T<:GenoArray
     return @inbounds ishom.(locus)
 end
 
 
 """
 ```
-ishet(locus::T) where T <: GenotypeArray
+ishet(locus::T) where T <: GenoArray
 ishet(locus::Genotype)
 ishet(locus::Missing)
 ```
@@ -44,7 +44,7 @@ end
     return missing
 end
 
-@inline function ishet(locus::T) where T<:GenotypeArray
+@inline function ishet(locus::T) where T<:GenoArray
     return @inbounds ishet.(locus)
 end
 
@@ -70,24 +70,24 @@ function gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Un
 end
 
 """
-    hetero_o(data::T) where T <: GenotypeArray
+    hetero_o(data::T) where T <: GenoArray
 Returns observed heterozygosity as a mean of the number of heterozygous genotypes, defined
 as genotypes returning `true` for `ishet()`. This is numerically feasible because
 `true` values are mathematically represented as `1`, whereas `false` are represented
 as `0`.
 """
-@inline function hetero_o(data::T) where T <: GenotypeArray
+@inline function hetero_o(data::T) where T <: GenoArray
     adjusted_vector = ishet(data) |> skipmissing
     isempty(adjusted_vector) ? missing : mean(adjusted_vector)
 end
 
 
 """
-    hetero_e(allele_freqs::Vector{T}) where T <: GenotypeArray
+    hetero_e(allele_freqs::Vector{T}) where T <: GenoArray
 Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
-function hetero_e(data::T) where T <: GenotypeArray
+function hetero_e(data::T) where T <: GenoArray
     1 - sum(@inbounds @avx allele_freq_vec(data) .^ 2)
 end
 

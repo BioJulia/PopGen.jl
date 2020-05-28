@@ -1,27 +1,27 @@
 """
-    alleles(locus::T) where T<:GenotypeArray
+    alleles(locus::T) where T<:GenoArray
 Return an array of all the non-missing alleles of a locus.
 """
-@inline function alleles(locus::T) where T<:GenotypeArray
+@inline function alleles(locus::T) where T<:GenoArray
     Base.Iterators.flatten(locus |> skipmissing) |> collect
 end
 
 
 """
-    unique_alleles(locus::T) where T<:GenotypeArray
+    unique_alleles(locus::T) where T<:GenoArray
 Return an array of all the unique non-missing alleles of a locus.
 """
-@inline function unique_alleles(locus::GenotypeArray)
+@inline function unique_alleles(locus::GenoArray)
     unique(alleles(locus))
 end
 
 
 """
-    allele_freq(locus::T) where T<:GenotypeArray
+    allele_freq(locus::T) where T<:GenoArray
 Return a `Dict` of allele frequencies of a single locus in a `PopData`
 object.
 """
-@inline function allele_freq(locus::GenotypeArray)
+@inline function allele_freq(locus::GenoArray)
     d = Dict{Int16,Float32}()
     flat_alleles = alleles(locus)
     len = length(flat_alleles)
@@ -33,13 +33,13 @@ end
 
 
 """
-    allele_freq_vec(locus::T) where T<:GenotypeArray
+    allele_freq_vec(locus::T) where T<:GenoArray
 Return a Vector of allele frequencies of a single locus in a `PopData`
 object. Similar to `allele_freq()`, except it returns only the frequencies,
 without the allele names, meaning they can be in any order. This is useful
 for getting the expected genotype frequencies.
 """
-@inline function allele_freq_vec(locus::GenotypeArray)
+@inline function allele_freq_vec(locus::GenoArray)
     flat_alleles = alleles(locus)
     len = length(flat_alleles)
     d = [count(i -> i == j, flat_alleles) for j in unique(flat_alleles)]
@@ -70,7 +70,7 @@ end
 
 #TODO add to docs (API)
 """
-    allele_freq(allele::Int, genos::T) where T<:GenotypeArray
+    allele_freq(allele::Int, genos::T) where T<:GenoArray
 Return the frequency of an `allele` from a vector of `genotypes`
 
 ### Example
@@ -82,17 +82,17 @@ pop_grp = groupby(ncats_sub, :population)
 DataFrames.combine(pop_grp, :genotype => (geno,) -> allele_freq(146, geno))
 ```
 """
-function allele_freq(allele::Int, genos::T) where T<:GenotypeArray
+function allele_freq(allele::Int, genos::T) where T<:GenoArray
     ploidy = (length.(genos) |> unique)[1]
     count(allele .== Base.Iterators.flatten(genos))/(ploidy*nonmissing(genos))
 end
 
 """
-    geno_count_observed(locus::T) where T<:GenotypeArray
+    geno_count_observed(locus::T) where T<:GenoArray
 Return a `Dict` of genotype counts of a single locus in a
 `PopData` object.
 """
-@inline function geno_count_observed(locus::T) where T<:GenotypeArray
+@inline function geno_count_observed(locus::T) where T<:GenoArray
     # conditional testing if all genos are missing
     all(ismissing.(locus)) && return missing
     d = Dict{Tuple, Float32}()
@@ -104,12 +104,12 @@ Return a `Dict` of genotype counts of a single locus in a
 end
 
 """
-    geno_count_expected(locus::T) where T<:GenotypeArray
+    geno_count_expected(locus::T) where T<:GenoArray
 Return a `Dict` of the expected genotype counts of a single locus in a
 `PopData` object. Expected counts are calculated as the product of observed
 allele frequencies multiplied by the number of non-missing genotypes.
 """
-function geno_count_expected(locus::T) where T<:GenotypeArray
+function geno_count_expected(locus::T) where T<:GenoArray
     #count number of non-missing genotypes in the locus
     n = nonmissing(locus)
 
@@ -139,11 +139,11 @@ end
 
 
 """
-    geno_freq(locus::T) where T<:GenotypeArray
+    geno_freq(locus::T) where T<:GenoArray
 Return a `Dict` of genotype frequencies of a single locus in a
 `PopData` object.
 """
-@inline function geno_freq(locus::T) where T<:GenotypeArray
+@inline function geno_freq(locus::T) where T<:GenoArray
     # conditional testing if all genos are missing
     all(ismissing.(locus)) && return missing
     d = Dict{Tuple, Float32}()
@@ -181,12 +181,12 @@ end
 
 
 """
-    geno_freq_expected(locus::T) where T<:GenotypeArray
+    geno_freq_expected(locus::T) where T<:GenoArray
 Return a `Dict` of the expected genotype frequencies of a single locus in a
 `PopData` object. Expected frequencies are calculated as the product of
 observed allele frequencies.
 """
-function geno_freq_expected(locus::T) where T<:GenotypeArray
+function geno_freq_expected(locus::T) where T<:GenoArray
     # Get expected number of genotypes in a locus
     ## get the observed allele frequencies
     allele_dict = allele_freq(locus)

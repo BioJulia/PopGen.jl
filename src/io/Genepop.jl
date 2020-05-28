@@ -137,5 +137,4 @@ function genepop(
     )
 
     PopData(sample_table, geno_parse)
-
 end

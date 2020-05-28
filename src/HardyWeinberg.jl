@@ -1,11 +1,11 @@
 export hwe_test, hwe
 
 """
-    locus_chi_sq(locus::T) where T <: GenotypeArray
+    locus_chi_sq(locus::T) where T <: GenoArray
 Calculate the chi square statistic and p-value for a locus
 Returns a tuple with chi-square statistic, degrees of freedom, and p-value
 """
-function chisq_locus(locus::T) where T <: GenotypeArray
+function chisq_locus(locus::T) where T <: GenoArray
     ## Get expected number of genotypes in a locus
     expected = geno_count_expected(locus)
 
