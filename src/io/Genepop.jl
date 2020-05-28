@@ -88,24 +88,29 @@ function genepop(
     end
 
     if !silent
-        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nloci formatting: $(format)\n$(sum(popcounts)) samples detected\n$(length(locinames)) loci detected"
+        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nloci formatting: $(format)\n$(sum(popcounts)) samples across $(length(popcounts)) populations detected\n$(length(locinames)) loci detected"
     end
 
     # load in samples and genotypes
     coln = append!(["name"], locinames)
+
+    diploid ? type = nothing : type = String
+
     geno_parse = CSV.read(
         infile,
         delim = delim,
         header = coln,
         datarow = pop_idx[1] + 1,
-        comment = popsep
+        comment = popsep,
+        missingstrings = ["-9", ""],
+        type = type
     ) |> DataFrame
 
     popnames = string.(collect(1:length(popcounts)))
     popnames = fill.(popnames,popcounts) |> Base.Iterators.flatten |> collect
     insertcols!(geno_parse, 2, :population => popnames)
     geno_parse.name .= replace.(geno_parse.name, "," => "")
-    geno_type = determine_marker(infile, geno_parse, digits)
+    geno_type = determine_marker(geno_parse, digits)
     # wide to long format
     geno_parse = DataFrames.stack(geno_parse, DataFrames.Not([:name, :population]))
     rename!(geno_parse, [:name, :population, :locus, :genotype])
@@ -117,7 +122,10 @@ function genepop(
     levels!(geno_parse.locus, unique(geno_parse.locus))
     levels!(geno_parse.name, unique(geno_parse.name))
 
-    ploidy = @by(geno_parse[geno_parse.genotype .!== missing, :], :name, ploidy = find_ploidy(:genotype)).ploidy
+    ploidy = DataFrames.combine(
+        groupby(dropmissing(geno_parse), :name),
+        :genotype => find_ploidy => :ploidy
+    ).ploidy
 
     # take a piece of the genotype table out and create a new table with the ploidy
     sample_table = DataFrame(

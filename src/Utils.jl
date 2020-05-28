@@ -57,7 +57,7 @@ function reciprocal(num::T) where T <: Real
     iszero(num) ? 1.0/Float64(num) : 0
 end
 
-
+#TODO change forwardstop in docs
 """
     multitest_missing(pvals::Array{Float64,1}, correction::String)
 Modification to `MultipleTesting.adjust` to include `missing` values in the
