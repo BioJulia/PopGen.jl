@@ -15,8 +15,8 @@ Currently, PopGen.jl provides four different file parsers with which to create `
 
 You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_in()`. 
 
-::: details file_import alias
-The name "read_in" is short and sweet, but isn't the most descriptive, so we provide a more explicitly-named alias `file_import()`. Feel free to use whichever you like best.
+:::note file_import alias
+The name `read_in` is short and sweet, but isn't the most descriptive, so we provide a more explicitly-named alias `file_import()`. Feel free to use whichever you like best.
 :::
 
 ```julia

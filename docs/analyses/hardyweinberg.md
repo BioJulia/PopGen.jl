@@ -1,4 +1,8 @@
-# Hardy-Weinberg Equilibrium
+---
+id: hardyweinberg
+title: Hardy-Weinberg Equilibrium
+sidebar_label: Hardy-Weinberg Equilibrium
+---
 
 Testing for Hardy-Weinberg Equilibrium (often abbreviated _HWE_) is a fairly common practice in population genetics. In a two-allele system, the HWE equation is defined as:
 $$p^2 + 2pq + q^2 = 1$$
@@ -176,5 +180,5 @@ julia> ncats_hwe = hwe_test(nancycats() ,by_pop = true, correction = "bonferroni
 
 julia> ncats |> @vlplot(:rect, :locus, :population, color=:P_bonferroni)
 ```
-![hwe_test](/PopGen.jl/images/hwe_test.png)
+![hwe_test](/img/hwe_test.png)
 

@@ -1,4 +1,8 @@
-# Data exclusion
+---
+id: exclusion
+title: Data exclusion
+sidebar_label: Data Exclusion
+---
 
 This section covers situations where one may want to remove samples or loci from `PopData`. By design, removal functions _do not_ alter your original `PopData`, so you always have a backup handy (but don't forget to assign a name to the new `PopData`). Since the exclusion functions don't alter the original `PopData`, they do not end with a bang `!`. 
 

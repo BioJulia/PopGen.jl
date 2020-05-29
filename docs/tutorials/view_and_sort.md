@@ -1,4 +1,8 @@
-# Viewing and Sorting
+---
+id: viewsort
+title: Viewing and sorting
+sidebar_label: Viewing and sorting
+---
 
 The functions here help you inspect your `PopData` and pull information from it easily.
 

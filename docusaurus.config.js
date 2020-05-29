@@ -8,6 +8,9 @@ module.exports = {
   projectName: 'PopGen.jl', // Usually your repo name.
   themeConfig: {
     navbar: {
+      prism: {
+        additionalLanguages: ['julia'],
+      },
       title: 'PopGen.jl',
       logo: {
         alt: 'PopGen.jl Logo',
@@ -18,9 +21,19 @@ module.exports = {
           to: 'docs/',
           activeBasePath: 'docs',
           label: 'Docs',
-          position: 'left',
+          position: 'right',
         },
-        {to: 'blog', label: 'Blog', position: 'left'},
+        {
+          to: 'docs/getting_started/about',
+          label: 'About',
+          position: 'right',
+        },        
+        {to: 'blog', label: 'Blog', position: 'right'},
+        {
+          to: 'docs/getting_started/community',
+          label: 'Get Involved',
+          position: 'right',
+        },
         {
           href: 'https://github.com/pdimens/popgen.jl',
           label: 'GitHub',
@@ -39,7 +52,7 @@ module.exports = {
       {
         docs: {
           // It is recommended to set document id as docs home page (`docs/` path).
-          homePageId: 'getting_started/about',
+          homePageId: 'getting_started/install',
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:

@@ -13,7 +13,7 @@ genepop(infile; kwargs...)
 julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
 ```
 
-::: warning Windows users
+:::caution Windows users
 Make sure to change your backslashes `\` to forward slashes `/` 
 :::
 
@@ -28,7 +28,7 @@ Make sure to change your backslashes `\` to forward slashes `/`
 - `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
 - `silent::Bool`   : whether to print file information during import (default: `true`)
 
-::: tip population names
+:::info population names
 By default, the file reader will assign numbers as population ID's (as Strings) in order of appearance in the genepop file. Use the `populations!` function to rename these with your own population ID's.
 :::
 
@@ -79,5 +79,5 @@ Newcomb_04,	254230	564000	090120
 
 ## Acknowledgements
 
-The original implementations of this parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is only 3.2mb in size). However, thanks to the efforts of the [CSV.jl](https://github.com/JuliaData/CSV.jl) team, we leverage that package to do much of the heavy lifting, in a multicore way, and all the while preserving the speed and reducing the memory footprint quite a bit!
+The original implementations of this parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is only 3.2mb in size). However, thanks to the efforts of [CSV.jl](https://github.com/JuliaData/CSV.jl) , we leverage that package to preserve the speed and reducie the memory footprint quite a bit!
 

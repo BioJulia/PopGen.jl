@@ -1,8 +1,12 @@
-# Directly accessing elements
+---
+id: accessing
+title: Accessing elements
+sidebar_label: Accessing elements
+---
 
 A little hands-on training will probably go a long way, so let's through some of the functions available in PopGen.jl with the included data. This tutorial will include both inputs and outputs so you can be confident what you're seeing in your Julia session is exactly what's supposed to happen. Sometimes the outputs can be a little lengthy, so they will be arranged in code "tabs", where the left-most tab is the input named after what it's accomplishing, and the right tab is the output of running the command. This guide is to show you how to directly access  `PopData` elements, but there are shortcut commands to view just about every element of the data within. 
 
-::: danger don't manually edit or sort
+:::danger don't manually edit or sort
 There are specific relationships between the record entries in `PopData` objects, so **do not use** `sort`, `sort!`, or manually arrange/add/delete anything in PopData. There are included functions to remove samples or loci, rename things, add location data, etc. 
 :::
 ## Loading in the data

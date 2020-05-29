@@ -1,4 +1,8 @@
-# Relatedness (Kinship)
+---
+id: relatedness
+title: Relatedness (Kinship)
+sidebar_label: Relatedness (Kinship)
+---
 
 **Background**
 

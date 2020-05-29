@@ -20,11 +20,11 @@ As you can see, a `PopData` is made up of two IndexedTables (from [JuliaDB.jl](h
 
 `PopData` and other custom types introduced in PopGen.jl fall under an AbstractType we call `PopObj`, which is short for "PopGen Object".
 
-::: details pronouncing "PopObj"
+:::note pronouncing "PopObj"
 It's not super obvious, but we decided to pronounce PopObj as "pop ob" with a silent j because it sounds better than saying "pop obj", but writing it as PopOb looks weird. It's a silly little detail that Pavel seems to care a lot about.
 :::
 
-::: danger avoid manual creation!
+:::danger avoid manual creation!
 While it may seem simple enough to create two IndexedTables and make a `PopData` out of them, the structure of `meta` and `loci` are specific, so small mistakes in creating them can create many errors and prevent PopGen from working correctly on your data. Please use the included `csv`, `genepop`, and `vcf` file importers instead.
 :::
 
@@ -114,7 +114,7 @@ The genotypes of the `loci` are an array of type `Genotype`, which is an alias f
 [(0,1), (0,0), missing, (1,2)]
 ```
 
-::: warning immutable genotypes
+:::caution immutable genotypes
 We use the Tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using PopGen.jl, your data should already be filtered and screened. Hand-editing of genotype alleles is **strongly** discouraged, so we outlawed it.
 :::
 

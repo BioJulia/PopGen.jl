@@ -13,7 +13,7 @@ delimited(infile::String; delim::Union{Char,String,Regex} = "auto", digits::Int 
 julia> a = delimited("/data/cali_poppy.csv", digits = 2)
 ```
 
-::: warning Windows users
+:::caution Windows users
 make sure to change your backslashes `\` to forward slashes `/` 
 :::
 
@@ -63,7 +63,7 @@ snbarb_03,coast,11.15,,001002,001001,001001 \n
 
 
 
-::: tip
+:::info alias
 You can also use the command `csv()` synonymously with `delimited()`. 
 :::
 

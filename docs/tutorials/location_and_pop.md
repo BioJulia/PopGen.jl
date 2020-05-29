@@ -1,4 +1,8 @@
-# Location and population data
+---
+id: populations
+title: Location and population data
+sidebar_label: Location and population data
+---
 
 Population genetics involves a focus on... populations (gasp!). The commands below show you how to view and modify both population information (names), and location information (geographic coordinates). 
 
