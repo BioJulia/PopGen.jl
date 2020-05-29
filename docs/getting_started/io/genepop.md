@@ -34,9 +34,9 @@ Files must follow standard Genepop formatting:
 
 - First line is a comment (and skipped)
 - Loci are listed after first line as one-per-line without commas or in single comma-separated row
-- A line with a particular and consistent keyword must delimit populations
-- **Must** be the same word each time and not a unique population name
-- File is **tab** delimited or **space** delimited, but not both
+- A line with a particular keyword (default `POP`) must delimit populations
+- Sample name is immediately followed by a *comma*
+- File is *tab or space delimted* (but not both!)
 
 :::: tabs card stretch
 ::: tab genepop w/loci stacked vertically
@@ -75,5 +75,5 @@ Newcomb_04,	254230	564000	090120
 
 ## Acknowledgements
 
-The original implementations of this parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is only 3.2mb in size). However, thanks to the efforts of the [CSV.jl](https://github.com/JuliaData/CSV.jl) team, we leverage that package to do much of the heavy lifting, in a multicore way, and all the while preserving the speed and reducing the memory footprint quite a bit!
+The original implementations of this parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is only 3.2mb in size). However, thanks to  [CSV.jl](https://github.com/JuliaData/CSV.jl), which does much of the heavy lifting, we preserved the speed and reduce the memory footprint quite a bit!
 

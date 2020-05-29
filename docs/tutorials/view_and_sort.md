@@ -193,20 +193,21 @@ julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]), :locus .== "con
 ## Missing Data
 
 ```julia
-missing(data::PopData; mode::String = "sample")
+missing(data::PopData; by::String = "sample")
 ```
 
-Get missing genotype information in a `PopData`. Specify a `mode` of operation to return a DataFrame corresponding with that missing information type.
+Get missing genotype information in a `PopData`. Specify a mode of operation using the `by =` keyword to return a table corresponding with that missing information type.
 
-| mode     | alternative name | what it does                                                 |
-| -------- | ---------------- | ------------------------------------------------------------ |
-| `"sample"` | `"individual"`     | returns a count and list of missing loci per individual (default) |
+| by | alternative name | what it does                                                 |
+| :------: | :--------------: | ------------------------------------------------------------ |
+| `"sample"` | `"individual"`     | returns a count of missing loci per individual (default) |
 | `"pop"`    | `"population"`     | returns a count of missing genotypes per population          |
 | `"locus"`  | `"loci"`           | returns a count of missing genotypes per locus               |
 | `"full"`   | `"detailed"`       | returns a count of missing genotypes per locus per population |
 
 :::: tabs card stretch
 ::: tab sample
+
 ```
 julia> missing(sharks)
 212×2 DataFrame
@@ -231,66 +232,67 @@ julia> missing(sharks)
 :::
 ::: tab pop
 ```
-julia> missing(sharks, mode = "pop")
-Table with 7 rows, 2 columns:
-population        missing
-─────────────────────────
-"Florida Keys"    782
-"Cape Canaveral"  666
-"Mideast Gulf"    379
-"Georgia"         744
-"Northeast Gulf"  93
-"Southeast Gulf"  1504
-"South Carolina"  480
+julia> missing(sharks, by = "pop")
+7×2 DataFrame
+│ Row │ population     │ missing │
+│     │ Categorical…   │ Int64   │
+├─────┼────────────────┼─────────┤
+│ 1   │ Florida Keys   │ 1246    │
+│ 2   │ Cape Canaveral │ 666     │
+│ 3   │ Mideast Gulf   │ 99      │
+│ 4   │ Georgia        │ 425     │
+│ 5   │ Northeast Gulf │ 474     │
+│ 6   │ Southeast Gulf │ 1504    │
+│ 7   │ South Carolina │ 234     │
 ```
 :::
 ::: tab locus
 ```
-julia> missing(sharks, mode = "locus")
-Table with 2213 rows, 2 columns:
-locus           missing
-───────────────────────
-"contig_35208"  0
-"contig_23109"  6
-"contig_4493"   3
-"contig_10742"  2
-"contig_14898"  0
-"contig_8483"   0
-"contig_8065"   0
-"contig_14708"  1
+julia> missing(sharks, by = "locus")
+2213×2 DataFrame
+│ Row  │ locus        │ missing │
+│      │ Categorical… │ Int64   │
+├──────┼──────────────┼─────────┤
+│ 1    │ contig_35208 │ 0       │
+│ 2    │ contig_23109 │ 6       │
+│ 3    │ contig_4493  │ 3       │
+│ 4    │ contig_10742 │ 2       │
+│ 5    │ contig_14898 │ 0       │
+│ 6    │ contig_8483  │ 0       │
 ⋮
-"contig_43517"  6
-"contig_27356"  2
-"contig_475"    0
-"contig_19384"  5
-"contig_22368"  3
-"contig_2784"   7
+│ 2207 │ contig_18959 │ 0       │
+│ 2208 │ contig_43517 │ 6       │
+│ 2209 │ contig_27356 │ 2       │
+│ 2210 │ contig_475   │ 0       │
+│ 2211 │ contig_19384 │ 5       │
+│ 2212 │ contig_22368 │ 3       │
+│ 2213 │ contig_2784  │ 7       │
 ```
 :::
 ::: tab full
 ```
-julia> missing(sharks, mode = "full")
-Table with 15491 rows, 3 columns:
-locus           population        missing
-─────────────────────────────────────────
-"contig_35208"  "Florida Keys"    0
-"contig_35208"  "Cape Canaveral"  0
-"contig_35208"  "Mideast Gulf"    0
-"contig_35208"  "Georgia"         0
-"contig_35208"  "Northeast Gulf"  0
-"contig_35208"  "Southeast Gulf"  0
-"contig_35208"  "South Carolina"  0
-"contig_23109"  "Florida Keys"    0
+julia> missing(sharks, by = "full")
+15491×3 DataFrame
+│ Row   │ locus        │ population     │ missing │
+│       │ Categorical… │ Categorical…   │ Int64   │
+├───────┼──────────────┼────────────────┼─────────┤
+│ 1     │ contig_35208 │ Cape Canaveral │ 0       │
+│ 2     │ contig_35208 │ Georgia        │ 0       │
+│ 3     │ contig_35208 │ South Carolina │ 0       │
+│ 4     │ contig_35208 │ Florida Keys   │ 0       │
+│ 5     │ contig_35208 │ Mideast Gulf   │ 0       │
+│ 6     │ contig_35208 │ Northeast Gulf │ 0       │
 ⋮
-"contig_2784"   "Cape Canaveral"  0
-"contig_2784"   "Mideast Gulf"    1
-"contig_2784"   "Georgia"         1
-"contig_2784"   "Northeast Gulf"  1
-"contig_2784"   "Southeast Gulf"  1
-"contig_2784"   "South Carolina"  0
+│ 15485 │ contig_2784  │ Cape Canaveral │ 0       │
+│ 15486 │ contig_2784  │ Georgia        │ 2       │
+│ 15487 │ contig_2784  │ South Carolina │ 1       │
+│ 15488 │ contig_2784  │ Florida Keys   │ 2       │
+│ 15489 │ contig_2784  │ Mideast Gulf   │ 1       │
+│ 15490 │ contig_2784  │ Northeast Gulf │ 0       │
+│ 15491 │ contig_2784  │ Southeast Gulf │ 1       │
 ```
 :::
 ::::
 ::: tip alternative names
-Each `mode` has an extra synonymous (alternative) name just because we can and want you to have the option of more explicitly legible code. If you get the `mode` wrong, it will let you know with an error message and run the default `"sample"` mode anyway.
+Each mode of operation has an extra synonymous (alternative) name just because we can and want you to have the option of more explicitly legible code. If you get the `by = ` argument wrong, it will let you know with an error message and run the default `"sample"` mode anyway.
 :::

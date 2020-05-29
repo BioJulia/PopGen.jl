@@ -34,17 +34,16 @@ end
 
 
 """
-    hwe_test(data::PopData; by_pop::Bool = false; correction = "none")
+    hwe_test(data::PopData; by::String = "locus"; correction = "none")
 Calculate chi-squared test of HWE for each locus and returns observed and
 expected heterozygosity with chi-squared, degrees of freedom and p-values for
-each locus. Use `by_pop = true` to perform this separately for each population
-(default: by_pop = false) and return a NamedTuple of DataFrames with the names
-corresponding to the population names. Use `correction =` to specify a P-value
+each locus. Use `by = "population"` to perform this separately for each population
+(default: `by = "locus"`). Use `correction =` to specify a P-value
 adjustment method for multiple testing.
 
 #### example
 `hwe_test(gulfsharks(), correction = "bh")` \n
-`hwe_test(gulfsharks(), by_pop = true, correction = "bh")` \n
+`hwe_test(gulfsharks(), by = "population", correction = "bh")` \n
 
 
 ### `correction` methods (case insensitive)
@@ -59,8 +58,8 @@ adjustment method for multiple testing.
 - `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
 """
-@inline function hwe_test(data::PopData; by_pop::Bool = false, correction::String = "none")
-    if !by_pop
+@inline function hwe_test(data::PopData; by::String = "locus", correction::String = "none")
+    if by == "locus"
         tmp =DataFrames.combine(
             groupby(data.loci, :locus),
             :genotype => chisq_locus => :chisq

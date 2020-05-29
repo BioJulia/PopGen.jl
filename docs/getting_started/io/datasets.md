@@ -20,8 +20,8 @@ cats = dataset("nancycats")
 
 We include the familiar nancycats microsatellite data, as featured in [adegenet](http://adegenet.r-forge.r-project.org), for easy importing into PopGen.jl as `PopData`. As an alternative to `datasets`, you can invoke the `nancycats()`  command without any arguments.
 
-```
-julia> ncats = nancycats() ; summary(ncats)
+```julia
+julia> ncats = nancycats()
 PopData Object
   Marker type: Microsatellite
   Ploidy: 2
@@ -39,7 +39,7 @@ The spatial coordinates provided for the dataset in `adegenet` are completely un
 We also include the SNP dataset used in Dimens *et al.* 2019 "[A genomic assessment of movement and gene flow around the South Florida vicariance zone in the migratory coastal blacknose shark, *Carcharhinus acronotus*](https://link.springer.com/article/10.1007/s00227-019-3533-1)" since it was already on hand. Like `nancycats`, we provide a convenient function to load these data into PopGen.jl as `PopData`. As an alternative to `datasets`, you can invoke the `gulfsharks()` command without any arguments. 
 
 ```julia
-julia> sharks = gulfsharks() ; summary(sharks)
+julia> sharks = gulfsharks()
 PopData Object
   Marker type: SNP
   Ploidy: 2

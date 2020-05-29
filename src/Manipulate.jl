@@ -178,7 +178,7 @@ to return a DataFrame corresponding with that missing information.
 missing(gulfsharks(), by = "pop")
 ```
 """
-@inline function Base.missing(data::PopData; by::String)
+@inline function Base.missing(data::PopData; by::String = "sample")
     if by ∈ ["sample", "individual"]
         return @by(data.loci, :name, missing = count(ismissing, :genotype))
 
@@ -191,7 +191,7 @@ missing(gulfsharks(), by = "pop")
     elseif by ∈ ["detailed", "full"]
         return @by(data.loci, [:locus, :population], missing = count(ismissing, :genotype))
     else
-        @error "Mode \"$mode\" not recognized. Please specify one of: sample, pop, locus, or full"
+        @error "Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"
         missing(data)
     end
 end

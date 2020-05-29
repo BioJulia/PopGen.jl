@@ -19,15 +19,19 @@ and use this as the parameter for our Chi Squared distribution, followed by a cu
 ## Chi-Squared Test
 
 ```julia
-hwe_test(x::PopObj, by_pop::Bool = false, correction::String = "none")
+hwe_test(data::PopObj, by::String = "locus", correction::String = "none")
 ```
 
-Calculate chi-squared test of HWE for each locus and returns observed and expected heterozygosity with chi-squared, degrees of freedom and p-values for each locus. Use `by_pop = true` to perform this separately for each population (default: by_pop = false) and return a NamedTuple with the names corresponding to the population names. Use `correction =` to specify a P-value correction method for multiple testing (recommended). For convenience, the correction method is appended to the name of the column, so you will always know how those P-values were adjusted.
+Calculate chi-squared test of HWE for each locus and returns observed and
+expected heterozygosity with chi-squared, degrees of freedom and p-values for
+each locus. Use `by = "population"` to perform this separately for each population
+(default: `by = "locus"`). Use `correction =` to specify a P-value
+adjustment method for multiple testing (recommended). For convenience, the correction method is appended to the name of the column, so you will always know how those P-values were adjusted.
 
 ### arguments
 
 - `x` : the input `PopObj`
-- `by_pop =` : `false` (default) or `true` for hwe-by-population
+- `by =` : `false` (default) or `true` for hwe-by-population
 - `correction =`  : a string specifying a P-value adjustment type (default: "none")
 
 ### `correction` methods
@@ -40,7 +44,7 @@ Calculate chi-squared test of HWE for each locus and returns observed and expect
 - `"bl"`  : Benjamini-Liu adjustment
 - `"hommel"` : Hommel adjustment
 - `"sidak"` : Šidák adjustment
-- `"forward stop"` or `"fs"` : Forward-Stop adjustment
+- `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
 
 :thinking: For more information on multiple testing adjustments, see [MultipleTesting.jl](https://juliangehring.github.io/MultipleTesting.jl/stable/)
@@ -96,7 +100,7 @@ julia> hwe_test(gulfsharks(), correction = "bh")
 :::
 ::: tab HWE by population
 ```
-julia> hwe_test(gulfsharks(), by_pop = true)
+julia> hwe_test(gulfsharks(), by = "population")
 15491×5 DataFrame
 │ Row   │ locus        │ population     │ chisq       │ df    │ P        │
 │       │ Categorical… │ Categorical…   │ Float64     │ Int64 │ Float64? │
@@ -124,7 +128,7 @@ When doing this test by population, you may notice some loci have `missing` P-va
 ## Interpreting the results
 Since the results are in table form, you can easily process the table using `JuliaDBMeta.jl` or `Query.jl` to find loci above or below the alpha threshold you want. As an example, let's perform an HWE-test on the `nancycats` data without any P-value adjustments:
 ```julia
-julia> ncats_hwe = hwe_test(nancycats() ,by_pop = true) ;
+julia> ncats_hwe = hwe_test(nancycats(), by = "population") ;
 ```
 Now, we can use `DataFramesMeta.jl` to easily filter this table and leave only what we're interested in:
 ```julia
@@ -159,7 +163,7 @@ While not strictly necessary, it might sometimes make sense to generate of heatm
 ```julia
 using VegaLite
 
-julia> ncats_hwe = hwe_test(nancycats() ,by_pop = true, correction = "bonferroni");
+julia> ncats_hwe = hwe_test(nancycats(), by = "population", correction = "bonferroni");
 
 julia> ncats |> @vlplot(:rect, :locus, :population, color=:P_bonferroni)
 ```
