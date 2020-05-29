@@ -8,12 +8,12 @@ For the PopGen.jl package to be consistent, a standard flexible data structure n
 
 ```julia
 struct PopData
-	meta::IndexedTable
-	loci::IndexedTable
+	meta::DataFrame
+	loci::DataFrame
 end
 ```
 
-As you can see, a `PopData` is made up of two IndexedTables (from [JuliaDB.jl](https://github.com/JuliaComputing/JuliaDB.jl)), one called `meta` for sample information (metadata), and the other called `loci` which includes genotype information. This structure allows for easy and convenient access to the fields using dot `.` accessors.. The `meta` and `loci` tables are both specific in their structure, so here is an illustration to help you visualize a `PopData` object:
+As you can see, a `PopData` is made up of two DataFrames, one called `meta` for sample information (metadata), and the other called `loci` which includes genotype information. This structure allows for easy and convenient access to the fields using dot `.` accessors.. The `meta` and `loci` tables are both specific in their structure, so here is an illustration to help you visualize a `PopData` object:
 
 ![PopData](/img/PopData.svg)
 
@@ -30,7 +30,7 @@ While it may seem simple enough to create two IndexedTables and make a `PopData`
 
 ## Metadata
 
-The `meta` table has 5 specific categories/columns: name, population, ploidy, longitude, latitude. These can be directly accessed with `PopData.meta.columns.colname` where `PopData` is the name of your PopData object, and `colname` is one of the five column names below.
+The `meta` table has 5 specific categories/columns: name, population, ploidy, longitude, latitude. These can be directly accessed with `PopData.meta.colname` where `PopData` is the name of your PopData object, and `colname` is one of the five column names below.
 
 ### name
 
@@ -84,7 +84,7 @@ longitude data of samples (decimal degrees)
 
 ## Genotype Information
 
-The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions, along with leveraging [JuliaDBMeta.jl](https://github.com/piever/JuliaDBMeta.jl). It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are `CategoricalStrings`  from [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.loci` can be directly accessed with `PopData.loci.columns.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below.
+The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions, along with leveraging [JuliaDBMeta.jl](https://github.com/piever/JuliaDBMeta.jl). It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are `CategoricalStrings`  from [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.loci` can be directly accessed with `PopData.loci.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below.
 
 ### name
 
@@ -117,24 +117,6 @@ The genotypes of the `loci` are an array of type `Genotype`, which is an alias f
 :::caution immutable genotypes
 We use the Tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using PopGen.jl, your data should already be filtered and screened. Hand-editing of genotype alleles is **strongly** discouraged, so we outlawed it.
 :::
-
-## Viewing PopData
-
-Given the volume of information that can be present in a `PopData`, we recommend `summary()` to summarize/overview the data rather than regurgitate everything on the screen. 
-
-```
-julia> a = gulfsharks() ;
-
-julia> summary(a)
-PopData Object
-  Marker type: SNP
-  Ploidy: 2
-  Number of individuals: 212
-  Number of loci: 2213
-  Populations: 7
-  Longitude: present with 0 missing
-  Latitude: present with 0 missing
-```
 
 ## location data
 

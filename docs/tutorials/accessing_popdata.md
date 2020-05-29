@@ -9,6 +9,7 @@ A little hands-on training will probably go a long way, so let's through some of
 :::danger don't manually edit or sort
 There are specific relationships between the record entries in `PopData` objects, so **do not use** `sort`, `sort!`, or manually arrange/add/delete anything in PopData. There are included functions to remove samples or loci, rename things, add location data, etc. 
 :::
+
 ## Loading in the data
 
 Let's keep things simple by loading in the nancycats data and calling it `ncats`.
@@ -37,7 +38,7 @@ PopData Object
 ::::
 
 
-Now that we have nancycats loaded in, we can use standard Julia accessor conventions to view the elements within our PopData. The IndexedTable format requires a little extra work, so we must use the convention `PopData.meta.columns.colname` to directly access the columns we want.
+Now that we have nancycats loaded in, we can use standard Julia accessor conventions to view the elements within our PopData. The IndexedTable format requires a little extra work, so we must use the convention `PopData.meta.colname` to directly access the columns we want.
 
 ## The metadata table
 
@@ -88,7 +89,7 @@ This will access the names of the samples.
 
 ::: tab meta .name field
 ``` julia
-julia> ncats.meta.columns.name
+julia> ncats.meta.name
 ```
 :::
 
@@ -123,7 +124,7 @@ This will access the names of the populations associated with each sample, in th
 :::: tabs card stretch
 ::: tab meta .population field
 ``` julia
-julia> ncats.meta.columns.population
+julia> ncats.meta.population
 ```
 :::
 
@@ -160,7 +161,7 @@ This shows you the ploidy of the data per individual
 :::: tabs card stretch
 ::: tab meta .ploidy
 ``` julia
-julia> ncats.meta.columns.ploidy
+julia> ncats.meta.ploidy
 ```
 :::
 ::: tab output
@@ -194,7 +195,7 @@ This accesses the latitude information of the PopObj. If there is none, like in 
 :::: tabs card stretch
 ::: tab meta .latitude field
 ```julia
-julia> ncats.meta.columns.latitude
+julia> ncats.meta.latitude
 ```
 :::
 ::: tab output
@@ -228,7 +229,7 @@ This accesses the longitude information of the PopObj. Like before, if there is 
 :::: tabs card stretch
 ::: tab meta .longitude field
 ```julia
-julia> ncats.meta.columns.longitude
+julia> ncats.meta.longitude
 ```
 :::
 ::: tab output
@@ -263,7 +264,7 @@ The nancycats data has some weird coordinate system for information, so those da
 ``` julia
 julia> sharks = gulfsharks() ;    # semicolon just supresses printing output
 
-julia> hcat(sharks.meta.columns.name, sharks.meta.columns.latitude, sharks.meta.columns.longitude)
+julia> hcat(sharks.meta.name, sharks.meta.latitude, sharks.meta.longitude)
 
 212×3 Array{Any,2}:
 "cc_001"   28.3062  -80.5993
@@ -336,9 +337,9 @@ This will access the names of the loci as they appear in the data. Since everyth
 :::: tabs card stretch
 ::: tab loci .locus
 ```julia
-julia> levels(ncats.loci.columns.locus)
+julia> levels(ncats.loci.locus)
 # or #
-julia> unique(ncats.loci.columns.locus)
+julia> unique(ncats.loci.locus)
 ```
 :::
 ::: tab output
