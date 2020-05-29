@@ -1,6 +1,13 @@
+---
+id: community
+title: Community
+sidebar_label: Community
+---
+
 ## Join the Slack channel!
+
 Have questions, want to talk population genetics, or have ideas?
- 
+
  [![alt text](https://img.shields.io/badge/slack-join%20PopGen.jl-9d72b1?style=for-the-badge&logo=slack)](https://join.slack.com/t/popgenjl/shared_invite/zt-deam65n8-DuBs2z1oDtsbBuRplJW~Pg)
 
 ## Contributing
@@ -37,4 +44,4 @@ The very soul of open-source projects relies on people wanting to get involved. 
 
 This stuff can be hard. As the package grows, we expect that we'll be dealing with a growing number of issues/complaints. A little thumbs-up :thumbsup: or prayer-hands :pray: emoji (Pavel's personal favorite) can go a long way. Or cook up your own cactus graphic (like the one below) and send it to us. Who doesn't love adorable cactuses doing human things?
 
-![error_cactus](/PopGen.jl/images/terminal_cactus.png)
+![error_cactus](img//terminal_cactus.png)
