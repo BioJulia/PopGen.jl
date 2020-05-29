@@ -1,18 +1,33 @@
-![logo](docs/.vuepress/public/images/logo_banner.png)
+# Website
 
-Population Genetics in Julia. This is a fork of `PopGen.jl` in `BioJulia` with the goal of merging with it.
+This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
 
-[![alt text](https://img.shields.io/badge/docs-stable-informational?style=for-the-badge&logo=Read%20The%20Docs)](https://pdimens.github.io/PopGen.jl/) [![alt text](https://img.shields.io/badge/slack-join%20PopGen.jl-9d72b1?style=for-the-badge&logo=slack)](https://join.slack.com/t/popgenjl/shared_invite/zt-deam65n8-DuBs2z1oDtsbBuRplJW~Pg)
+### Installation
 
-#### How to install:
-Invoke the package manager by pressing `]` on an empty line and `add` this repo
+```
+$ yarn
+```
 
-![install_instructions](docs/.vuepress/public/images/install_carbon.png)
+### Local Development
 
----------
+```
+$ yarn start
+```
 
-### Authors
+This command starts a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
 
-[![alt text](docs/.vuepress/public/images/orcid.png)](https://orcid.org/0000-0003-3823-0373) [![alt text](docs/.vuepress/public/images/twitter.png)](https://twitter.com/PVDimens) Pavel Dimens, PhD Candidate @ U. Southern Mississippi
+### Build
 
-[![alt text](docs/.vuepress/public/images/orcid.png)](http://orcid.org/0000-0002-9100-217X) [![alt text](docs/.vuepress/public/images/twitter.png)](https://twitter.com/JasonSelwyn) Jason Selwyn, PhD Candidate @ Texas A&M University - Corpus Christi
+```
+$ yarn build
+```
+
+This command generates static content into the `build` directory and can be served using any static contents hosting service.
+
+### Deployment
+
+```
+$ GIT_USER=<Your GitHub username> USE_SSH=true yarn deploy
+```
+
+If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
