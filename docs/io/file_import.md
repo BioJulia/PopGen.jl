@@ -1,4 +1,8 @@
-# Reading in data
+---
+id: file_import
+title: Reading in data
+sidebar_label: Reading in data
+---
 
 Currently, PopGen.jl provides four different file parsers with which to create `PopData`. Each of the file types have their own file importer denoted simply by the file type:
 

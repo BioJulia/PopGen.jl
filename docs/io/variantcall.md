@@ -1,4 +1,8 @@
-# Variant Call Format
+---
+id: vcf
+title: Variant Call Format
+sidebar_label: Variant Call Format
+---
 
 ## Import a BCF/VCF file as a `PopObj`
 PopGen.jl provides a simple command `vcf` to import a VCF file as a `PopObj`, which requires only the name of the file and nothing else. While not strictly necessary, if you have polyploid or mixed-ploidy samples, this import method may be most efficient.

@@ -1,4 +1,8 @@
-# Genepop format
+---
+id: genepop
+title: Genepop format
+sidebar_label: Genepop format
+---
 
 ## Import a genepop file as `PopData`
 

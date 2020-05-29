@@ -14,7 +14,7 @@ Invoke the package manager with `]` in the REPL and use
 add "https://github.com/pdimens/PopGen.jl"
 ```
 
-![install](/PopGen.jl/images/install_repl.gif)
+![install](/img/install_repl.gif)
 :::
 ::: tab with Jupyter Notebooks or nteract
 
@@ -23,7 +23,7 @@ using Pkg
 Pkg.add(PackageSpec(url="https://github.com/pdimens/PopGen.jl", rev="master"))
 ```
 
-![install](/PopGen.jl/images/install_jupyter.gif)
+![install](/img/install_jupyter.gif)
 :::
 ::::
 

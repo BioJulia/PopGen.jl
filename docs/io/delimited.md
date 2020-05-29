@@ -1,4 +1,8 @@
-## Delimited format
+---
+id: delimited
+title: Delimited format
+sidebar_label: Delimited format
+---
 
 ## Import a delimited file as `PopData`
 
@@ -41,21 +45,23 @@ make sure to change your backslashes `\` to forward slashes `/`
 Missing genotypes can be formatted as all-zeros (ex.`000000`) or negative-nine `-9`
 
 #### Location data
-If location data is missing for a sample (which is ok!), make sure the value is written
-as `0`, otherwise there will be transcription errors!
+If location data is missing for a sample (which is ok!), make sure the value is blank, otherwise there will be transcription errors! (example at line 3 in the example below)
 
-:::: tabs card stretch
-::: tab formatting example
+**Example**
 ```
-name,population,long,lat,Locus1,Locus2,Locus3
-sierra_01,mountain,11.11,-22.22,001001,002002,001001
-sierra_02,mountain,11.12,-22.21,001001,001001,001002
-snbarb_03,coast,0,0,001001,001001,001002
-snbarb_02,coast,11.14,-22.24,001001,001001,001001
-snbarb_03,coast,11.15,0,001002,001001,001001
+lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
 ```
-:::
-::::
+##### Formatting example:
+```
+name,population,long,lat,Locus1,Locus2,Locus3   \n
+sierra_01,mountain,11.11,-22.22,001001,002002,001001   \n
+sierra_02,mountain,11.12,-22.21,001001,001001,001002   \n
+snbarb_01,coast,,,001001,001001,001002 \n
+snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
+snbarb_03,coast,11.15,,001002,001001,001001 \n
+```
+
+
 
 ::: tip
 You can also use the command `csv()` synonymously with `delimited()`. 

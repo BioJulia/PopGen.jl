@@ -1,4 +1,9 @@
-# Provided datasets
+---
+id: datasets
+title: Provided datasets
+sidebar_label: Provided datasets
+---
+
 PopGen.jl provides two datasets as examples, `nancycats` and `gulfsharks`. The datasets can be retrieved using the `dataset` function, or their names as commands without arguments (e.g. `gulfsharks()`). 
 
 ::: tip identitcal methods
