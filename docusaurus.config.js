@@ -9,7 +9,16 @@ module.exports = {
   themeConfig: {
     navbar: {
       prism: {
+        defaultLanguage: 'julia',
         additionalLanguages: ['julia'],
+        theme: require('prism-react-renderer/themes/github'),
+        darkTheme: require('prism-react-renderer/themes/palenight')
+      },
+      algolia: {
+        apiKey: 'f6d1b3005e55708c6b33b80157908b05',
+        indexName: 'popgen_jl',
+        //appId: 'app-id', // Optional, if you run the DocSearch crawler on your own
+        //algoliaOptions: {}, // Optional, if provided by Algolia
       },
       title: 'PopGen.jl',
       logo: {

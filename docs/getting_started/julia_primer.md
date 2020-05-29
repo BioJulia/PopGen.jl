@@ -13,7 +13,7 @@ There is nothing inherently special about this documentation relative to other d
 
 Everyone has their own particular workflows, and if you're new to Julia, you might not have established one yet. Julia can be used rather comfortably using its built-in interpreter, but you can also use it via Atom (the officially supported [uber-juno](https://junolab.org/) add-on) for an RStudio-like experience. If you're already a fan of Jupyter notebooks (or [**nteract**](https://nteract.io/)), then all you need is to install the `IJulia` package in Julia and you have full Jupyter support for Julia! Other popular options are VScode (julia add-on), or Emacs. 
 
-::: tip Trivia
+:::note Trivia
 If you didn't already know,  the name "Jupyter" is actually a concatenation of **Ju** (julia) **Pyt** (python) and **eR** (R). 🤯
 :::
 
@@ -138,8 +138,8 @@ So, instead of writing `thing1::Float64, thing2::Float64, thing3::Float64`, we j
 
 As part of Julia's type-safe paradigm and multiple dispatch (see "ERROR: MethodError: no method matching" below), type specifications in functions often reduce runtime of functions, but also establish function identity. Multiple dispatch refers to several different functions having the same name, but employing different *methods* depending on the input. In Julia, it's easier to write a single function with multiple type-safe methods, rather than one mega-function that accepts any type and have a bunch of `if` statements that determines what the program does depending on the input. 
 
-::: tip Best Practice
-As a rule of thumb, `for ` loops with `if` conditions in them slow down the compiler, so best-practice often encourages us to write type-specific methods.
+:::info Best Practice
+As a rule of thumb, `for`  loops with `if` conditions in them slow down the compiler, so best-practice often encourages us to write type-specific methods.
 :::
 In practice, this looks like:
 
@@ -194,11 +194,13 @@ MethodError's can definitely get annoying, but they are more commonly the result
 
 Let's talk about semicolons some more.
 
-::: details TL;DR
+:::info TL;DR
 Reading these docs, pay attention to semicolons in the function argument lists.
+
 -  arguments before a semicolon have no keyword and follow an explicit order
 -  arguments after a semicolon have a keyword `argument = value` and their order doesn't matter
-- `MethodError: no methods matching` is often a user error and not a bug, but if it is, please open an issue!
+-  `MethodError: no methods matching` is often a user error and not a bug, but if it is, please open an issue!
+
 :::
 
 Broadly speaking, there are two types of function declarations in Julia: ones with keywords and ones without keywords. The term "keywords" refers to an input argument that has the format `argument = value`. This format is present in many of the functions in this and other packages, however there are some specifics to understand when functions use keywords and when they don't. 
