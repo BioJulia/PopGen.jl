@@ -163,7 +163,7 @@ end
 
 #### Find missing ####
 """
-    missing(data::PopData; mode::String = "sample")
+    missing(data::PopData; by::String = "sample")
 Get missing genotype information in a `PopData`. Specify a mode of operation
 to return a DataFrame corresponding with that missing information.
 
@@ -175,20 +175,20 @@ to return a DataFrame corresponding with that missing information.
 
 ### Example:
 ```
-missing(gulfsharks(), mode = "pop")
+missing(gulfsharks(), by = "pop")
 ```
 """
-@inline function Base.missing(data::PopData; mode::String)
-    if mode == "sample" || mode == "individual"
+@inline function Base.missing(data::PopData; by::String)
+    if by ∈ ["sample", "individual"]
         return @by(data.loci, :name, missing = count(ismissing, :genotype))
 
-    elseif mode == "pop" || mode == "population"
+    elseif by ∈ ["pop", "population"]
         return @by(data.loci, :population, missing = count(ismissing, :genotype))
 
-    elseif mode == "locus" || mode == "loci"
+    elseif by ∈ ["locus", "loci"]
         return @by(data.loci, :locus, missing = count(ismissing, :genotype))
 
-    elseif mode == "detailed" || mode == "full"
+    elseif by ∈ ["detailed", "full"]
         return @by(data.loci, [:locus, :population], missing = count(ismissing, :genotype))
     else
         @error "Mode \"$mode\" not recognized. Please specify one of: sample, pop, locus, or full"
@@ -196,8 +196,8 @@ missing(gulfsharks(), mode = "pop")
     end
 end
 
-@inline function Base.missing(data::PopData, mode::String = "sample")
-    missing(data, mode = mode)
+@inline function Base.missing(data::PopData, by::String = "sample")
+    missing(data, by = mode)
 end
 
 """

@@ -9,7 +9,15 @@ To follow along like a tutorial, load the `gulfsharks` data in if you haven't al
 ```julia
 julia> using PopGen
 
-julia> sharks = gulfsharks() ;
+julia> sharks = gulfsharks()
+PopData Object
+  Marker type: SNP
+  Ploidy: 2
+  Number of individuals: 212
+  Number of loci: 2213
+  Populations: 7
+  Longitude: present with 0 missing
+  Latitude: present with 0 missing
 ```
 
 ### [Accessing Elements](accessing_popdata.md)
