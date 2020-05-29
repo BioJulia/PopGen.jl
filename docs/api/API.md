@@ -10,7 +10,7 @@ This page contains the APIs, or **A**pplication **P**rogramming **I**nterface, w
 ::: tab AlleleFreq.jl/alleles
 ### `alleles`
 ```julia
-alleles(locus::T) where T<:GenotypeArray
+alleles(locus::T) where T<:GenoArray
 ```
 Return an array of all the non-missing alleles present in a locus.
 :::
@@ -20,7 +20,7 @@ Return an array of all the non-missing alleles present in a locus.
 ::: tab AlleleFreq.jl/unique_alleles
 ### `unique_alleles`
 ```julia
-unique_alleles(locus::T) where T<:GenotypeArray
+unique_alleles(locus::T) where T<:GenoArray
 ```
 Return an array of all the unique non-missing alleles of a locus.
 :::
@@ -30,7 +30,7 @@ Return an array of all the unique non-missing alleles of a locus.
 ::: tab AlleleFreq.jl/allele_freq
 ### `allele_freq`
 ```julia
-allele_freq(locus::T) where T<:GenotypeArray
+allele_freq(locus::T) where T<:GenoArray
 ```
 Return a `Dict` of allele frequencies of a single locus in a `PopData`
 object.
@@ -60,7 +60,7 @@ allele_freq(cats, "fca8", population = true)
 ::: tab AlleleFreq.jl/allele_feq_vec
 ### `allele_freq_vec`
 ```julia
-allele_freq_vec(locus::T) where T<:GenotypeArray
+allele_freq_vec(locus::T) where T<:GenoArray
 ```
 Return a Vector of allele frequencies of a single locus in a `PopData` object. Similar to `allele_freq()`, except it returns only the frequencies, without the allele names, meaning they can be in any order. This can be useful for getting the expected genotype frequencies.
 :::
@@ -70,7 +70,7 @@ Return a Vector of allele frequencies of a single locus in a `PopData` object. S
 ::: tab AlleleFreq.jl/geno_count_observed
 ### `geno_count_observed`
 ```julia
-geno_count_observed(locus::T) where T<:GenotypeArray
+geno_count_observed(locus::T) where T<:GenoArray
 ```
 Return a `Dict` of genotype counts of a single locus in a
 `PopData` object.
@@ -81,7 +81,7 @@ Return a `Dict` of genotype counts of a single locus in a
 ::: tab AlleleFreq.jl/geno_count_expected
 ### `geno_count_expected`
 ```julia
-geno_count_expected(locus::T) where T<:GenotypeArray
+geno_count_expected(locus::T) where T<:GenoArray
 ```
 Return a `Dict` of the expected genotype counts of a single locus in a
 `PopData` object. Expected counts are calculated as the product of observed allele frequencies multiplied by the number of non-missing genotypes.
@@ -122,7 +122,7 @@ geno_freq(cats, "fca8", population = true)
 ::: tab AlleleFreq.jl/geno_freq
 ### `geno_freq`
 ```julia
-geno_freq_expected(locus::T) where T<:GenotypeArray
+geno_freq_expected(locus::T) where T<:GenoArray
 ```
 Return a `Dict` of the expected genotype frequencies of a single locus in a `PopData` object. Expected frequencies are calculated as the product of
 observed allele frequencies.
@@ -207,7 +207,7 @@ sharks = gulfsharks()
 ::: tab HardyWeinberg.jl/locus_chi_sq
 ### `locus_chi_sq`
 ```julia
-locus_chi_sq(locus::T) where T <: GenotypeArray
+locus_chi_sq(locus::T) where T <: GenoArray
 ```
 Calculate the chi square statistic and p-value for a locus
 Returns a tuple with chi-square statistic, degrees of freedom, and p-value.
@@ -215,28 +215,12 @@ Returns a tuple with chi-square statistic, degrees of freedom, and p-value.
 ::::
 
 :::: tabs
-::: tab HardyWeinberg.jl/multitest_missing
-### `multitest_missing`
-```julia
-    multitest_missing(pvals::Array{Float64,1}, correction::String)
-```
-Modification to `MultipleTesting.adjust` to include `missing` values in the returned array. Missing values are first removed from the array, the appropriate correction made, then missing values are re-added to the array at their original positions. See MultipleTesting.jl docs for full more detailed information.
-:::
-::: tab example
-``` julia
-multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")
-```
-:::
-::::
-
-:::: tabs
 ::: tab HardyWeinberg.jl/hwe_test
 ### `hwe_test`
 ```julia
-    hwe_test(data::PopData; by_pop::Bool = false; correction = "none")
+    hwe_test(data::PopData; by::String = "locus", correction = "none")
 ```
-Calculate chi-squared test of HWE for each locus and returns observed and
-expected heterozygosity with chi-squared, degrees of freedom and p-values for each locus. Use `by_pop = true` to perform this separately for each population (default: by_pop = false) and return a NamedTuple of DataFrames with the names corresponding to the population names. Use `correction =` to specify a P-value adjustment method for multiple testing.
+Calculate chi-squared test of HWE for each locus and returns observed and expected heterozygosity with chi-squared, degrees of freedom and p-values for each locus. Use `by = "population"` to perform this separately for each population (default: `by = "locus"`). Use `correction =` to specify a P-value adjustment method for multiple testing.
 
 **correction methods (case insensitive)**
 - `"bonferroni"` : Bonferroni adjustment
@@ -247,13 +231,13 @@ expected heterozygosity with chi-squared, degrees of freedom and p-values for ea
 - `"bl"`  : Benjamini-Liu adjustment
 - `"hommel"` : Hommel adjustment
 - `"sidak"` : Šidák adjustment
-- `"forward stop"` or `"fs"` : Forward-Stop adjustment
+- `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
 :::
 ::: tab example
 ```julia
 hwe_test(gulfsharks(), correction = "bh")
-hwe_test(gulfsharks(), by_pop = true, correction = "bh")
+hwe_test(gulfsharks(), by = "population", correction = "bh")
 ```
 :::
 ::::
@@ -263,7 +247,7 @@ hwe_test(gulfsharks(), by_pop = true, correction = "bh")
 ::: tab Heterozygosity.jl/ishom
 ### `ishom`
 ```julia
-ishom(locus::T) where T <: GenotypeArray
+ishom(locus::T) where T <: GenoArray
 ishom(locus::Genotype)
 ishom(locus::Missing)
 ```
@@ -275,7 +259,7 @@ A series of methods to test if a locus or loci are homozygous and return `true` 
 ::: tab Heterozygosity.jl/ishet
 ### `ishet`
 ```julia
-ishet(locus::T) where T <: GenotypeArray
+ishet(locus::T) where T <: GenoArray
 ishet(locus::Genotype)
 ishet(locus::Missing)
 ```
@@ -287,7 +271,7 @@ A series of methods to test if a locus or loci are heterozygous and return `true
 ::: tab Heterozygosity.jl/hetero_o
 ### `hetero_o`
 ```julia
-hetero_o(data::T) where T <: GenotypeArray
+hetero_o(data::T) where T <: GenoArray
 ```
 Returns observed heterozygosity as a mean of the number of heterozygous genotypes, defined as genotypes returning `true` for `ishet()`. This is numerically feasible because `true` values are mathematically represented as `1`, whereas `false` are represented as `0`.
 :::
@@ -297,7 +281,7 @@ Returns observed heterozygosity as a mean of the number of heterozygous genotype
 ::: tab Heterozygosity.jl/hetero_e
 ### `hetero_e`
 ```julia
-hetero_e(allele_freqs::Vector{T}) where T <: GenotypeArray
+hetero_e(allele_freqs::Vector{T}) where T <: GenoArray
 ```
 Returns the expected heterozygosity of an array of genotypes, calculated as 1 - sum of the squared allele frequencies.
 :::
@@ -355,16 +339,17 @@ locations!(data::PopData; lat::Vector{Float64}, long::Vector{Float64})
 locations!(data::PopData, lat::Vector{Union{Missing,T}}, long::Vector{Union{Missing,T}}) where T <: AbstractFloat
 locations!(data::PopData, lat::Vector{T}, long::Vector{T}) where T <: AbstractFloat
 ```
-Replaces existing `PopData` location data (latitude `lat`, longitude `long`).
-Takes decimal degrees as a `Vector` of any `AbstractFloat`.
+Replaces existing `PopData` location data (longitude `long`, latitude `lat`). Takes **decimal degrees** as a `Vector` of any `AbstractFloat` with tolerance for `missing` values.
 
-**Formatting requirements**
+## Formatting requirements
 - Decimal Degrees format: `-11.431`
 - **Must** use negative sign `-` instead of cardinal directions
 - Location data must be in the order that samples appear in your `PopData`
 - Missing data should be coded as `missing` values of type `Missing` (can be accomplished with `replace!()`)
+
 :::
 ::: tab example
+
 ```julia
 ncats = nancycats() ;
 x = rand(237) ; y = rand(237)
@@ -374,80 +359,46 @@ locations!(ncats, long = x, lat = y)
 ::::
 
 :::: tabs
-::: tab Manipulate.jl/locations
+::: tab Manipulate.jl/locations!
+
 ### `locations!`
 ```julia
-locations!(data::PopData; lat::Vector{String}, long::Vector{String})
-locations!(data::PopData, long::Vector{Union{Missing,String}}, lat::Vector{Union{Missing,String}})
+locations!(data::PopData; long::Vector{String}, lat::Vector{String})
 ```
-Replaces existing `PopData` location data (latitude `lat`, longitude `long`). Takes
-decimal minutes format as a `Vector` of `String`. Recommended to use `CSV.read`
-from `CSV.jl` to import your spatial coordinates from a text file.
+Replaces existing `PopData` location data (longitude `long`, latitude `lat`). Takes **decimal minutes** or **degrees minutes seconds** format as a `Vector` of `String`. Recommended to use `CSV.read` from `CSV.jl` to import your spatial coordinates from a text file.
+## Formatting requirements
+- Coordinates as a `String` separated by spaces (`"11 43 41"`) or colons (`"11:43:41"`)
+- Must use negative sign (`"-11 43.52"`) or single-letter cardinal direction (`"11 43.52W"`)
+- Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
+- Can mix colons and spaces (although it's bad practice)
 
-**Formatting requirements**
-- Decimal Minutes: `"-11 43.11"` (must use space and be a `String`)
-- **Must** use negative sign `-` instead of cardinal directions
-- Location data must be in the order that samples appear in your `PopData`
-- Missing data should be coded as `missing` values of type `Missing` (can be accomplished with `replace!()`)
+
+
+**NOTE**
+
+If you read in the coordinate data as 4 vectors (longitude degrees, longitude minutes, latitude degrees, latitude minutes), then the easiest course of action would be to merge them into two vectors of strings
+(one for longitude, one for latitude):
+
+```
+long_string = string.(lat_deg, " ", lat_min)
+lat_string = string.(long_deg, " ", long_min)
+```
+and use these as inputs into `locations!`
+
 :::
 ::: tab example
+
 ```julia
 ncats = nancycats();
-x = fill("-11 22.33", 237) ; y = fill("-41 31.52", 237)
+x = fill("11 22.33W", 237) ; y = fill("-41 31.52", 237)
 locations!(ncats, long = x, lat = y)
 ```
 :::
 ::::
 
 :::: tabs
-::: tab Manipulate.jl/locations!
-### `locations!`
-```julia
-locations!(data::PopData; kwargs...)
-```
-Replaces existing `PopData` location data (latitude, longitude). Requires all four keyword arguments. Takes decimal minutes format as vectors of degrees (`Int`) and decimal minutes (`Float`). Recommended to use `CSV.read` from `CSV.jl` to import your spatial coordinates from a text file.
-
-**Keyword Arguments:**
-- `lat_deg::Vector{Int}` a vector of postive or negative integers denoting the latitude degrees
-    - example: `[11, -12, 15, 11]`
-- `lat_min::Vector{Float64}` a vector of positive floating point numbers denoting the latitude decimal minutes
-    - example: `[43.12, 41.32, 36.53, 22.41]`
-- `long_deg::Vector{Int}` same as `lat_deg` but for longitude degrees
-- `long_min::Vector{Float64}` same as `lat_min` but for longitude minutes
-
- **Formatting requirements**
-- **Must** use negative sign `-` instead of cardinal directions
-- Location data must be in the order that samples appear in your `PopData`
-- Missing data should be coded as `missing` values of type `Missing` (can be accomplished with `replace!()`)
-:::
-::: tab example
-If you have decimal-minutes coordinates for two samples:
-- Sample 1  _Long:_ 11 43.12  _Lat:_ 15 36.53
-- Sample 2  _Long:_ -12 41.32 _Lat:_ 11 22.41
-
-Then your inputs would be:
-```julia
-lo_deg = [11, -12]
-lo_min = [43.12, 41.32]
-la_deg  = [15, 11]
-la_min  = [36.53, 22.41]
-locations!(data, long_deg = lo_deg, long_min = lo_min, lat_deg = la_deg, lat_min = la_min)
-```
-:::
-::::
-
-:::: tabs
-::: tab Manipulate.jl/locations!
-### `locations!`
-```julia
-locations!(data::PopData,lat_deg::Vector{Union{Missing,Int}},lat_min::Vector{Union{Missing,Float64}},long_deg::Vector{Union{Missing,Int}},long_min::Vector{Union{Missing,Float64}})
-```
-Used internally for the appropriate processing of `locations!(::PopData; kwargs...)`
-:::
-::::
-
-:::: tabs
 ::: tab Manipulate.jl/loci
+
 ### `loci`
 ```julia
 loci(data::PopData)
@@ -457,18 +408,8 @@ Returns an array of strings of the loci names in a `PopData` object.
 ::::
 
 :::: tabs
-::: tab Manipulate.jl/loci
-### `loci`
-```julia
-loci(data::IndexedTable)
-```
-Convenience wrapper to return an array of loci names as strings in the `loci`
-Table of a `PopData` object.
-:::
-::::
-
-:::: tabs
 ::: tab Manipulate.jl/get_genotypes
+
 ### `get_genotypes`
 ```julia
 get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
@@ -521,11 +462,12 @@ locus(gulfsharks(), "contig_475")
 ::: tab Manipulate.jl/missing
 ### `missing`
 ```julia
-missing(data::PopData; mode::String = "sample")
+missing(data::PopData; by::String = "sample")
 ```
 Get missing genotype information in a `PopData`. Specify a mode of operation to return a DataFrame corresponding with that missing information.
 
 **Modes**
+
 - `"sample"` - returns a count and list of missing loci per individual (default)
 - `"pop"` - returns a count of missing genotypes per population
 - `"locus"` - returns a count of missing genotypes per locus
@@ -533,7 +475,7 @@ Get missing genotype information in a `PopData`. Specify a mode of operation to 
 :::
 ::: tab example
 ```julia
-missing(gulfsharks(), mode = "pop")
+missing(gulfsharks(), by = "pop")
 ```
 :::
 ::::
@@ -541,7 +483,7 @@ missing(gulfsharks(), mode = "pop")
 :::: tabs
 ::: tab Manipulate.jl/populations
 ```julia
-    populations(data::PopData; listall::Bool = false)
+populations(data::PopData; listall::Bool = false)
 ```
 View unique population ID's and their counts in a `PopData`.
 
@@ -586,68 +528,22 @@ populations!(potatoes, potatopops)
 ::: tab Manipulate.jl/populations!
 ### `populations!`
 ```julia
-populations!(data::PopData, oldnames::Vector{String}, newnames::Vector{String})
+populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
 ```
-Similar to the `Dict` method, except instead of creating a dictionary of "oldname" => "newname" you input a Vector{String} of `oldnames` followed by another of `newnames`. Logically, the new names will replace the old names in the same order as they appear in PopData.meta(e.g. the first newname replaces the first oldname, etc.).
+Completely reassign populations for each individual. Takes two vectors of strings as input: one of the sample names, and the other with their new corresponding population name.
 
 :::
 ::: tab example
-```julia
-populations!(potatoes, ["russet1", "russet2"], ["north_russet", "south_russet"])
-```
-:::
-::::
 
-:::: tabs
-::: tab Manipulate.jl/populations!
-### ` populations!`
 ```julia
-populations!(data::PopData, rename::NamedTuple)
-```
-Generate new population names for a `PopData`, overwriting everthing/anything currently there. Will generate an array of population names from a NamedTuple of `(names = , counts = )` where `names` is an array of the names of the populations and `counts` is an array of the number of samples per population.
-:::
-::: tab example
-To assign names for three populations in a `PopData` named "Starlings" where new
-population names are "North", "South", "East" and their sizes are 15, 32, 11:
-```
-populations!(Starlings, (names = ["North","South", "East"], counts = [15,32,11]))
-```
-:::
-::::
-
-:::: tabs
-::: tab Manipulate.jl/populations!
-### `populations!`
-```julia
-populations!(data::PopData, rename::Vector{String}, counts::Vector{T}) where T<:Signed
-```
-Just like the NamedTuple method, except without the NamedTuple. Use an Array of Strings as the second argument to denote population names, and an Array of Integers as the third argument to denote the number of samples per population.
-:::
-::: tab example
-```julia
-populations!(Starlings, ["North","South", "East"], [15,32,11])
-```
-:::
-::::
-
-:::: tabs
-::: tab Manipulate.jl/reindex
-### `reindex`
-```julia
-reindex(data::PopData, col::Union{String, Symbol})
-```
-Re-index and sort the `loci` table of a `PopData` object by column `col`. Returns a new `PopData` object.
-:::
-::: tab example
-```julia
-sharks = gulfsharks()
-reindex(sharks, :population)
+populations!(potatoes, ["potato_1", "potato_2"], ["north_russet", "south_russet"])
 ```
 :::
 ::::
 
 :::: tabs
 ::: tab Manipulate.jl/exclude_loci
+
 ### `exclude_loci`
 ```julia
 exclude_loci(data::PopData, locus::String)
@@ -787,10 +683,10 @@ For convenience purposes, an alias for `NTuple{N, <:Signed} where N`, which is t
 ::::
 
 :::: tabs
-::: tab Types.jl/GenoTypeArray
-### `GenoTypeArray`
+::: tab Types.jl/GenoArray
+### `GenoArray`
 ```julia
-GenotypeArray::DataType
+GenoArray::DataType
 ```
 For convenience purposes, an alias for an `AbstractVector` of elements `Missing` and `Genotype`, which itself is of type `NTuple{N, <:Signed} where N`. The definition as an `AbstractVector` adds flexibility for `SubArray` cases.
 :::
@@ -849,8 +745,6 @@ lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
 :::
 ::::
-
-
 
 ## Genepop.jl
 :::: tabs
@@ -1002,5 +896,66 @@ vcf(infile::String)
 ```
 Load a VCF file into memory as a PoDataj object. Population and [optional] location information need to be provided separately.
 - `infile` : path to VCF file
+
+:::
+::::
+
+## Utils.jl
+:::: tabs
+::: tab Utils.jl/convert_coord
+```julia
+convert_coord(coordinate::String)
+```
+Takes non-decimal-degree format as a `String` and returns it as a decimal degree `Float32`. Can be broadcasted over an array of coordinate strings to convert them.
+### Formatting requirements
+- Coordinates as a `String` separated by spaces (`"11 43 41"`) or colons (`"11:43:41"`)
+- Must use negative sign (`"-11 43.52"`) or single-letter cardinal direction (`"11 43.52W"`)
+- Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
+- Can mix colons and spaces (although it's bad practice)
+:::
+::: tab example
+```julia
+julia> convert_coord("-41 31.52")
+-41.5253f0
+
+julia> convert_coord.(["-41 31.52", "25 11:54S"])
+2-element Array{Float32,1}:
+-41.5253
+-25.1983
+```
+:::
+::::
+
+:::: tabs
+::: tab Utils.jl/multitest_missing
+### `multitest_missing`
+```julia
+multitest_missing(pvals::multitest_missing(pvals::Vector{T}, correction::String) where T <: Union{Missing, <:AbstractFloat}
+```
+Modification to `MultipleTesting.adjust` to include `missing` values in the returned array. Missing values are first removed from the array, the appropriate correction made, then missing values are re-added to the array at their original positions. See MultipleTesting.jl docs for full more detailed information.
+:::
+::: tab example
+``` julia
+multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")
+```
+:::
+::::
+
+:::: tabs
+::: tab Utils.jl/nonmissing
+```julia
+nonmissing(vec::T) where T<:AbstractArray
+```
+Convenience function to count the number of non-`missing` values
+in a vector.
+:::
+::::
+
+:::: tabs
+::: tab Utils.jl/reciprocal
+```julia
+reciprocal(num::T) where T <: Signed
+```
+Returns the reciprocal (1/number) of a number. Will return `0` when the number is `0` instead of returning `Inf`.
 :::
 ::::

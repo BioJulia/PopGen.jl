@@ -55,7 +55,7 @@ end
 """
     locations!(data::PopData; long::Vector{String}, lat::Vector{String})
 Replaces existing `PopData` location data (longitude `long`, latitude `lat`). Takes
-**decimal minutes** format as a `Vector` of `String`. Recommended to use `CSV.read`
+**decimal minutes** or **degrees minutes seconds** format as a `Vector` of `String`. Recommended to use `CSV.read`
 from `CSV.jl` to import your spatial coordinates from a text file.
 ## Formatting requirements
 - Coordinates as a `String` separated by spaces (`"11 43 41"`) or colons (`"11:43:41"`)
