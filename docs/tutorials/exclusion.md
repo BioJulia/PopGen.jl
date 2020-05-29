@@ -17,9 +17,7 @@ Returns a new `PopData` object without the sample or samples provided. Input can
 :::: tabs card stretch
 ::: tab single individual
 ``` julia
-julia> fewer_sharks = exclude_samples(sharks, "cc_001") ;
-
-julia> summary(fewer_sharks)
+julia> fewer_sharks = exclude_samples(sharks, "cc_001")
 PopData Object
   Marker type: SNP
   Ploidy: 2
@@ -32,9 +30,7 @@ PopData Object
 :::
 ::: tab multiple individuals
 ``` julia
-julia> lots_fewer_sharks = remove_samples(sharks, ["cc_001", "cc_002", "cc_003"]) ; 
-
-julia> summary(lots_fewer_sharks)
+julia> lots_fewer_sharks = remove_samples(sharks, ["cc_001", "cc_002", "cc_003"])
 PopData Object
   Marker type: SNP
   Ploidy: 2
@@ -62,9 +58,7 @@ Returns a new `PopData` object without the locus or loci provided. Input can be 
 :::: tabs card stretch
 ::: tab single locus
 ``` julia
-julia> fewer_shark_loci = exclude_loci(sharks, "contig_475") ;
-
-julia> summary(fewer_shark_loci)
+julia> fewer_shark_loci = exclude_loci(sharks, "contig_475")
 PopData Object
   Marker type: SNP
   Ploidy: 2
@@ -77,9 +71,7 @@ PopData Object
 :::
 ::: tab multiple loci
 ``` julia
-julia> lots_fewer_loci = remove_loci(sharks, ["contig_475", "contig_2784", "contig_8065"]) ; 
-
-julia> summary(lots_fewer_loci)
+julia> lots_fewer_loci = remove_loci(sharks, ["contig_475", "contig_2784", "contig_8065"])
 PopData Object
   Marker type: SNP
   Ploidy: 2

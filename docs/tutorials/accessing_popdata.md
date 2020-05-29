@@ -379,25 +379,25 @@ julia> @where(ncats.loci, :locus .== "fca8")
 :::
 ::: tab multiple loci
 ```julia
-julia> @where ncats.loci :locus in ["fca8", "fca23"]
-Table with 474 rows, 4 columns:
-name    population  locus    genotype
-─────────────────────────────────────
-"N1"    "1"         "fca8"   missing
-"N1"    "1"         "fca23"  (4, 9)
-"N2"    "1"         "fca8"   missing
-"N2"    "1"         "fca23"  (9, 9)
-"N3"    "1"         "fca8"   (9, 13)
-"N3"    "1"         "fca23"  (4, 9)
-"N4"    "1"         "fca8"   (8, 9)
-"N4"    "1"         "fca23"  (5, 5)
+julia> cats.loci[ncats.loci.locus .∈ Ref(["fca8", "fca23"]), :]
+474×4 DataFrame
+│ Row │ name │ population │ locus │ genotype   │
+│     │ Cat… │ Cat…       │ Cat…  │ Tuple…?    │
+├─────┼──────┼────────────┼───────┼────────────┤
+│ 1   │ N215 │ 1          │ fca8  │ missing    │
+│ 2   │ N216 │ 1          │ fca8  │ missing    │
+│ 3   │ N217 │ 1          │ fca8  │ (135, 143) │
+│ 4   │ N218 │ 1          │ fca8  │ (133, 135) │
+│ 5   │ N219 │ 1          │ fca8  │ (133, 135) │
+│ 6   │ N220 │ 1          │ fca8  │ (135, 143) │
 ⋮
-"N235"  "17"        "fca8"   (9, 12)
-"N235"  "17"        "fca23"  (4, 8)
-"N236"  "17"        "fca8"   (10, 13)
-"N236"  "17"        "fca23"  (2, 4)
-"N237"  "17"        "fca8"   (9, 12)
-"N237"  "17"        "fca23"  (2, 9)
+│ 468 │ N294 │ 17         │ fca23 │ (136, 146) │
+│ 469 │ N295 │ 17         │ fca23 │ (130, 136) │
+│ 470 │ N296 │ 17         │ fca23 │ (136, 146) │
+│ 471 │ N297 │ 17         │ fca23 │ (130, 130) │
+│ 472 │ N281 │ 17         │ fca23 │ (136, 144) │
+│ 473 │ N289 │ 17         │ fca23 │ (130, 136) │
+│ 474 │ N290 │ 17         │ fca23 │ (130, 146) │
 ```
 :::
 ::::
