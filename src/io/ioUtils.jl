@@ -49,9 +49,6 @@ of a sample and return the ploidy of the first non-missing locus.
     return Int8(length(genotypes[1]))
 end
 
-@inline function find_ploidy(genotypes::T) where T<:PoolGenoArray
-    return Int8(length(genotypes[1]))
-end
 
 #TODO remove phase dip from docs
 """
