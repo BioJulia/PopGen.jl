@@ -1,4 +1,8 @@
-# Other data types
+---
+id: other_types
+title: Other data types
+sidebar_label: Other data types
+---
 
 While not strictly their own composite types, we also define aliases for genotypes and vectors of genotypes, as their explicit types can get a little unwieldy to use. The types shown below in the code blocks include their name and type (all types are of type `DataType`) on the first line, and what the alias actually defines on the second line.
 

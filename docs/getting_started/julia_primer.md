@@ -1,4 +1,9 @@
-# A quick Julia primer 
+---
+id: julia_primer
+title: A quick Julia primer
+sidebar_label: A quick Julia primer
+---
+
 *For getting the most out of this documentation*
 
 There is nothing inherently special about this documentation relative to other documentation, other than we really *really* want you to get the most out of what's written here. This means that we need to embrace the fact that both novice and experienced Julia users may be reading these docs and using this package. So let's cover some Julia basics that will really help in navigating this package before we even get into the complicated genetics stuff. This primer is by no means "everything you need to get started in Julia", and is a poor substitute for actually learning the language. In general, we recommend [Think Julia: How to Think Like a Data Scientist](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html) by Ben Lauwens to establish some solid Julia foundations. It's free online! Also, the Julia language maintains [its own great documentation](https://docs.julialang.org/en/v1/) that we rely on quite heavily for development.

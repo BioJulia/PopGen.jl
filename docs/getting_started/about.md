@@ -1,5 +1,8 @@
-
-## About
+---
+id: about
+title: About
+sidebar_label: About
+---
 
 PopGen.jl is an attempt to shift population genetics analyses away from the patchwork of available pop-gen packages present in the R and Python languages, and combine it with the speed, power, fun(?), and community of the Julia language. We hope to implement common analyses (heterozygosity, kinship, FST, Tajima's D, etc.) in *sane*, user friendly ways, with syntax used within the package being consistent with the rest of the Julia ecosystem.
 

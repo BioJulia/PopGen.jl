@@ -1,4 +1,9 @@
-# PopObj and PopData types
+---
+id: types
+title: PopObj and PopData types
+sidebar_label: PopObj and PopData types
+---
+
 For the PopGen.jl package to be consistent, a standard flexible data structure needs to be defined. The solution is a custom type called  `PopData`. The struct is defined as:
 
 ```julia

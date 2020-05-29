@@ -1,6 +1,8 @@
-# Installation
-
-## Installing PopGen.jl
+---
+id: install
+title: Installation
+sidebar_label: Installation
+---
 
 The package is currently unregistered while it's under active early development. However, installation is still simple!
 

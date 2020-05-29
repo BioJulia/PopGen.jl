@@ -1,8 +1,8 @@
 ---
-sidebarDepth: 2
+id: comparison
+title: Comparison
+sidebar_label: Comparison
 ---
-
-# Comparison
 
 There's a reason we started investing so many hours and so many new grey hairs into writing PopGen.jl when there was an existing ecosystem in R to perform these same tasks. Like we explain in the home page of these docs, we want a platform that is:
 
