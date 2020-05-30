@@ -22,7 +22,7 @@ Invoke the package manager with `]` in the REPL and use
 add "https://github.com/pdimens/PopGen.jl"
 ```
 
-![install](/img/install_repl.gif)
+![install](img/install_repl.gif)
 
 </TabItem>
 <TabItem value="jupyter">
@@ -32,7 +32,7 @@ using Pkg
 Pkg.add(PackageSpec(url="https://github.com/pdimens/PopGen.jl", rev="master"))
 ```
 
-![install](/img/install_jupyter.gif)
+![install](img/install_jupyter.gif)
 
 </TabItem>
 </Tabs>

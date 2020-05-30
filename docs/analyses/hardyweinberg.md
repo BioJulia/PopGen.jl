@@ -142,9 +142,11 @@ Since the results are in table form, you can easily process the table using `Jul
 ```julia
 julia> ncats_hwe = hwe_test(nancycats() ,by_pop = true) ;
 ```
-Now, we can use `JuliaDBMeta` to easily filter this table and leave only what we're interested in:
+Now, we can use `DataFramesMeta` to easily filter this table and leave only what we're interested in:
 ```julia
-julia> @where ncats_hwe :P !== missing && :P <= 0.05
+using DataFramesMeta
+
+julia> @wher(ncats_hwe, :P .!= missing, :P .<= 0.05)
 ```
 With this command, we invoke the `@where` filtering macro, then specify our `ncats_hwe` table, the `:P` column of P-values, and then specify two filtering parameters: 1. the P-values are not `missing`, and (`&&`) 2. the P-values are less than or equal to 0.05. Doing this results in a table that now only includes non-missing P-values of 0.05 or lower:
 ```
