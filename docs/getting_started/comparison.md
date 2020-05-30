@@ -52,7 +52,7 @@ As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux
 
 ### Loading in data
 
-Since `gulfsharks` is shamelessly provided in PopGen.jl, we simply invoke the `gulfsharks()` command in Julia. If you would like to try this yourself in R, find the `gulfsharks.gen` file in the package repository under `/data/data/gulfsharks.gen`. It will print out the input filename several times, which is omitted below for clarity. Since the file importer now uses CSV.jl to read in the file, there are two steps of the genepop parser that are multithreaded. However, the majority of the data parsing (formatting the raw data into a correct PopObj structure) occurs using a single thread. This R benchmark will take a few minutes. Consider making some tea while you wait.
+Since `gulfsharks` is shamelessly provided in PopGen.jl, we will just load it with `genepop()`.  If you would like to try this yourself in R, find the `gulfsharks.gen` file in the package repository under `/data/source/gulfsharks.gen`. Since the file importer now uses CSV.jl to read files, there is one step of the genepop parser that is multithreaded. However, the majority of the data parsing (formatting the raw data into a correct PopData structure) occurs using a single thread. This R benchmark will take a few minutes. Consider making some tea while you wait.
 
 <Tabs
   defaultValue="j"
@@ -63,9 +63,19 @@ Since `gulfsharks` is shamelessly provided in PopGen.jl, we simply invoke the `g
 }>
 <TabItem value="j">
 
-```julia
-julia> @btime x = gulfsharks() ; # hide the output
-  1.445 s (9342559 allocations: 386.67 MiB)
+```
+@benchmark sharks = genepop("data/source/gulfsharks.gen", silent = true)
+BenchmarkTools.Trial: 
+  memory estimate:  330.58 MiB
+  allocs estimate:  6905285
+  --------------
+  minimum time:     806.202 ms (5.91% GC)
+  median time:      884.887 ms (5.61% GC)
+  mean time:        910.722 ms (5.41% GC)
+  maximum time:     1.071 s (4.82% GC)
+  --------------
+  samples:          6
+  evals/sample:     1
 ```
 
 </TabItem>
@@ -86,15 +96,15 @@ microbenchmark)
 
 ![import plot](/img/speedplot.png)
 
-Comparing averages, PopGen.jl clocks in at `1.445s` versus adegenet's `6.745s` , so ~6.4x faster.
+Comparing averages, PopGen.jl clocks in at `910ms` versus adegenet's `6.745s` , so ~7.4x faster.
 
 
 
 ### `PopData` vs `genind` size
 
-It was pretty tricky to come up with a sensible/efficient/convenient data structure for PopGen.jl, and the original attempt was a Julian variant to a `genind`, which itself is something known as an `S4 class object`. While the two-IndexedTables design might not seem like it took a lot of effort, we ultimately decided that the column-major style and available tools, combined with careful genotype Typing was a decent "middle-ground" of ease-of-use vs performance. Plus, we are suckers for consistent syntax, which `genind`'s don't have compared to standard R syntax (looking at you too, Tidyverse/ggplot!). 
+It was pretty tricky to come up with a sensible/efficient/convenient data structure for PopGen.jl, and the original attempt was a Julian variant to a `genind`, which itself is something known as an `S4 class object`. While the two-DataFrames design might not seem like it took a lot of effort, we ultimately decided that the column-major style and available tools, combined with careful genotype Typing was a decent "middle-ground" of ease-of-use vs performance. Plus, we are suckers for consistent syntax, which `genind`'s don't have compared to standard R syntax (looking at you too, Tidyverse/ggplot!). 
 
-*Anyway*, it's important to understand how much space your data will take up in memory (your RAM) when you load it in, especially since data's only getting bigger! Keep in mind that `gulfsharks()` in PopGen.jl also provides lat/long data, which _should_ inflate the size of the object somewhat compared to the `genind`, which we won't add any location data to.
+*Anyway*, it's important to understand how much space your data will take up in memory (your RAM) when you load it in, especially since data's only getting bigger! Keep in mind that `gulfsharks` in PopGen.jl also provides lat/long data, which _should_ inflate the size of the object somewhat compared to the `genind`, which we won't add any location data to.
 
 <Tabs
   defaultValue="j"
@@ -106,8 +116,8 @@ It was pretty tricky to come up with a sensible/efficient/convenient data struct
 <TabItem value="j">
 
 ```julia
-julia> Base.summarysize(x)
- 3498172
+julia> Base.summarysize(sharks)
+3527765
 #bytes
 ```
 
@@ -141,8 +151,18 @@ This is a classic population genetics test and a relatively simple one. The R be
 <TabItem value="j">
 
 ```julia
-julia> @btime hwe_test(x) ;
-  591.396 ms (962353 allocations: 39.88 MiB)
+julia> @benchmark hwe_test(sharks)
+BenchmarkTools.Trial: 
+  memory estimate:  46.22 MiB
+  allocs estimate:  1050525
+  --------------
+  minimum time:     145.476 ms (0.00% GC)
+  median time:      179.146 ms (4.35% GC)
+  mean time:        176.142 ms (3.56% GC)
+  maximum time:     204.813 ms (0.00% GC)
+  --------------
+  samples:          29
+  evals/sample:     1
 ```
 
 </TabItem>
@@ -160,4 +180,4 @@ Unit: seconds
 
 ![chi squared plot](/img/chisqplot.png)
 
-Comparing averages, PopGen.jl clocks in at ~`591ms` versus adegenet's `6.3s`, so ~10.5x faster. 
+Comparing averages, PopGen.jl clocks in at ~`176ms` versus adegenet's `6.3s`, so ~**35.8x** faster(!) 
