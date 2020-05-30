@@ -10,9 +10,7 @@ module.exports = {
     navbar: {
       prism: {
         defaultLanguage: 'julia',
-        additionalLanguages: ['julia'],
-        theme: require('prism-react-renderer/themes/github'),
-        darkTheme: require('prism-react-renderer/themes/palenight')
+        additionalLanguages: 'julia',
       },
       algolia: {
         apiKey: 'f6d1b3005e55708c6b33b80157908b05',
