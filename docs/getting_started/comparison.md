@@ -94,7 +94,7 @@ microbenchmark)
 </Tabs>
 
 
-![import plot](img/speedplot.png)
+![import plot](../../img/speedplot.png)
 
 Comparing averages, PopGen.jl clocks in at `910ms` versus adegenet's `6.745s` , so ~7.4x faster.
 
@@ -132,7 +132,7 @@ julia> Base.summarysize(sharks)
 </TabItem>
 </Tabs>
 
-![data structure plot](img/objectplot.png)
+![data structure plot](../../img/objectplot.png)
 
 The original file is `3.2mb`, and our `PopData` object takes up ~`3.5mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
 
@@ -178,6 +178,6 @@ Unit: seconds
 </TabItem>
 </Tabs>
 
-![chi squared plot](img/chisqplot.png)
+![chi squared plot](../../img/chisqplot.png)
 
 Comparing averages, PopGen.jl clocks in at ~`176ms` versus adegenet's `6.3s`, so ~**35.8x** faster(!) 
