@@ -2,7 +2,7 @@ module.exports = {
   title: 'PopGen.jl',
   tagline: 'Population Genetics in Julia',
   url: 'https://pdimens.github.io',
-  baseUrl: '/',
+  baseUrl: '/PopGen.jl/',
   favicon: 'img/favicon.ico',
   organizationName: 'pdimens', // Usually your GitHub org/user name.
   projectName: 'PopGen.jl', // Usually your repo name.
