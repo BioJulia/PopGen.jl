@@ -3,6 +3,8 @@ id: genepop
 title: Genepop format
 sidebar_label: Genepop format
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Import a genepop file as `PopData`
 
@@ -42,8 +44,15 @@ Files must follow standard Genepop formatting:
 - **Must** be the same word each time and not a unique population name
 - File is **tab** delimited or **space** delimited, but not both
 
-:::: tabs card stretch
-::: tab genepop w/loci stacked vertically
+<Tabs
+  defaultValue="v"
+  values={[
+    { label: 'genepop w/loci stacked vertically', value: 'v', },
+    { label: 'genepop w/loci stacked horizontally', value: 'h', },
+  ]
+}>
+<TabItem value="v">
+
 ```
 Wasp populations in New York
 Locus1
@@ -59,8 +68,10 @@ Newcomb_02,	000230	564558	090080
 Newcomb_03,	254230	000000	090100
 Newcomb_04,	254230	564000	090120
 ```
-:::
-::: tab genepop w/loci stacked horizontally
+
+</TabItem>
+<TabItem value="h">
+
 ```
 Wasp populations in New York
 Locus1,Locus2,Locus3
@@ -74,8 +85,9 @@ Newcomb_02,	000230	564558	090080
 Newcomb_03,	254230	000000	090100
 Newcomb_04,	254230	564000	090120
 ```
-:::
-::::
+
+</TabItem>
+</Tabs>
 
 ## Acknowledgements
 

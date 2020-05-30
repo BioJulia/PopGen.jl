@@ -3,6 +3,8 @@ id: julia_primer
 title: A quick Julia primer
 sidebar_label: A quick Julia primer
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 *For getting the most out of this documentation*
 
@@ -85,8 +87,6 @@ search: population populations population! populations!
 
   listall = true, displays ind and their population instead (default = false).
 ```
-
-
 
 ## Type information
 
@@ -185,7 +185,7 @@ The functions within `PopGen` are almost always explicitly typed, so if you are 
 
 Sometimes you might include an argument with a keyword when there isn't one, or include an argument without a keyword when there needs to be one (honestly, we make that mistake too and we *wrote* this stuff). To help minimize those mistakes, please read below about which arguments have keywords and which don't.
 
-::: warning MethodErrors
+:::note MethodErrors
 MethodError's can definitely get annoying, but they are more commonly the result of incorrect inputs versus . If you double-checked your inputs and things still don't work, please submit an issue. Thanks!
 :::
 
@@ -205,22 +205,32 @@ Reading these docs, pay attention to semicolons in the function argument lists.
 
 Broadly speaking, there are two types of function declarations in Julia: ones with keywords and ones without keywords. The term "keywords" refers to an input argument that has the format `argument = value`. This format is present in many of the functions in this and other packages, however there are some specifics to understand when functions use keywords and when they don't. 
 
-:::: tabs card stretch
-::: tab 1. No semicolon in argument list
+<Tabs
+  defaultValue="1"
+  values={[
+    { label: '1. No semicolon in argument list', value: '1', },
+    { label: '2. Semicolon in argument list', value: '2', },
+  ]
+}>
+<TabItem value="1">
+
 ```julia
 function function_name(var1::type, var2::type, var3::type)
     do stuff with vars
 end
 ```
 If a function is declared with only commas in the argument list, like shown above, then the arguments to that function **must** have no keywords and follow the exact order they appear in. If the generic example above had the typing:
+
 ```julia
 function function_name(var1::String, var2::Float64, var3::Array{String,1})
     do stuff with vars
 end
 ```
 then the only acceptable way to run this function without getting a `MethodError` would be with arguments in the order of `function_name(String, Float64, Array{String,1})`. Even if some of the arguments have a default values, like `var2::Float64 = 6.66`, the order of arguments/types has to be respected as declared.
-:::
-::: tab 2. Semicolon in argument list
+
+</TabItem>
+<TabItem value="2">
+
 ```julia
 function function_name(var1::type; var2::type, var3::type)
     do stuff with vars
@@ -228,5 +238,6 @@ end
 ```
 
 In this format, everything that comes **before** the semicolon follows the strict rules from **Format 1**, and everything that comes **after** the semicolon is a keyword argument. Keyword arguments have the flexibility to not require any particular input order. However, you **must** use the keywords to declare those arguments, or you will receive another `MethodError: no method matching`, which is, as we've mentioned, annoying. 
-:::
-::::
+
+</TabItem>
+</Tabs>
