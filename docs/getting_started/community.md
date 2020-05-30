@@ -44,4 +44,4 @@ The very soul of open-source projects relies on people wanting to get involved. 
 
 This stuff can be hard. As the package grows, we expect that we'll be dealing with a growing number of issues/complaints. A little thumbs-up :thumbsup: or prayer-hands :pray: emoji (Pavel's personal favorite) can go a long way. Or cook up your own cactus graphic (like the one below) and send it to us. Who doesn't love adorable cactuses doing human things?
 
-![error_cactus](../../img/terminal_cactus.png)
+![error_cactus](/PopGen.jl/img/terminal_cactus.png)
