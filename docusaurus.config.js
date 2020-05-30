@@ -1,7 +1,7 @@
 module.exports = {
   title: 'PopGen.jl',
   tagline: 'Population Genetics in Julia',
-  url: 'https://your-docusaurus-test-site.com',
+  url: 'https://pdimens.github.io',
   baseUrl: '/',
   favicon: 'img/favicon.ico',
   organizationName: 'pdimens', // Usually your GitHub org/user name.
@@ -22,7 +22,7 @@ module.exports = {
       },
       title: 'PopGen.jl',
       logo: {
-        alt: 'PopGen.jl Logo',
+        alt: 'PopGen.jl logo',
         src: 'img/logo_icon.png',
       },
       links: [
