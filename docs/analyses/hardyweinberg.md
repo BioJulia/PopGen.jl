@@ -4,15 +4,14 @@ title: Hardy-Weinberg Equilibrium
 sidebar_label: Hardy-Weinberg Equilibrium
 ---
 
-Testing for Hardy-Weinberg Equilibrium (often abbreviated _HWE_) is a fairly common practice in population genetics. In a two-allele system, the HWE equation is defined as:
-$$p^2 + 2pq + q^2 = 1$$
+Testing for Hardy-Weinberg Equilibrium (often abbreviated _HWE_) is a fairly common practice in population genetics. In a two-allele system, the HWE equation is defined as: p^2 + 2pq + q^2 = 1
 where $p$ is the frequency of the first allele and $q$ is the frequency of the second allele. The formula describes the frequency of all possible genotypes where
 
 | HWE variable | Genotype |    State     |
 | :----------: | :------: | :----------: |
-|    $p^2$    |   "pp"   |  homozygous  |
-|    $q^2$    |   "qq"   |  homozygous  |
-|    $2pq$     |   "pq"   | heterozygous |
+|    p^2    |   "pp"   |  homozygous  |
+|    q^2    |   "qq"   |  homozygous  |
+|    2pq     |   "pq"   | heterozygous |
 
 Testing for deviation from HWE is usually done with a Chi-Squared test, where one compares the observed genotype frequencies to the expected genotype frequencies given the observed allele frequencies at a locus. Specifically the equation is
 $$\sum{\frac{(observed - expected)^2}{expected}}$$
@@ -182,5 +181,5 @@ julia> ncats_hwe = hwe_test(nancycats() ,by_pop = true, correction = "bonferroni
 
 julia> ncats |> @vlplot(:rect, :locus, :population, color=:P_bonferroni)
 ```
-![hwe_test](/img/hwe_test.png)
+![hwe_test](../img/hwe_test.png)
 
