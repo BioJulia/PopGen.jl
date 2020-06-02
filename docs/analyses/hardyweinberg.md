@@ -138,6 +138,7 @@ julia> @where(ncats_hwe, :P .!== missing, :P .<= 0.05)
 With this command, we invoke the `@where` filtering macro, then specify our `ncats_hwe` table, the `:P` column of P-values, and then specify two filtering parameters: 
 1. the P-values are not `missing`
 2. the P-values are less than or equal to 0.05. 
+
 Doing this results in a table that now only includes non-missing P-values of 0.05 or lower:
 ```
 46×5 DataFrame
