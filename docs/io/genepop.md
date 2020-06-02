@@ -91,5 +91,5 @@ Newcomb_04,	254230	564000	090120
 
 ## Acknowledgements
 
-The original implementations of this parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is only 3.2mb in size). However, thanks to the efforts of [CSV.jl](https://github.com/JuliaData/CSV.jl) , we leverage that package to preserve the speed and reducie the memory footprint quite a bit!
+The original implementations of this parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is only 3.2mb in size). However, thanks to the efforts of [CSV.jl](https://github.com/JuliaData/CSV.jl) , we leverage that package to preserve the speed and reduce the memory footprint quite a bit!
 
