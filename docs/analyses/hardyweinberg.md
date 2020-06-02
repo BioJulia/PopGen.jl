@@ -22,14 +22,14 @@ and use this as the parameter for our Chi Squared distribution, followed by a cu
 ## Chi-Squared Test
 
 ```julia
-hwe_test(x::PopObj, by::String = "locus", correction::String = "none")
+hwe_test(data::PopData, by::String = "locus", correction::String = "none")
 ```
 
 Calculate chi-squared test of HWE for each locus and returns observed and expected heterozygosity with chi-squared, degrees of freedom and p-values for each locus. Use `by = "population"` to perform this separately for each population (default: `"locus"`). Use `correction =` to specify a P-value correction method for multiple testing (recommended). For convenience, the correction method is appended to the name of the column, so you will always know how those P-values were adjusted.
 
 ### arguments
 
-- `x` : the input `PopObj`
+- `data` : the input `PopData`
 - `by_pop =` : `false` (default) or `true` for hwe-by-population
 - `correction =`  : a string specifying a P-value adjustment type (default: "none")
 
@@ -43,7 +43,7 @@ Calculate chi-squared test of HWE for each locus and returns observed and expect
 - `"bl"`  : Benjamini-Liu adjustment
 - `"hommel"` : Hommel adjustment
 - `"sidak"` : Šidák adjustment
-- `"forward stop"` or `"fs"` : Forward-Stop adjustment
+- `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
 
 :thinking: For more information on multiple testing adjustments, see [MultipleTesting.jl](https://juliangehring.github.io/MultipleTesting.jl/stable/)
