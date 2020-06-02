@@ -125,17 +125,20 @@ When doing this test by population, you may notice some loci have `missing` P-va
 ::::
 
 ## Interpreting the results
-Since the results are in table form, you can easily process the table using `JuliaDBMeta.jl` or `Query.jl` to find loci above or below the alpha threshold you want. As an example, let's perform an HWE-test on the `nancycats` data without any P-value adjustments:
+Since the results are in table form, you can easily process the table using `DataFramesMeta.jl` or `Query.jl` to find loci above or below the alpha threshold you want. As an example, let's perform an HWE-test on the `nancycats` data without any P-value adjustments:
 ```julia
 julia> ncats_hwe = hwe_test(nancycats() , by = "population") ;
 ```
-Now, we can use `DataFramesMeta` to easily filter this table and leave only what we're interested in:
+Now, we can use `DataFramesMeta.jl` to easily filter this table and leave only what we're interested in:
 ```julia
 using DataFramesMeta
 
 julia> @where(ncats_hwe, :P .!== missing, :P .<= 0.05)
 ```
-With this command, we invoke the `@where` filtering macro, then specify our `ncats_hwe` table, the `:P` column of P-values, and then specify two filtering parameters: 1. the P-values are not `missing`, and 2. the P-values are less than or equal to 0.05. Doing this results in a table that now only includes non-missing P-values of 0.05 or lower:
+With this command, we invoke the `@where` filtering macro, then specify our `ncats_hwe` table, the `:P` column of P-values, and then specify two filtering parameters: 
+1. the P-values are not `missing`
+2. the P-values are less than or equal to 0.05. 
+Doing this results in a table that now only includes non-missing P-values of 0.05 or lower:
 ```
 46×5 DataFrame
 │ Row │ locus │ population │ chisq   │ df    │ P           │
