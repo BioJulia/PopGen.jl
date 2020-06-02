@@ -31,14 +31,14 @@ make sure to change your backslashes `\` to forward slashes `/`
 
 ## Formatting
 
-- First row is column names in this order:
-  1. name
-  2. population
-  3. longitude
-  4. latitude
-  5. locus_1_name
-  6. locus_2_name
-  7. etc...
+First row is column names, and they occur in this order:
+1. name
+2. population
+3. longitude
+4. latitude
+5. locus_1_name
+6. locus_2_name
+7. etc...
 
 ### Missing data
 #### Genotypes
