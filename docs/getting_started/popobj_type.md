@@ -25,7 +25,7 @@ It's not super obvious, but we decided to pronounce PopObj as "pop ob" with a si
 :::
 
 :::danger avoid manual creation!
-While it may seem simple enough to create two IndexedTables and make a `PopData` out of them, the structure of `meta` and `loci` are specific, so small mistakes in creating them can create many errors and prevent PopGen from working correctly on your data. Please use the included `csv`, `genepop`, and `vcf` file importers instead.
+While it may seem simple enough to create two DataFrames and make a `PopData` out of them, the structure of `meta` and `loci` are specific, so small mistakes in creating them can create many errors and prevent PopGen from working correctly on your data. Please use the included `csv`, `genepop`, and `vcf` file importers instead.
 :::
 
 ## Metadata
