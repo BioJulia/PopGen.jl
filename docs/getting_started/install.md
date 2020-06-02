@@ -45,7 +45,7 @@ Like all Julia packages, to activate PopGen.jl, simply run:
 julia> using PopGen
 ```
 
-Feel free to play around with the test data in `/data/data/` or add it to your workspace with the `nancycats` and `gulfsharks` commands.
+Feel free to play around with the test data in `/data/source/` or add it to your workspace with the `nancycats` and `gulfsharks` commands.
 
 
 :::note Arch Linux users
