@@ -186,7 +186,7 @@ The functions within `PopGen` are almost always explicitly typed, so if you are 
 Sometimes you might include an argument with a keyword when there isn't one, or include an argument without a keyword when there needs to be one (honestly, we make that mistake too and we *wrote* this stuff). To help minimize those mistakes, please read below about which arguments have keywords and which don't.
 
 :::note MethodErrors
-MethodError's can definitely get annoying, but they are more commonly the result of incorrect inputs versus . If you double-checked your inputs and things still don't work, please submit an issue. Thanks!
+MethodError's can definitely get annoying, but they are more commonly the result of incorrect inputs versus being bugs. If you double-checked your inputs and things still don't work, please submit an issue. Thanks!
 :::
 
 
