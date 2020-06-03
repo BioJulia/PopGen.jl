@@ -3,6 +3,8 @@ id: accessing
 title: Accessing elements
 sidebar_label: Accessing elements
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 A little hands-on training will probably go a long way, so let's through some of the functions available in PopGen.jl with the included data. This tutorial will include both inputs and outputs so you can be confident what you're seeing in your Julia session is exactly what's supposed to happen. Sometimes the outputs can be a little lengthy, so they will be arranged in code "tabs", where the left-most tab is the input named after what it's accomplishing, and the right tab is the output of running the command. This guide is to show you how to directly access  `PopData` elements, but there are shortcut commands to view just about every element of the data within. 
 
@@ -15,19 +17,8 @@ There are specific relationships between the record entries in `PopData` objects
 Let's keep things simple by loading in the nancycats data and calling it `ncats`.
 
 
-:::: tabs card stretch
-
-::: tab load nancycats
-
 ``` julia
 julia> ncats = nancycats()
-```
-
-:::
-
-::: tab output
-
-```
 PopData Object
   Marker type: Microsatellite
   Ploidy: 2
@@ -38,11 +29,7 @@ PopData Object
   Latitude: absent
 ```
 
-:::
-::::
-
-
-Now that we have nancycats loaded in, we can use standard Julia accessor conventions to view the elements within our PopData. The IndexedTable format requires a little extra work, so we must use the convention `PopData.meta.colname` to directly access the columns we want.
+Now that we have nancycats loaded in, we can use standard Julia accessor conventions to view the elements within our PopData. The DataFrames uses the convention `PopData.meta.colname` to directly access the columns we want.
 
 ## The metadata table
 
@@ -50,19 +37,8 @@ Now that we have nancycats loaded in, we can use standard Julia accessor convent
 
 To view the entire `meta` table.
 
-:::: tabs card stretch
-
-::: tab PopData meta field
-
 ```julia
 julia> ncats.meta
-```
-
-:::
-
-::: tab output
-
-```julia
 237×5 DataFrame
 │ Row │ name   │ population │ ploidy │ latitude │ longitude │
 │     │ String │ String     │ Int8   │ Float32? │ Float32?  │
@@ -83,28 +59,12 @@ julia> ncats.meta
 │ 237 │ N290   │ 17         │ 2      │ missing  │ missing   │
 ```
 
-:::
-
-::::
-
 ### .name
 
 This will access the names of the samples.
 
-
-:::: tabs card stretch
-
-::: tab meta .name field
-
 ``` julia
 julia> ncats.meta.name
-```
-
-:::
-
-::: tab output
-
-```
 237-element Array{String,1}:
  "N1"  
  "N2"  
@@ -125,26 +85,12 @@ julia> ncats.meta.name
  "N237"
 ```
 
-:::
-::::
-
 ### .population
 
 This will access the names of the populations associated with each sample, in the same order as the  samples.
 
-
-:::: tabs card stretch
-::: tab meta .population field
-
 ``` julia
 julia> ncats.meta.population
-```
-
-:::
-
-::: tab output
-
-```
 237-element Array{String,1}:
  "1" 
  "1" 
@@ -165,26 +111,14 @@ julia> ncats.meta.population
  "17"
 ```
 
-:::
-::::
+These ID's aren't super informative. Later, we'll change them using the `populations!` command.
 
-These ID's aren't super informative. Later, we'll change them using the `popid!` command.
-
-###  .ploidy
+### .ploidy
 
 This shows you the ploidy of the data per individual
 
-:::: tabs card stretch
-::: tab meta .ploidy
-
 ``` julia
 julia> ncats.meta.ploidy
-```
-
-:::
-::: tab output
-
-```
 237-element Array{Int8,1}:
  2
  2
@@ -205,24 +139,12 @@ julia> ncats.meta.ploidy
  2
 ```
 
-:::
-::::
-
 ### .latitude
 
 This accesses the latitude information of the PopObj. If there is none, like in the nancycats data, it returns a vector of `missing`.
 
-:::: tabs card stretch
-::: tab meta .latitude field
-
 ```julia
 julia> ncats.meta.latitude
-```
-
-:::
-::: tab output
-
-```
 237-element Array{Union{Missing, Float32},1}:
  missing
  missing
@@ -242,25 +164,14 @@ julia> ncats.meta.latitude
  missing
  missing
 ```
-
-:::
-::::
 
 ### .longitude
 
 This accesses the longitude information of the PopObj. Like before, if there is none, like in the nancycats data, it returns an array of `missing`.
 
-:::: tabs card stretch
-::: tab meta .longitude field
 
 ```julia
 julia> ncats.meta.longitude
-```
-
-:::
-::: tab output
-
-```
 237-element Array{Union{Missing, Float32},1}:
  missing
  missing
@@ -281,15 +192,10 @@ julia> ncats.meta.longitude
  missing
 ```
 
-:::
-::::
 
-:::: tabs card stretch
-::: tab actually seeing some location info 
+
+:::note actually seeing some location info 
 The nancycats data has some weird coordinate system for information, so those data were omitted. If you want a proof of concept for `.longitude` and `.latitude`, load in `gulfsharks` and try it out. We'll use `DataFrames.select` to isolate just the information we want. Later, you'll see that the `locations` command does this.
-:::    
-::: tab gulfsharks location data
-
 ``` julia
 julia> sharks = gulfsharks() ;    # semicolon just supresses printing output
 
@@ -313,10 +219,8 @@ julia> select(sharks.meta, :name, :longitude, :latitude)
 │ 211 │ seg_030 │ -85.7143  │ 29.8234  │
 │ 212 │ seg_031 │ -85.7143  │ 29.8234  │
 ```
-
 :::
 
-::::
 --------------------
 
 ## The genotype table
@@ -325,18 +229,8 @@ julia> select(sharks.meta, :name, :longitude, :latitude)
 
 This will show you the entire `loci` table.
 
-:::: tabs card stretch
-::: tab PopData loci field 
-
 ```julia
 julia> ncats.loci
-```
-
-:::
-
-::: tab output
-
-```
 2133×4 DataFrame
 │ Row  │ name │ population │ locus │ genotype   │
 │      │ Cat… │ Cat…       │ Cat…  │ Tuple…?    │
@@ -357,26 +251,14 @@ julia> ncats.loci
 │ 2133 │ N290 │ 17         │ fca37 │ (208, 208) │
 ```
 
-:::
-::::
-
 ### locus names
 
 This will access the names of the loci as they appear in the data. Since everything but the genotypes in `.loci` are coded as Categorical, we need to use `levels()` from `CategoricalArrays.jl` or `unique()` from Base to pull out the unique loci. 
-
-:::: tabs card stretch
-::: tab loci .locus
 
 ```julia
 julia> levels(ncats.loci.locus)
 # or #
 julia> unique(ncats.loci.locus)
-```
-
-:::
-::: tab output
-
-```
 9-element Array{String,1}:
  "fca8" 
  "fca23"
@@ -389,16 +271,40 @@ julia> unique(ncats.loci.locus)
  "fca37"
 ```
 
-:::
-::::
+### locus population
 
+This will access the population of the individual for a genotype of a locus. These are also coded as Categorical, we need to use `levels()` from `CategoricalArrays.jl` or `unique()` from Base to pull out the unique populations. 
+
+```julia
+julia> levels(ncats.loci.locus)
+# or #
+julia> unique(ncats.loci.locus)
+17-element Array{String,1}:
+ "1" 
+ "2"
+ "3"
+ "4"
+ "5"
+ ⋮
+ "14"
+ "15"
+ "16"
+ "17"
+```
 
 ### view genotypes
 
-Because the genotype data is in "tidy" format, accessing genotypes in a meaningful way is not immediately obvious. We can of course follow the same convention of `data.loci.genotype` as we have above, but a list of all the genotypes across all individuals, loci, and populations isn't terribly useful. Instead, we can use the DataFrames or DataFramesMeta interfaces to retrieve this information. Here is an example using `@where` from DataFramesMeta:
-
-:::: tabs card stretch
-::: tab single locus
+Because the genotype data is in "tidy" format, accessing genotypes in a meaningful way is not immediately obvious. We can of course follow the same convention of `data.loci.genotype` as we have above, but a list of all the genotypes across all individuals, loci, and populations isn't terribly useful. Instead, we can use the DataFrames or DataFramesMeta interfaces to retrieve this information. Here are examples using `@where` from DataFramesMeta:
+<Tabs
+  block={true}
+  defaultValue="s"
+  values={[
+    { label: 'single locus', value: 's', },
+    { label: 'multiple loci', value: 'm', },
+    { label: 'population', value: 'p', },
+  ]
+}>
+<TabItem value="s">
 
 ```julia
 julia> @where(ncats.loci, :locus .== "fca8")
@@ -422,11 +328,11 @@ julia> @where(ncats.loci, :locus .== "fca8")
 │ 2133 │ N290 │ 17         │ fca8  │ (208, 208) │
 ```
 
-:::
-::: tab multiple loci
+</TabItem>
+<TabItem value="m">
 
 ```julia
-julia> cats.loci[ncats.loci.locus .∈ Ref(["fca8", "fca23"]), :]
+julia> @where(ncats.loci, :locus .∈ Ref(["fca8", "fca23"])
 474×4 DataFrame
 │ Row │ name │ population │ locus │ genotype   │
 │     │ Cat… │ Cat…       │ Cat…  │ Tuple…?    │
@@ -447,7 +353,34 @@ julia> cats.loci[ncats.loci.locus .∈ Ref(["fca8", "fca23"]), :]
 │ 474 │ N290 │ 17         │ fca23 │ (130, 146) │
 ```
 
-:::
-::::
+</TabItem>
+<TabItem value="p">
+
+```julia
+julia> @where(x.loci, :population .== "9")
+81×4 DataFrames.DataFrame
+│ Row │ name │ population │ locus │ genotype   │
+│     │ Cat… │ Cat…       │ Cat…  │ Tuple…?    │
+├─────┼──────┼────────────┼───────┼────────────┤
+│ 1   │ N104 │ 9          │ fca8  │ (121, 135) │
+│ 2   │ N105 │ 9          │ fca8  │ (137, 137) │
+│ 3   │ N106 │ 9          │ fca8  │ (135, 135) │
+│ 4   │ N107 │ 9          │ fca8  │ (121, 135) │
+│ 5   │ N108 │ 9          │ fca8  │ (135, 135) │
+│ 6   │ N109 │ 9          │ fca8  │ (137, 137) │
+│ 7   │ N111 │ 9          │ fca8  │ (135, 135) │
+⋮
+│ 74  │ N105 │ 9          │ fca37 │ (182, 182) │
+│ 75  │ N106 │ 9          │ fca37 │ (182, 208) │
+│ 76  │ N107 │ 9          │ fca37 │ (182, 208) │
+│ 77  │ N108 │ 9          │ fca37 │ (208, 208) │
+│ 78  │ N109 │ 9          │ fca37 │ (182, 208) │
+│ 79  │ N111 │ 9          │ fca37 │ (208, 214) │
+│ 80  │ N112 │ 9          │ fca37 │ (182, 206) │
+│ 81  │ N113 │ 9          │ fca37 │ (208, 214) │
+```
+
+</TabItem>
+</Tabs>
 
 Now that you're somewhat familiar with the parts of `PopData`, [have a look at the commands](view_and_sort.md) to view and manipulate `PopData` objects.

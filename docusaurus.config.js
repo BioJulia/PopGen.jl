@@ -1,3 +1,5 @@
+const remarkMath = require("remark-math");
+const rehypeKatex = require("rehype-katex");
 module.exports = {
   title: 'PopGen.jl',
   tagline: 'Population Genetics in Julia',
@@ -69,6 +71,8 @@ module.exports = {
           // Please change this to your repo.
           editUrl: 'https://github.com/pdimens/popgen.jl/edit/documentation/',
           showLastUpdateTime: true,
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [[rehypeKatex, {strict: false}]],
         },
         blog: {
           showReadingTime: true,
@@ -78,6 +82,11 @@ module.exports = {
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+        sitemap: {
+          cacheTime: 600 * 1000, // 600 sec - cache purge period
+          changefreq: "weekly",
+          priority: 0.5,
         },
       },
     ],

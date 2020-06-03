@@ -3,21 +3,29 @@ id: hardyweinberg
 title: Hardy-Weinberg Equilibrium
 sidebar_label: Hardy-Weinberg Equilibrium
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
-Testing for Hardy-Weinberg Equilibrium (often abbreviated _HWE_) is a fairly common practice in population genetics. In a two-allele system, the HWE equation is defined as: p^2 + 2pq + q^2 = 1
-where $p$ is the frequency of the first allele and $q$ is the frequency of the second allele. The formula describes the frequency of all possible genotypes where
+<link rel="stylesheet" href={useBaseUrl("katex/katex.min.css")} />
+
+Testing for Hardy-Weinberg Equilibrium (often abbreviated _HWE_) is a fairly common practice in population genetics. In a two-allele system, the HWE equation is defined as: $p^2 + 2pq + q^2 = 1$ , where $p$ is the frequency of the first allele and $q$ is the frequency of the second allele. The formula describes the frequency of all possible genotypes where
 
 | HWE variable | Genotype |    State     |
 | :----------: | :------: | :----------: |
-|    p^2    |   "pp"   |  homozygous  |
-|    q^2    |   "qq"   |  homozygous  |
-|    2pq     |   "pq"   | heterozygous |
+|    $p^2$    |   "pp"   |  homozygous  |
+|    $q^2$    |   "qq"   |  homozygous  |
+|    $2pq$     |   "pq"   | heterozygous |
 
-Testing for deviation from HWE is usually done with a Chi-Squared test, where one compares the observed genotype frequencies to the expected genotype frequencies given the observed allele frequencies at a locus. Specifically the equation is
-$$\sum{\frac{(observed - expected)^2}{expected}}$$
+Testing for deviation from HWE is usually done with a Chi-Squared ($\chi^2$) test, where one compares the observed genotype frequencies to the expected genotype frequencies given the observed allele frequencies at a locus. Specifically, the equation is
+$$
+\sum{\frac{(observed - expected)^2}{expected}}
+$$
 where $observed$ is the observed genotype frequency and $expected$ is the expected genotype frequency for a locus. To generate our test statistic, we calculate the degrees of freedom: 
-$$degrees\ of\ freedom = n_{expected\ genotypes} - n_{observed\ alleles}$$ 
-and use this as the parameter for our Chi Squared distribution, followed by a cumulative density function using this Chi Squared distribution and our Chi-Squared value calculated above.
+$$
+degrees\ of\ freedom = n_{expected\ genotypes} - n_{observed\ alleles}
+$$ 
+and use this as the parameter for our $\chi^2$ distribution, followed by a cumulative density function using this $\chi^2$ distribution and our $\chi^2$ value calculated above.
 
 ## Chi-Squared Test
 
@@ -49,8 +57,16 @@ Calculate chi-squared test of HWE for each locus and returns observed and expect
 :thinking: For more information on multiple testing adjustments, see [MultipleTesting.jl](https://juliangehring.github.io/MultipleTesting.jl/stable/)
 
 ### example
-:::: tabs card stretch
-::: tab HWE Chi-Squared
+<Tabs
+  block={true}
+  defaultValue="hwe"
+  values={[
+    { label: 'HWE Chi-Sq', value: 'hwe', },
+    { label: 'HWE with P adjustment', value: 'hwe_p', },
+    { label: 'HWE with by population', value: 'hwe_pop', },
+  ]
+}>
+<TabItem value="hwe">
 
 ```
 julia> hwe_test(gulfsharks())
@@ -73,8 +89,10 @@ julia> hwe_test(gulfsharks())
 │ 2212 │ contig_22368 │ 0.473923  │ 1     │ 0.491188 │
 │ 2213 │ contig_2784  │ 0.0452162 │ 1     │ 0.831607 │
 ```
-:::
-::: tab HWE with P adjustment
+
+</TabItem>
+<TabItem value="hwe_p">
+
 ```
 julia> hwe_test(gulfsharks(), correction = "bh")
 2213×5 DataFrame
@@ -96,8 +114,10 @@ julia> hwe_test(gulfsharks(), correction = "bh")
 │ 2212 │ contig_22368 │ 0.473923  │ 1     │ 0.491188 │ 0.999911 │
 │ 2213 │ contig_2784  │ 0.0452162 │ 1     │ 0.831607 │ 0.999911 │
 ```
-:::
-::: tab HWE by population
+
+</TabItem>
+<TabItem value="hwe_pop">
+
 ```
 julia> hwe_test(gulfsharks(), by = "population")
 15491×5 DataFrame
@@ -121,8 +141,8 @@ julia> hwe_test(gulfsharks(), by = "population")
 ```
 When doing this test by population, you may notice some loci have `missing` P-values for certain populations, indicating that this locus is missing for that population. 
 
-:::
-::::
+</TabItem>
+</Tabs>
 
 ## Interpreting the results
 Since the results are in table form, you can easily process the table using `DataFramesMeta.jl` or `Query.jl` to find loci above or below the alpha threshold you want. As an example, let's perform an HWE-test on the `nancycats` data without any P-value adjustments:

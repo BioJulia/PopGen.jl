@@ -3,6 +3,8 @@ id: populations
 title: Location and population data
 sidebar_label: Location and population data
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Population genetics involves a focus on... populations (gasp!). The commands below show you how to view and modify both population information (names), and location information (geographic coordinates). 
 
@@ -16,17 +18,8 @@ locations(data::PopData)
 
 View location data (`.longitude` and `.latitude`) in a `PopData`,  returning a table the longitude and latitude information in `meta`. 
 
-:::: tabs card stretch
-::: tab locations
-
 ```julia
 julia> locations(sharks)
-```
-
-:::
-::: tab output
-
-```
 212×2 SubDataFrame
 │ Row │ longitude │ latitude │
 │     │ Float64   │ Float64  │
@@ -47,29 +40,27 @@ julia> locations(sharks)
 │ 212 │ -85.7143  │ 29.8234  │
 ```
 
-:::
-::::
-
-### Add location data
-
-Location data can be added using one of the methods of `locations!`. As indicated by the bang `!`, your `PopData` will be edited in place, and there will be no return output. If your data is in anything other than Decimal-Degrees format, this function will convert your long/lat into Decimal Degrees. To import those data into Julia, you'll likely want to use the wonderful `CSV.jl` package first. 
-
-#### Formatting requirements
-
-- Coordinates as a `String` separated by spaces (`"11 43 41"`) or colons (`"11:43:41"`)
-- Must use negative sign (`"-11 43.52"`) or single-letter cardinal direction (`"11 43.52W"`)
-- Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
-- Can mix colons and spaces (although it's bad practice)
-
-There are three main ways of adding location data:
-:::: tabs card stretch
-::: tab Already in decimal degrees
-
+### Add geographical coordinates
 ```julia
-locations!(data::PopObj, long::Vector{T}, lat::Vector{T}) where T<:AbstractFloat
+locations!(data::PopData; long::Vector{T}, lat::Vector{T}) where T<:AbstractFloat
+locations!(data::PopData; long::Vector{String}, lat::Vector{String})
 ```
 
-This method is pretty straightforward, and it tolerates vectors with `missing` data.
+Location data can be added using one of the methods of `locations!`. As indicated by the bang `!`, your `PopData` will be edited in place, and there will be no return output. If your data is in anything other than Decimal-Degrees format, this function will convert your long/lat into Decimal Degrees. To import those data into Julia, you'll likely want to use the wonderful `CSV.jl` package first. The functions accept keywords `long` and `lat`, or can be used without them so long as the vectors are input in that order. 
+
+<Tabs
+  block={true}
+  defaultValue="dm"
+  values={[
+    { label: 'decimal minutes', value: 'dm', },
+    { label: 'other formats', value: 'other', },
+  ]
+}>
+<TabItem value="dm">
+
+This method is pretty straightforward and tolerates vectors with `missing` data.
+#### Formatting requirements
+- Coordinates must be decimal-minutes as either `Float32` or `Float64` (e.g. `-21.321`)
 
 ```julia
 # generate some fake location data
@@ -78,28 +69,29 @@ julia> long = rand(212) .* 10 ; lat = rand(212) .* -10
 julia> locations!(sharks, long, lat)
 ```
 
-:::
-::: tab Decimal minutes as strings
-It would likely be most convenient if you imported your coordinate data as vectors of strings, which would look something like this:
+</TabItem>
+<TabItem value="other">
+
+#### Formatting requirements
+
+- Coordinates as `String` separated by spaces (`"11 43 41"`) or colons (`"11:43:41"`)
+- Must use negative sign (`"-11 43.52"`) or single-letter cardinal direction (`"11 43.52W"`)
+- Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
+- Can mix colons and spaces (although it's bad practice)
+
+If not already in decimal-minutes format, it would likely be most convenient if you imported your coordinate data as vectors of strings, which would look something like this:
 
 ```julia
 long = ["-43 54 11", "22 23 11N"]
-lat = ["11 44 31", "-25 41 94"]
+lat = ["11 44 31", "-25 41 13"]
 ```
-
-For this, the method is
-
-```julia
-locations!(data::PopData; long::Vector{String}, lat::Vector{String})
-```
-
-which uses the `long` and `lat` keywords.
 
 :::caution Missing values
 This method tolerates `missing` values, but you will need to `replace!` instances of `missing` with the string `"missing"`.
 :::
-::::
 
+</TabItem>
+</Tabs>
 
 ## Population Names
 
@@ -111,17 +103,18 @@ populations(data::PopData; listall::Bool = false)
 
 Just as you can view population names with `PopData.meta.population`, you can also view them with the `populations` command, which by default shows you a summary of the number of individuals in each population.  
 
-:::: tabs card stretch
-::: tab populations
+<Tabs
+  block={true}
+  defaultValue="pop"
+  values={[
+    { label: 'populations', value: 'pop', },
+    { label: 'listall = true', value: 'all', },
+  ]
+}>
+<TabItem value="pop">
 
 ``` julia
 julia> populations(sharks)
-```
-
-:::
-::: tab output
-
-```
 7×2 DataFrame
 │ Row │ population     │ count │
 │     │ String         │ Int64 │
@@ -135,21 +128,13 @@ julia> populations(sharks)
 │ 7   │ Southeast Gulf │ 20    │
 ```
 
-:::
-::::
+</TabItem>
+<TabItem value="all">
 
-You can use the keyword `listall=true` to display each individual and their associated population as a table. 
-:::: tabs card stretch
-::: tab listall = true
+You can use the keyword `listall = true` to display each individual and their associated population as a table. 
 
 ``` julia
 julia> populations(sharks, listall=true)
-```
-
-:::
-::: tab output
-
-```
 212×2 DataFrame
 │ Row │ name    │ population     │
 │     │ String  │ String         │
@@ -170,22 +155,32 @@ julia> populations(sharks, listall=true)
 │ 212 │ seg_031 │ Southeast Gulf │
 ```
 
-:::
-::::
+</TabItem>
+</Tabs>
 
 :::note alias
 You can use the command `population` for the same functionality. We made the commands `population` and `populations` synonymous so you wouldn't have to memorize if the name was singular or plural-- it just works! This also applies to `populations!` and `population!`
 :::
 
 ### Rename populations
+```julia
+populations!(data::PopData, rename::Dict)
+populations!(data::PopData, rename::Vector{String})
+populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
+```
 
-There are a handful of methods to alter `PopData` population names depending on what you find most convenient. Each of these methods start with `populations!()` and vary in their inputs. It's for that reason this function has an obnoxiously long docstring. For simplicity, the methods will be separated into categories. However, all the methods for `populations!` are unified in that they edit `PopData` in place, and print (rather than return) a table of the new population names and counts courtesy of `populations()`.
+There are a handful of methods to alter `PopData` population names depending on what you find most convenient. Each of these methods start with `populations!()` and vary in their inputs. It's for that reason this function has an uncharacteristically long docstring. However, all the methods for `populations!` are unified in that they edit `PopData` in place, and print (rather than return) a table of the new population names and counts courtesy of `populations()`.
 
-#### Replace by matching
-
-These methods require that some kind of population information is already present, in the sense that the samples in `PopData` aren't all in one population.
-:::: tabs card stretch
-::: tab using a Dictionary
+<Tabs
+  block={true}
+  defaultValue="dict"
+  values={[
+    { label: 'using a Dictionary', value: 'dict', },
+    { label: 'using a Vector of names', value: 'vec', },
+	{ label: 'reassign by sample', value: 'samp', },
+  ]
+}>
+<TabItem value="dict">
 
 ```julia
 populations!(data::PopData, rename::Dict)
@@ -216,8 +211,8 @@ julia> populations!(sharks, new_popnames)
 │ 2   │ Gulf       │ 133   │
 ```
 
-:::
-::: tab Using a Vector of names
+</TabItem>
+<TabItem value="vec">
 
 ```julia
 populations!(data::PopData, rename::Vector{String})
@@ -238,11 +233,12 @@ julia> populations!(sharks, new_popnames)
 │ 2   │ Gulf       │ 133   │
 ```
 
-:::
+</TabItem>
+<TabItem value="samp">
 
-**********
-
-#### Reassign population information
+```julia
+populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
+```
 
 You may want outright overwrite all current population information. This is particularly useful when importing from VCF format when population information is not provided. This method will completely replace the population names of `PopData` regardless of what they currently are. 
 
@@ -265,9 +261,7 @@ and we then also create the vector of these samples' new population names:
 julia> popnames = ["North Cape", "North Cape", "North Cape", "South Cape", "South Cape"] ;
 ```
 
-Now we can combine them with `populations!` to restore the population names to how they were originally
-::::: tabs card stretch
-::: tab Replace using a NamedTuple
+Now we can combine them with `populations!` to rename the first 5 Cape Canaveral samples.
 
 ```julia
 julia> populations!(x, ch_names, popnames)
@@ -291,6 +285,5 @@ julia> populations!(x, ch_names, popnames)
 │ 212 │ seg_031 │ Gulf       │
 ```
 
-:::
-
-::::
+</TabItem>
+</Tabs>

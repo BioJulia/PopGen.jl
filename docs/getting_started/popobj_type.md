@@ -82,27 +82,33 @@ longitude data of samples (decimal degrees)
 [-11.12, 15.32, 11.02, -4]
 ```
 
+
+:::note location data
+Location data is optional for `PopData`. There are functions that use location information (e.g. `locations`), but most don't, so it's not a dealbreaker. At present, there are no analyses that utilize location information. 
+:::
+
+
 ## Genotype Information
 
-The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions, along with leveraging [JuliaDBMeta.jl](https://github.com/piever/JuliaDBMeta.jl). It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are `CategoricalStrings`  from [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.loci` can be directly accessed with `PopData.loci.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below.
+The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions. It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are `CategoricalValue`  from [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.loci` can be directly accessed with `PopData.loci.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below.
 
 ### name
 
-`::Vector{CategoricalString}`
+`::Vector{CategoricalValue{String}}`
 
-The sample name, stored as a `CategoricalString`. Fundamentally, this acts like the `name` column of the `meta` table, except when deleting entries and a few uncommon edge cases.
+The sample name, stored as a `CategoricalValue{String}`. Fundamentally, this acts like the `name` column of the `meta` table, except when deleting entries and a few uncommon edge cases.
 
 ### population
 
-`::Vector{CategoricalString}`
+`::Vector{CategoricalValue{String}}`
 
-The population ID associated with that sample, stored as a `CategoricalString`. Fundamentally, this acts like the `population` column of the `meta` table, except when deleting entries and a few uncommon edge cases.
+The population ID associated with that sample, stored as a `CategoricalValue{String}`. Fundamentally, this acts like the `population` column of the `meta` table, except when deleting entries and a few uncommon edge cases.
 
 ### locus
 
-`::Vector{CategoricalString}`
+`::Vector{CategoricalValue{String}}`
 
-The locus associated with the genotype, stored as a `CategoricalString`.
+The locus associated with the genotype, stored as a `CategoricalValue{String}`.
 
 ### genotype
 
@@ -117,7 +123,3 @@ The genotypes of the `loci` are an array of type `Genotype`, which is an alias f
 :::caution immutable genotypes
 We use the Tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using PopGen.jl, your data should already be filtered and screened. Hand-editing of genotype alleles is **strongly** discouraged, so we outlawed it.
 :::
-
-## location data
-
-Location data is optional for a `PopData`. There are functions that use location information (e.g. `locations`), but most don't, so it's not a dealbreaker. At present, there are no analyses that utilize location information. 

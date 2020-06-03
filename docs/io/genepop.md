@@ -10,14 +10,7 @@ import TabItem from '@theme/TabItem';
 
 ```julia
 genepop(infile; kwargs...)
-
-# Example
-julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
 ```
-
-:::caution Windows users
-Make sure to change your backslashes `\` to forward slashes `/` 
-:::
 
 ### arguments
 
@@ -34,6 +27,14 @@ Make sure to change your backslashes `\` to forward slashes `/`
 By default, the file reader will assign numbers as population ID's (as Strings) in order of appearance in the genepop file. Use the `populations!` function to rename these with your own population ID's.
 :::
 
+### Example
+```julia
+julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
+```
+:::caution Windows users
+Make sure to change your backslashes `\` to forward slashes `/` 
+:::
+
 ## Format
 
 Files must follow standard Genepop formatting:
@@ -45,6 +46,7 @@ Files must follow standard Genepop formatting:
 - File is **tab** delimited or **space** delimited, but not both
 
 <Tabs
+  block={true}
   defaultValue="v"
   values={[
     { label: 'genepop w/loci stacked vertically', value: 'v', },

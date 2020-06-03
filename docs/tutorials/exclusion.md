@@ -3,6 +3,8 @@ id: exclusion
 title: Data exclusion
 sidebar_label: Data Exclusion
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 This section covers situations where one may want to remove samples or loci from `PopData`. By design, removal functions _do not_ alter your original `PopData`, so you always have a backup handy (but don't forget to assign a name to the new `PopData`). Since the exclusion functions don't alter the original `PopData`, they do not end with a bang `!`. 
 
@@ -18,8 +20,16 @@ exclude_samples(data::PopObj, samp_id::Union{String, Vector{String}})
 
 Returns a new `PopData` object without the sample or samples provided. Input can be a single sample, or an array of samples. Will output an entire `PopData`, so use a semicolon after the command if you don't want the entire object printed to your screen. Use `summary`  if you want to confirm that the samples were removed. This command will inform you if samples were not found in the data. 
 
-:::: tabs card stretch
-::: tab single individual
+<Tabs
+  block={true}
+  defaultValue="s"
+  values={[
+    { label: 'single individual', value: 's', },
+    { label: 'multiple individuals', value: 'm', },
+  ]
+}>
+<TabItem value="s">
+
 ``` julia
 julia> fewer_sharks = exclude_samples(sharks, "cc_001") 
 PopData Object
@@ -31,8 +41,10 @@ PopData Object
   Longitude: present with 0 missing
   Latitude: present with 0 missing
 ```
-:::
-::: tab multiple individuals
+
+</TabItem>
+<TabItem value="m">
+
 ``` julia
 julia> lots_fewer_sharks = remove_samples(sharks, ["cc_001", "cc_002", "cc_003"]) 
 PopData Object
@@ -44,8 +56,10 @@ PopData Object
   Longitude: present with 0 missing
   Latitude: present with 0 missing
 ```
-:::
-::::
+
+</TabItem>
+</Tabs>
+
 :::note sample not found!
 If removing a single sample and it is not found in the PopData, an error will be returned. However, if removing multiple samples, you will receive a notice above the PopData output indicating which individuals were not found, while still removing the ones that were present.
 :::
@@ -59,8 +73,16 @@ exclude_loci(data::PopObj, loci::Union{String, Vector{String}})
 
 Returns a new `PopData` object without the locus or loci provided. Input can be a single locus, or an array of loci, all as Strings. Will output an entire `PopData`, so use a semicolon after the command if you don't want the entire object printed to your screen. Use `summary`  if you want to confirm that the loci were removed. This command will inform you if loci were not found in the data.
 
-:::: tabs card stretch
-::: tab single locus
+<Tabs
+  block={true}
+  defaultValue="s"
+  values={[
+    { label: 'single locus', value: 's', },
+    { label: 'multiple loci', value: 'm', },
+  ]
+}>
+<TabItem value="s">
+
 ``` julia
 julia> fewer_shark_loci = exclude_loci(sharks, "contig_475") 
 PopData Object
@@ -72,8 +94,10 @@ PopData Object
   Longitude: present with 0 missing
   Latitude: present with 0 missing
 ```
-:::
-::: tab multiple loci
+
+</TabItem>
+<TabItem value="m">
+
 ``` julia
 julia> lots_fewer_loci = remove_loci(sharks, ["contig_475", "contig_2784", "contig_8065"]) 
 PopData Object
@@ -85,8 +109,9 @@ PopData Object
   Longitude: present with 0 missing
   Latitude: present with 0 missing
 ```
-:::
-::::
+
+</TabItem>
+</Tabs>
 
 :::note locus not found!
 If removing a single locus and it is not found in the PopData, an error will be returned. However, if removing multiple loci, you will receive a notice above the PopData summary indicating which loci were not found, while removing the ones that were. If none of the loci specified were found, it will return an error.

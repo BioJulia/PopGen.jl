@@ -3,6 +3,8 @@ id: viewsort
 title: Viewing and sorting
 sidebar_label: Viewing and sorting
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 The functions here help you inspect your `PopData` and pull information from it easily.
 
@@ -15,17 +17,9 @@ samples(data::PopData)
 ```
 
 View individual/sample names in a `PopData`. 
-:::: tabs card stretch
-::: tab samples
 
 ``` julia
 julia> samples(sharks)
-```
-
-:::
-::: tab output
-
-```
 212-element Array{String,1}:
  "cc_001" 
  "cc_002" 
@@ -49,10 +43,6 @@ julia> samples(sharks)
  "seg_031"
 ```
 
-:::
-::::
-
-
 ## Display Specific Loci and/or Samples
 
 ### Get loci names
@@ -62,17 +52,9 @@ loci(data::PopData)
 ```
 
 Returns a vector of strings of the loci names in a `PopData`
-:::: tabs card stretch
-::: tab loci
 
 ```julia
 julia> loci(sharks)
-```
-
-:::
-::: tab output
-
-```
 2213-element Array{String,1}:
  "contig_35208"
  "contig_23109"
@@ -94,27 +76,16 @@ julia> loci(sharks)
  "contig_2784" 
 ```
 
-:::
-::::
-
 ### View genotypes at a locus
 
 ```julia
 locus(data::PopData, locus::String)
 ```
 
-Default shows all genotypes for all individuals. Returns a Vector.
-:::: tabs card stretch
-::: tab all loci
+Returns a Vector of genotypes for a locus
 
 ``` julia
 julia> locus(sharks, "contig_2784")
-```
-
-:::
-::: tab output
-
-```
 212-element Array{Union{Missing, Tuple{Int8,Int8}},1}:
  (1, 1)
  (1, 1)
@@ -136,13 +107,20 @@ julia> locus(sharks, "contig_2784")
  (1, 1)
 ```
 
-::::
-
 ## View genotypes by sample (or anything)
 
 This can be done fairly easily using DataFramesMeta macro `@where`
-:::: tabs card stretch
-::: tab single sample
+
+<Tabs
+  block={true}
+  defaultValue="s"
+  values={[
+    { label: 'single sample', value: 's', },
+    { label: 'multiple samples', value: 'm', },
+    { label: 'name and locus', value: 'nl', },
+  ]
+}>
+<TabItem value="s">
 
 ```julia
 julia> @where(sharks.loci, :name .== "cc_001")
@@ -166,8 +144,8 @@ julia> @where(sharks.loci, :name .== "cc_001")
 │ 2213 │ cc_001 │ Cape Canaveral │ contig_2784  │ (1, 1)   │
 ```
 
-:::
-::: tab multiple samples
+</TabItem>
+<TabItem value="m">
 
 ```julia
 julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]))
@@ -191,9 +169,10 @@ julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]))
 │ 4426 │ cc_002 │ Cape Canaveral │ contig_2784  │ (1, 1)   │
 ```
 
-:::
-::: tab name and locus
-It also means that you can combine different queries with "and" `&&` and "or" `||`. Here is an example of an approach combining a name and locus criteria:
+</TabItem>
+<TabItem value="nl">
+
+It also means that you can combine different queries with commas. Here is an example of an approach combining a name and locus criteria:
 
 ```julia
 julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]), :locus .== "contig_2784")
@@ -205,8 +184,8 @@ julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]), :locus .== "con
 │ 2   │ cc_002 │ Cape Canaveral │ contig_2784 │ (1, 1)   │
 ```
 
-:::
-::::
+</TabItem>
+</Tabs>
 
 
 ## Missing Data
@@ -224,8 +203,17 @@ Get missing genotype information in a `PopData`. Specify a mode of operation usi
 | `"locus"`  |     `"loci"`     | returns a count of missing genotypes per locus               |
 |  `"full"`  |   `"detailed"`   | returns a count of missing genotypes per locus per population |
 
-:::: tabs card stretch
-::: tab sample
+<Tabs
+  block={true}
+  defaultValue="s"
+  values={[
+    { label: 'sample', value: 's', },
+    { label: 'population', value: 'p', },
+    { label: 'locus', value: 'l', },
+    { label: 'detailed', value: 'f', },
+  ]
+}>
+<TabItem value="s">
 
 ```
 julia> missing(sharks)
@@ -249,8 +237,8 @@ julia> missing(sharks)
 │ 212 │ seg_031 │ 1       │
 ```
 
-:::
-::: tab pop
+</TabItem>
+<TabItem value="p">
 
 ```
 julia> missing(sharks, by = "pop")
@@ -267,8 +255,8 @@ julia> missing(sharks, by = "pop")
 │ 7   │ South Carolina │ 234     │
 ```
 
-:::
-::: tab locus
+</TabItem>
+<TabItem value="l">s
 
 ```
 julia> missing(sharks, by = "locus")
@@ -292,8 +280,8 @@ julia> missing(sharks, by = "locus")
 │ 2213 │ contig_2784  │ 7       │
 ```
 
-:::
-::: tab full
+</TabItem>
+<TabItem value="f">
 
 ```
 julia> missing(sharks, by = "full")
@@ -317,8 +305,9 @@ julia> missing(sharks, by = "full")
 │ 15491 │ contig_2784  │ Southeast Gulf │ 1       │
 ```
 
-:::
-::::
+</TabItem>
+</Tabs>
+
 :::tip alternative names
 Each mode of operation has an extra synonymous (alternative) name just because we can and want you to have the option of more explicitly legible code. If you get the `by = `  argument wrong, it will let you know with an error message and run the default `"sample"` mode anyway.
 :::
