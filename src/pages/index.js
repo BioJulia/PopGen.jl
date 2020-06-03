@@ -12,7 +12,7 @@ const features = [
     imageUrl: 'img/speed.svg',
     description: (
       <>
-        Python/MATLAB like syntax, with C-like speed.
+        Writes in a consistent and familiar Python-like syntax, but has speed comparable to C.
       </>
     ),
   },
