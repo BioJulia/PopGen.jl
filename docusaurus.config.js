@@ -7,17 +7,20 @@ module.exports = {
   organizationName: 'pdimens', // Usually your GitHub org/user name.
   projectName: 'PopGen.jl', // Usually your repo name.
   themeConfig: {
+    prism: {
+      //defaultLanguage: 'julia',
+      additionalLanguages: ['julia', 'r'],
+      theme: require('prism-react-renderer/themes/github'),
+      darkTheme: require('prism-react-renderer/themes/palenight'),
+    },
+    algolia: {
+      apiKey: 'f6d1b3005e55708c6b33b80157908b05',
+      indexName: 'popgen_jl',
+      //appId: 'app-id', // Optional, if you run the DocSearch crawler on your own
+      //algoliaOptions: {}, // Optional, if provided by Algolia
+    },
     navbar: {
-      prism: {
-        defaultLanguage: 'julia',
-        additionalLanguages: 'julia',
-      },
-      algolia: {
-        apiKey: 'f6d1b3005e55708c6b33b80157908b05',
-        indexName: 'popgen_jl',
-        //appId: 'app-id', // Optional, if you run the DocSearch crawler on your own
-        //algoliaOptions: {}, // Optional, if provided by Algolia
-      },
+      hideOnScroll: true,
       title: 'PopGen.jl',
       logo: {
         alt: 'PopGen.jl logo',
@@ -45,6 +48,8 @@ module.exports = {
           href: 'https://github.com/pdimens/popgen.jl',
           label: 'GitHub',
           position: 'right',
+          className: 'header-github-link',
+          'aria-label': 'GitHub repository',
         },
       ],
     },
@@ -62,8 +67,8 @@ module.exports = {
           homePageId: 'getting_started/install',
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
-          editUrl:
-            'https://github.com/pdimens/popgen.jl/edit/documentation/',
+          editUrl: 'https://github.com/pdimens/popgen.jl/edit/documentation/',
+          showLastUpdateTime: true,
         },
         blog: {
           showReadingTime: true,

@@ -30,7 +30,7 @@ const features = [
     imageUrl: 'img/transparent.svg',
     description: (
       <>
-        The package is written entirely in Julia, meaning anyone using the package can investigate the internals and root out errors or inconsistencies.
+        PopGen.jl is written entirely in Julia, meaning anyone using it can also understand what it's actually doing.
       </>
     ),
   },
