@@ -9,7 +9,7 @@ import styles from './styles.module.css';
 const features = [
   {
     title: <>Fast</>,
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    imageUrl: 'img/speed.svg',
     description: (
       <>
         Python/MATLAB like syntax, with C-like speed.
@@ -18,7 +18,7 @@ const features = [
   },
   {
     title: <>Sane</>,
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    imageUrl: 'img/sane.svg',
     description: (
       <>
         Sensible function and arguments names, and default settings. Get more done without scratching your head.
@@ -27,7 +27,7 @@ const features = [
   },
   {
     title: <>Transparent</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    imageUrl: 'img/transparent.svg',
     description: (
       <>
         The package is written entirely in Julia, meaning anyone using the package can investigate the internals and root out errors or inconsistencies.
