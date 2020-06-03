@@ -9,6 +9,7 @@ import TabItem from '@theme/TabItem';
 The package is currently unregistered while it's under active early development. However, installation is still simple!
 
 <Tabs
+  block={true}
   defaultValue="repl"
   values={[
     { label: 'REPL/Juno', value: 'repl', },
@@ -49,7 +50,7 @@ Feel free to play around with the test data in `/data/source/` or add it to your
 
 
 :::note Arch Linux users
-If you compiled Julia from source, your PopGen.jl installation may fail due to incorrectly building `Arpack`, which is expected to be in one place, but the compilation puts in another. 
+If you compiled Julia from source, your PopGen.jl installation may fail due to incorrectly building `Arpack`, which is expected to be in one place, but the compilation puts in another.
 
 **Solutions**:
 
