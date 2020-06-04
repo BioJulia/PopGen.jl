@@ -26,7 +26,20 @@ module.exports = {
       "analyses/relatedness"
     ],
     "API": [
-      "api/api"
+      "api/api",
+      "api/allelefreq",
+      "api/datasets",
+      "api/delimited",
+      "api/genepop",
+      "api/hardyweinberg",
+      "api/heterozygosity",
+      "api/ioutils",
+      "api/manipulate",
+      "api/read",
+      "api/summaryinfo",
+      "api/types",
+      "api/utils",
+      "api/variantcall",
     ]
   }
 }
