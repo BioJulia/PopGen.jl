@@ -60,4 +60,5 @@ unphase((1,2,3,4), digits = 3)
 "001002003004"
 
 unphase(missing, digits = 2)
+"-9"
 ```
