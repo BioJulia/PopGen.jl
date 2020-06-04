@@ -12,7 +12,7 @@ const features = [
     imageUrl: 'img/speed.svg',
     description: (
       <>
-        Writes in a consistent and familiar Python-like syntax, but has speed comparable to C.
+        The Julia language writes in a consistent and familiar Python-like syntax, but has speed comparable to C.
       </>
     ),
   },
