@@ -91,7 +91,25 @@ Newcomb_04,	254230	564000	090120
 </TabItem>
 </Tabs>
 
+## Writing to a Genepop file
+```julia
+popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
+```
+Writes a `PopData` object to a Genepop-formatted file.
+### Arguments
+- `data`: the `PopData` object you wish to convert to a Genepop file
+### keyword arguments
+- `filename`: a `String` of the output filename
+- `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
+- `format` : a `String` indicating whether loci should be formatted vertically (`"v"` or `"vertical"`) or hortizontally (`"h"`, or `"horizontal"`)
+### Example
+```julia
+cats = nancycats();
+fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+julia> popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
+```
+
+
 ## Acknowledgements
 
-The original implementations of this parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is only 3.2mb in size). However, thanks to the efforts of [CSV.jl](https://github.com/JuliaData/CSV.jl) , we leverage that package to preserve the speed and reduce the memory footprint quite a bit!
-
+The original implementations of the importing parser were written using only Base Julia, and while the speed was fantastic, the memory footprint involved seemed unusually high (~650mb RAM to parse `gulfsharks`, which is only 3.2mb in size). However, thanks to the efforts of [CSV.jl](https://github.com/JuliaData/CSV.jl), we leverage that package to preserve the speed and reduce the memory footprint quite a bit!
