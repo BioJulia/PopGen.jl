@@ -45,3 +45,19 @@ map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
 # or #
 [phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
 ```
+
+### unphase
+```julia
+unphase(geno::T; digits::Int = 3) where T <: Genotype
+```
+Takes a `Genotype` (e.g. `(131, 94)`) and returns a string of concatenated
+alleles padded with *n* number of zeroes, where *n* is given by `digits = `.
+`missing` values are returned as `"-9"`.
+
+**Example**
+```julia
+unphase((1,2,3,4), digits = 3)
+"001002003004"
+
+unphase(missing, digits = 2)
+```
