@@ -27,7 +27,7 @@ genepop(infile; kwargs...)
 By default, the file reader will assign numbers as population ID's (as Strings) in order of appearance in the genepop file. Use the `populations!` function to rename these with your own population ID's.
 :::
 
-### Example
+### example
 ```julia
 julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
 ```
@@ -96,13 +96,13 @@ Newcomb_04,	254230	564000	090120
 popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
 ```
 Writes a `PopData` object to a Genepop-formatted file.
-### Arguments
+### arguments
 - `data`: the `PopData` object you wish to convert to a Genepop file
 ### keyword arguments
 - `filename`: a `String` of the output filename
 - `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
 - `format` : a `String` indicating whether loci should be formatted vertically (`"v"` or `"vertical"`) or hortizontally (`"h"`, or `"horizontal"`)
-### Example
+### example
 ```julia
 cats = nancycats();
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
