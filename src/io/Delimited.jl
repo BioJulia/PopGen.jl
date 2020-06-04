@@ -42,9 +42,9 @@ lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
 ### Formatting example:
 ```
 name,population,long,lat,Locus1,Locus2,Locus3   \n
-sierra_01,mountain,11.11,-22.22,001001,002002,001001   \n
+sierra_01,mountain,11.11,-22.22,001001,-9,001001   \n
 sierra_02,mountain,11.12,-22.21,001001,001001,001002   \n
-snbarb_01,coast,,,001001,001001,001002 \n
+snbarb_01,coast,,,001001,000000,001002 \n
 snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
 snbarb_03,coast,11.15,,001002,001001,001001 \n
 ```

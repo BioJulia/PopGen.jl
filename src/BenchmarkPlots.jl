@@ -48,42 +48,17 @@ end
 xaxis = ["Julia", "R"]
 
 #### Load in Data ####
-import_speed = [1.445, 6.745]
+import_speed = [0.910, 6.745]
 speedplot = comparison_plot(xaxis,import_speed, "Seconds", "Importing a genepop file")
 speedplot |> save("speedplot.png")
 
 #### Filesize (KB) ####
 obj = ["PopData (Julia)", "genind (R)"]
-f_size = [3.498172, 5.331536]
+f_size = [3.527765, 5.331536]
 objplot = comparison_plot(obj, f_size, "megabytes", "Data structure size")
 objplot |> save("objectplot.png")
 
 #### Χ² test ####
-chitest = [0.591396, 6.2659]
+chitest = [0.176, 6.2659]
 chiplot = comparison_plot(xaxis, chitest, "Seconds", "Hardy-Weinberg Equilibrium Χ² test")
 chiplot |> save("chisqplot.png")
-
-
-#### Makie version
-using Makie
-# Made in Juno, so preferring the Plot pane
-popdisplay(AbstractPlotting.PlotDisplay())
-AbstractPlotting.inline!(true)
-
-# set generic X axis
-xaxis = ["Julia", "R"]
-
-# create generic plotting function
-function comparison_plot(x::Vector{String},y::Vector{Float64}, yaxis::String)
-    scene = barplot(
-        x,
-        y,
-        color = ["#aa79c1","#769fd2"]
-    )
-    axis= scene[Axis]
-    axis[:names][:axisnames] = ("", yaxis)
-    axis[:grid][:linewidth] = (0, 0)
-    axis[:ticks][:linewidth] = (0,0)
-    axis[:frame][:frames] = ((true,false),(true,false))
-    return scene
-end

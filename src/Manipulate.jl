@@ -55,13 +55,13 @@ end
 """
     locations!(data::PopData; long::Vector{String}, lat::Vector{String})
 Replaces existing `PopData` location data (longitude `long`, latitude `lat`). Takes
-**decimal minutes** format as a `Vector` of `String`. Recommended to use `CSV.read`
+**decimal minutes** or **degrees minutes seconds** format as a `Vector` of `String`. Recommended to use `CSV.read`
 from `CSV.jl` to import your spatial coordinates from a text file.
 ## Formatting requirements
-- Decimal Minutes: `"-11 43.11"` (must use space and be a `String`)
-- **Must** use negative sign `-` or single-letter cardinal directions like "11 43.11W"
-- Location data must be in the order that samples appear in your `PopData`
+- Coordinates as a `String` separated by spaces (`"11 43 41"`) or colons (`"11:43:41"`)
+- Must use negative sign (`"-11 43.52"`) or single-letter cardinal direction (`"11 43.52W"`)
 - Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
+- Can mix colons and spaces (although it's bad practice)
 ### NOTE
 If you read in the coordinate data as 4 vectors (longitude degrees, longitude minutes, latitude degrees, latitude minutes),
 then the easiest course of action would be to merge them into two vectors of strings
@@ -93,14 +93,11 @@ end
 
 function locations!(data::PopData; kwargs...)
     kwargs = Dict(kwargs)
-    # vectors as strings mode
-    if any([haskey(kwargs, :lat), haskey(kwargs, :long)])
-        # check for matching lat and long keywords
-        if all([haskey(kwargs, :lat), haskey(kwargs, :long)])
-            locations!(data, kwargs[:lat], kwargs[:long])
-        else
-            error("keyword arguments \"lat\" and \"long\" must be supplied together")
-        end
+    # check for matching lat and long keywords
+    if all([haskey(kwargs, :lat), haskey(kwargs, :long)])
+        locations!(data, kwargs[:long], kwargs[:lat])
+    else
+        error("keyword arguments \"lat\" and \"long\" must be supplied together")
     end
 end
 
@@ -166,7 +163,7 @@ end
 
 #### Find missing ####
 """
-    missing(data::PopData; mode::String = "sample")
+    missing(data::PopData; by::String = "sample")
 Get missing genotype information in a `PopData`. Specify a mode of operation
 to return a DataFrame corresponding with that missing information.
 
@@ -178,29 +175,29 @@ to return a DataFrame corresponding with that missing information.
 
 ### Example:
 ```
-missing(gulfsharks(), mode = "pop")
+missing(gulfsharks(), by = "pop")
 ```
 """
-@inline function Base.missing(data::PopData; mode::String)
-    if mode == "sample" || mode == "individual"
+@inline function Base.missing(data::PopData; by::String = "sample")
+    if by ∈ ["sample", "individual"]
         return @by(data.loci, :name, missing = count(ismissing, :genotype))
 
-    elseif mode == "pop" || mode == "population"
+    elseif by ∈ ["pop", "population"]
         return @by(data.loci, :population, missing = count(ismissing, :genotype))
 
-    elseif mode == "locus" || mode == "loci"
+    elseif by ∈ ["locus", "loci"]
         return @by(data.loci, :locus, missing = count(ismissing, :genotype))
 
-    elseif mode == "detailed" || mode == "full"
+    elseif by ∈ ["detailed", "full"]
         return @by(data.loci, [:locus, :population], missing = count(ismissing, :genotype))
     else
-        @error "Mode \"$mode\" not recognized. Please specify one of: sample, pop, locus, or full"
+        @error "Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"
         missing(data)
     end
 end
 
-@inline function Base.missing(data::PopData, mode::String = "sample")
-    missing(data, mode = mode)
+@inline function Base.missing(data::PopData, by::String = "sample")
+    missing(data, by = mode)
 end
 
 """
@@ -287,6 +284,7 @@ function populations!(data::PopData, samples::Vector{String}, populations::Vecto
         data.loci[data.loci.name .== i, :population] .= j
     end
     droplevels!(data.loci.population)
+    show(populations(data))
     return
 end
 

@@ -1,6 +1,6 @@
 #TODO add to docs
 """
-    convert_coord(coordinate::string)
+    convert_coord(coordinate::String)
 Takes non-decimal-degree format as a `String` and returns it as a decimal degree
 `Float32`. Can be broadcasted over an array of coordinate strings to convert them.
 ## Formatting requirements
@@ -38,28 +38,8 @@ function convert_coord(coordinate::String)
     end
 end
 
-
 """
-    nonmissing(vec::T) where T<:AbstractArray
-Convenience function to count the number of non-`missing` values
-in a vector.
-"""
-function nonmissing(vec::T) where T<:AbstractArray
-    count(!ismissing, vec)
-end
-
-"""
-    reciprocal(num::T) where T <: Signed
-Returns the reciprocal (1/number) of a number. Will return `0` when
-the number is `0` instead of returning `Inf`.
-"""
-function reciprocal(num::T) where T <: Real
-    iszero(num) ? 1.0/Float64(num) : 0
-end
-
-#TODO change forwardstop in docs
-"""
-    multitest_missing(pvals::Array{Float64,1}, correction::String)
+    multitest_missing(pvals::Vector{T}, correction::String) where T <: Union{Missing, <:AbstractFloat}
 Modification to `MultipleTesting.adjust` to include `missing` values in the
 returned array. Missing values are first removed from the array, the appropriate
 correction made, then missing values are re-added to the array at their original
@@ -108,4 +88,22 @@ positions. See MultipleTesting.jl docs for full more detailed information.
         @inbounds insert!(correct, i, missing)
     end
     return correct
+end
+
+"""
+    nonmissing(vec::T) where T<:AbstractArray
+Convenience function to count the number of non-`missing` values
+in a vector.
+"""
+function nonmissing(vec::T) where T<:AbstractArray
+    count(!ismissing, vec)
+end
+
+"""
+    reciprocal(num::T) where T <: Signed
+Returns the reciprocal (1/number) of a number. Will return `0` when
+the number is `0` instead of returning `Inf`.
+"""
+function reciprocal(num::T) where T <: Real
+    iszero(num) ? 1.0/Float64(num) : 0
 end
