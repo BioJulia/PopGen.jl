@@ -45,3 +45,22 @@ Newcomb_04, 254230  564000  090120
 ```julia
 waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
 ```
+
+### `popdata2genepop`
+```julia
+popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
+```
+Writes a `PopData` object to a Genepop-formatted file
+- `data`: the `PopData` object you wish to convert to a Genepop file
+
+**Keyword arguments**
+- `filename`: a `String` of the output filename
+- `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
+- `format` : a `String` indicating whether loci should be formatted vertically (`"v"` or `"vertical"`) or hortizontally (`"h"`, or `"horizontal"`)
+
+**Example**
+```julia
+cats = nancycats();
+fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+julia> popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
+```
