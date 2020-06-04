@@ -2,7 +2,7 @@
 These are commands that are for the general manipulation and viewing of the
 PopData type. The appear in alphabetical order.
 =#
-export locations, locations!, loci, locus, get_genotypes, get_sample_genotypes, missing, populations, population, populations!, population!, reindex, exclude_loci, remove_loci, omit_loci, exclude_samples, remove_samples, omit_samples, samples
+export locations, locations!, loci, locus, get_genotypes, get_sample_genotypes, missing, populations, population, populations!, population!, exclude_loci, remove_loci, omit_loci, exclude_samples, remove_samples, omit_samples, samples
 
 """
     locations(data::PopData)
@@ -48,7 +48,7 @@ function locations!(data::PopData, long::Vector{T}, lat::Vector{T}) where T <: A
     # convert to the right type and use locations!()
     lat_adjust = lat |> Vector{Union{Missing, Float32}}
     long_adjust = long |> Vector{Union{Missing, Float32}}
-    locations!(data, lat = lat_adjust, long = long_adjust)
+    locations!(data, long = long_adjust, lat = lat_adjust)
 end
 
 
@@ -123,7 +123,7 @@ get_genotype(cats, sample = "N115" , locus = ["fca8", "fca37"])
 get_genotype(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
 ```
 """
-function get_genotype(data::PopData, sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
+function get_genotypes(data::PopData, sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
     if typeof(sample) == String
         sample = [sample]
     end

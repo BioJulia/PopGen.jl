@@ -151,7 +151,7 @@ Writes a `PopData` object to a Genepop-formatted file.
 ```julia
 cats = nancycats();
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
-julia> popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
+popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
 """
 function popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")

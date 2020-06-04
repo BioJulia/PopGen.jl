@@ -200,7 +200,7 @@ function geno_freq_expected(locus::T) where T<:GenoArray
     ## regenerate genotypes by concatenating alleles and re-phasing them with
     ## same all-by-all approach
     alle = lpad.(alle, 4, "0")    # cheat by padding strings
-    genos = phase_dip.(vec(alle .* permutedims(alle)), Int16, 4)
+    genos = phase.(vec(alle .* permutedims(alle)), Int16, 4)
 
     # reform genotype frequencies into a Dict
     expected = Dict{Tuple, Float64}()
