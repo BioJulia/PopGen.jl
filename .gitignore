@@ -1,12 +1,3 @@
 .DS_Store
 /Manifest.toml
 /dev/
-/node_modules/
-/src/playtest/
-/yarn-error.log
-/yarn.lock
-/docs/yarn-error.log
-/docs/yarn.lock
-/docs/.vuepress/dist
-/package.json
-/package-lock.json
