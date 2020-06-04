@@ -4,7 +4,7 @@ title: Variant Call Format
 sidebar_label: Variant Call Format
 ---
 
-## Import a BCF/VCF file as a `PopObj`
+## Import a BCF/VCF file as `PopData`
 ```julia
 vcf(infile::String)
 bcf(infile::String)
@@ -47,4 +47,4 @@ but they **will not** provide:
 This means you will need to add that information separately afterwards. Location data (which is optional!) can be added to the `PopData` with the `locations!` command. Population names (mandatory!) can be added using `populations!()`
 
 ## Acknowledgements
-The majority of the BCF/VCF reader is thanks to the tremendous efforts of Ben J. Ward and the BioJulia contributors involved in [GeneticVariation.jl](https://github.com/BioJulia/GeneticVariation.jl), which we use to parse your files into `PopObj` format. If you love the file importer, then give those folks your thanks. If something is wrong and/or you hate the importer, blame us (and please [open up an issue](https://github.com/pdimens/PopGen.jl/issues) :sweat_smile:).
+The majority of the BCF/VCF reader is thanks to the tremendous efforts of Ben J. Ward and the BioJulia contributors involved in [GeneticVariation.jl](https://github.com/BioJulia/GeneticVariation.jl), which we use to parse your files into `PopData` format. If you love the file importer, then give those folks your thanks. If something is wrong and/or you hate the importer, blame us first (and please [open up an issue](https://github.com/pdimens/PopGen.jl/issues) 😅). 

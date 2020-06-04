@@ -30,7 +30,7 @@ lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
 make sure to change your backslashes `\` to forward slashes `/` 
 :::
 
-## Format
+### Format
 
 First row is column names, and they occur in this order:
 1. name
@@ -51,11 +51,11 @@ snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
 snbarb_03,coast,11.15,,001002,001001,001001 \n
 ```
 
-## Missing data
-### Genotypes
+### Missing data
+#### Genotypes
 Missing genotypes can be formatted as all-zeros (ex.`000000`) or negative-nine `-9`
 
-### Location data
+#### Location data
 If location data is missing for a sample (which is ok!), make sure the value is blank, otherwise there will be transcription errors! (example at line 3 in the example above)
 
 

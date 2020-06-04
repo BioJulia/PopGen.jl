@@ -6,13 +6,13 @@ module.exports = {
       "getting_started/comparison",
       "getting_started/types",
       "getting_started/other_types",
+      "getting_started/datasets"
     ],
-    "Importing Data": [
+    "File I/O": [
       "io/file_import",
       "io/delimited",
       "io/genepop",
       "io/vcf",
-      "io/datasets"
     ],
     "Tutorial": [
       "tutorials/manipulate",
