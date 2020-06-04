@@ -196,9 +196,6 @@ missing(gulfsharks(), by = "pop")
     end
 end
 
-@inline function Base.missing(data::PopData, by::String = "sample")
-    missing(data, by = mode)
-end
 
 """
     populations(data::PopData; listall::Bool = false)

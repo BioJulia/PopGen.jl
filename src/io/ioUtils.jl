@@ -50,7 +50,6 @@ of a sample and return the ploidy of the first non-missing locus.
 end
 
 
-#TODO remove phase dip from docs
 """
     phase(loc::Union{String, Int}, type::DataType, digit::Int)
 Takes a String of numbers or Integers and returns a typed locus appropriate for PopGen.jl as used in the
@@ -83,4 +82,27 @@ end
     allele1 = loc ÷ units |> type
     allele2 = loc % units |> type
     return [allele1, allele2] |> sort |> Tuple
+end
+
+"""
+    unphase(geno::T; digits::Int = 3) where T <: Genotype
+Takes a `Genotype` (e.g. `(131, 94)`) and returns a string of concatenated
+alleles padded with *n* number of zeroes, where *n* is given by `digits = `.
+`missing` values are returned as `"-9"`.
+
+### Example
+```
+unphase((1,2,3,4), digits = 3)
+"001002003004"
+
+unphase(missing, digits = 2)
+"-9"
+```
+"""
+function unphase(geno::T; digits::Int = 3) where T <: Genotype
+    join(map(i -> lpad(i, digits, "0"), geno))
+end
+
+function unphase(geno::Missing; digits::Int = 3)
+    return "-9"
 end

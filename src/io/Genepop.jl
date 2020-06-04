@@ -138,3 +138,42 @@ function genepop(
 
     PopData(sample_table, geno_parse)
 end
+
+"""
+    popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
+Writes a `PopData` object to a Genepop-formatted file.
+- `data`: the `PopData` object you wish to convert to a Genepop file
+### keyword arguments
+- `filename`: a `String` of the output filename
+- `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
+- `format` : a `String` indicating whether loci should be formatted vertically (`"v"` or `"vertical"`) or hortizontally (`"h"`, or `"horizontal"`)
+
+```julia
+cats = nancycats();
+fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+julia> popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
+```
+"""
+function popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
+    open(filename, "w") do outfile
+        println(outfile, "genepop generated from PopData by PopGen.jl")
+        if format in ["v", "vertical"]
+            [println(outfile,i) for i in loci(data)];
+        else
+            [print(outfile, i, ",") for i in loci(data)[1:end-1]];
+            print(outfile, loci(data)[end], "\n")
+        end
+        println(outfile, "POP")
+        pops = [unique(data.loci.population)[1]]
+        for (keys, sample) in pairs(groupby(data.loci, [:name, :population]))
+            print(outfile, sample.name[1], ",\t")
+            format_geno = unphase.(sample.genotype, digits = digits)
+            [print(outfile, i, "\t") for i in format_geno[1:end-1]]
+            print(outfile, format_geno[end], "\n" )
+            if keys.population != pops[end]
+                println(outfile, "POP")
+                push!(pops, keys.population)
+            end
+        end
+    end
+end
