@@ -1,4 +1,4 @@
-![logo](docs/.vuepress/public/images/logo_banner.png)
+![logo](misc/logo.png)
 
 Population Genetics in Julia. This is a fork of `PopGen.jl` in `BioJulia` with the goal of merging with it.
 
@@ -7,12 +7,12 @@ Population Genetics in Julia. This is a fork of `PopGen.jl` in `BioJulia` with t
 #### How to install:
 Invoke the package manager by pressing `]` on an empty line and `add` this repo
 
-![install_instructions](docs/.vuepress/public/images/install_carbon.png)
+![install_instructions](misc/install_carbon.png)
 
 ---------
 
 ### Authors
 
-[![alt text](docs/.vuepress/public/images/orcid.png)](https://orcid.org/0000-0003-3823-0373) [![alt text](docs/.vuepress/public/images/twitter.png)](https://twitter.com/PVDimens) Pavel Dimens, PhD Candidate @ U. Southern Mississippi
+[![alt text](misc/orcid.png)](https://orcid.org/0000-0003-3823-0373) [![alt text](misc/twitter.png)](https://twitter.com/PVDimens) Pavel Dimens, PhD Candidate @ U. Southern Mississippi
 
-[![alt text](docs/.vuepress/public/images/orcid.png)](http://orcid.org/0000-0002-9100-217X) [![alt text](docs/.vuepress/public/images/twitter.png)](https://twitter.com/JasonSelwyn) Jason Selwyn, PhD Candidate @ Texas A&M University - Corpus Christi
+[![alt text](misc/orcid.png)](http://orcid.org/0000-0002-9100-217X) [![alt text](misc/twitter.png)](https://twitter.com/JasonSelwyn) Jason Selwyn, PhD Candidate @ Texas A&M University - Corpus Christi
