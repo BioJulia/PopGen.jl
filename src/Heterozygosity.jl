@@ -51,9 +51,8 @@ end
 #TODO add to docs (API)
 
 """
-    gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::U where U<:Signed)
-Calculate overall gene diversity with the adjustment/correction
-given by Nei:
+    gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::U where U<:Signed, corr::Bool = true)
+Calculate overall gene diversity with the adjustment/correction given by Nei:
 
 Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
 - _ñ_ is the number of genotypes for a locus for a population
@@ -64,9 +63,14 @@ Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
     - Hₛ =  ñ/(ñ-1) * (1 - sum(pbar²ᵢ - Het_observed / 2ñ))
 
 (Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press).
+use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 """
-function gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::U where U<:Signed)
-    het_exp - (het_obs/n/2) * n/(n-1)
+function gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::T where T<:Signed; corr::Bool = true)
+    if corr == true
+        (het_exp - (het_obs/n/2.0)) * n/(n-1)
+    else
+        (het_exp - (het_obs/n/2.0))
+    end
 end
 
 """

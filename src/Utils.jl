@@ -105,5 +105,5 @@ Returns the reciprocal (1/number) of a number. Will return `0` when
 the number is `0` instead of returning `Inf`.
 """
 function reciprocal(num::T) where T <: Real
-    iszero(num) ? 1.0/Float64(num) : 0
+    !iszero(num) ? 1.0/Float(num) : 0
 end
