@@ -1,8 +1,8 @@
 export read_from, file_import
-#TODO update docs
+
 """
     read_from(infile::String; kwargs...)
-Wraps `csv()`, `genepop()`, `bcf()`, and `vcf()` to read a file in as a `PopObj`. File type is
+Wraps `delimited()`, `genepop()`, `bcf()`, and `vcf()` to read a file in as a `PopObj`. File type is
 inferred from the file extension (case insensitive):
 | File Format         | Extensions             | Docstring     |
 | :------------------ | :--------------------- | :------------ |
@@ -43,13 +43,18 @@ end
 
 const file_import = read_from
 
-#TODO add to Read and API docs
 """
     write_to(data::PopData; filename::String, kwargs...)
 Writes `PopData` to a specified file type inferred from the extension of `filename = ` (case insensitive). Additional keyword
 arguments `kwargs...` are specific to the intended file type, and are listed in the docstrings of the specific
-file writer with the format `?popdata2filetype`. For example, to find the appropriate keywords for a converstion
+file writer with the format `?popdata2filetype`. For example, to find the appropriate keywords for a conversion
 to Genepop format, call up the docstring to `popdata2genepop` with `?popdata2genepop`.
+
+| File Format | Extensions             | Docstring          |
+| :---------- | :--------------------- | :----------------- |
+| genepop     | '.gen', '.genepop'     | ?popdata2genepop   |
+| JLD2        | '.jld2'                | ?popdata2jld2      |
+| delimited   | '.csv', '.txt', '.tsv' | ?popdata2delimited |
 
 ### Example
 ```
@@ -57,11 +62,6 @@ cats = nancycats();
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
 write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
-| File Format | Extensions             | Docstring          |
-| :---------- | :--------------------- | :----------------- |
-| genepop     | '.gen', '.genepop'     | ?popdata2genepop   |
-| JLD2        | '.jld2'                | ?popdata2jld2      |
-| delimited   | '.csv', '.txt', '.tsv' | ?popdata2delimited |
 """
 function write_to(data::PopData; filename::String, kwargs...)
     ext = split(filename, ".")[end] |> lowercase

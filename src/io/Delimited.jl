@@ -3,7 +3,6 @@ This file handles the import/export of delmited file formats
 =#
 
 export delimited, csv
-#TODO update API docs
 """
     delimited(infile::String; delim::Union{Char,String,Regex} = "auto", digits::Int64 = 3, silent::Bool = false)
 Load a delimited-type file into memory as a PopData object. *There should be no empty cells
@@ -38,7 +37,7 @@ blank, otherwise there will be transcription errors! (look at line 3 in the exam
 
 ## Example
 ```
-lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
+lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
 
 ### Formatting example:
@@ -100,6 +99,8 @@ Write PopData to a text-delimited file.
 - `filename`: a `String` of the output filename
 - `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
 - `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
+  - `wide` : the standard format CSV for importing into PopGen.jl
+  - `long` : the `loci` table with `longitude` and `latitude` columns added 
 - `delim` : the `String` delimiter to use for writing the file. 
 
 ### Example
@@ -131,13 +132,4 @@ function popdata2delimited(data::PopData; filename::String, delim::String = ",",
         CSV.write(filename, out_df, delim = delim) ;
         return
     end
-end
-
-
-
-
-
-for (i,j) in zip(samples, populations)
-    data.meta[data.meta.name .== i, :population] .= j
-    data.loci[data.loci.name .== i, :population] .= j
 end
