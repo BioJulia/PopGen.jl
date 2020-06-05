@@ -10,6 +10,7 @@ module.exports = {
     ],
     "File I/O": [
       "io/file_import",
+      "io/file_write",
       "io/delimited",
       "io/genepop",
       "io/vcf",

@@ -46,7 +46,7 @@ map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
 [phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
 ```
 
-### unphase
+### `unphase`
 ```julia
 unphase(geno::T; digits::Int = 3) where T <: Genotype
 ```

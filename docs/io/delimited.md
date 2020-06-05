@@ -63,7 +63,7 @@ You can also use the command `csv()` synonymously with `delimited()`.
 :::
 
 ## Writing to a delimited file
-All file writing options can be performed using write_to(), which calls popdata2delimited when writing to a delimited file.
+All file writing options can be performed using `write_to()`, which calls `popdata2delimited` when writing to a delimited file.
 ```julia
 popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
 ```
