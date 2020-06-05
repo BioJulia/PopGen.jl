@@ -56,7 +56,10 @@ Writes a `PopData` object to a Genepop-formatted file
 **Keyword arguments**
 - `filename`: a `String` of the output filename
 - `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
-- `format` : a `String` indicating whether loci should be formatted vertically (`"v"` or `"vertical"`) or hortizontally (`"h"`, or `"horizontal"`)
+- `format` : a `String` indicating whether loci should be formatted 
+    - vertically (`"v"` or `"vertical"`)
+    - hortizontally (`"h"`, or `"horizontal"`)
+    - Genepop Isolation-By-Distance (`"ibd"`) where each sample is a population with long/lat data prepended
 
 **Example**
 ```julia
