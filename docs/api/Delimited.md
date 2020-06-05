@@ -12,6 +12,7 @@ Load a delimited-type file into memory as a PopData object. *There should be no 
 in your file*
 #### Arguments
 - `infile` : path to file
+#### Keyword Arguments
 - `delim` : delimiter characters. By default uses auto-parsing of `CSV.File`
 - `digits` : number of digits denoting each allele (default: `3`)
 - `diploid`  : whether samples are diploid for parsing optimizations (default: `true`)
@@ -49,4 +50,22 @@ snbarb_03,coast,11.15,,001002,001001,001001
 **Example**
 ```julia
 lizardsCA = delimited("CA_lizards.csv", digits = 3);
+```
+
+## popdata2delimtied
+```julia
+popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
+```
+Write PopData to a text-delimited file. 
+### Keyword Arguments
+- `filename`: a `String` of the output filename
+- `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
+- `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
+- `delim` : the `String` delimiter to use for writing the file. 
+
+### Example
+```julia
+cats = nancycats();
+fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+popdata2delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
 ```
