@@ -35,7 +35,7 @@ If location data is missing for a sample (which is ok!), make sure the value is
 blank, otherwise there will be transcription errors! (look at line 3 in the example below)
 #### Example
 ```
-lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
+lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
 ### Formatting example
 ```
