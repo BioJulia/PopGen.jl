@@ -13,20 +13,20 @@ Currently, PopGen.jl provides four different file parsers with which to create `
 | Variant Call Format           | `vcf()`               |
 | Variant Call Format (bzipped) | `bcf()`               |
 
-You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_in()`. 
+You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_from()`. 
 
 :::note file_import alias
-The name `read_in` is short and sweet, but isn't the most descriptive, so we provide a more explicitly-named alias `file_import()`. Feel free to use whichever you like best.
+The name `read_from` is short and sweet, but isn't the most descriptive, so we provide a more explicitly-named alias `file_import()`. Feel free to use whichever you like best.
 :::
 
 ```julia
-read_in(infile::String; kwargs...)
+read_from(infile::String; kwargs...)
 file_import(infile::String; kwargs...)
 ```
 
 where `infile` is a String of your filename (in quotes) and `kwargs` are the corresponding keyword arguments associated with your file type. The function `read_in()` uses all the same keyword arguments as do the commands specific to their file types, therefore you should have a look at those commands (usually the defaults suffice). 
 
-`read_in()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below (case insensitive). If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.gen.final.v2.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and ignore file extensions. Ultimately, what crazy extensions you give your files is your business, and we love that about you. 
+`read_from()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below (case insensitive). If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.gen.final.v2.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and ignore file extensions. Ultimately, what crazy extensions you give your files is your business, and we love that about you. 
 
 ## Supported File Types
 
