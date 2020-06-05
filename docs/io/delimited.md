@@ -72,7 +72,10 @@ Write PopData to a text-delimited file.
 - `filename`: a `String` of the output filename
 - `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
 - `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
+  - `wide` : the standard format CSV for importing into PopGen.jl
+  - `long` : the `loci` table with `longitude` and `latitude` columns added
 - `delim` : the `String` delimiter to use for writing the file. 
+
 
 ### Example
 ```julia
