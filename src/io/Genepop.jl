@@ -146,7 +146,10 @@ Writes a `PopData` object to a Genepop-formatted file.
 ### keyword arguments
 - `filename`: a `String` of the output filename
 - `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
-- `format` : a `String` indicating whether loci should be formatted vertically (`"v"` or `"vertical"`) or hortizontally (`"h"`, or `"horizontal"`)
+- `format` : a `String` indicating whether loci should be formatted
+    - vertically (`"v"` or `"vertical"`)
+    - hortizontally (`"h"`, or `"horizontal"`)
+    - Genepop Isolation-By-Distance (`"ibd"`) where each sample is a population with long/lat data prepended
 
 ```julia
 cats = nancycats();
@@ -157,22 +160,34 @@ popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, for
 function popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
     open(filename, "w") do outfile
         println(outfile, "genepop generated from PopData by PopGen.jl")
-        if format in ["v", "vertical"]
-            [println(outfile,i) for i in loci(data)];
-        else
+        if format in ["h", "horizontal"]
             [print(outfile, i, ",") for i in loci(data)[1:end-1]];
             print(outfile, loci(data)[end], "\n")
+        else
+            [println(outfile,i) for i in loci(data)];
         end
-        println(outfile, "POP")
-        pops = [unique(data.loci.population)[1]]
-        for (keys, sample) in pairs(groupby(data.loci, [:name, :population]))
-            print(outfile, sample.name[1], ",\t")
-            format_geno = unphase.(sample.genotype, digits = digits)
-            [print(outfile, i, "\t") for i in format_geno[1:end-1]]
-            print(outfile, format_geno[end], "\n" )
-            if keys.population != pops[end]
+        if lowercase(format) != "ibd"
+            println(outfile, "POP")
+            pops = [unique(data.loci.population)[1]]
+            for (keys, sample) in pairs(groupby(data.loci, [:name, :population]))
+                print(outfile, sample.name[1], ",\t")
+                format_geno = unphase.(sample.genotype, digits = digits)
+                [print(outfile, i, "\t") for i in format_geno[1:end-1]]
+                print(outfile, format_geno[end], "\n" )
+                if keys.population != pops[end]
+                    println(outfile, "POP")
+                    push!(pops, keys.population)
+                end
+            end
+        else
+            for (keys, sample) in pairs(groupby(data.loci, :name))
                 println(outfile, "POP")
-                push!(pops, keys.population)
+                long = data.meta[data.meta.name .== keys.name, :longitude][1]
+                lat = data.meta[data.meta.name .== keys.name, :latitude][1]
+                print(outfile, long, "\t", lat, "\t", keys.name, ",\t")
+                format_geno = unphase.(sample.genotype, digits = digits)
+                [print(outfile, i, "\t") for i in format_geno[1:end-1]]
+                print(outfile, format_geno[end], "\n" )
             end
         end
     end
