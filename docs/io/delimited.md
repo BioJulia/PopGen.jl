@@ -24,7 +24,7 @@ delimited(infile::String; kwargs...)
 
 ### Example
 ```
-lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
+lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
 :::caution Windows users
 make sure to change your backslashes `\` to forward slashes `/` 
