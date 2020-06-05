@@ -58,13 +58,28 @@ Missing genotypes can be formatted as all-zeros (ex.`000000`) or negative-nine `
 #### Location data
 If location data is missing for a sample (which is ok!), make sure the value is blank, otherwise there will be transcription errors! (example at line 3 in the example above)
 
-
-
-
 :::info alias
 You can also use the command `csv()` synonymously with `delimited()`. 
 :::
 
-## Acknowledgements
+## Writing to a delimited file
+All file writing options can be performed using write_to(), which calls popdata2delimited when writing to a delimited file.
+```julia
+popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
+```
+Write PopData to a text-delimited file. 
+### Keyword Arguments
+- `filename`: a `String` of the output filename
+- `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
+- `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
+- `delim` : the `String` delimiter to use for writing the file. 
 
+### Example
+```julia
+cats = nancycats();
+fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+popdata2delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
+```
+
+## Acknowledgements
 Thanks to the efforts of the [CSV.jl](https://github.com/JuliaData/CSV.jl) team, we are able leverage that package to do much of the heavy lifting within this parser. 
