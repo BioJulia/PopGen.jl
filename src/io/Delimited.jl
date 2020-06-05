@@ -10,6 +10,8 @@ Load a delimited-type file into memory as a PopData object. *There should be no 
 in your file*
 ### Arguments
 - `infile` : path to file
+
+### Keyword Arguments
 - `delim` : delimiter characters. By default uses auto-parsing of `CSV.File`
 - `digits` : number of digits denoting each allele (default: `3`)
 - `diploid`  : whether samples are diploid for parsing optimizations (default: `true`)
@@ -90,3 +92,52 @@ function delimited(
 end
 
 const csv = delimited
+
+"""
+    popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
+Write PopData to a text-delimited file. 
+### Keyword Arguments
+- `filename`: a `String` of the output filename
+- `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
+- `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
+- `delim` : the `String` delimiter to use for writing the file. 
+
+### Example
+```julia
+cats = nancycats();
+fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+popdata2delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
+```
+"""
+function popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
+    unphased_df = select(data.loci, 1:3, 4 => (i -> unphase.(i, digits = digits)) => :genotype)
+    if format == "wide"
+        wide_df = DataFrames.unstack(unphased_df, :locus, :genotype)
+        insertcols!(wide_df, 3, :longitude => data.meta.longitude, :latitude => data.meta.latitude)
+        CSV.write(filename, wide_df, delim = delim) ;
+        return
+    else
+        out_df = sort(
+                    transform(
+                        unphased_df, 1:2, 
+                        3 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :longitude, 
+                        4 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :latitude, 3:4
+                        )
+                    )
+        for i in 1:length(data.meta.name)
+            out_df[out_df.name .== data.meta.name[i], :longitude] .= data.meta.longitude[i]
+            out_df[out_df.name .== data.meta.name[i], :latitude] .= data.meta.latitude[i]
+        end
+        CSV.write(filename, out_df, delim = delim) ;
+        return
+    end
+end
+
+
+
+
+
+for (i,j) in zip(samples, populations)
+    data.meta[data.meta.name .== i, :population] .= j
+    data.loci[data.loci.name .== i, :population] .= j
+end

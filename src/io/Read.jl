@@ -4,9 +4,12 @@ export read_from, file_import
     read_from(infile::String; kwargs...)
 Wraps `csv()`, `genepop()`, `bcf()`, and `vcf()` to read a file in as a `PopObj`. File type is
 inferred from the file extension (case insensitive):
-- delimited: .csv | .tsv | .txt
-- genepop: .gen | .genepop
-- variant call format: .vcf
+| File Format         | Extensions             | Docstring     |
+| :------------------ | :--------------------- | :------------ |
+| delimited           | '.csv', '.txt', '.tsv' | ?delimited    |
+| genepop             | '.gen', '.genepop'     | ?genepop      |
+| variant call format | '.vcf', '.bcf'         | ?vcf, ?bcf    |
+
 This function uses the same keyword arguments (and defaults) as the file importing
 functions it wraps; please see their respective docstrings in the Julia help console.
 (e.g. `?genepop`) for specific usage details. Use the alias function `file_import`
@@ -54,14 +57,30 @@ cats = nancycats();
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
 write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
-### File format | extensions |  docstring
-- genepop | `.gen` or `.genepop` | `?popdata2genepop`
+| File Format | Extensions             | Docstring          |
+| :---------- | :--------------------- | :----------------- |
+| genepop     | '.gen', '.genepop'     | ?popdata2genepop   |
+| JLD2        | '.jld2'                | ?popdata2jld2      |
+| delimited   | '.csv', '.txt', '.tsv' | ?popdata2delimited |
 """
 function write_to(data::PopData; filename::String, kwargs...)
     ext = split(filename, ".")[end] |> lowercase
     if ext in ["gen", "genepop"]
-        popdata2genepop(data, filename = filename, kwargs...)
+        popdata2genepop(data, filename = filename; kwargs...)
+    elseif ext == "jld2"
+        popdata2jdl2(data, filename = filename)
+    elseif ext in ["csv", "txt", "tsv"]
+        popdata2delimited(data, filename = filename; kwargs...)
     else
         @error "File type not recognized by filename extension. Please see the docstring"
     end
+end
+
+
+"""
+    popdata2jdl2(data::PopData; filename::String)
+Write PopData to a `JLD2` file.
+"""
+function popdata2jdl2(data::PopData; filename::String)
+    JLD2.@save filename data
 end
