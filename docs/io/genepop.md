@@ -92,6 +92,7 @@ Newcomb_04,	254230	564000	090120
 </Tabs>
 
 ## Writing to a Genepop file
+All file writing options can be performed using `write_to()`, which calls `popdata2genpop` when writing to a Genepop file.
 ```julia
 popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
 ```
