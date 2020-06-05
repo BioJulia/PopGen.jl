@@ -33,7 +33,7 @@ Missing genotypes can be formatted as all-zeros `000000`, left empty, or negativ
 ##### Location data
 If location data is missing for a sample (which is ok!), make sure the value is
 blank, otherwise there will be transcription errors! (look at line 3 in the example below)
-## Example
+#### Example
 ```
 lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
 ```
@@ -52,20 +52,20 @@ snbarb_03,coast,11.15,,001002,001001,001001
 lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
 
-## popdata2delimtied
+### popdata2delimtied
 ```julia
 popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
 ```
 Write PopData to a text-delimited file. 
-### Keyword Arguments
+#### Keyword Arguments
 - `filename`: a `String` of the output filename
 - `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
 - `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
 - `delim` : the `String` delimiter to use for writing the file. 
 
-### Example
+#### Example
 ```julia
 cats = nancycats();
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
-popdata2delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
+popdata2delimited(fewer_cats, filename = "filtered_nancycats.csv", digits = 3, format = "wide", delim = " ")
 ```
