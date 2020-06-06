@@ -21,6 +21,7 @@ So, we'd like to prove that Julia and PopGen.jl actually achieves that by showin
 To make this a practical comparison, we're going to use the `gulfsharks` data because it is considerably larger (212 samples x 2213 loci) than `nancycats` (237 x 9) and a bit more of a "stress test".  All benchmarks in R are performed using the `microbenchmark` package, and  `BenchmarkTools` are used for Julia. 
 
 <Tabs
+  block={true}
   defaultValue="j"
   values={[
     { label: 'load Julia packages', value: 'j', },
@@ -56,6 +57,7 @@ As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux
 Since `gulfsharks` is shamelessly provided in PopGen.jl, we will just load it with `genepop()`.  If you would like to try this yourself in R, find the `gulfsharks.gen` file in the package repository under `/data/source/gulfsharks.gen`. Since the file importer now uses CSV.jl to read files, there is one step of the genepop parser that is multithreaded. However, the majority of the data parsing (formatting the raw data into a correct PopData structure) occurs using a single thread. This R benchmark will take a few minutes. Consider making some tea while you wait.
 
 <Tabs
+  block={true}
   defaultValue="j"
   values={[
     { label: 'Julia', value: 'j', },
@@ -108,6 +110,7 @@ It was pretty tricky to come up with a sensible/efficient/convenient data struct
 *Anyway*, it's important to understand how much space your data will take up in memory (your RAM) when you load it in, especially since data's only getting bigger! Keep in mind that `gulfsharks` in PopGen.jl also provides lat/long data, which _should_ inflate the size of the object somewhat compared to the `genind`, which we won't add any location data to.
 
 <Tabs
+  block={true}
   defaultValue="j"
   values={[
     { label: 'Julia', value: 'j', },
@@ -141,6 +144,7 @@ The original file is `3.2mb`, and our `PopData` object takes up ~`3.5mb` in memo
 The obvious hallmark of population genetics is heterozygosity values and F-statistics. Here we'll compare the basic summary statistics that can be produced using `hierfstat` and `PopGenjl`.
 
 <Tabs
+  block={true}
   defaultValue="j"
   values={[
     { label: 'Julia', value: 'j', },
@@ -180,6 +184,7 @@ Unit: seconds
 </Tabs>
 
 ![summary statistics plot](/PopGen.jl/img/sumstatplot.png)
+
 Comparing averages, PopGen.jl clocks in at ~`108ms` versus hierfstat's `4.6s`, which is ~**42.5x** faster on these data.
 
 
@@ -188,6 +193,7 @@ Comparing averages, PopGen.jl clocks in at ~`108ms` versus hierfstat's `4.6s`, w
 This is a classic population genetics test and a relatively simple one. The R benchmark will take a while again, so if you're following along, this would be a good time to reconnect with an old friend.
 
 <Tabs
+  block={true}
   defaultValue="j"
   values={[
     { label: 'Julia', value: 'j', },

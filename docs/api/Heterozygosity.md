@@ -3,6 +3,9 @@ id: heterozygosity
 title: Heterozygosity.jl
 sidebar_label: Heterozygosity.jl
 ---
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
+<link rel="stylesheet" href={useBaseUrl("katex/katex.min.css")} />
 
 ### `ishom`
 ```julia
@@ -19,6 +22,24 @@ ishet(locus::Genotype)
 ishet(locus::Missing)
 ```
 A series of methods to test if a locus or loci are heterozygous and return `true` if it is, `false` if it isn't. The vector version simply broadcasts the function over the elements. Under the hood, this function is simply `!ishom`.
+
+### `gene_diversity_nei87`
+```julia
+gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)
+```
+Calculate overall gene diversity with the adjustment/correction given by Nei:
+
+$$1-\sum{\bar{p}^2_i + \frac{H_s}{\tilde{n}\times np} - \frac{H_{obs}}{2\tilde{n}\times np}}$$
+
+- $\tilde{n}$ is the number of genotypes for a locus for a population
+- $np$ is the number of genotypes of a locus across all populations, i.e. $\sum{\tilde{n}}$
+- $\bar{p}^2_i$ is the observed homozygosity of a locus for that population
+- $H_s$ is the within population gene diversity given by:
+$$H_s = \frac{\tilde{n}}{\tilde{n}-1} \times 1 - (\bar{p}^2_i - \frac{H_{obs}}{2\tilde{n}})$$
+
+Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press
+
+Use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 
 ### `hetero_o`
 ```julia
