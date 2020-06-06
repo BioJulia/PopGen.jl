@@ -68,7 +68,6 @@ DataFrames.combine(
     groupby(alleles_df, :locus),
     :alleles => (i -> sum(avg_allele_freq(i).^2)) => :avg_freq
 )
-
 ```
 """
 function avg_allele_freq(allele_dicts::AbstractVector{T}) where T<:Dict{Int16,Float32}
