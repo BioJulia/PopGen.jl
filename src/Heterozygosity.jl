@@ -92,12 +92,12 @@ Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
 function hetero_e(data::T) where T <: GenoArray
-    1 - sum(@inbounds @avx allele_freq_vec(data) .^ 2)
+    1.0 - sum(@inbounds @avx allele_freq_vec(data) .^ 2)
 end
 
 
 """
-    heterozygosity(data::PopData, mode::String = "locus")
+    heterozygosity(data::PopData, by::String = "locus")
 Calculate observed and expected heterozygosity in a `PopData` object. For loci,
 heterozygosity is calculated in the Nei fashion, such that heterozygosity is
 calculated as the average over heterozygosity per locus per population.
@@ -108,8 +108,8 @@ calculated as the average over heterozygosity per locus per population.
 ## Example
 heterozygosity(nancycats(), "population" )
 """
-function heterozygosity(data::PopData, mode::String = "locus")
-    if mode ∈ ["locus", "loci"]
+function heterozygosity(data::PopData, by::String = "locus")
+    if by ∈ ["locus", "loci"]
         tmp = DataFrames.combine(
                 groupby(data.loci, [:locus, :population]),
                 :genotype => nonmissing => :n_tmp,
@@ -123,14 +123,14 @@ function heterozygosity(data::PopData, mode::String = "locus")
                 :het_pop_exp => (h_e -> mean(skipmissing(h_e))) => :het_exp
             )
 
-    elseif lowercase(mode) ∈  ["sample", "ind", "individual"]
+    elseif lowercase(by) ∈  ["sample", "ind", "individual"]
         return DataFrames.combine(
                 groupby(data.loci, :name),
                 :genotype => nonmissing => :n,
                 :genotype => hetero_o => :het_obs
             )
 
-    elseif lowercase(mode) ∈  ["pop", "population"]
+    elseif lowercase(by) ∈  ["pop", "population"]
         return DataFrames.combine(
                 groupby(data.loci, :population),
                 :genotype => nonmissing => :n,
@@ -138,7 +138,7 @@ function heterozygosity(data::PopData, mode::String = "locus")
                 :genotype => hetero_e => :het_exp
             )
     else
-        error("please specify mode \"locus\", \"sample\", or \"population\"")
+        error("please specify by = \"locus\", \"sample\", or \"population\"")
     end
 end
 
