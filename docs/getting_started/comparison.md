@@ -39,6 +39,7 @@ using BenchmarkTools, PopGen
 ```r
 library(adegenet)
 library(pegas)
+library(hierfstat)
 library(microbenchmark)
 ```
 
@@ -136,6 +137,51 @@ julia> Base.summarysize(sharks)
 
 The original file is `3.2mb`, and our `PopData` object takes up ~`3.5mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
 
+### Summary statistics
+The obvious hallmark of population genetics is heterozygosity values and F-statistics. Here we'll compare the basic summary statistics that can be produced using `hierfstat` and `PopGenjl`.
+
+<Tabs
+  defaultValue="j"
+  values={[
+    { label: 'Julia', value: 'j', },
+    { label: 'R', value: 'r', },
+  ]
+}>
+<TabItem value="j">
+
+```julia
+julia> @benchmark summary(sharks, by = "locus")
+BenchmarkTools.Trial: 
+  memory estimate:  89.84 MiB
+  allocs estimate:  1353634
+  --------------
+  minimum time:     101.278 ms (6.47% GC)
+  median time:      109.324 ms (12.86% GC)
+  mean time:        108.419 ms (11.41% GC)
+  maximum time:     116.902 ms (15.37% GC)
+  --------------
+  samples:          47
+  evals/sample:     1
+```
+
+</TabItem>
+<TabItem value="r">
+
+```r
+> microbenchmark(basic.stats(gen))
+Unit: seconds
+             expr      min       lq     mean
+ basic.stats(gen) 4.276996 4.425934 4.618796
+   median       uq      max neval
+ 4.609901 4.706666 5.292831   100
+```
+
+</TabItem>
+</Tabs>
+
+![summary statistics plot](/PopGen.jl/img/sumstatplot.png)
+Comparing averages, PopGen.jl clocks in at ~`108ms` versus hierfstat's `4.6s`, which is ~**42.5x** faster on these data.
+
 
 ### Chi-squared test for HWE
 
@@ -180,4 +226,4 @@ Unit: seconds
 
 ![chi squared plot](/PopGen.jl/img/chisqplot.png)
 
-Comparing averages, PopGen.jl clocks in at ~`176ms` versus adegenet's `6.3s`, so ~**35.8x** faster(!) 
+Comparing averages, PopGen.jl clocks in at ~`176ms` versus adegenet's `6.3s`, so ~**35.8x** faster on these data(!) 
