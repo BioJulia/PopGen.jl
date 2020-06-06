@@ -3,12 +3,13 @@ export read_from, file_import
 """
     read_from(infile::String; kwargs...)
 Wraps `delimited()`, `genepop()`, `bcf()`, and `vcf()` to read a file in as a `PopObj`. File type is
-inferred from the file extension (case insensitive):
+inferred from the file extension (case insensitive): \n
+
 | File Format         | Extensions             | Docstring     |
 | :------------------ | :--------------------- | :------------ |
-| delimited           | '.csv', '.txt', '.tsv' | ?delimited    |
-| genepop             | '.gen', '.genepop'     | ?genepop      |
-| variant call format | '.vcf', '.bcf'         | ?vcf, ?bcf    |
+| delimited           | `.csv`, `.txt`, `.tsv` | `?delimited`  |
+| genepop             | `.gen`, `.genepop`     | `?genepop`    |
+| variant call format | `.vcf`, `.bcf`         | `?vcf, ?bcf`  |
 
 This function uses the same keyword arguments (and defaults) as the file importing
 functions it wraps; please see their respective docstrings in the Julia help console.
