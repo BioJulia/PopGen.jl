@@ -25,6 +25,7 @@ object.
     d = Dict{Int16,Float32}()
     flat_alleles = alleles(locus)
     len = length(flat_alleles)
+    len == 0 && return d
     @inbounds @simd for allele in flat_alleles
         @inbounds d[allele] = get!(d, allele, 0) + 1/len
     end
@@ -72,17 +73,24 @@ DataFrames.combine(
 """
 function avg_allele_freq(allele_dicts::AbstractVector{T}) where T<:Dict{Int16,Float32}
    sum_dict = Dict{Int16, Tuple{Float32, Int}}()
+   # remove any dicts with no entries (i.e. from a group without that locus)
+   allele_dicts = allele_dicts[length.(allele_dicts) .> 0]
+   # create a list of all the alleles
    all_alleles = keys.(allele_dicts) |> Base.Iterators.flatten |> collect |> unique
+   # populate the sum dict with allele frequency and n for each allele
    @inbounds for allele in all_alleles
        for allele_dict in allele_dicts
            sum_dict[allele] = get!(sum_dict, allele, (0., 0)) .+ (get!(allele_dict, allele, 0.), 1)
        end
    end
    avg_dict = Dict{Int16, Float32}()
+   # collapse the sum dict into a dict of averages
    @inbounds for (key, value) in sum_dict
        freq_sum, n = value
-       if !iszero(freq_sum)
-           @inbounds avg_dict[key] = freq_sum / n
+       avg = freq_sum / n
+       # drop zeroes
+       if !iszero(avg)
+           @inbounds avg_dict[key] = avg
        end
    end
    return avg_dict

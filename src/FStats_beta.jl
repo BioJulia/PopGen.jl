@@ -1,4 +1,4 @@
-function fstat(data::PopData)
+function fstat(data::PopData; by::String = "global")
     # observed/expected het per locus per pop
     het_df = DataFrames.combine(
         groupby(data.loci, [:locus, :population]),
@@ -7,64 +7,66 @@ function fstat(data::PopData)
         :genotype => (i -> hetero_e(i)) => :het_exp,
         :genotype => allele_freq => :alleles
     )
-    transform!(het_df,
-        #[:het_obs, :het_exp, :n] => ((o,e,n) -> (e .- o ./ 2 ./ n)) => :Hs,
-        #[:het_obs, :het_exp, :n] => ((o,e,n) -> (e .- o ./ 2 ./ n) .* (n ./ (n .- 1))) => :Hs_cor,
-        [:het_obs, :het_exp, :n] => ((o,e,n) -> gene_diversity_nei87.(e,o,n, corr = false)) => :Hs,
-        [:het_obs, :het_exp, :n] => ((o,e,n) -> gene_diversity_nei87.(e,o,n)) => :Hs_nei,
-    )
-    transform!(
-        het_df,
-        [:het_obs, :Hs] => ((Ho, Hs) -> 1 .- (Ho./Hs)) => :FIS
-    )
-
-    # number of populations each locus appears in
+    # collapse down to retrieve averages and counts
     n_df = DataFrames.combine(
-        groupby(het_df, :locus),
-        :n => (i -> sum(.!iszero.(i))) => :count,
-        :n => (i -> sum(reciprocal.(i))) => :N,
-        :alleles => (i -> sum(values(avg_allele_freq(i)).^2)) => :avg_freq,
-        :alleles => (i -> sum(values(avg_allele_freq(i)).^2)) => :avg_freq
-    )
-    transform!(
-        n_df,
-        [:count, :N] =>((np, N) -> np ./ N) => :mn
-    )
-    transform!(
-        n_df,
-        [:]
+        [:het_obs, :het_exp, :n, :alleles] => (o,e,n,alleles) -> (
+            count = sum(.!iszero.(n)),
+            mn = sum(.!iszero.(n)) ./ sum(reciprocal.(n)),
+            Hs_nei = mean(skipmissing(gene_diversity_nei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n))))),
+            Het_obs = mean(skipmissing(o)),
+            avg_freq = sum(values(avg_allele_freq(alleles)).^2)
+            ),
+        groupby(het_df, :locus)
     )
 
-    return n_df
-end
+    Ht = 1.0 .- n_df.avg_freq .+ (n_df.Hs_nei ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)
+    FIS =  1.0 .- (n_df.Het_obs ./ n_df.Hs_nei)
+    DST = Ht .- n_df.Hs_nei
+    FST = DST ./ Ht
+    DSTP = n_df.count ./ (n_df.count .- 1) .* DST
+    DEST = DSTP ./ (1 .- n_df.Hs_nei)
+    HTP = n_df.Hs_nei .+ DSTP
+    FSTP = DSTP ./ Ht
 
+    if lowercase(by) == "global"
+        Het_obs = mean(n_df.Het_obs)
+        Hs_nei = mean(n_df.Hs_nei)
+        Ht = mean(Ht)
+        FIS = mean(FIS)
+        DST = mean(DST)
+        FST = mean(FST)
+        DSTP = mean(DSTP)
+        DEST = mean(DEST)
+        HTP = mean(HTP)
+        FSTP = mean(FSTP)
 
-
-z = DataFrames.combine(
-    groupby(x.loci, [:locus, :population]),
-    :genotype => allele_freq => :alleles
-)
-
-DataFrames.combine(
-       groupby(z, :locus),
-       :mp2 => (i -> sum(i.^2)) => :mp
-       )
-
-
-function avg_allele_freq(allele_dicts::AbstractVector{T}) where T<:Dict{Int16,Float32}
-   sum_dict = Dict{Int16, Tuple{Float32, Int}}()
-   all_alleles = keys.(allele_dicts) |> Base.Iterators.flatten |> collect |> unique
-   @inbounds for allele in all_alleles
-       for allele_dict in allele_dicts
-           sum_dict[allele] = get!(sum_dict, allele, (0., 0)) .+ (get!(allele_dict, allele, 0.), 1)
-       end
-   end
-   avg_dict = Dict{Int16, Float32}()
-   @inbounds for (key, value) in sum_dict
-       freq_sum, n = value
-       if !iszero(freq_sum)
-           @inbounds avg_dict[key] = freq_sum / n
-       end
-   end
-   return avg_dict
+        DataFrame(
+        :Het_obs => round.(Het_obs, digits = 4),
+        :Hs_nei => round.(Hs_nei, digits = 4),
+        :HT => round.(Ht , digits = 4),
+        :DST => round.(DST, digits = 4),
+        :HTP => round.(HTP, digits = 4),
+        :DSTP => round.(DSTP, digits = 4),
+        :FST => round(DST/Ht, digits = 4),
+        :FSTP => round(DSTP/HTP, digits = 4),
+        :FIS => round(1 - (Het_obs / Hs_nei), digits = 4),
+        :DEST => round(DSTP / (1 - Hs_nei), digits = 4)
+        )
+    elseif by ∈ ["locus", "loci"]
+        insertcols!(
+        select!(
+        n_df, :locus,
+        :Het_obs => (i -> round.(i, digits = 4)) => :Het_obs,
+        :Hs_nei => (i -> round.(i, digits = 4)) => :Hs_nei,
+        ),
+        :HT => round.(Ht, digits = 4),
+        :DST => round.(DST, digits = 4),
+        :HTP => round.(HTP, digits = 4),
+        :DSTP => round.(DSTP, digits = 4),
+        :FST => round.(FST, digits = 4),
+        :FSTP => round.(FSTP, digits = 4),
+        :FIS => round.(FIS, digits = 4),
+        :DEST => round.(DEST, digits = 4)
+        )
+    end
 end

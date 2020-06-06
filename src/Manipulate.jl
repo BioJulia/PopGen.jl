@@ -263,7 +263,6 @@ function populations!(data::PopData, rename::Dict)
     end
     msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
     recode!(data.loci.population,rename...)
-    show(populations(data))
     return
 end
 
@@ -281,7 +280,6 @@ function populations!(data::PopData, samples::Vector{String}, populations::Vecto
         data.loci[data.loci.name .== i, :population] .= j
     end
     droplevels!(data.loci.population)
-    show(populations(data))
     return
 end
 
