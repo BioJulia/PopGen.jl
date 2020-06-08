@@ -61,7 +61,7 @@ objplot |> save("objectplot.png")
 
 
 #### f-stat summary ####
-sumstat = [0.108, 4.6]
+sumstat = [0.242, 4.6]
 sumstatplot = comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics")
 sumstatplot |> save("sumstatplot.png")
 
