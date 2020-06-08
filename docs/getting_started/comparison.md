@@ -52,7 +52,7 @@ As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux
 
 
 
-### Loading in data
+### Reading in data
 
 Since `gulfsharks` is shamelessly provided in PopGen.jl, we will just load it with `genepop()`.  If you would like to try this yourself in R, find the `gulfsharks.gen` file in the package repository under `/data/source/gulfsharks.gen`. Since the file importer now uses CSV.jl to read files, there is one step of the genepop parser that is multithreaded. However, the majority of the data parsing (formatting the raw data into a correct PopData structure) occurs using a single thread. This R benchmark will take a few minutes. Consider making some tea while you wait.
 
@@ -185,7 +185,7 @@ Unit: seconds
 
 ![summary statistics plot](/PopGen.jl/img/sumstatplot.png)
 
-Comparing averages, PopGen.jl clocks in at ~`242ms` versus hierfstat's `4.6s`, which is ~**19x** faster on these data.
+Comparing averages, PopGen.jl clocks in at ~`242ms` versus hierfstat's `4.6s`, which is ~**19x** faster on these data. However, when testing on a data that was 401 samples x 5331 loci (not shown), PopGen.jl performed 36.6x faster. This gap seems to increase the larger the data is, but we have not tested the upper limits of this.
 
 
 ### Chi-squared test for HWE
