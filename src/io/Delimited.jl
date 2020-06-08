@@ -61,7 +61,7 @@ function delimited(
     diploid ? type = nothing : type = String
     dlm = delim == "auto" ? nothing : delim
 
-    file_parse = CSV.read(infile, delim = dlm, missingstrings = ["-9", ""], type = type) |> DataFrame
+    file_parse = CSV.File(infile, delim = dlm, missingstrings = ["-9", ""], type = type) |> DataFrame
 
     locinames = names(file_parse)[5:end]
 
@@ -94,14 +94,14 @@ const csv = delimited
 
 """
     popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
-Write PopData to a text-delimited file. 
+Write PopData to a text-delimited file.
 ### Keyword Arguments
 - `filename`: a `String` of the output filename
 - `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
-- `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
+- `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format
   - `wide` : the standard format CSV for importing into PopGen.jl
-  - `long` : the `loci` table with `longitude` and `latitude` columns added 
-- `delim` : the `String` delimiter to use for writing the file. 
+  - `long` : the `loci` table with `longitude` and `latitude` columns added
+- `delim` : the `String` delimiter to use for writing the file.
 
 ### Example
 ```julia
@@ -120,8 +120,8 @@ function popdata2delimited(data::PopData; filename::String, delim::String = ",",
     else
         out_df = sort(
                     transform(
-                        unphased_df, 1:2, 
-                        3 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :longitude, 
+                        unphased_df, 1:2,
+                        3 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :longitude,
                         4 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :latitude, 3:4
                         )
                     )

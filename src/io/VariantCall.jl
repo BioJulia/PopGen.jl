@@ -97,7 +97,7 @@ location information need to be provided separately. Use `silent=true` to supres
 printing during file loading.
 - `infile` : path to VCF file
 """
-function vcf(infile::String, silent::Bool)
+function vcf(infile::String, silent::Bool = false)
     vcf_file = VCF.Reader(open(infile, "r"))
 
     # get sample names from header

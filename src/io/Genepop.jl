@@ -96,7 +96,7 @@ function genepop(
 
     diploid ? type = nothing : type = String
 
-    geno_parse = CSV.read(
+    geno_parse = CSV.File(
         infile,
         delim = delim,
         header = coln,
