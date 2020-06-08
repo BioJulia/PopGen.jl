@@ -1,4 +1,3 @@
-#TODO add to docs
 """
     convert_coord(coordinate::String)
 Takes non-decimal-degree format as a `String` and returns it as a decimal degree
@@ -97,6 +96,45 @@ in a vector.
 """
 function nonmissing(vec::T) where T<:AbstractArray
     count(!ismissing, vec)
+end
+
+
+#TODO add to docs/API/Utils
+"""
+    permute_loci!(data::PopData)
+Edits `PopData` in place with loci permuted across populations within
+the `.loci` dataframe.
+"""
+function permute_loci!(data::PopData)
+    loci_df = groupby(data.loci, :locus)
+    for locus in loci_df
+        shuffle!(locus.population)
+    end
+end
+
+#TODO add to docs/API/Utils
+"""
+    permute_samples!(data::PopData; meta::Bool = false)
+Edits `PopData` in place with samples permuted across populations within
+the `.loci` dataframe. Since performance is important for many permutation,
+the default is to only edit the `.loci` table in place; use `meta = true`
+if you also require the `.meta` dataframe edited in place.
+"""
+function permute_samples!(data::PopData; meta::Bool = false)
+    pops = shuffle(data.meta.population)
+
+    if meta == true
+        meta_pops = deepcopy(pops)
+        meta_df = groupby(data.meta, :name)
+        for name in meta_df
+            name.population .= pop!(meta_pops)
+        end
+    end
+
+    loci_df = groupby(data.loci, :name)
+    for name in loci_df
+        name.population .= pop!(pops)
+    end
 end
 
 """
