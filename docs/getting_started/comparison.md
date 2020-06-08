@@ -154,17 +154,17 @@ The obvious hallmark of population genetics is heterozygosity values and F-stati
 <TabItem value="j">
 
 ```julia
-julia> @benchmark summary(sharks, by = "locus")
+julia> @benchmark summary(sharks, by = "global")
 BenchmarkTools.Trial: 
-  memory estimate:  89.84 MiB
-  allocs estimate:  1353634
+  memory estimate:  89.53 MiB
+  allocs estimate:  1353626
   --------------
-  minimum time:     101.278 ms (6.47% GC)
-  median time:      109.324 ms (12.86% GC)
-  mean time:        108.419 ms (11.41% GC)
-  maximum time:     116.902 ms (15.37% GC)
+  minimum time:     228.611 ms (8.62% GC)
+  median time:      239.732 ms (8.40% GC)
+  mean time:        242.464 ms (8.59% GC)
+  maximum time:     268.207 ms (9.29% GC)
   --------------
-  samples:          47
+  samples:          21
   evals/sample:     1
 ```
 
@@ -185,7 +185,7 @@ Unit: seconds
 
 ![summary statistics plot](/PopGen.jl/img/sumstatplot.png)
 
-Comparing averages, PopGen.jl clocks in at ~`108ms` versus hierfstat's `4.6s`, which is ~**42.5x** faster on these data.
+Comparing averages, PopGen.jl clocks in at ~`242ms` versus hierfstat's `4.6s`, which is ~**19x** faster on these data.
 
 
 ### Chi-squared test for HWE
