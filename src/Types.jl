@@ -68,7 +68,7 @@ function Base.show(io::IO, data::PopData)
         print(io, "  Ploidy: ") ; printstyled(io, ploidy |> join, "\n", bold = true)
     else
         print(io, "  Ploidy (varies): ")
-        print(io, ploidy[1]); [print(io, ", $i") for i in ploidy[2:end]]
+        printstyled(io, ploidy[1], bold = true); [printstyled(io, ", $i", bold = true) for i in ploidy[2:end]]
         print(io, "\n")
     end
     print(io, "  Number of individuals: ") ; printstyled(io, length(data.meta.name), "\n", bold = true)
