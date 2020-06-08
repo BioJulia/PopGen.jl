@@ -41,51 +41,51 @@ end
 """
     summary(data::PopData; by::String = "global")
 Provides summary statistics for a `PopData` object. Use `by = "locus"` for
-summary information by locus. Global values are given as unweighted means of 
+summary information by locus. Global values are given as unweighted means of
 the per-locus parameters.
 
 ### Het_obs
 observed heterozygosity given as:\n
 1 - ∑ₖ ∑ᵢ Pₖᵢᵢ/np \n
-where Pkii represents the proportion of homozygote `i` in sample `k` and `np` 
+where Pkii represents the proportion of homozygote `i` in sample `k` and `np`
 is the number of samples in that population
 
-### HT 
+### HT
 overall gene diversity given as: \n
 1 - ∑ᵢ(p̄ᵢ² + (HS / (ñ × np)) - Het_obs / (2 × ñ × np)) \n
 where p̄ᵢ = ∑ₖpₖᵢ / np
 
-### HS        
+### HS
 within population gene diversity given as: \n
 1 - ∑ᵢ(pᵢ² + HS / (ñ × np) - Het_obs / (2 × ñ × np)) \n
 where ñ = np / ∑ₖ(1/nₖ) \n
 where p̄ᵢ² = ∑ₖ(pᵢₖ² / np)
 
-### DST       
+### DST
 amount of gene diversity among samples given as: \n
 HT - HS
 
-### DST′      
+### DST′
 amount of gene diversity among samples adjusted for sample size given as: \n
 (np / (np-1)) × Dst
 
-### HT′       
+### HT′
 overall gene diversity adjusted for sample size given as: \n
 HS + DST′
 
-### FST       
+### FST
 proportion of the total genetic variance in subpopulations relative to the total genetic variance  given as: \n
 DST / HT
 
-### FST′      
+### FST′
 proportion of the total genetic variance in subpopulations relative to the total genetic variance, adjusted for heterozygosity given as: \n
 DST′ / HT′
 
-### FIS       
+### FIS
 proportion of the genetic variance in a locus relative to the genetic variance within subpopulations given as: \n
 1 - (Het_obs / HS)
 
-### DEST      
+### DEST
 population differentiation (Jost 2008) given as: \n
 (np/(np-1)) × (Ht'-Hs) / (1-Hs)
 """
@@ -139,13 +139,13 @@ function Base.summary(data::PopData; by::String = "global")
         Het_obs = mean(n_df.Het_obs)
         HS = mean(n_df.HS)
         Ht = mean(Ht)
-        FIS = mean(FIS)
+        #FIS = mean(FIS)
         DST = mean(DST)
-        FST = mean(FST)
+        #FST = mean(FST)
         DST′ = mean(DST′)
-        DEST = mean(DEST)
+        #DEST = mean(DEST)
         HT′ = mean(HT′)
-        FST′ = mean(FST′)
+        #FST′ = mean(FST′)
 
         DataFrame(
         :Het_obs => round.(Het_obs, digits = 4),

@@ -275,10 +275,23 @@ function populations!(data::PopData, rename::Vector{String})
 end
 
 function populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
+    meta_pops = deepcopy(populations)
+    meta_df = groupby(data.meta, :name)
+    for name in meta_df
+        name.population .= pop!(meta_pops)
+    end
+
+    loci_df = groupby(data.loci, :name)
+    for name in loci_df
+        name.population .= pop!(populations)
+    end
+    # legacy version
+    #=
     for (i,j) in zip(samples, populations)
         data.meta[data.meta.name .== i, :population] .= j
         data.loci[data.loci.name .== i, :population] .= j
     end
+    =#
     droplevels!(data.loci.population)
     return
 end
