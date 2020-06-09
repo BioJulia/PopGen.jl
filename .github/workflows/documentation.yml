@@ -53,5 +53,5 @@ jobs:
           npm ci
           else
           npm i
-          if
+          fi
           npx docusaurus deploy
