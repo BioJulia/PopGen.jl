@@ -2,7 +2,7 @@
 These are commands that are for the general manipulation and viewing of the
 PopData type. The appear in alphabetical order.
 =#
-export locations, locations!, loci, locus, get_genotypes, get_sample_genotypes, missing, populations, population, populations!, population!, exclude_loci, remove_loci, omit_loci, exclude_samples, remove_samples, omit_samples, samples
+export locations, locations!, loci, locus, get_genotypes, get_sample_genotypes, missing, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
 
 """
     locations(data::PopData)
@@ -301,46 +301,6 @@ const population! = populations!
 const popnames! = populations!
 
 ##### Exclusion #####
-#=
-To have a built-in "undo button", exclusion functions return new PopData objects
-with the specified loci/samples removed rather than overwriting the original.
-=#
-"""
-    exclude(data::PopData, kwargs...)
-Exclude all occurences of specified information from a `PopData` object. Returns
-a new `PopData` object, leaving the original intact. The keywords can be used
-in any combination. Synonymous with `omit` and `remove`.
-
-### Keyword Arguments
-#### `locus`
-A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
-The keyword `loci` also works.
-
-#### `population`
-A `String` or `Vector{String}` of populations you want to remove from the `PopData`
-The keyword `populations` also works.
-
-#### `name`
-A `String` or `Vector{String}` of samples you want to remove from the `PopData`
-The keywords `names`, `sample`, and `samples` also work.
-
-**Examples**
-```
-cats = nancycats();
-exclude(cats, name = "N100", population = ["1", "15"])
-exclude(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
-exclude(cats, names = "N102", loci = "fca8", population = "3")
-```
-"""
-function exclude(data::PopData; kwargs...)
-    tmp = deepcopy(data)
-    exclude!(tmp; kwargs...)
-    return tmp
-end
-
-const omit = exclude
-const remove = exclude
-
 """
     exclude!(data::PopData, kwargs...)
 Edit a `PopData` object in-place by excluding all occurences of the specified information.
@@ -473,6 +433,42 @@ end
 
 const omit! = exclude!
 const remove! = exclude!
+
+"""
+    exclude(data::PopData, kwargs...)
+Exclude all occurences of specified information from a `PopData` object. Returns
+a new `PopData` object, leaving the original intact. The keywords can be used
+in any combination. Synonymous with `omit` and `remove`.
+
+### Keyword Arguments
+#### `locus`
+A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
+The keyword `loci` also works.
+
+#### `population`
+A `String` or `Vector{String}` of populations you want to remove from the `PopData`
+The keyword `populations` also works.
+
+#### `name`
+A `String` or `Vector{String}` of samples you want to remove from the `PopData`
+The keywords `names`, `sample`, and `samples` also work.
+
+**Examples**
+```
+cats = nancycats();
+exclude(cats, name = "N100", population = ["1", "15"])
+exclude(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
+exclude(cats, names = "N102", loci = "fca8", population = "3")
+```
+"""
+function exclude(data::PopData; kwargs...)
+    tmp = deepcopy(data)
+    exclude!(tmp; kwargs...)
+    return tmp
+end
+
+const omit = exclude
+const remove = exclude
 
 """
     samples(data::PopData)
