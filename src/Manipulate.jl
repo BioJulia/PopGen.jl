@@ -306,80 +306,271 @@ To have a built-in "undo button", exclusion functions return new PopData objects
 with the specified loci/samples removed rather than overwriting the original.
 =#
 """
-```
-exclude_loci(data::PopData, locus::String)
-exclude_loci(data::PopData, loci::Vector{String})
-```
-Exclude selected loci from a `PopData` object. Returns a new `PopData` object,
-leaving the original intact. Synonymous with `omit_loci` and `remove_loci`.
+    exclude(data::PopData, kwargs...)
+Exclude all occurences of specified information from a `PopData` object. Returns
+a new `PopData` object, leaving the original intact. The keywords can be used
+in any combination. Synonymous with `omit` and `remove`.
 
-### Examples
+### Keyword Arguments
+#### `locus`
+A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
+The keyword `loci` also works.
+
+#### `population`
+A `String` or `Vector{String}` of populations you want to remove from the `PopData`
+The keyword `populations` also works.
+
+#### `name`
+A `String` or `Vector{String}` of samples you want to remove from the `PopData`
+The keywords `names`, `sample`, and `samples` also work.
+
+**Examples**
 ```
-new_cats = exclude_loci(nancycats(), "fca8")
-very_new_cats = exclude_loci(nancycats(), ["fca8", "fca23"])
+cats = nancycats();
+exclude(cats, name = "N100", population = ["1", "15"])
+exclude(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
+exclude(cats, names = "N102", loci = "fca8", population = "3")
 ```
 """
-function exclude_loci(data::PopData, locus::String)
-    locus ∉ loci(data) && error("Locus \"$locus\" not found")
-    new_table = @where(data.loci, :locus .!= locus)
-    droplevels!(new_table.locus)
-    return PopData(data.meta, new_table)
-end
-
-function exclude_loci(data::PopData, exloci::Vector{String})
-    msg = ""
-    all_loci = loci(data)
-    for each in exloci
-        if each ∉ all_loci
-            msg *= "\n  locus \"$each\" not found"
+function exclude(data::PopData; kwargs...)
+    filter_by = Dict(kwargs...)
+    tmp = deepcopy(data)
+    filter_params = keys(filter_by) |> collect
+    notices_flag = 0
+    notices = ""
+    # check for keywords
+    # samples
+    if any([:name, :names, :sample, :samples] .∈ Ref(filter_params))
+        # specify keyword
+        if :name ∈ filter_params
+            filt_name = filter_by[:name]
+        elseif :names ∈ filter_params
+            filt_name = filter_by[:names]
+        elseif :sample ∈ filter_params
+            filt_name = filter_by[:sample]
+        else
+            filt_name = filter_by[:samples]
         end
-    end
-    new_table =  @where data.loci :locus .∉ Ref(exloci)
-    msg != "" && printstyled("Warnings:", color = :yellow) ; println(msg)
-    droplevels!(new_table.locus)
-    return PopData(data.meta, new_table)
-end
+        # filter based on single or multiple
+        if typeof(filt_name) == String
+            if filt_name ∉ tmp.meta.name
+                notices_flag += 1
+                notices *= "\n  sample $filt_name not found"
+            end
 
-const omit_loci = exclude_loci
-const remove_loci = exclude_loci
-
-"""
-    exclude_samples(data::PopData, samp_id::Union{Vector{String}})
-Exclude selected samples from a `PopData` object. Returns a new `PopData` object,
-leaving the original intact. Synonymous with `omit_samples` and `remove_samples`.
-
-### Examples
-```
-exclude_samples(nancycats, "N100")
-exclude_samples(nancycats, ["N100", "N102", "N211"])
-```
-"""
-function exclude_samples(data::PopData, samp_id::String)
-    samp_id ∉ samples(data) && error("Sample \"$samp_id\" not found")
-    new_loc_table = @where(data.loci, :name .!= samp_id)
-    new_meta_table = @where(data.meta, :name .!= samp_id)
-    droplevels!(new_loc_table.locus)
-    return PopData(new_meta_table, new_loc_table)
-end
-
-
-function exclude_samples(data::PopData, samp_ids::Vector{String})
-    msg = ""
-    all_samp = samples(data)
-    for each in samp_ids
-        if each ∉ all_samp
-            msg *= "\n  Sample \"$each\" not found"
+            filter!(:name => x -> x != filt_name, tmp.loci)
+            filter!(:name => x -> x != filt_name, tmp.meta)
+        else
+            for i in filt_name
+                if i ∉ tmp.meta.name
+                    notices_flag += 1
+                    notices *= "\n  sample $i not found"
+                end
+            end
+            filter!(:name => x -> x ∉ filt_name, tmp.loci)
+            filter!(:name => x -> x ∉ filt_name, tmp.meta)
         end
+        droplevels!(tmp.loci.name)
     end
-    new_loc_table = @where(data.loci, :name .∉  Ref(samp_ids))
-    new_meta_table = @where(data.meta, :name .∉  Ref(samp_ids))
-    msg != "" && printstyled("Warnings:", color = :yellow) ; println(msg)
-    droplevels!(new_loc_table.locus)
-    return PopData(new_meta_table, new_loc_table)
+
+    # loci
+    if any([:locus, :loci] .∈ Ref(filter_params))
+        # specify keyword
+        if :locus ∈ filter_params
+            filt_loc = filter_by[:locus]
+        else
+            filt_loc = filter_by[:loci]
+        end
+        # filter based on single or multiple
+        if typeof(filt_loc) == String
+            if filt_loc ∉ tmp.loci.locus
+                notices_flag += 1
+                notices *= "\n  locus $filt_loc not found"
+            end
+            filter!(:locus => x -> x != filt_loc, tmp.loci)
+        else
+            for i in filt_loc
+                if i ∉ tmp.loci.locus
+                    notices_flag += 1
+                    notices *= "\n  locus $i not found"
+                end
+            end
+            filter!(:locus => x -> x ∉ filt_loc, tmp.loci)
+        end
+        droplevels!(tmp.loci.locus)
+    end
+
+    # populations
+    if any([:population, :populations] .∈ Ref(filter_params))
+        # specify keyword
+        if :population ∈ filter_params
+            filt_pop = filter_by[:population]
+        else
+            filt_pop = filter_by[:populations]
+        end
+        # filter based on single or multiple
+        if typeof(filt_pop) == String
+            if filt_pop ∉ tmp.meta.population
+                notices_flag += 1
+                notices *= "\n  population $filt_pop not found"
+            end
+            filter!(:population => x -> x != filt_pop, tmp.loci)
+            filter!(:population => x -> x != filt_pop, tmp.meta)
+        else
+            for i in filt_pop
+                if i ∉ tmp.meta.population
+                    notices_flag += 1
+                    notices *= "\n  population $i not found"
+                end
+            end
+            filter!(:population => x -> x ∉ filt_pop, tmp.loci)
+            filter!(:population => x -> x ∉ filt_pop, tmp.meta)
+        end
+        droplevels!(tmp.loci.population)
+    end
+
+    if notices_flag > 0
+        printstyled("Notices:", bold = true, color = :blue)
+        print(notices, "\n\n")
+    end
+    return tmp
 end
 
-const omit_samples = exclude_samples
-const remove_samples = exclude_samples
+const omit = exclude
+const remove = exclude
+
+"""
+    exclude!(data::PopData, kwargs...)
+Edit a `PopData` object in-place by excluding all occurences of the specified information.
+The keywords can be used in any combination. Synonymous with `omit!` and `remove!`.
+
+### Keyword Arguments
+#### `locus`
+A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
+The keyword `loci` also works.
+
+#### `population`
+A `String` or `Vector{String}` of populations you want to remove from the `PopData`
+The keyword `populations` also works.
+
+#### `name`
+A `String` or `Vector{String}` of samples you want to remove from the `PopData`
+The keywords `names`, `sample`, and `samples` also work.
+
+**Examples**
+```
+cats = nancycats();
+exclude!(cats, name = "N100", population = ["1", "15"])
+exclude!(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
+exclude!(cats, names = "N102", loci = "fca8", population = "3")
+```
+"""
+function exclude!(data::PopData; kwargs...)
+    filter_by = Dict(kwargs...)
+    tmp = data
+    filter_params = keys(filter_by) |> collect
+    notices_flag = 0
+    notices = ""
+    # check for keywords
+    # samples
+    if any([:name, :names, :sample, :samples] .∈ Ref(filter_params))
+        # specify keyword
+        if :name ∈ filter_params
+            filt_name = filter_by[:name]
+        elseif :names ∈ filter_params
+            filt_name = filter_by[:names]
+        elseif :sample ∈ filter_params
+            filt_name = filter_by[:sample]
+        else
+            filt_name = filter_by[:samples]
+        end
+        # filter based on single or multiple
+        if typeof(filt_name) == String
+            if filt_name ∉ tmp.meta.name
+                notices_flag += 1
+                notices *= "\n  sample $filt_name not found"
+            end
+
+            filter!(:name => x -> x != filt_name, tmp.loci)
+            filter!(:name => x -> x != filt_name, tmp.meta)
+        else
+            for i in filt_name
+                if i ∉ tmp.meta.name
+                    notices_flag += 1
+                    notices *= "\n  sample $i not found"
+                end
+            end
+            filter!(:name => x -> x ∉ filt_name, tmp.loci)
+            filter!(:name => x -> x ∉ filt_name, tmp.meta)
+        end
+        droplevels!(tmp.loci.name)
+    end
+
+    # loci
+    if any([:locus, :loci] .∈ Ref(filter_params))
+        # specify keyword
+        if :locus ∈ filter_params
+            filt_loc = filter_by[:locus]
+        else
+            filt_loc = filter_by[:loci]
+        end
+        # filter based on single or multiple
+        if typeof(filt_loc) == String
+            if filt_loc ∉ tmp.loci.locus
+                notices_flag += 1
+                notices *= "\n  locus $filt_loc not found"
+            end
+            filter!(:locus => x -> x != filt_loc, tmp.loci)
+        else
+            for i in filt_loc
+                if i ∉ tmp.loci.locus
+                    notices_flag += 1
+                    notices *= "\n  locus $i not found"
+                end
+            end
+            filter!(:locus => x -> x ∉ filt_loc, tmp.loci)
+        end
+        droplevels!(tmp.loci.locus)
+    end
+
+    # populations
+    if any([:population, :populations] .∈ Ref(filter_params))
+        # specify keyword
+        if :population ∈ filter_params
+            filt_pop = filter_by[:population]
+        else
+            filt_pop = filter_by[:populations]
+        end
+        # filter based on single or multiple
+        if typeof(filt_pop) == String
+            if filt_pop ∉ tmp.meta.population
+                notices_flag += 1
+                notices *= "\n  population $filt_pop not found"
+            end
+            filter!(:population => x -> x != filt_pop, tmp.loci)
+            filter!(:population => x -> x != filt_pop, tmp.meta)
+        else
+            for i in filt_pop
+                if i ∉ tmp.meta.population
+                    notices_flag += 1
+                    notices *= "\n  population $i not found"
+                end
+            end
+            filter!(:population => x -> x ∉ filt_pop, tmp.loci)
+            filter!(:population => x -> x ∉ filt_pop, tmp.meta)
+        end
+        droplevels!(tmp.loci.population)
+    end
+
+    if notices_flag > 0
+        printstyled("Notices:", bold = true, color = :blue)
+        print(notices, "\n\n")
+    end
+    return tmp
+end
+
+const omit! = exclude!
+const remove! = exclude!
 
 """
     samples(data::PopData)

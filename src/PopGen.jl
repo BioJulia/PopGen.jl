@@ -31,9 +31,6 @@ using Convex,
       Random,
       StatsBase
 =#
-
-
-
 #   o O       o O       o O       o O       o O
 # o | | O   o | | O   o | | O   o | | O   o | | O
 # | | | | O | | | |Include Files| | | | O | | | | O
