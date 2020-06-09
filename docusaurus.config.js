@@ -6,7 +6,7 @@ module.exports = {
   url: 'https://pdimens.github.io',
   baseUrl: '/PopGen.jl/',
   favicon: 'img/favicon.ico',
-  organizationName: 'pdimens', // Usually your GitHub org/user name.
+  organizationName: 'anshulrgoyal', // Usually your GitHub org/user name.
   projectName: 'PopGen.jl', // Usually your repo name.
   themeConfig: {
     prism: {
