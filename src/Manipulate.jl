@@ -333,106 +333,8 @@ exclude(cats, names = "N102", loci = "fca8", population = "3")
 ```
 """
 function exclude(data::PopData; kwargs...)
-    filter_by = Dict(kwargs...)
     tmp = deepcopy(data)
-    filter_params = keys(filter_by) |> collect
-    notices_flag = 0
-    notices = ""
-    # check for keywords
-    # samples
-    if any([:name, :names, :sample, :samples] .∈ Ref(filter_params))
-        # specify keyword
-        if :name ∈ filter_params
-            filt_name = filter_by[:name]
-        elseif :names ∈ filter_params
-            filt_name = filter_by[:names]
-        elseif :sample ∈ filter_params
-            filt_name = filter_by[:sample]
-        else
-            filt_name = filter_by[:samples]
-        end
-        # filter based on single or multiple
-        if typeof(filt_name) == String
-            if filt_name ∉ tmp.meta.name
-                notices_flag += 1
-                notices *= "\n  sample $filt_name not found"
-            end
-
-            filter!(:name => x -> x != filt_name, tmp.loci)
-            filter!(:name => x -> x != filt_name, tmp.meta)
-        else
-            for i in filt_name
-                if i ∉ tmp.meta.name
-                    notices_flag += 1
-                    notices *= "\n  sample $i not found"
-                end
-            end
-            filter!(:name => x -> x ∉ filt_name, tmp.loci)
-            filter!(:name => x -> x ∉ filt_name, tmp.meta)
-        end
-        droplevels!(tmp.loci.name)
-    end
-
-    # loci
-    if any([:locus, :loci] .∈ Ref(filter_params))
-        # specify keyword
-        if :locus ∈ filter_params
-            filt_loc = filter_by[:locus]
-        else
-            filt_loc = filter_by[:loci]
-        end
-        # filter based on single or multiple
-        if typeof(filt_loc) == String
-            if filt_loc ∉ tmp.loci.locus
-                notices_flag += 1
-                notices *= "\n  locus $filt_loc not found"
-            end
-            filter!(:locus => x -> x != filt_loc, tmp.loci)
-        else
-            for i in filt_loc
-                if i ∉ tmp.loci.locus
-                    notices_flag += 1
-                    notices *= "\n  locus $i not found"
-                end
-            end
-            filter!(:locus => x -> x ∉ filt_loc, tmp.loci)
-        end
-        droplevels!(tmp.loci.locus)
-    end
-
-    # populations
-    if any([:population, :populations] .∈ Ref(filter_params))
-        # specify keyword
-        if :population ∈ filter_params
-            filt_pop = filter_by[:population]
-        else
-            filt_pop = filter_by[:populations]
-        end
-        # filter based on single or multiple
-        if typeof(filt_pop) == String
-            if filt_pop ∉ tmp.meta.population
-                notices_flag += 1
-                notices *= "\n  population $filt_pop not found"
-            end
-            filter!(:population => x -> x != filt_pop, tmp.loci)
-            filter!(:population => x -> x != filt_pop, tmp.meta)
-        else
-            for i in filt_pop
-                if i ∉ tmp.meta.population
-                    notices_flag += 1
-                    notices *= "\n  population $i not found"
-                end
-            end
-            filter!(:population => x -> x ∉ filt_pop, tmp.loci)
-            filter!(:population => x -> x ∉ filt_pop, tmp.meta)
-        end
-        droplevels!(tmp.loci.population)
-    end
-
-    if notices_flag > 0
-        printstyled("Notices:", bold = true, color = :blue)
-        print(notices, "\n\n")
-    end
+    exclude!(tmp; kwargs...)
     return tmp
 end
 
@@ -488,7 +390,7 @@ function exclude!(data::PopData; kwargs...)
         if typeof(filt_name) == String
             if filt_name ∉ tmp.meta.name
                 notices_flag += 1
-                notices *= "\n  sample $filt_name not found"
+                notices *= "\n  sample \"$filt_name\" not found"
             end
 
             filter!(:name => x -> x != filt_name, tmp.loci)
@@ -497,7 +399,7 @@ function exclude!(data::PopData; kwargs...)
             for i in filt_name
                 if i ∉ tmp.meta.name
                     notices_flag += 1
-                    notices *= "\n  sample $i not found"
+                    notices *= "\n  sample \"$i\" not found"
                 end
             end
             filter!(:name => x -> x ∉ filt_name, tmp.loci)
@@ -518,14 +420,14 @@ function exclude!(data::PopData; kwargs...)
         if typeof(filt_loc) == String
             if filt_loc ∉ tmp.loci.locus
                 notices_flag += 1
-                notices *= "\n  locus $filt_loc not found"
+                notices *= "\n  locus \"$filt_loc\" not found"
             end
             filter!(:locus => x -> x != filt_loc, tmp.loci)
         else
             for i in filt_loc
                 if i ∉ tmp.loci.locus
                     notices_flag += 1
-                    notices *= "\n  locus $i not found"
+                    notices *= "\n  locus \"$i\" not found"
                 end
             end
             filter!(:locus => x -> x ∉ filt_loc, tmp.loci)
@@ -545,7 +447,7 @@ function exclude!(data::PopData; kwargs...)
         if typeof(filt_pop) == String
             if filt_pop ∉ tmp.meta.population
                 notices_flag += 1
-                notices *= "\n  population $filt_pop not found"
+                notices *= "\n  population \"$filt_pop\" not found"
             end
             filter!(:population => x -> x != filt_pop, tmp.loci)
             filter!(:population => x -> x != filt_pop, tmp.meta)
@@ -553,7 +455,7 @@ function exclude!(data::PopData; kwargs...)
             for i in filt_pop
                 if i ∉ tmp.meta.population
                     notices_flag += 1
-                    notices *= "\n  population $i not found"
+                    notices *= "\n  population \"$i\" not found"
                 end
             end
             filter!(:population => x -> x ∉ filt_pop, tmp.loci)
