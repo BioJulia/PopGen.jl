@@ -62,7 +62,7 @@ function Base.show(io::IO, data::PopData)
     else
         marker = "SNP"
     end
-    print(io,"  Marker type: "); printstyled(io, marker, "\n", bold = true)
+    print(io,"  Markers: "); printstyled(io, marker, "\n", bold = true)
     ploidy = unique(data.meta.ploidy) |> sort
     if length(ploidy) == 1
         print(io, "  Ploidy: ") ; printstyled(io, ploidy |> join, "\n", bold = true)
@@ -71,8 +71,8 @@ function Base.show(io::IO, data::PopData)
         printstyled(io, ploidy[1], bold = true); [printstyled(io, ", $i", bold = true) for i in ploidy[2:end]]
         print(io, "\n")
     end
-    print(io, "  Number of individuals: ") ; printstyled(io, length(data.meta.name), "\n", bold = true)
-    print(io, "  Number of loci: ") ; printstyled(io, length(levels(data.loci.locus)), "\n", bold = true)
+    print(io, "  Samples: ") ; printstyled(io, length(data.meta.name), "\n", bold = true)
+    print(io, "  Loci: ") ; printstyled(io, length(levels(data.loci.locus)), "\n", bold = true)
     print(io, "  Populations: ") ; printstyled(io, length(unique(data.meta.population)), "\n", bold = true)
 
     if ismissing.(data.meta.longitude) |> all == true
