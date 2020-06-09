@@ -13,24 +13,26 @@ Currently, PopGen.jl provides four different file parsers with which to create `
 | Variant Call Format           | `vcf()`               |
 | Variant Call Format (bzipped) | `bcf()`               |
 
-You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_from()`. 
+You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_from()`.
 
 :::note file_import alias
 The name `read_from` is short and sweet, but isn't the most descriptive, so we provide a more explicitly-named alias `file_import()`. Feel free to use whichever you like best.
 :::
+
+## `read_from()`
 
 ```julia
 read_from(infile::String; kwargs...)
 file_import(infile::String; kwargs...)
 ```
 
-where `infile` is a String of your filename (in quotes) and `kwargs` are the corresponding keyword arguments associated with your file type. The function `read_in()` uses all the same keyword arguments as do the commands specific to their file types, therefore you should have a look at those commands (usually the defaults suffice). 
+where `infile` is a String of your filename (in quotes) and `kwargs` are the corresponding keyword arguments associated with your file type. The function `read_from()` uses all the same keyword arguments as do the commands specific to their file types, therefore you should have a look at those commands (usually the defaults suffice).
 
-`read_from()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below (case insensitive). If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.gen.final.v2.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and ignore file extensions. Ultimately, what crazy extensions you give your files is your business, and we love that about you. 
+`read_from()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below (case insensitive). If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.gen.final.v2.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and ignore file extensions. Ultimately, what crazy extensions you give your files is your business, and we love that about you.
 
 ## Supported File Types
 
-### [Delimited files](delimited.md) 
+### [Delimited files](delimited.md)
 
 Accepted extensions: `.csv`, `.tsv`, `.txt`
 
@@ -49,7 +51,7 @@ Accepted extensions: `.gen`, `.genepop`
 - populations separated by a word like `"POP"`
 - sample names followed by a **comma, then a tab or space**
 - genotypes separated by **tabs** or **spaces**
-- genotypes represented as a combination of ploidy x _n_-digits 
+- genotypes represented as a combination of ploidy x _n_-digits
 	- e.g. for genotype 001002 (3 digits per allele)
 	- allele 1 = 001
 	- allele 2 = 002
