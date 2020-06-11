@@ -13,7 +13,7 @@ A few things things you can do to get started:
 - populations(PopData) to view population information
 - loci(PopData) to view locus names
 - samples(PopData) to view sample names
-- missing(PopData, by = \...\) to view missing information
+- missing(PopData, by = ...) to view missing information
 
 ## Manipulate PopData
 - populations!(PopData, ...) to rename populations
