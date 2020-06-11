@@ -40,7 +40,7 @@ end
 
 """
     motivational_quote()
-Randomly returns one of ~50 somewhat motivational quotes.
+Randomly returns one of ~50 _somewhat_ motivational quotes.
 """
 function motivational_quote()
 # quotes retrieved on 06/11/2020 from https://www.coburgbanks.co.uk/blog/friday-funnies/50-funny-motivational-quotes/
@@ -215,12 +215,12 @@ function quickstart()
     println("- populations(PopData) to view population information")
     println("- loci(PopData) to view locus names")
     println("- samples(PopData) to view sample names")
-    println("- missing(PopData, by = \"...\") to view missing information")
+    println("- missing(PopData, by = ...) to view missing information")
 
     printstyled("\nManipulate PopData\n\n", color = :light_red)
     println("- populations!(PopData, ...) to rename populations")
     println("- locations!(PopData, ...) to add geographical coordinates")
-    println("- exclude!(PopData, loci = ..., populations = ..., samples = ...) to selectively remove data")
+    println("- exclude!(PopData, kwargs...) to selectively remove data")
 
     printstyled("\nAnalyses\n\n", color = :green)
     println("- richness(PopData) to calculate allelic richness")
@@ -238,5 +238,5 @@ Returns the reciprocal (1/number) of a number. Will return `0` when
 the number is `0` instead of returning `Inf`.
 """
 function reciprocal(num::T) where T <: Real
-    !iszero(num) ? 1.0/float(num) : 0
+    !iszero(num) ? 1.0/float(num) : 0.0
 end
