@@ -1,3 +1,31 @@
+"""
+# Quickstart for PopGen
+Documentation: https://pdimens.github.io/PopGen.jl/
+Motivational(?) quote: $(motivational_quote())
+A few things things you can do to get started:
+
+## Load in data
+- read_from(filename; kwargs...)
+- genepop(infile; kwargs...)  or similar file-specific importer
+- use available gulfsharks() or nancycats() datasets
+
+## Explore PopData
+- populations(PopData) to view population information
+- loci(PopData) to view locus names
+- samples(PopData) to view sample names
+- missing(PopData, by = \...\) to view missing information
+
+## Manipulate PopData
+- populations!(PopData, ...) to rename populations
+- locations!(PopData, ...) to add geographical coordinates
+- exclude!(PopData, loci = ..., populations =..., samples = ...) to selectively remove data
+
+## Analyses
+- richness(PopData) to calculate allelic richness
+- allele_avg(PopData) to calculate average # of alleles
+- summary(PopData) to calculate F-statistics, heterozygosity, etc.
+- hwe_test(PopData) to test for Hardy-Weinberg Equilibrium
+"""
 module PopGen
 
 #   o O       o O       o O       o O       o O
@@ -16,21 +44,11 @@ using GeneticVariation:
 
 #=
 using Convex,
-      CSV,
-      Distributions,
       ECOS,
-      GeneticVariation,
-      DataFrames,
-      DataFramesMeta,
-      FileIO,
-      JLD2,
-      LoopVectorization,
       LinearAlgebra,
-      MultipleTesting,
       ProgressMeter,
-      Random,
-      StatsBase
 =#
+
 #   o O       o O       o O       o O       o O
 # o | | O   o | | O   o | | O   o | | O   o | | O
 # | | | | O | | | |Include Files| | | | O | | | | O
@@ -38,27 +56,27 @@ using Convex,
 #   O o       O o       O o       O o       O o
 
 # the types
-include("Types.jl")
+include(Types.jl)
 # file io
-include("io/ioUtils.jl")
-include("io/Delimited.jl")
-include("io/Genepop.jl")
-include("io/Read.jl")
-include("io/VariantCall.jl")
+include(io/ioUtils.jl)
+include(io/Delimited.jl)
+include(io/Genepop.jl)
+include(io/Read.jl)
+include(io/VariantCall.jl)
 # utility functions
-include("Utils.jl")
+include(Utils.jl)
 # example data
-include("Datasets.jl")
+include(Datasets.jl)
 # manipulation commands
-include("Manipulate.jl")
+include(Manipulate.jl)
 # allele frequency and heterozygosity functions
-include("AlleleFreq.jl")
-include("Heterozygosity.jl")
+include(AlleleFreq.jl)
+include(Heterozygosity.jl)
 # summary information
-include("SummaryInfo.jl")
+include(SummaryInfo.jl)
 #Analyses
-include("HardyWeinberg.jl")
-#include("PairwiseRelatedness.jl")  # not yet ready
-#include("PlotRecipes.jl")  # not yet ready
+include(HardyWeinberg.jl)
+#include(PairwiseRelatedness.jl)  # not yet ready
+#include(PlotRecipes.jl)  # not yet ready
 
 end # module PopGen
