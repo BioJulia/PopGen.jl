@@ -220,7 +220,7 @@ function quickstart()
     printstyled("\nManipulate PopData\n\n", color = :light_red)
     println("- populations!(PopData, ...) to rename populations")
     println("- locations!(PopData, ...) to add geographical coordinates")
-    println("- exclude!(PopData, loci = ..., populations =..., samples = ...) to selectively remove data")
+    println("- exclude!(PopData, loci = ..., populations = ..., samples = ...) to selectively remove data")
 
     printstyled("\nAnalyses\n\n", color = :green)
     println("- richness(PopData) to calculate allelic richness")

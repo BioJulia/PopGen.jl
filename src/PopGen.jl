@@ -18,7 +18,7 @@ A few things things you can do to get started:
 ## Manipulate PopData
 - populations!(PopData, ...) to rename populations
 - locations!(PopData, ...) to add geographical coordinates
-- exclude!(PopData, loci = ..., populations =..., samples = ...) to selectively remove data
+- exclude!(PopData, loci = ..., populations = ..., samples = ...) to selectively remove data
 
 ## Analyses
 - richness(PopData) to calculate allelic richness
@@ -56,26 +56,26 @@ using Convex,
 #   O o       O o       O o       O o       O o
 
 # the types
-include(Types.jl)
+include("Types.jl")
 # file io
-include(io/ioUtils.jl)
-include(io/Delimited.jl)
-include(io/Genepop.jl)
-include(io/Read.jl)
-include(io/VariantCall.jl)
+include("io/ioUtils.jl")
+include("io/Delimited.jl")
+include("io/Genepop.jl")
+include("io/Read.jl")
+include("io/VariantCall.jl")
 # utility functions
-include(Utils.jl)
+include("Utils.jl")
 # example data
-include(Datasets.jl)
+include("Datasets.jl")
 # manipulation commands
-include(Manipulate.jl)
+include("Manipulate.jl")
 # allele frequency and heterozygosity functions
-include(AlleleFreq.jl)
-include(Heterozygosity.jl)
+include("AlleleFreq.jl")
+include("Heterozygosity.jl")
 # summary information
-include(SummaryInfo.jl)
+include("SummaryInfo.jl")
 #Analyses
-include(HardyWeinberg.jl)
+include("HardyWeinberg.jl")
 #include(PairwiseRelatedness.jl)  # not yet ready
 #include(PlotRecipes.jl)  # not yet ready
 
