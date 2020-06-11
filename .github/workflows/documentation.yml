@@ -15,10 +15,11 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
+      - run: npm install -g yarn
       - name: Deploy
         run: |
-            npm ci
-            npm run build
+          yarn install --frozen-lockfile
+          yarn build
   gh-release:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
