@@ -157,7 +157,6 @@ function nonmissing(vec::T) where T<:AbstractArray
 end
 
 
-#TODO add to docs/API/Utils
 """
     permute_loci!(data::PopData)
 Edits `PopData` in place with loci permuted across populations within
@@ -170,11 +169,10 @@ function permute_loci!(data::PopData)
     end
 end
 
-#TODO add to docs/API/Utils
 """
     permute_samples!(data::PopData; meta::Bool = false)
 Edits `PopData` in place with samples permuted across populations within
-the `.loci` dataframe. Since performance is important for many permutation,
+the `.loci` dataframe. Since performance is important for many permutations,
 the default is to only edit the `.loci` table in place; use `meta = true`
 if you also require the `.meta` dataframe edited in place.
 """
@@ -195,7 +193,6 @@ function permute_samples!(data::PopData; meta::Bool = false)
     end
 end
 
-#TODO add to docs
 """
     quickstart()
 Prints helpful text of how to get started using PopGen.
