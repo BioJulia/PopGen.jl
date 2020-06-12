@@ -50,7 +50,7 @@ pop_adeg = ["PopGen.jl", "adegenet"]
 pop_hierf = ["PopGen.jl", "hierfstat"]
 
 #### Load in Data ####
-import_speed = [1.445, 6.745]
+import_speed = [.910, 6.745]
 comparison_plot(pop_adeg, import_speed, "Seconds", "Importing a genepop file") |> save("speedplot.png")
 
 #### Filesize (mb) ####
