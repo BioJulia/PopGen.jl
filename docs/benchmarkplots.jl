@@ -50,25 +50,21 @@ pop_hierf = ["PopGen.jl", "hierfstat"]
 
 #### Load in Data ####
 import_speed = [1.445, 6.745]
-speedplot = comparison_plot(pop_adeg, import_speed, "Seconds", "Importing a genepop file")
-speedplot |> save("speedplot.png")
+comparison_plot(pop_adeg, import_speed, "Seconds", "Importing a genepop file") |> save("speedplot.png")
 
 #### Filesize (KB) ####
 obj = ["PopData (PopGen.jl)", "genind (adegenet)"]
 f_size = [3.498172, 5.331536]
-objplot = comparison_plot(obj, f_size, "megabytes", "Data structure size")
-objplot |> save("objectplot.png")
+comparison_plot(obj, f_size, "megabytes", "Data structure size") |> save("objectplot.png")
 
 
 #### f-stat summary ####
 sumstat = [0.242, 4.6]
-sumstatplot = comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics")
-sumstatplot |> save("sumstatplot.png")
+comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics") save("sumstatplot.png")
 
 #### Χ² test ####
 chitest = [0.591396, 6.2659]
-chiplot = comparison_plot(pop_adeg, chitest, "Seconds", "Hardy-Weinberg Equilibrium Χ² test")
-chiplot |> save("chisqplot.png")
+comparison_plot(pop_adeg, chitest, "Seconds", "Hardy-Weinberg Equilibrium Χ² test") |> save("chisqplot.png")
 
 
 #### Makie version
