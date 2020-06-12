@@ -36,6 +36,11 @@ module.exports = {
           position: 'right',
         },
         {
+          to: 'docs/getting_started/quickstart',
+          label: 'Quickstart',
+          position: 'right',
+        },
+        {
           to: 'docs/getting_started/about',
           label: 'About',
           position: 'right',

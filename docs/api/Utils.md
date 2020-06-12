@@ -32,12 +32,12 @@ nonmissing(vec::T) where T<:AbstractArray
 Convenience function to count the number of non-`missing` values in a vector.
 
 
-### `reciprocal`
+### `motivational_quote`
 ```julia
-reciprocal(num::T) where T <: Signed
+motivational_quote()
 ```
-Returns the reciprocal (1/number) of a number. Will return `0` when 
-the number is `0` instead of returning `Inf`.
+Randomly returns one of ~50 _somewhat_ motivational quotes.
+
 
 ### `multitest_missing`
 ```julia
@@ -63,3 +63,32 @@ multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
 - `"sidak"` : Šidák adjustment
 - `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
+
+
+###    `permute_loci!`
+```julia
+permute_loci!(data::PopData)
+```
+Edits `PopData` in place with loci permuted across populations within the `.loci` dataframe.
+
+### `permute_samples!`
+```julia
+permute_samples!(data::PopData; meta::Bool = false)
+```
+Edits `PopData` in place with samples permuted across populations within
+the `.loci` dataframe. Since performance is important for many permutations,
+the default is to only edit the `.loci` table in place; use `meta = true`
+if you also require the `.meta` dataframe edited in place.
+
+### `quickstart`
+```julia
+quickstart()
+```
+Prints helpful text of how to get started using PopGen.
+
+### `reciprocal`
+```julia
+reciprocal(num::T) where T <: Signed
+```
+Returns the reciprocal (1/number) of a number. Will return `0` when 
+the number is `0` instead of returning `Inf`.

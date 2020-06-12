@@ -42,7 +42,8 @@ function comparison_plot(x::Vector{String},y::Vector{Float64}, yaxis::String, ma
             scale={range=["#aa79c1","#769fd2"]},
             legend=false
         }
-    )
+    ) +
+    @vlplot(mark={:rule, strokeDash=[2,2], size=2}, y={datum=3.2})
 end
 
 pop_adeg = ["PopGen.jl", "adegenet"]
@@ -53,12 +54,14 @@ import_speed = [1.445, 6.745]
 speedplot = comparison_plot(pop_adeg, import_speed, "Seconds", "Importing a genepop file")
 speedplot |> save("speedplot.png")
 
-#### Filesize (KB) ####
+#### Filesize (mb) ####
 obj = ["PopData (PopGen.jl)", "genind (adegenet)"]
 f_size = [3.498172, 5.331536]
-objplot = comparison_plot(obj, f_size, "megabytes", "Data structure size")
+objplot = comparison_plot(obj, f_size, "megabytes", "Data structure size") |> save("objectplot.png")
 objplot |> save("objectplot.png")
 
+
+objplot + @vlplot(mark={:rule, strokeDash=[2,2], size=2}, y={datum=3.2})
 
 #### f-stat summary ####
 sumstat = [0.242, 4.6]
