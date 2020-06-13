@@ -83,9 +83,10 @@ search: population populations population! populations!
 
   population(data::PopData; listall::Bool = false)
 
-  View unique population ID's in a PopObj.
+View unique population ID's and their counts in a `PopData`.
 
-  listall = true, displays ind and their population instead (default = false).
+
+- `listall = true` displays all samples and their `population` instead (default = `false`)
 ```
 
 ## Type information
