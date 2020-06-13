@@ -118,7 +118,7 @@ This looks weird at first,  but it's actually very simple. When we do method def
 function funct1(data::PopData, thing1::T) where T
 ```
 
-This will auto-create a method for any possible Type for `thing1`. Usually, that's problematic, as incorrect input will lead to obscure errors (e.g. multiplying integers with strings?!). Instead, you can constrain the types for `T` like this:
+This will auto-create a method for any possible Type for `thing1`. That's really convenvient, but sometimes it's problematic, as incorrect input can lead to obscure errors (e.g. multiplying integers with strings?!). Instead, you can constrain the types for `T` like this:
 
 ```julia
 function funct2(data::PopData, thing1::T) where T <: Signed
