@@ -111,29 +111,30 @@ function Base.summary(data::PopData; by::String = "global")
     )
 
     Ht = 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)
-    FIS =  1.0 .- (n_df.Het_obs ./ n_df.HS)
     DST = Ht .- n_df.HS
-    FST = DST ./ Ht
     DST′ = n_df.count ./ (n_df.count .- 1) .* DST
-    DEST = DST′ ./ (1 .- n_df.HS)
     HT′ = n_df.HS .+ DST′
-    FST′ = DST′ ./ Ht
 
     if lowercase(by) != "global"
+        FIS =  1.0 .- (n_df.Het_obs ./ n_df.HS)
+        FST = DST ./ Ht
+        DEST = DST′ ./ (1 .- n_df.HS)
+        FST′ = DST′ ./ HT′
         insertcols!(
-        select!(
-        n_df, :locus,
-        :Het_obs => (i -> round.(i, digits = 4)) => :Het_obs,
-        :HS => (i -> round.(i, digits = 4)) => :HS,
-        ),
-        :HT => round.(Ht, digits = 4),
-        :DST => round.(DST, digits = 4),
-        :HT′ => round.(HT′, digits = 4),
-        :DST′ => round.(DST′, digits = 4),
-        :FST => round.(FST, digits = 4),
-        :FST′ => round.(FST′, digits = 4),
-        :FIS => round.(FIS, digits = 4),
-        :DEST => round.(DEST, digits = 4)
+            select!(
+                n_df,
+                :locus,
+                :Het_obs => (i -> round.(i, digits = 4)) => :Het_obs,
+                :HS => (i -> round.(i, digits = 4)) => :HS,
+            ),
+            :HT => round.(Ht, digits = 4),
+            :DST => round.(DST, digits = 4),
+            :HT′ => round.(HT′, digits = 4),
+            :DST′ => round.(DST′, digits = 4),
+            :FST => round.(FST, digits = 4),
+            :FST′ => round.(FST′, digits = 4),
+            :FIS => round.(FIS, digits = 4),
+            :DEST => round.(DEST, digits = 4)
         )
     else
         Het_obs = mean(n_df.Het_obs)

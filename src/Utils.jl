@@ -163,8 +163,7 @@ Edits `PopData` in place with loci permuted across populations within
 the `.loci` dataframe.
 """
 function permute_loci!(data::PopData)
-    loci_df = groupby(data.loci, :locus)
-    for locus in loci_df
+    for locus in groupby(data.loci, :locus)
         shuffle!(locus.population)
     end
 end
@@ -181,14 +180,12 @@ function permute_samples!(data::PopData; meta::Bool = false)
 
     if meta == true
         meta_pops = deepcopy(pops)
-        meta_df = groupby(data.meta, :name)
-        for name in meta_df
+        for name in groupby(data.meta, :name)
             name.population .= pop!(meta_pops)
         end
     end
 
-    loci_df = groupby(data.loci, :name)
-    for name in loci_df
+    for name in groupby(data.loci, :name)
         name.population .= pop!(pops)
     end
 end
