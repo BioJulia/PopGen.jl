@@ -42,8 +42,7 @@ function comparison_plot(x::Vector{String},y::Vector{Float64}, yaxis::String, ma
             scale={range=["#aa79c1","#769fd2"]},
             legend=false
         }
-    ) +
-    @vlplot(mark={:rule, strokeDash=[2,2], size=2}, y={datum=3.2})
+    )
 end
 
 pop_adeg = ["PopGen.jl", "adegenet"]
