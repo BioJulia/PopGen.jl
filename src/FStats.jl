@@ -70,7 +70,7 @@ function f_stat_p(data::PopData, nperm::Int = 1000)
     end
 
     for (k,v) in perm_dict
-        observed[k] = sum(observed[k] .<= v)/nperm
+        observed[k] = (1 + sum(observed[k] .<= v))/nperm
     end
 
     return observed
