@@ -41,7 +41,7 @@ the `.loci` dataframe.
 """
 @inline function permute_genotypes!(data::PopData)
     @inbounds for locus in groupby(data.loci, :locus)
-        strict_shuffle!(locus.genotype)
+        locus.genotype .= strict_shuffle!(locus.genotype)
     end
 end
 
@@ -53,7 +53,7 @@ populations within the `.loci` dataframe.
 """
 @inline function permute_genotypes_pop!(data::PopData)
     @inbounds for locus in groupby(data.loci, [:locus, :population])
-        strict_shuffle!(locus.genotype)
+        locus.genotype .= strict_shuffle!(locus.genotype)
     end
 end
 

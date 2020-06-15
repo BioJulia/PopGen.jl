@@ -250,5 +250,5 @@ to return a copy instead of editing in-place.
 """
 function strict_shuffle!(x::T) where T <: AbstractArray
     shuffle!(@view x[.!ismissing.(x)])
-    return
+    return x
 end
