@@ -215,7 +215,6 @@ View unique population ID's and their counts in a `PopData`.
     end
 end
 
-#TODO all the populations! functions
 """
 ```
 # Replace by matching

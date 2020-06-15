@@ -140,13 +140,9 @@ function Base.summary(data::PopData; by::String = "global")
         Het_obs = mean(n_df.Het_obs)
         HS = mean(n_df.HS)
         Ht = mean(Ht)
-        #FIS = mean(FIS)
         DST = mean(DST)
-        #FST = mean(FST)
         DST′ = mean(DST′)
-        #DEST = mean(DEST)
         HT′ = mean(HT′)
-        #FST′ = mean(FST′)
 
         DataFrame(
         :Het_obs => round.(Het_obs, digits = 4),

@@ -25,24 +25,14 @@ function FST(data::PopData; by::String = "global")
     HT′ = n_df.HS .+ DST′
 
     if lowercase(by) != "global"
-        return Dict(
-            :FST => DST ./ Ht,
-            :FST′ => DST′ ./ HT′,
-            :FIS => 1.0 .- (n_df.Het_obs ./ n_df.HS)
-        )
+        return (DST ./ Ht, DST′ ./ HT′)
     else
-        Het_obs = mean(n_df.Het_obs)
-        HS = mean(n_df.HS)
         Ht = mean(Ht)
         HT′ = mean(HT′)
         DST = mean(DST)
         DST′ = mean(DST′)
 
-        return Dict(
-            :FST => DST / Ht,
-            :FST′ => DST′ / HT′,
-            :FIS => 1 - (Het_obs / HS)
-        )
+        return (DST / Ht, DST′ / HT′,)
     end
 end
 
