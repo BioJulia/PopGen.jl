@@ -1,3 +1,27 @@
+#TODO change location in API docs
+"""
+    alleles(locus::T; miss::Bool = false) where T<:GenoArray
+Return an array of all the non-missing alleles of a locus. Use
+`miss = true` to include missing values.
+"""
+@inline function alleles(locus::T; miss::Bool = false) where T<:GenoArray
+    if miss==true
+        Base.Iterators.flatten(locus) |> collect
+    else
+        Base.Iterators.flatten(locus |> skipmissing) |> collect
+    end
+end
+
+
+"""
+    unique_alleles(locus::T) where T<:GenoArray
+Return an array of all the unique non-missing alleles of a locus.
+"""
+@inline function unique_alleles(locus::GenoArray)
+    unique(alleles(locus))
+end
+
+
 """
     convert_coord(coordinate::String)
 Takes non-decimal-degree format as a `String` and returns it as a decimal degree
@@ -121,7 +145,7 @@ positions. See MultipleTesting.jl docs for full more detailed information.
     miss_idx = findall(i -> i === missing, pvals)
 
     # make seperate array for non-missing P vals
-    p_no_miss = skipmissing(pvals) |> collect
+    p_no_miss = x[.!ismissing.(x)]
 
     # make a dict of all possible tests and their respective functions
     d = Dict(
@@ -156,39 +180,6 @@ function nonmissing(vec::T) where T<:AbstractArray
     count(!ismissing, vec)
 end
 
-
-"""
-    permute_loci!(data::PopData)
-Edits `PopData` in place with loci permuted across populations within
-the `.loci` dataframe.
-"""
-function permute_loci!(data::PopData)
-    for locus in groupby(data.loci, :locus)
-        shuffle!(locus.population)
-    end
-end
-
-"""
-    permute_samples!(data::PopData; meta::Bool = false)
-Edits `PopData` in place with samples permuted across populations within
-the `.loci` dataframe. Since performance is important for many permutations,
-the default is to only edit the `.loci` table in place; use `meta = true`
-if you also require the `.meta` dataframe edited in place.
-"""
-function permute_samples!(data::PopData; meta::Bool = false)
-    pops = shuffle(data.meta.population)
-
-    if meta == true
-        meta_pops = deepcopy(pops)
-        for name in groupby(data.meta, :name)
-            name.population .= pop!(meta_pops)
-        end
-    end
-
-    for name in groupby(data.loci, :name)
-        name.population .= pop!(pops)
-    end
-end
 
 """
     quickstart()
@@ -233,4 +224,31 @@ the number is `0` instead of returning `Inf`.
 """
 function reciprocal(num::T) where T <: Real
     !iszero(num) ? 1.0/float(num) : 0.0
+end
+
+#TODO add to API docs
+"""
+    strict_shuffle(x::T) where T <: AbstractArray
+Shuffle only the non-missing values of a Vector and return a copy of the vector,
+keeping the `missing` values at their original locations.
+Use `strict_shuffle!` to edit in-place instead of returning a copy.
+"""
+@inline function strict_shuffle(x::T) where T <: AbstractArray
+    # get indices of where original missing are
+    miss_idx = findall(i -> i === missing, x)
+    out_vec = shuffle(x[.!ismissing.(x)])
+
+    insert!.(Ref(out_vec), miss_idx, missing)
+    return out_vec
+end
+
+"""
+    strict_shuffle!(x::T)! where T <: AbstractArray
+Shuffle only the non-missing values of a Vector, keeping the
+`missing` values at their original locations. Use `strict_shuffle`
+to return a copy instead of editing in-place.
+"""
+function strict_shuffle!(x::T) where T <: AbstractArray
+    shuffle!(@view x[.!ismissing.(x)])
+    return
 end

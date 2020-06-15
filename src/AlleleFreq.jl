@@ -1,22 +1,4 @@
 """
-    alleles(locus::T) where T<:GenoArray
-Return an array of all the non-missing alleles of a locus.
-"""
-@inline function alleles(locus::T) where T<:GenoArray
-    Base.Iterators.flatten(locus |> skipmissing) |> collect
-end
-
-
-"""
-    unique_alleles(locus::T) where T<:GenoArray
-Return an array of all the unique non-missing alleles of a locus.
-"""
-@inline function unique_alleles(locus::GenoArray)
-    unique(alleles(locus))
-end
-
-
-"""
     allele_freq(locus::T) where T<:GenoArray
 Return a `Dict` of allele frequencies of a single locus in a `PopData`
 object.
