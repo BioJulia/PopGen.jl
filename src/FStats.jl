@@ -1,6 +1,6 @@
 @inline function FST_global(data::PopData)
     # observed/expected het per locus per pop
-    het_df = DataFrames.combine(
+    het_df = @inbounds DataFrames.combine(
         groupby(data.loci, [:locus, :population]),
         :genotype => nonmissing => :n,
         :genotype => hetero_o => :het_obs,
@@ -8,7 +8,7 @@
         :genotype => allele_freq => :alleles
     )
     # collapse down to retrieve averages and counts
-    n_df = DataFrames.combine(
+    n_df = @inbounds DataFrames.combine(
         [:het_obs, :het_exp, :n, :alleles] => (o,e,n,alleles) -> (
             count = sum(.!iszero.(n)),
             mn = sum(.!iszero.(n)) ./ sum(reciprocal.(n)),

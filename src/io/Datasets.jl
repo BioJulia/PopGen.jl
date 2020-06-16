@@ -30,7 +30,7 @@ ncats = nancycats()
 ```
 """
 function nancycats()
-    filename = normpath(joinpath(@__DIR__,"..","data", "datasets.jld"))
+    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
     load(filename, "nancycats")
 end
 
@@ -47,6 +47,6 @@ sharks = gulfsharks()
 ```
 """
 function gulfsharks()
-    filename = normpath(joinpath(@__DIR__,"..","data", "datasets.jld"))
+    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
     load(filename, "gulfsharks")
 end

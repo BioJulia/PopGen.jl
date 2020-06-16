@@ -48,7 +48,6 @@ end
     return @inbounds ishet.(locus)
 end
 
-#TODO add to docs (API)
 
 """
     gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)
@@ -65,20 +64,21 @@ Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
 (Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press).
 use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 """
-function gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Integer; corr::Bool = true)
+@inline function gene_diversity_nei87(het_exp::AbstractFloat, het_obs::AbstractFloat, n::Union{Integer,AbstractFloat}; corr::Bool = true)
     if corr == true
-        (het_exp - (het_obs/n/2.0)) * n/(n-1)
+        corr_val = n/(n-1)
     else
-        (het_exp - (het_obs/n/2.0))
-        end
+        corr_val = 1
+    end
+    return @fastmath (het_exp - (het_obs/n/2.0)) * corr_val
 end
 
-function gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::T where T<: AbstractFloat; corr::Bool = true)
-    if corr == true
-        (het_exp - (het_obs/n/2.0)) * n/(n-1)
-    else
-        (het_exp - (het_obs/n/2.0))
-        end
+@inline function gene_diversity_nei87(het_exp::AbstractFloat, het_obs::Missing, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+    return missing
+end
+
+@inline function gene_diversity_nei87(het_exp::Missing, het_obs::AbstractFloat, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+    return missing
 end
 
 """
@@ -99,7 +99,7 @@ end
 Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
-function hetero_e(data::T) where T <: GenoArray
+@inline function hetero_e(data::T) where T <: GenoArray
     1.0 - sum(@inbounds @avx allele_freq_vec(data) .^ 2)
 end
 
@@ -156,6 +156,6 @@ const het = heterozygosity
     het_sample(data::PopData, individual::String)
 Calculate the observed heterozygosity for an individual in a `PopData` object.
 """
-function het_sample(data::PopData, individual::String)
+@inline function het_sample(data::PopData, individual::String)
     data.loci[data.loci.name .== individual, :genotype] |> hetero_o
 end
