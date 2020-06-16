@@ -41,10 +41,11 @@ the `.loci` dataframe. Use `by = "population"` (or `"pop"`) to permute genotypes
 within populations.
 """
 @inline function permute_genotypes!(data::PopData; by::String = "locus")
+    #establish mode of operation
     if by in ["locus", "loci"]
         groupings = :locus
     else
-        groupings = [:locus, :genotype]
+        groupings = [:locus, :population]
     end
     @inbounds for locus in groupby(data.loci, groupings)
         locus.genotype .= strict_shuffle!(locus.genotype)
@@ -57,12 +58,17 @@ end
     permute_alleles!(data::PopData)
 
 """
-@inline function permute_alleles!(data::PopData; ploidy::Int = 2)
-    @inbounds for locus in groupby(data.loci, :locus)
-        alle = alleles(locus.genotype)
-        shuffle!(alle)
+@inline function permute_alleles!(data::PopData; ploidy::Int = 2, by::String = "locus")
+    #establish mode of operation
+    if by in ["locus", "loci"]
+        groupings = :locus
+    else
+        groupings = [:locus, :population]
+    end
+
+    @inbounds for locus in groupby(data.loci, groupings)
+        alle = shuffle(alleles(locus.genotype))
         new_genos = Tuple.(Base.Iterators.partition(alle, ploidy))
-        return new_genos
         @inbounds locus.genotype[@view .!ismissing.(locus.genotype)] .= new_genos
     end
 end
