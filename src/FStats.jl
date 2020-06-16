@@ -63,41 +63,8 @@ function FST_locus(data::PopData)
 end
 
 
-"""
-    f_stat_p(data::PopObj; nperm::Int64)
-Performs a permutation test (permuting individuals among populations) to calculate
-p-values for F-statistics
-"""
 function f_stat_p(data::PopData; nperm::Int = 1000)
-    tmp = deepcopy(data)
-    observed = FST(data, by = "global")
-    FST_p = 1.0
-    FST′_p = 1.0
-    #=
-    perm_dict = Dict{Symbol,Vector{Float64}}(
-        :FST => Vector{Float64}(undef, nperm-1),
-        :FST′ => Vector{Float64}(undef, nperm-1)
-    )
-    =#
-    @inbounds for n in 1:nperm-1
-        permute_samples!(tmp)
-        permuted = FST(tmp, by = "global")
-        FST_p += (observed[:FST] < permuted[:FST])
-        FST′_p += (observed[:FST′] < permuted[:FST])
-    end
-
-    return (FST_p / nperm , FST′_p / nperm)
-    #=
-    for (k,v) in perm_dict
-        observed[k] = (1 + sum(observed[k] .<= v))/nperm
-    end
-    =#
-    return observed
-end
-
-
-function f_stat_old(data::PopData; nperm::Int = 1000)
-    tmp = deepcopy(data)
+    tmp = PopData(copy(data.meta), copy(data.loci))
     observed = FST_global(data)
     perm_dict = Dict{Symbol,Vector{Float64}}(
         :FST => Vector{Float64}(undef, nperm-1),
@@ -116,6 +83,3 @@ function f_stat_old(data::PopData; nperm::Int = 1000)
     end
     return observed
 end
-
-julia> @btime f_stat_p(y, nperm = 1000)
-  116.729 s (1310968334 allocations: 96.95 GiB)

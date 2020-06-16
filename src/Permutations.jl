@@ -1,4 +1,3 @@
-
 """
     permute_loci!(data::PopData)
 Edits `PopData` in place with loci permuted across populations within
@@ -30,7 +29,6 @@ if you also require the `.meta` dataframe edited in place.
     @inbounds for name in groupby(data.loci, :name)
         @inbounds name.population .= pop!(pops)
     end
-
 end
 
 
@@ -44,31 +42,36 @@ within populations.
     #establish mode of operation
     if by in ["locus", "loci"]
         groupings = :locus
-    else
+    elseif by in ["population", "pop"]
         groupings = [:locus, :population]
+    else
+        error("Please choose from either \"locus\" or \"population\" run methods.")
     end
-    @inbounds for locus in groupby(data.loci, groupings)
-        locus.genotype .= strict_shuffle!(locus.genotype)
+    @inbounds for grp in groupby(data.loci, groupings)
+        grp.genotype .= strict_shuffle!(grp.genotype)
     end
 end
 
 
-#WIP
 """
     permute_alleles!(data::PopData)
-
+Edits `PopData` in place with alleles permuted and reconstructed into genotypes
+for each locus within the `.loci` dataframe. Use `by = "population"` (or `"pop"`)
+to permute alleles within populations.
 """
 @inline function permute_alleles!(data::PopData; ploidy::Int = 2, by::String = "locus")
     #establish mode of operation
     if by in ["locus", "loci"]
         groupings = :locus
-    else
+    elseif by in ["population", "pop"]
         groupings = [:locus, :population]
+    else
+        error("Please choose from either \"locus\" or \"population\" run methods.")
     end
 
-    @inbounds for locus in groupby(data.loci, groupings)
-        alle = shuffle(alleles(locus.genotype))
+    @inbounds for grp in groupby(data.loci, groupings)
+        alle = shuffle(alleles(grp.genotype))
         new_genos = Tuple.(Base.Iterators.partition(alle, ploidy))
-        @inbounds locus.genotype[@view .!ismissing.(locus.genotype)] .= new_genos
+        (@view grp.genotype[.!ismissing.(grp.genotype)]) .= new_genos
     end
 end
