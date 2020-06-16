@@ -8,7 +8,7 @@ Return an array of all the non-missing alleles of a locus. Use
     if miss==true
         Base.Iterators.flatten(locus) |> collect
     else
-        Base.Iterators.flatten(locus |> skipmissing) |> collect
+        @inbounds Base.Iterators.flatten(locus[.!ismissing.(locus)]) |> collect
     end
 end
 
@@ -249,6 +249,6 @@ Shuffle only the non-missing values of a Vector, keeping the
 to return a copy instead of editing in-place.
 """
 function strict_shuffle!(x::T) where T <: AbstractArray
-    shuffle!(@view x[.!ismissing.(x)])
+    @inbounds shuffle!(@view x[.!ismissing.(x)])
     return x
 end

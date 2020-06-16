@@ -67,7 +67,7 @@ include("io/Read.jl")
 include("io/VariantCall.jl")
 # utility functions
 include("Utils.jl")
-include("Permutations.jl")
+#include("Permutations.jl")
 # example data
 include("Datasets.jl")
 # manipulation commands
