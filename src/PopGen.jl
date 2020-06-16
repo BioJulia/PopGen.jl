@@ -65,11 +65,11 @@ include("io/Delimited.jl")
 include("io/Genepop.jl")
 include("io/Read.jl")
 include("io/VariantCall.jl")
+# example data
+include("io/Datasets.jl")
 # utility functions
 include("Utils.jl")
 #include("Permutations.jl")
-# example data
-include("Datasets.jl")
 # manipulation commands
 include("Manipulate.jl")
 # allele frequency and heterozygosity functions
