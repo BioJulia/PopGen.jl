@@ -61,6 +61,10 @@ function convert_coord(coordinate::String)
     end
 end
 
+function Base.copy(data::PopData)
+    PopData(copy.([data.meta,data.loci])...)
+end
+
 
 """
     motivational_quote()
