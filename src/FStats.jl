@@ -7,6 +7,7 @@
         :genotype => (i -> hetero_e(i)) => :het_exp,
         :genotype => allele_freq => :alleles
     )
+
     # collapse down to retrieve averages and counts
     n_df = @inbounds DataFrames.combine(
         [:het_obs, :het_exp, :n, :alleles] => (o,e,n,alleles) -> (
@@ -19,10 +20,10 @@
         groupby(het_df, :locus)
     )
 
-    HT = mean(@inbounds 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count))
-    DST = mean(@inbounds HT .- n_df.HS)
-    DST′ = mean(@inbounds n_df.count ./ (n_df.count .- 1) .* DST)
-    HT′ = mean(@inbounds n_df.HS .+ DST′)
+    HT = mean(@inbounds @avx 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count))
+    DST = mean(@inbounds @avx HT .- n_df.HS)
+    DST′ = mean(@inbounds @avx n_df.count ./ (n_df.count .- 1) .* DST)
+    HT′ = mean(@inbounds @avx n_df.HS .+ DST′)
 
     return Dict{Symbol, Float64}(
         :FST => DST / HT,
@@ -64,16 +65,16 @@ end
 
 
 function f_stat_p(data::PopData; nperm::Int = 1000)
-    tmp = PopData(copy(data.meta), copy(data.loci))
-    observed = FST_global(data)
+    tmp = copy(data)
+    observed = FST_global(tmp)
+
     perm_dict = Dict{Symbol,Vector{Float64}}(
         :FST => Vector{Float64}(undef, nperm-1),
         :FST′ => Vector{Float64}(undef, nperm-1)
     )
 
-    @inbounds for n in 1:nperm-1
-        permute_samples!(tmp)
-        tmp_f = FST_global(tmp)
+    Base.Threads.@spawn for n in 1:nperm-1
+        tmp_f = FST_global(permute_samples!(tmp))
         perm_dict[:FST][n] = tmp_f[:FST]
         perm_dict[:FST′][n] = tmp_f[:FST′]
     end
@@ -81,5 +82,6 @@ function f_stat_p(data::PopData; nperm::Int = 1000)
     @inbounds for (k,v) in perm_dict
         observed[k] = (1 + sum(observed[k] .<= v))/nperm
     end
+
     return observed
 end
