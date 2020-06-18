@@ -12,6 +12,6 @@ We have GitHub Actions configured to auto-deploy the documentation site when cha
 1. Clone the respository onto your system with `git clone https://github.com/pdimens/PopGen.jl.git` and switch to the `documentation` branch.
 2. Install the correct NodeJS modules by navigating to the repository folder and using the command `yarn install`, which will parse the `package.json` file and install all the necessary NodeJS modules into the directory.
     1. You will need NodeJS and Yarn installed on your system for this to work.
-3. Make your changes.
-4. Use `yarn start` to start a local live-reloading development server in a browser window. Most changes are reflected live without having to restart the server.
-5. You can do `yarn build` and `GIT_USER=<Your GitHub username> yarn deploy`, but since GitHub Actions takes care of that for us, you just need to submit your changes as a Pull Request and things magically work. 
+3. Use `yarn start` to start a local live-reloading development server in a browser window. Most changes are reflected live without having to restart the server.
+4. Make your changes.
+5. Since GitHub Actions takes care of building and deploying, you just need to submit your changes as a Pull Request and things magically work. 
