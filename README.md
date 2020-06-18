@@ -1,33 +1,17 @@
+![error_cactus](/static/img/logo_banner.png)
+
 # Website
+The documentation website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
 
-This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
+There are two easy ways to edit this documentation:
 
-### Installation
+## 1. The Easier Way - Submit Pull Requests
+We have GitHub Actions configured to auto-deploy the documentation site when changes are pushed to the `documentation` branch. That means as long as we edit the source content, building and deployment will be handled automatically!
 
-```
-$ yarn
-```
-
-### Local Development
-
-```
-$ yarn start
-```
-
-This command starts a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
-
-### Build
-
-```
-$ yarn build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-### Deployment
-
-```
-$ GIT_USER=<Your GitHub username> USE_SSH=true yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+## 2. The More Technical Way - Clone locally
+1. Clone the respository onto your system with `git clone https://github.com/pdimens/PopGen.jl.git` and switch to the `documentation` branch.
+2. Install the correct NodeJS modules by navigating to the repository folder and using the command `yarn install`, which will parse the `package.json` file and install all the necessary NodeJS modules into the directory.
+    1. You will need NodeJS and Yarn installed on your system for this to work.
+3. Make your changes.
+4. Use `yarn start` to start a local live-reloading development server in a browser window. Most changes are reflected live without having to restart the server.
+5. You can do `yarn build` and `GIT_USER=<Your GitHub username> yarn deploy`, but since GitHub Actions takes care of that for us, you just need to submit your changes as a Pull Request and things magically work. 
