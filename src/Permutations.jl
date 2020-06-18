@@ -7,6 +7,7 @@ the `.loci` dataframe.
     @inbounds for locus in groupby(data.loci, :locus)
         shuffle!(locus.population)
     end
+    data
 end
 
 """
@@ -29,6 +30,7 @@ if you also require the `.meta` dataframe edited in place.
     @inbounds for name in groupby(data.loci, :name)
         @inbounds name.population .= pop!(pops)
     end
+    data
 end
 
 
@@ -50,16 +52,19 @@ within populations.
     @inbounds for grp in groupby(data.loci, groupings)
         grp.genotype .= strict_shuffle!(grp.genotype)
     end
+    data
 end
 
 
 """
-    permute_alleles!(data::PopData)
+    permute_alleles!(data::PopData; ploidy::Union{Nothing, Int} = nothing, by::String = "locus")
 Edits `PopData` in place with alleles permuted and reconstructed into genotypes
 for each locus within the `.loci` dataframe. Use `by = "population"` (or `"pop"`)
-to permute alleles within populations.
+to permute alleles within populations. If `ploidy` is not provided (default `ploidy = nothing`),
+then ploidy will be identified from the PopData. If performance is important,
+it would be best to identify ploidy in advance and set it to a specific integer.
 """
-@inline function permute_alleles!(data::PopData; ploidy::Int = 2, by::String = "locus")
+@inline function permute_alleles!(data::PopData; ploidy::Union{Nothing, Int} = nothing, by::String = "locus")
     #establish mode of operation
     if by in ["locus", "loci"]
         groupings = :locus
@@ -69,9 +74,16 @@ to permute alleles within populations.
         error("Please choose from either \"locus\" or \"population\" run methods.")
     end
 
+    if ploidy == nothing
+        tmp = unique(data.meta.ploidy)
+        length(tmp) > 1 && error("This permutation method is not appropriate for mixed-ploidy data")
+        ploidy = tmp[1]
+    end
+
     @inbounds for grp in groupby(data.loci, groupings)
         alle = shuffle(alleles(grp.genotype))
         new_genos = Tuple.(Base.Iterators.partition(alle, ploidy))
         (@view grp.genotype[.!ismissing.(grp.genotype)]) .= new_genos
     end
+    data
 end
