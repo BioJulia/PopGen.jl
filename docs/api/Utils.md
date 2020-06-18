@@ -4,6 +4,18 @@ title: Utils.jl
 sidebar_label: Utils.jl
 ---
 
+### `alleles`
+```julia
+alleles(locus::T) where T<:GenotypeArray
+```
+Return an array of all the non-missing alleles present in a locus.
+
+### `unique_alleles`
+```julia
+unique_alleles(locus::T) where T<:GenotypeArray
+```
+Return an array of all the unique non-missing alleles of a locus.
+
 ### `convert_coord`
 ```julia
 convert_coord(coordinate::string)
@@ -24,6 +36,12 @@ julia> convert_coord.(["-41 31.52", "25 11:54S"])
 -41.5253
 -25.1983
 ```
+
+### `copy`
+```julia
+copy(data::PopData)
+```
+Creates a copy of `PopData`.
 
 ### `nonmissing`
 ```julia
@@ -65,21 +83,6 @@ multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
 - `"bc"` : Barber-Candès adjustment
 
 
-###    `permute_loci!`
-```julia
-permute_loci!(data::PopData)
-```
-Edits `PopData` in place with loci permuted across populations within the `.loci` dataframe.
-
-### `permute_samples!`
-```julia
-permute_samples!(data::PopData; meta::Bool = false)
-```
-Edits `PopData` in place with samples permuted across populations within
-the `.loci` dataframe. Since performance is important for many permutations,
-the default is to only edit the `.loci` table in place; use `meta = true`
-if you also require the `.meta` dataframe edited in place.
-
 ### `quickstart`
 ```julia
 quickstart()
@@ -92,3 +95,19 @@ reciprocal(num::T) where T <: Signed
 ```
 Returns the reciprocal (1/number) of a number. Will return `0` when 
 the number is `0` instead of returning `Inf`.
+
+### `strict_shuffle`
+```julia
+strict_shuffle(x::T) where T <: AbstractArray
+```
+Shuffle only the non-missing values of a Vector and return a copy of the vector,
+keeping the `missing` values at their original locations.
+Use `strict_shuffle!` to edit in-place instead of returning a copy.
+
+### `strict_shuffle!`
+```julia
+strict_shuffle!(x::T)! where T <: AbstractArray
+```
+Shuffle only the non-missing values of a Vector, keeping the
+`missing` values at their original locations. Use `strict_shuffle`
+to return a copy instead of editing in-place.

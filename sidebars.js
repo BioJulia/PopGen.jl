@@ -36,6 +36,7 @@ module.exports = {
       "api/heterozygosity",
       "api/ioutils",
       "api/manipulate",
+      "api/permutations",
       "api/read",
       "api/summaryinfo",
       "api/types",

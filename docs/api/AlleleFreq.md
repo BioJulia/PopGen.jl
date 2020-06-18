@@ -4,18 +4,6 @@ title: AlleleFreq.jl
 sidebar_label: AlleleFreq.jl
 ---
 
-### `alleles`
-```julia
-alleles(locus::T) where T<:GenotypeArray
-```
-Return an array of all the non-missing alleles present in a locus.
-
-### `unique_alleles`
-```julia
-unique_alleles(locus::T) where T<:GenotypeArray
-```
-Return an array of all the unique non-missing alleles of a locus.
-
 ### `allele_freq`
 ```julia
 allele_freq(locus::T) where T<:GenotypeArray
