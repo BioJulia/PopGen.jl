@@ -61,7 +61,7 @@ comparison_plot(obj, f_size, "megabytes", "Data structure size") |> save("object
 objplot + @vlplot(mark={:rule, strokeDash=[2,2], size=2}, y={datum=3.2})
 
 #### f-stat summary ####
-sumstat = [0.242, 4.6]
+sumstat = [0.171, 4.6]
 comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics") save("sumstatplot.png")
 
 #### Χ² test ####
