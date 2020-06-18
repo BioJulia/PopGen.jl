@@ -69,7 +69,7 @@ include("io/VariantCall.jl")
 include("io/Datasets.jl")
 # utility functions
 include("Utils.jl")
-#include("Permutations.jl")
+include("Permutations.jl")
 # manipulation commands
 include("Manipulate.jl")
 # allele frequency and heterozygosity functions
