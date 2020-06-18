@@ -4,7 +4,7 @@ title: Permutations.jl
 sidebar_label: Permutations.jl
 ---
 
-### permute_loci!
+### `permute_loci!`
 ```julia
 permute_loci!(data::PopData)
 ```
