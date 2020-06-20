@@ -56,7 +56,8 @@ comparison_plot(pop_adeg, import_speed, "Seconds", "Importing a genepop file") |
 obj = ["PopData (PopGen.jl)", "genind (adegenet)"]
 f_size = [3.498172, 5.331536]
 # I know, it's kind of obnoxiously long, but this is the syntax for getting that line on there.
-DataFrame(:names => obj, :size => f_size) |> @vlplot() +
+DataFrame(:names => obj, :size => f_size) |>
+    @vlplot() +
     @vlplot(
         height=500,
         width=450,
@@ -82,7 +83,7 @@ DataFrame(:names => obj, :size => f_size) |> @vlplot() +
                 domain = false
             }
         },
-        x={"names:o",
+        x={"names:n",
             axis={
                 title="",
                 labelAngle= 0,
@@ -93,16 +94,16 @@ DataFrame(:names => obj, :size => f_size) |> @vlplot() +
                 }
             },
         color={
-            "names:o",
+            "names:n",
             scale={range=["#aa79c1","#769fd2"]},
             legend=false
         }
     ) +
-    @vlplot(:rule, y={datum=3.2})  |> save("objectplot.png")
+    @vlplot(:rule, y={datum=3.2})  |> save("static/img/objectplot.png")
 
 #### f-stat summary ####
 sumstat = [0.171, 4.6]
-comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics") save("static/img/sumstatplot.png")
+comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics") |> save("static/img/sumstatplot.png")
 
 #### Χ² test ####
 chitest = [0.176, 6.2659]
