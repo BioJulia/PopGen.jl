@@ -50,23 +50,63 @@ pop_hierf = ["PopGen.jl", "hierfstat"]
 
 #### Load in Data ####
 import_speed = [.910, 6.745]
-comparison_plot(pop_adeg, import_speed, "Seconds", "Importing a genepop file") |> save("speedplot.png")
+comparison_plot(pop_adeg, import_speed, "Seconds", "Importing a genepop file") |> save("static/img/speedplot.png")
 
 #### Filesize (mb) ####
 obj = ["PopData (PopGen.jl)", "genind (adegenet)"]
 f_size = [3.498172, 5.331536]
-comparison_plot(obj, f_size, "megabytes", "Data structure size") |> save("objectplot.png")
-
-
-objplot + @vlplot(mark={:rule, strokeDash=[2,2], size=2}, y={datum=3.2})
+# I know, it's kind of obnoxiously long, but this is the syntax for getting that line on there.
+DataFrame(:names => obj, :size => f_size) |> @vlplot() +
+    @vlplot(
+        height=500,
+        width=450,
+        title={
+          text="Data structure size",
+          fontSize=22,
+          fontWeight="normal"
+        },
+        mark={
+            :bar,
+            cornerRadiusTopLeft=25,
+            cornerRadiusTopRight=25,
+            cornerRadiusBottomLeft=25,
+            cornerRadiusBottomRight=25
+        },
+        y={"size:q",
+            axis={
+                title="megabytes",
+                titleFontSize = 17,
+                titleFontWeight = "normal",
+                labelFontSize = 12,
+                grid = false,
+                domain = false
+            }
+        },
+        x={"names:o",
+            axis={
+                title="",
+                labelAngle= 0,
+                labelFontSize = 17,
+                domain = false,
+                ticks = false,
+                labelPadding = 4
+                }
+            },
+        color={
+            "names:o",
+            scale={range=["#aa79c1","#769fd2"]},
+            legend=false
+        }
+    ) +
+    @vlplot(:rule, y={datum=3.2})  |> save("objectplot.png")
 
 #### f-stat summary ####
 sumstat = [0.171, 4.6]
-comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics") save("sumstatplot.png")
+comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics") save("static/img/sumstatplot.png")
 
 #### Χ² test ####
-chitest = [0.591396, 6.2659]
-comparison_plot(pop_adeg, chitest, "Seconds", "Hardy-Weinberg Equilibrium Χ² test") |> save("chisqplot.png")
+chitest = [0.176, 6.2659]
+comparison_plot(pop_adeg, chitest, "Seconds", "Hardy-Weinberg Equilibrium Χ² test") |> save("static/img/chisqplot.png")
 
 
 #### Makie version

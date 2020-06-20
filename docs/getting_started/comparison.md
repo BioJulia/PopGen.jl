@@ -18,7 +18,7 @@ So, we'd like to prove that Julia and PopGen.jl actually achieves that by showin
 
 ## Benchmarks
 
-To make this a practical comparison, we're going to use the `gulfsharks` data because it is considerably larger (212 samples x 2213 loci) than `nancycats` (237 x 9) and a bit more of a "stress test".  All benchmarks in R are performed using the `microbenchmark` package, and  `BenchmarkTools` are used for Julia. 
+To make this a practical comparison, we're going to use the `gulfsharks` data because it is considerably larger (212 samples x 2213 loci) than `nancycats` (237 x 9) and a bit more of a "stress test".  All benchmarks in R are performed using the `microbenchmark` package, and  `BenchmarkTools` are used for Julia.
 
 <Tabs
   block={true}
@@ -48,7 +48,7 @@ library(microbenchmark)
 </Tabs>
 
 
-As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux system on a nothing-special Lenovo Thinkbook 14S  with 8gigs of RAM and a 8th gen Intel i5 mobile processor. **Note:** all of the Julia benchmarks, unless explicitly stated, are performed single-threaded (i.e. not parallel, distributed, or GPU). 
+As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux system on a nothing-special Lenovo Thinkbook 14S  with 8gigs of RAM and a 8th gen Intel i5 mobile processor. **Note:** all of the Julia benchmarks, unless explicitly stated, are performed single-threaded (i.e. not parallel, distributed, or GPU).
 
 
 
@@ -68,7 +68,7 @@ Since `gulfsharks` is shamelessly provided in PopGen.jl, we will just load it wi
 
 ```
 @benchmark sharks = genepop("data/source/gulfsharks.gen", silent = true)
-BenchmarkTools.Trial: 
+BenchmarkTools.Trial:
   memory estimate:  330.58 MiB
   allocs estimate:  6905285
   --------------
@@ -138,7 +138,7 @@ julia> Base.summarysize(sharks)
 
 ![data structure plot](/PopGen.jl/img/objectplot.png)
 
-The original file is `3.2mb`, and our `PopData` object takes up ~`3.5mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
+The original file is `3.2mb` (the horizontal line), and our `PopData` object takes up ~`3.5mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
 
 ### Summary statistics
 The obvious hallmark of population genetics is heterozygosity values and F-statistics. Here we'll compare the basic summary statistics that can be produced using `hierfstat` and `PopGenjl`.
@@ -155,7 +155,7 @@ The obvious hallmark of population genetics is heterozygosity values and F-stati
 
 ```julia
 julia> @benchmark summary(sharks, by = "global")
-BenchmarkTools.Trial: 
+BenchmarkTools.Trial:
   memory estimate:  88.42 MiB
   allocs estimate:  1307128
   --------------
@@ -204,7 +204,7 @@ This is a classic population genetics test and a relatively simple one. The R be
 
 ```julia
 julia> @benchmark hwe_test(sharks)
-BenchmarkTools.Trial: 
+BenchmarkTools.Trial:
   memory estimate:  46.22 MiB
   allocs estimate:  1050525
   --------------
@@ -232,4 +232,4 @@ Unit: seconds
 
 ![chi squared plot](/PopGen.jl/img/chisqplot.png)
 
-Comparing averages, PopGen.jl clocks in at ~`176ms` versus adegenet's `6.3s`, so ~**35.8x** faster on these data(!) 
+Comparing averages, PopGen.jl clocks in at ~`176ms` versus adegenet's `6.3s`, so ~**35.8x** faster on these data(!)
