@@ -435,9 +435,8 @@ const remove! = exclude!
 
 """
     exclude(data::PopData, kwargs...)
-Exclude all occurences of specified information from a `PopData` object. Returns
-a new `PopData` object, leaving the original intact. The keywords can be used
-in any combination. Synonymous with `omit` and `remove`.
+Returns a new `PopData` object excluding all occurrences of the specified keywords.
+The keywords can be used in any combination. Synonymous with `omit` and `remove`.
 
 ### Keyword Arguments
 #### `locus`
