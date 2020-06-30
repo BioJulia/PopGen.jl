@@ -190,6 +190,7 @@ The keywords can be used in any combination. Synonymous with `omit` and `remove`
     - The keyword `populations` also works.
 - `name`: A `String` or `Vector{String}` of samples you want to remove from the `PopData`.
     - The keywords `names`, `sample`, and `samples` also work.
+
 **Examples**
 ```julia
 cats = nancycats();
