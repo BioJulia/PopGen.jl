@@ -14,4 +14,4 @@ We have GitHub Actions configured to auto-deploy the documentation site when cha
     1. You will need NodeJS and Yarn installed on your system for this to work.
 3. Use `yarn start` to start a local live-reloading development server in a browser window. Most changes are reflected live without having to restart the server.
 4. Make your changes.
-5. Since GitHub Actions takes care of building and deploying, you just need to submit your changes as a Pull Request and things magically work. 
+5. Since GitHub Actions takes care of building and deploying, you just need to submit your changes as a Pull Request and things magically work. **this is why we generally recommend "The Easier Way".**
