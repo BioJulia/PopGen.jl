@@ -100,7 +100,7 @@ get_sample_genotypes(cats, "N115")
 ```julia
 locus(data::PopData, locus::Union{String, Symbol})
 ```
-Convenience wrapper to return a vector of all the genotypes of a single locus 
+Convenience wrapper to return a vector of all the genotypes of a single locus
 
 **Example**
 ```julia
@@ -174,34 +174,26 @@ population name.
 populations!(potatoes, ["potato_1", "potato_2"], ["north_russet", "south_russet"])
 ```
 
-### `exclude_loci`
+### `exclude`
 ```julia
-exclude_loci(data::PopData, locus::String)
-exclude_loci(data::PopData, loci::Vector{String})
+exclude(data::PopData, kwargs...)
+remove(data::PopData, kwargs...)
+omit(data::PopData, kwargs...)
 ```
-Exclude selected loci from a `PopData` object. Returns a new `PopData` object,
-leaving the original intact. Synonymous with `omit_loci` and `remove_loci`.
+Returns a new `PopData` object excluding all occurrences of the specified keywords.
+The keywords can be used in any combination. Synonymous with `omit` and `remove`.
 
-**Example**
+**Keyword Arguments**
+-`locus`: A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
+    - The keyword `loci` also works.
+- `population`: A `String` or `Vector{String}` of populations you want to remove from the `PopData`.
+    - The keyword `populations` also works.
+- `name`: A `String` or `Vector{String}` of samples you want to remove from the `PopData`.
+    - The keywords `names`, `sample`, and `samples` also work.
+**Examples**
 ```julia
-new_cats = exclude_loci(nancycats(), "fca8")
-very_new_cats = exclude_loci(nancycats(), ["fca8", "fca23"])
+cats = nancycats();
+exclude(cats, name = "N100", population = ["1", "15"])
+exclude(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
+exclude(cats, names = "N102", loci = "fca8", population = "3")
 ```
-
-### `exclude_samples`
-```julia
-exclude_samples(data::PopData, samp_id::String)
-exclude_samples(data::PopData, samp_id::Vector{String})
-```
-Exclude selected samples from a `PopData` object. Returns a new `PopData` object, leaving the original intact. Synonymous with `omit_samples` and `remove_samples`.
-
-**Example**
-```julia
-exclude_samples(nancycats, "N100")
-exclude_samples(nancycats, ["N100", "N102", "N211"])
-```
-
-```julia
-samples(data::PopData)
-```
-View individual/sample names in a `PopData`
