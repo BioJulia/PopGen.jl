@@ -174,6 +174,31 @@ population name.
 populations!(potatoes, ["potato_1", "potato_2"], ["north_russet", "south_russet"])
 ```
 
+### `exclude!`
+```julia
+exclude!(data::PopData, kwargs...)
+remove!(data::PopData, kwargs...)
+omit!(data::PopData, kwargs...)
+```
+Edit a `PopData` object in-place by excluding all occurences of the specified information.
+The keywords can be used in any combination. Synonymous with `omit!` and `remove!`.
+
+**Keyword Arguments**
+-`locus`: A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
+    - The keyword `loci` also works.
+- `population`: A `String` or `Vector{String}` of populations you want to remove from the `PopData`.
+    - The keyword `populations` also works.
+- `name`: A `String` or `Vector{String}` of samples you want to remove from the `PopData`.
+    - The keywords `names`, `sample`, and `samples` also work.
+
+**Examples**
+```julia
+cats = nancycats();
+exclude!(cats, name = "N100", population = ["1", "15"])
+exclude!(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
+exclude!(cats, names = "N102", loci = "fca8", population = "3")
+```
+
 ### `exclude`
 ```julia
 exclude(data::PopData, kwargs...)
