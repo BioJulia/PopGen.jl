@@ -57,7 +57,7 @@ julia> fewer_sharks = exclude(sharks, sample = "cc_001")
 PopData Object
   Marker: SNP
   Ploidy: 2
-  Individuals: 211
+  Samples: 211
   Loci: 2213
   Populations: 7
   Longitude: present with 0 missing
@@ -68,7 +68,7 @@ julia> lots_fewer_sharks = remove(sharks, name = ["cc_001", "cc_002", "cc_003"])
 PopData Object
   Marker: SNP
   Ploidy: 2
-  Individuals: 209
+  Samples: 209
   Loci: 2213
   Populations: 7
   Longitude: present with 0 missing
@@ -83,7 +83,7 @@ julia> fewer_shark_loci = exclude(sharks, loci = "contig_475")
 PopData Object
   Marker: SNP
   Ploidy: 2
-  Individuals: 212
+  Samples: 212
   Loci: 2212
   Populations: 7
   Longitude: present with 0 missing
@@ -94,7 +94,7 @@ julia> lots_fewer_loci = remove(sharks, locus = ["contig_475", "contig_2784", "c
 PopData Object
   Marker: SNP
   Ploidy: 2
-  Individuals: 212
+  Samples: 212
   Loci: 2210
   Populations: 7
   Longitude: present with 0 missing
@@ -106,22 +106,22 @@ PopData Object
 ``` julia
 julia> fewer_shark_pops = exclude(sharks, population = "Georgia")
 PopData Object
-  Marker: SNP
+  Markers: SNP
   Ploidy: 2
-  Individuals: 212
-  Loci: 2212
-  Populations: 7
+  Samples: 182
+  Loci: 2213
+  Populations: 6
   Longitude: present with 0 missing
   Latitude: present with 0 missing
 
 # multiple populations
 julia> lots_fewer_pops = remove(sharks, population = ["Florida Keys", "Mideast Gulf"])
 PopData Object
-  Marker: SNP
+  Markers: SNP
   Ploidy: 2
-  Individuals: 212
-  Loci: 2210
-  Populations: 7
+  Samples: 119
+  Loci: 2213
+  Populations: 5
   Longitude: present with 0 missing
   Latitude: present with 0 missing
 ```
@@ -130,13 +130,17 @@ PopData Object
 <TabItem value="c">
 
 ``` julia
-julia> tiny_shark = exclude(sharks, loci = "contig_475", name = ["cc_001", "neg_021"], population = "Cape Canaveral")
+julia> tiny_shark = exclude(sharks, loci = "contig_475", name = ["cc_001", "neg_021", "mango_111"], population = ["Cape Canaveral", "kiwi"])
+Notices:
+  sample "mango_111" not found
+  population "kiwi" not found
+
 PopData Object
-  Marker: SNP
+  Markers: SNP
   Ploidy: 2
-  Individuals: 212
+  Samples: 190
   Loci: 2212
-  Populations: 7
+  Populations: 6
   Longitude: present with 0 missing
   Latitude: present with 0 missing
 ```
