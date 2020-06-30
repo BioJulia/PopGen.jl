@@ -33,7 +33,7 @@ single sample, or an array of samples. This command will inform you if your crit
 were not found in the `PopData`.
 
 ### Keyword Arguments
--`locus`: A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
+- `locus`: A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
     - The keyword `loci` also works.
 - `population`: A `String` or `Vector{String}` of populations you want to remove from the `PopData`.
     - The keyword `populations` also works.
