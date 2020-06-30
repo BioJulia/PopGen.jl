@@ -445,11 +445,11 @@ A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
 The keyword `loci` also works.
 
 #### `population`
-A `String` or `Vector{String}` of populations you want to remove from the `PopData`
+A `String` or `Vector{String}` of populations you want to remove from the `PopData`.
 The keyword `populations` also works.
 
 #### `name`
-A `String` or `Vector{String}` of samples you want to remove from the `PopData`
+A `String` or `Vector{String}` of samples you want to remove from the `PopData`.
 The keywords `names`, `sample`, and `samples` also work.
 
 **Examples**

@@ -153,7 +153,7 @@ Writes a `PopData` object to a Genepop-formatted file.
 
 ```julia
 cats = nancycats();
-fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+fewer_cats = omit(cats, name = samples(cats)[1:10]);
 popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
 """
