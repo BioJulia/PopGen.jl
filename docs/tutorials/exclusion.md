@@ -103,6 +103,7 @@ PopData Object
 
 </TabItem>
 <TabItem value="p">
+
 ``` julia
 julia> fewer_shark_pops = exclude(sharks, population = "Georgia")
 PopData Object
