@@ -24,7 +24,7 @@ module.exports = {
     ],
     "Analyses":[
       "analyses/hardyweinberg",
-      "analyses/relatedness"
+      //"analyses/relatedness"
     ],
     "API": [
       "api/api",
