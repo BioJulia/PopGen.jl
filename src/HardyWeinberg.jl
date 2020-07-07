@@ -64,13 +64,21 @@ adjustment method for multiple testing.
             groupby(data.loci, :locus),
             :genotype => chisq_locus => :chisq
         )
-        out_table = @select(tmp, :locus,  chisq = getindex.(:chisq, 1), df = getindex.(:chisq, 2), P = getindex.(:chisq, 3))
+        out_table = select(tmp, :locus, 
+            :chisq => (i -> getindex.(i, 1)) => :chisq, 
+            :chisq => (i -> getindex.(i, 2)) => :df, 
+            :chisq => (i -> getindex.(i, 3)) => :P 
+        )
     else
         tmp =DataFrames.combine(
             groupby(data.loci, [:locus, :population]),
             :genotype => chisq_locus => :chisq
         )
-        out_table = @select(tmp, :locus, :population, chisq = getindex.(:chisq, 1), df = getindex.(:chisq, 2), P = getindex.(:chisq, 3))
+        out_table = select(tmp, :locus, :population, 
+            :chisq => (i -> getindex.(i, 1)) => :chisq, 
+            :chisq => (i -> getindex.(i, 2)) => :df, 
+            :chisq => (i -> getindex.(i, 3)) => :P 
+        )
     end
     if correction == "none"
         return out_table

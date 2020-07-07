@@ -4,9 +4,9 @@ authors = ["Pavel Dimens", "Jason Selwyn"]
 version = "0.0.3"
 
 [deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 GeneticVariation = "9bc6ac9d-e6b2-5f70-b0a8-242a01662520"

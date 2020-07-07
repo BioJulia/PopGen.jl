@@ -130,7 +130,7 @@ function get_genotypes(data::PopData, sample::Union{String, Vector{String}}, loc
     if typeof(locus) == String
         locus = [locus]
     end
-    @where(data.loci, :name .∈ Ref(sample), :locus .∈ Ref(locus))
+    @view data.loci[(data.loci.name .∈ Ref(sample)) .& (data.loci.locus .∈ Ref(locus)), :] 
 end
 
 
@@ -143,7 +143,7 @@ get_sample_genotypes(cats, "N115")
 ```
 """
 function get_sample_genotypes(data::PopObj, sample::String)
-    @where(data.loci, :name .== sample)[! , :genotype]
+    @view data.loci[data.loci.name .== sample, :genotype]
 end
 
 
@@ -157,7 +157,8 @@ locus(gulfsharks(), "contig_475")
 ```
 """
 function locus(data::PopData, locus::String)
-    @where(data.loci, :locus .== locus)[! , :genotype]
+    @view data.loci[data.loci.locus .== locus, :genotype]
+    #@where(data.loci, :locus .== locus)[! , :genotype]
 end
 
 
@@ -178,18 +179,29 @@ to return a DataFrame corresponding with that missing information.
 missing(gulfsharks(), by = "pop")
 ```
 """
+
 @inline function Base.missing(data::PopData; by::String = "sample")
     if by ∈ ["sample", "individual"]
-        return @by(data.loci, :name, missing = count(ismissing, :genotype))
-
+        DataFrames.combine(
+            DataFrames.groupby(data.loci, :name),
+            :genotype => (i -> count(ismissing, i)) => :missing
+        )
     elseif by ∈ ["pop", "population"]
-        return @by(data.loci, :population, missing = count(ismissing, :genotype))
-
+                DataFrames.combine(
+            DataFrames.groupby(data.loci, :population),
+            :genotype => (i -> count(ismissing, i)) => :missing
+        )
     elseif by ∈ ["locus", "loci"]
-        return @by(data.loci, :locus, missing = count(ismissing, :genotype))
+        DataFrames.combine(
+            DataFrames.groupby(data.loci, :locus),
+            :genotype => (i -> count(ismissing, i)) => :missing
+        )
 
     elseif by ∈ ["detailed", "full"]
-        return @by(data.loci, [:locus, :population], missing = count(ismissing, :genotype))
+        DataFrames.combine(
+            DataFrames.groupby(data.loci, [:locus, :population]),
+            :genotype => (i -> count(ismissing, i)) => :missing
+        )
     else
         @error "Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"
         missing(data)
@@ -204,14 +216,16 @@ View unique population ID's and their counts in a `PopData`.
 - `listall = true` displays all samples and their `population` instead (default = `false`)
 """
 @inline function populations(data::PopData; listall::Bool = false)
-    if listall == true
-        return @select(data.meta, :name, :population)
+    if all(ismissing.(data.meta.population)) == true
+        @info "no population data present in PopData"
+        return
+    elseif listall == true
+        return @view data.meta[!, [:name, :population]]
     else
-        if all(ismissing.(data.meta.population)) == true
-            @info "no population data present in PopData"
-            return populations(data, listall = true)
-        end
-        return @by(data.meta, :population, count = length(:population))
+        DataFrames.combine(
+            DataFrames.groupby(data.meta, :population),
+            nrow => :count
+        )
     end
 end
 
@@ -243,7 +257,7 @@ populations!(potatoes, potatopops)
 ## Reassign using samples and new population assignments
 Completely reassign populations for each individual. Takes two vectors of strings
 as input: one of the sample names, and the other with their new corresponding
-population name.
+population name. This can be useful to change population names for only some individuals.
 
 \n**Example**
 ```
@@ -276,21 +290,11 @@ end
 function populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
     meta_pops = deepcopy(populations)
     meta_df = groupby(data.meta, :name)
-    for name in meta_df
-        name.population .= pop!(meta_pops)
-    end
-
     loci_df = groupby(data.loci, :name)
-    for name in loci_df
-        name.population .= pop!(populations)
+    for (sample, new_pop) in zip(samples, populations)
+        meta_df[(name = sample,)].population .= new_pop
+        loci_df[(name = sample,)].population .= new_pop
     end
-    # legacy version
-    #=
-    for (i,j) in zip(samples, populations)
-        data.meta[data.meta.name .== i, :population] .= j
-        data.loci[data.loci.name .== i, :population] .= j
-    end
-    =#
     droplevels!(data.loci.population)
     return
 end
@@ -460,7 +464,7 @@ exclude(cats, names = "N102", loci = "fca8", population = "3")
 ```
 """
 function exclude(data::PopData; kwargs...)
-    tmp = deepcopy(data)
+    tmp = copy(data)
     exclude!(tmp; kwargs...)
     return tmp
 end
@@ -473,5 +477,5 @@ const remove = exclude
 View individual/sample names in a `PopData`
 """
 function samples(data::PopData)
-    data.meta.name
+    @view data.meta.name
 end
