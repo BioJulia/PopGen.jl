@@ -20,7 +20,7 @@ Additional keyword arguments `kwargs...` are specific to the intended file type,
 
 ```julia
 cats = nancycats();
-fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+fewer_cats = omit(cats, names = samples(cats)[1:10]);
 write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "horizontal")
 write_to(fewer_cats, filename = "filtered_nancycats.txt", digits = 4, format = "tidy", delim = ",")
 write_to(fewer_cats, filename = "filtered_nancycats.jld2")
