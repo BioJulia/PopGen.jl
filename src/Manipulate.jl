@@ -477,5 +477,5 @@ const remove = exclude
 View individual/sample names in a `PopData`
 """
 function samples(data::PopData)
-    @view data.meta.name
+    @view data.meta[!, :name]
 end
