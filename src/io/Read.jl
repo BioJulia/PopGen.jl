@@ -1,4 +1,4 @@
-export read_from, file_import
+export read_from, file_import, write_to
 
 """
     read_from(infile::String; kwargs...)
