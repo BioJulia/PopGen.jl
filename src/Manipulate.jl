@@ -348,8 +348,16 @@ function exclude!(data::PopData; kwargs...)
         if length(err) > 0
             [notices *= "\n  population \"$i\" not found" for i in err]
         end
-        filter!(:population => x -> x ∉ filt_pop, tmp.loci)
-        filter!(:population => x -> x ∉ filt_pop, tmp.meta)
+        # choose the cheaper method
+        all_pops = levels(tmp.loci.population)
+        if length(filt_pop) < length(all_pops)/2
+            filter!(:population => x -> x ∉ filt_pop, tmp.loci)
+            filter!(:population => x -> x ∉ filt_pop, tmp.meta)
+        else
+            keep = all_pops[all_pops .∉ Ref(filt_pop)]
+            filter!(:population => x -> x in filt_pop, tmp.loci)
+            filter!(:population => x -> x in filt_pop, tmp.meta)
+        end
         droplevels!(tmp.loci.population)
     end
 
@@ -366,25 +374,40 @@ function exclude!(data::PopData; kwargs...)
         if length(err) > 0
             [notices *= "\n  sample \"$i\" not found" for i in err]
         end
-        filter!(:name => x -> x ∉ filt_name, tmp.loci)
-        filter!(:name => x -> x ∉ filt_name, tmp.meta)
+        # choose the cheaper method
+        all_samples = tmp.meta.name
+        if length(filt_name) < length(all_samples)/2
+            filter!(:name => x -> x ∉ filt_name, tmp.loci)
+            filter!(:name => x -> x ∉ filt_name, tmp.meta)
+        else
+            keep = all_samples[all_samples .∉ Ref(filt_name)]
+            filter!(:name => x -> x in keep, tmp.loci)
+            filter!(:name => x -> x in keep, tmp.meta)
+        end
         droplevels!(tmp.loci.name)
     end
 
     # loci
     # check for keywords
-    filt_loc = get.(Ref(filter_by), [:locus, :loci], nothing)
-    filt_loc = filt_loc[filt_loc .!= nothing]
-    if length(filt_loc) != 0
-        filt_loc = filt_loc[begin]
-        if typeof(filt_loc) == String
-            filt_loc = [filt_loc]
+    filt_loci = get.(Ref(filter_by), [:locus, :loci], nothing)
+    filt_loci = filt_loci[filt_loci .!= nothing]
+    if length(filt_loci) != 0
+        filt_loci = filt_loci[begin]
+        if typeof(filt_loci) == String
+            filt_loci = [filt_loci]
         end
-        err = filt_loc[filt_loc .∉ Ref(loci(tmp))]
+        err = filt_loci[filt_loci .∉ Ref(loci(tmp))]
         if length(err) > 0
             [notices *= "\n  locus \"$i\" not found" for i in err]
         end
-        filter!(:locus => x -> x ∉ filt_loc, tmp.loci)
+        # choose the cheaper method
+        all_loci = loci(tmp)
+        if length(filt_loci) < length(all_loci)/2
+            filter!(:locus => x -> x ∉ filt_loci, tmp.loci)
+        else
+            keep = all_loci[all_loci .∉ Ref(filt_loci)]
+            filter!(:locus => x -> x in keep, tmp.loci)
+        end
         droplevels!(tmp.loci.locus)
     end
 
