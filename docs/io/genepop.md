@@ -94,7 +94,7 @@ Newcomb_04,	254230	564000	090120
 ## Writing to a Genepop file
 All file writing options can be performed using `write_to()`, which calls `popdata2genpop` when writing to a Genepop file.
 ```julia
-popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
+popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
 ```
 Writes a `PopData` object to a Genepop-formatted file.
 ### Arguments
@@ -104,14 +104,17 @@ Writes a `PopData` object to a Genepop-formatted file.
 - `digits` : an `Integer` indicating how many digits to format each allele
   -  e.g. `(1, 2)` => `001002` for `digits = 3`
 - `format` : a `String` indicating whether loci should be formatted 
-    - vertically (`"v"` or `"vertical"`)
-    - hortizontally (`"h"`, or `"horizontal"`)
-    - Genepop Isolation-By-Distance (`"ibd"`) where each sample is a population with long/lat data prepended
+  - vertically (`"v"` or `"vertical"`)
+  - hortizontally (`"h"`, or `"horizontal"`)
+  - Genepop Isolation-By-Distance (`"ibd"`) where each sample is a population with long/lat data prepended
+- `miss` : an `Integer` for how you would like missing values written 
+  - `0` : As a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 
+  - `-9` : As a single value `-9`
 
 ### Example
 ```julia
 cats = nancycats();
-fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+fewer_cats = omit(cats, names = samples(cats)[1:10]);
 julia> popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
 

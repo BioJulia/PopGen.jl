@@ -154,3 +154,10 @@ If removing a single thing and it is not found in the PopData, an error will be 
 :::
 
 The in-place variant `exclude!()` follows all the same syntax as `exclude()`, therefore all examples above would be identical for `exclude!()`.
+
+:::info Efficient Exclusion
+1. Internally, there are two things that try to speed up data exclusion.
+Exclusion occurs in the order of populations => samples => loci because this order removes the most volume of data per search so that each subsequent step has fewer data to process. Because of this order, you may get erroneous warnings if something isn't not found in the data if the previous step removed it.
+
+2. If you are excluding more than half of the present data for any particular category, the function will instead just "keep the opposite". It's *much* faster to keep 53 loci than it is to remove 5400 of them (390ms vs 20s)!. 
+:::

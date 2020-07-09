@@ -15,12 +15,12 @@ module.exports = {
       "io/genepop",
       "io/vcf",
     ],
-    "Tutorial": [
-      "tutorials/manipulate",
-      "tutorials/accessing",
-      "tutorials/exclusion",
-      "tutorials/populations",
-      "tutorials/viewsort"
+    "Basics": [
+      "basics/manipulate",
+      "basics/accessing",
+      "basics/exclusion",
+      "basics/populations",
+      "basics/viewsort"
     ],
     "Analyses":[
       "analyses/hardyweinberg",
