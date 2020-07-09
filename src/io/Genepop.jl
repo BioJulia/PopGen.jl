@@ -140,7 +140,7 @@ function genepop(
 end
 
 """
-    popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
+    popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
 Writes a `PopData` object to a Genepop-formatted file.
 - `data`: the `PopData` object you wish to convert to a Genepop file
 ### keyword arguments
@@ -150,6 +150,9 @@ Writes a `PopData` object to a Genepop-formatted file.
     - vertically (`"v"` or `"vertical"`)
     - hortizontally (`"h"`, or `"horizontal"`)
     - Genepop Isolation-By-Distance (`"ibd"`) where each sample is a population with long/lat data prepended
+- `miss` : an `Integer` for how you would like missing values written 
+    - `0` : As a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 
+    - `-9` : As a single value `-9`
 
 ```julia
 cats = nancycats();
@@ -157,7 +160,7 @@ fewer_cats = omit(cats, name = samples(cats)[1:10]);
 popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
 """
-function popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
+function popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
     open(filename, "w") do outfile
         println(outfile, "genepop generated from PopData by PopGen.jl")
         if format in ["h", "horizontal"]
@@ -170,8 +173,11 @@ function popdata2genepop(data::PopData; filename::String = "output.gen", digits:
             println(outfile, "POP")
             pops = [unique(data.loci.population)[1]]
             for (keys, sample) in pairs(groupby(data.loci, [:name, :population]))
-                print(outfile, sample.name[1], ",\t")
-                format_geno = unphase.(sample.genotype, digits = digits)
+                samplename = sample.name[1]
+                sample_ploidy = convert(Int, data.meta.ploidy[data.meta.name .== samplename][1])
+                #return sample_ploidy
+                print(outfile, samplename, ",\t")
+                format_geno = unphase.(sample.genotype, digits = digits, ploidy = sample_ploidy, miss = miss)
                 [print(outfile, i, "\t") for i in format_geno[1:end-1]]
                 print(outfile, format_geno[end], "\n" )
                 if keys.population != pops[end]
@@ -185,7 +191,7 @@ function popdata2genepop(data::PopData; filename::String = "output.gen", digits:
                 long = data.meta[data.meta.name .== keys.name, :longitude][1]
                 lat = data.meta[data.meta.name .== keys.name, :latitude][1]
                 print(outfile, long, "\t", lat, "\t", keys.name, ",\t")
-                format_geno = unphase.(sample.genotype, digits = digits)
+                format_geno = unphase.(sample.genotype, digits = digits, ploidy = sample_ploidy, miss = miss)
                 [print(outfile, i, "\t") for i in format_geno[1:end-1]]
                 print(outfile, format_geno[end], "\n" )
             end

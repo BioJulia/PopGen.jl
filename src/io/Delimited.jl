@@ -93,7 +93,7 @@ end
 const csv = delimited
 
 """
-    popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
+    popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
 Write PopData to a text-delimited file.
 ### Keyword Arguments
 - `filename`: a `String` of the output filename
@@ -101,7 +101,10 @@ Write PopData to a text-delimited file.
 - `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format
   - `wide` : the standard format CSV for importing into PopGen.jl
   - `long` : the `loci` table with `longitude` and `latitude` columns added
-- `delim` : the `String` delimiter to use for writing the file.
+- `delim` : the `String` delimiter to use for writing the file
+- `miss` : an `Integer` for how you would like missing values written 
+    - `0` : As a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 
+    - `-9` : As a single value `-9`
 
 ### Example
 ```julia
@@ -110,20 +113,27 @@ fewer_cats = omit(cats, name = samples(cats)[1:10]);
 popdata2delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
 ```
 """
-function popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
-    unphased_df = select(data.loci, 1:3, 4 => (i -> unphase.(i, digits = digits)) => :genotype)
+function popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
+    unphased_df = insertcols!(copy(data.loci), :string_geno => fill("", length(data.loci.name)))
+    grp_df = groupby(unphased_df, :name)
+    for sample in grp_df
+        samplename = sample.name[1]
+        sample_ploidy = convert(Int, data.meta.ploidy[data.meta.name .== samplename][1])
+        sample.string_geno .= unphase.(sample.genotype, digits = digits, ploidy = sample_ploidy, miss = miss)
+    end
+    select!(unphased_df, 1, 2, 3, 5)
     if format == "wide"
-        wide_df = DataFrames.unstack(unphased_df, :locus, :genotype)
+        wide_df = DataFrames.unstack(unphased_df, :locus, :string_geno)
         insertcols!(wide_df, 3, :longitude => data.meta.longitude, :latitude => data.meta.latitude)
         CSV.write(filename, wide_df, delim = delim) ;
         return
     else
         out_df = sort(
-                    transform(
-                        unphased_df, 1:2,
-                        3 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :longitude,
-                        4 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :latitude, 3:4
-                        )
+            transform(
+                unphased_df, 1:2,
+                3 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :longitude,
+                4 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :latitude, 3:4
+                )
                     )
         for i in 1:length(data.meta.name)
             out_df[out_df.name .== data.meta.name[i], :longitude] .= data.meta.longitude[i]

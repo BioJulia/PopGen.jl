@@ -85,24 +85,34 @@ end
 end
 
 """
-    unphase(geno::T; digits::Int = 3) where T <: Genotype
+    unphase(geno::T; digits::Int = 3, ploidy::Int = 2, miss::Int = 0) where T <: Genotype
 Takes a `Genotype` (e.g. `(131, 94)`) and returns a string of concatenated
 alleles padded with *n* number of zeroes, where *n* is given by `digits = `.
-`missing` values are returned as `"-9"`.
+`missing` values are returned as either a string of 'digits × ploidy' zeroes (`miss = 0`)
+or `"-9"` (`miss = -9`). The `ploidy` flag is only relevant for unphasing `missing` genotypes
+and not used otherwise.
 
 ### Example
 ```
 unphase((1,2,3,4), digits = 3)
 "001002003004"
 
-unphase(missing, digits = 2)
+unphase(missing, digits = 2, ploidy = 2, miss = -9)
 "-9"
+
+unphase(missing, digits = 2, ploidy = 2, miss = 0)
+"0000"
 ```
 """
-function unphase(geno::T; digits::Int = 3) where T <: Genotype
+function unphase(geno::T; digits::Int = 3, ploidy::Int = 2, miss::Int = 0) where T <: Genotype
     join(map(i -> lpad(i, digits, "0"), geno))
 end
 
-function unphase(geno::Missing; digits::Int = 3)
-    return "-9"
+
+function unphase(geno::Missing; digits::Int = 3, ploidy::Int, miss::Int = 0)
+    if miss == 0
+        return "0"^(digits * ploidy)
+    else
+        return "$miss"
+    end
 end
