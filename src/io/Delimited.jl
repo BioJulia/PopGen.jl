@@ -42,12 +42,12 @@ lizardsCA = delimited("CA_lizards.csv", digits = 3);
 
 ### Formatting example:
 ```
-name,population,long,lat,Locus1,Locus2,Locus3   \n
-sierra_01,mountain,11.11,-22.22,001001,-9,001001   \n
-sierra_02,mountain,11.12,-22.21,001001,001001,001002   \n
-snbarb_01,coast,,,001001,000000,001002 \n
-snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
-snbarb_03,coast,11.15,,001002,001001,001001 \n
+name,population,long,lat,Locus1,Locus2,Locus3 
+sierra_01,mountain,11.11,-22.22,001001,-9,001001
+sierra_02,mountain,11.12,-22.21,001001,001001,001002
+snbarb_01,coast,,,001001,000000,001002
+snbarb_02,coast,11.14,-22.24,001001,001001,001001
+snbarb_03,coast,11.15,,001002,001001,001001
 ```
 """
 function delimited(
@@ -114,13 +114,16 @@ popdata2delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, f
 ```
 """
 function popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
+    # create empty String column
     unphased_df = insertcols!(copy(data.loci), :string_geno => fill("", length(data.loci.name)))
+    # grouping to facilitate pulling out ploidy values for coding missing genotypes
     grp_df = groupby(unphased_df, :name)
     for sample in grp_df
         samplename = sample.name[1]
         sample_ploidy = convert(Int, data.meta.ploidy[data.meta.name .== samplename][1])
         sample.string_geno .= unphase.(sample.genotype, digits = digits, ploidy = sample_ploidy, miss = miss)
     end
+    # pop out original genotype column
     select!(unphased_df, 1, 2, 3, 5)
     if format == "wide"
         wide_df = DataFrames.unstack(unphased_df, :locus, :string_geno)
