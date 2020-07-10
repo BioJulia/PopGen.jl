@@ -70,7 +70,8 @@ include("io/Datasets.jl")
 # utility functions
 include("Utils.jl")
 include("Permutations.jl")
-# manipulation commands
+# manipulation and exploration
+include("DataExploration.jl")
 include("Manipulate.jl")
 # allele frequency and heterozygosity functions
 include("AlleleFreq.jl")
