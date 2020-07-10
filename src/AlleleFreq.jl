@@ -150,20 +150,16 @@ function geno_count_expected(locus::T) where T<:GenoArray
     allele_dict = allele_freq(locus)
 
     ## split the appropriate pairs into their own vectors
-    alle, freq = string.(keys(allele_dict)), collect(values(allele_dict))
+    alle, freq = collect(keys(allele_dict)), collect(values(allele_dict))
     #return alle, freq
     ## calculate expected genotype frequencies by multiplying all-by-all x n
     expected_genotype_freq = vec(freq * freq' .* n)
 
-    ## regenerate genotypes by concatenating alleles and re-phasing them with
-    ## same all-by-all approach
-    alle = lpad.(alle, 4, "0")    # cheat by padding strings
-    genos = phase.(vec(alle .* permutedims(alle)), Int16, 4)
-
-    # reform genotype frequencies into a Dict
+    # reform genotype frequencies with same all-by-all approach
+    genos = reverse.(Base.Iterators.product(alle, alle) |> collect |> vec)
     expected = Dict{Tuple, Float64}()
     for (geno, freq) in zip(genos, expected_genotype_freq)
-        expected[geno] = get!(expected, geno, 0) + freq
+        expected[geno] = get!(expected, geno, 0.0) + freq
     end
 
     return expected
@@ -211,7 +207,7 @@ function geno_freq(data::PopData, locus::String, population::Bool=false)
     end
 end
 
-
+#TODO replace allele creation with Base.Iterators.product
 """
     geno_freq_expected(locus::T) where T<:GenoArray
 Return a `Dict` of the expected genotype frequencies of a single locus in a
@@ -224,15 +220,13 @@ function geno_freq_expected(locus::T) where T<:GenoArray
     allele_dict = allele_freq(locus)
 
     ## split the appropriate pairs into their own vectors
-    alle, freq = string.(keys(allele_dict)), collect(values(allele_dict))
-    #return alle, freq
+    alle, freq = collect(keys(allele_dict)), collect(values(allele_dict))
+
     ## calculate expected genotype frequencies by multiplying all-by-all
     expected_genotype_freq = vec(freq * freq')
 
-    ## regenerate genotypes by concatenating alleles and re-phasing them with
-    ## same all-by-all approach
-    alle = lpad.(alle, 4, "0")    # cheat by padding strings
-    genos = phase.(vec(alle .* permutedims(alle)), Int16, 4)
+    # reform genotype frequencies with same all-by-all approach
+    genos = reverse.(Base.Iterators.product(alle, alle) |> collect |> vec)
 
     # reform genotype frequencies into a Dict
     expected = Dict{Tuple, Float64}()
