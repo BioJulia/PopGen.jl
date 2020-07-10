@@ -2,7 +2,7 @@
 These are commands that are for the general manipulation and viewing of the
 PopData type. The appear in alphabetical order.
 =#
-export locations, locations!, loci, locus, get_genotypes, get_sample_genotypes, missing, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
+export locations, locations!, loci, locus, get_genotypes, get_genotypes, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
 
 """
     locations(data::PopData)
@@ -135,14 +135,14 @@ end
 
 
 """
-    get_sample_genotypes(data::PopData, sample::String)
+    get_genotypes(data::PopData, sample::String)
 Return all the genotypes of a specific sample in a `PopData` object.
 ```
 cats = nancycats()
 get_sample_genotypes(cats, "N115")
 ```
 """
-function get_sample_genotypes(data::PopObj, sample::String)
+function get_genotypes(data::PopObj, sample::String)
     @view data.loci[data.loci.name .== sample, :genotype]
 end
 
@@ -159,53 +159,6 @@ locus(gulfsharks(), "contig_475")
 function locus(data::PopData, locus::String)
     @view data.loci[data.loci.locus .== locus, :genotype]
     #@where(data.loci, :locus .== locus)[! , :genotype]
-end
-
-
-#### Find missing ####
-"""
-    missing(data::PopData; by::String = "sample")
-Get missing genotype information in a `PopData`. Specify a mode of operation
-to return a DataFrame corresponding with that missing information.
-
-#### Modes
-- "sample" - returns a count and list of missing loci per individual (default)
-- "pop" - returns a count of missing genotypes per population
-- "locus" - returns a count of missing genotypes per locus
-- "full" - returns a count of missing genotypes per locus per population
-
-### Example:
-```
-missing(gulfsharks(), by = "pop")
-```
-"""
-
-@inline function Base.missing(data::PopData; by::String = "sample")
-    if by ∈ ["sample", "individual"]
-        DataFrames.combine(
-            DataFrames.groupby(data.loci, :name),
-            :genotype => (i -> count(ismissing, i)) => :missing
-        )
-    elseif by ∈ ["pop", "population"]
-                DataFrames.combine(
-            DataFrames.groupby(data.loci, :population),
-            :genotype => (i -> count(ismissing, i)) => :missing
-        )
-    elseif by ∈ ["locus", "loci"]
-        DataFrames.combine(
-            DataFrames.groupby(data.loci, :locus),
-            :genotype => (i -> count(ismissing, i)) => :missing
-        )
-
-    elseif by ∈ ["detailed", "full"]
-        DataFrames.combine(
-            DataFrames.groupby(data.loci, [:locus, :population]),
-            :genotype => (i -> count(ismissing, i)) => :missing
-        )
-    else
-        @error "Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"
-        missing(data)
-    end
 end
 
 
