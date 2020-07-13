@@ -291,7 +291,7 @@ function exclude!(data::PopData; kwargs...)
     # populations
     # check for keywords
     filt_pop = get.(Ref(filter_by), [:population, :populations], nothing)
-    filt_pop = filt_pop[filt_pop .!= nothing]
+    filt_pop = filt_pop[filt_pop .!== nothing]
     if length(filt_pop) != 0
         filt_pop = filt_pop[begin]
         if typeof(filt_pop) == String
@@ -317,7 +317,7 @@ function exclude!(data::PopData; kwargs...)
     # samples
     # check for keywords
     filt_name = get.(Ref(filter_by), [:name, :names, :sample, :samples], nothing)
-    filt_name = filt_name[filt_name .!= nothing]
+    filt_name = filt_name[filt_name .!== nothing]
     if length(filt_name) != 0
         filt_name = filt_name[begin]
         if typeof(filt_name) == String
