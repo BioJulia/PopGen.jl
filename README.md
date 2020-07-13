@@ -1,5 +1,5 @@
 ![error_cactus](/static/img/logo_banner.png)
-
+![build_status](https://img.shields.io/github/workflow/status/pdimens/PopGen.jl/documentation?label=Build%20Status&logo=GitHub&style=for-the-badge)
 # Website
 The documentation website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
 
