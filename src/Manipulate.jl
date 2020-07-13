@@ -1,8 +1,67 @@
-#=
-These are commands that are for the general manipulation and viewing of the
-PopData type. The appear in alphabetical order.
-=#
-export locations, locations!, loci, locus, get_genotypes, get_genotypes, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
+export add_meta!, locations, locations!, loci, locus, get_genotypes, get_genotypes, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
+
+"""
+    add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
+Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Metadata 
+must be in the same order as the samples in `PopData.meta`.
+
+#### Arguments
+- `popdata` : The `PopData` object to add information to
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+
+#### Keyword Arguments
+- `name` : String of the name of this new column
+- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
+"""
+function add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
+    length(metadata) != length(popdata.meta.name) && error("Provided metadata vector (n = $length(metadata)) and samples in PopData (n = $length(popdata.meta.name)) have different lengths")
+    @info "Adding $Symbol(name) column to .meta dataframe"
+    # add to meta
+    insertcols!(popdata.meta, Symbol(name) => metadata)
+
+    # add to loci
+    if loci
+        @info "Adding $Symbol(name) column to .meta and .loci dataframes"
+        tmp = DataFrame(:name => popdata.meta.name, Symbol(name) => metadata)
+        popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
+        categorical == true && categorical!(popdata.loci, Symbol(name), compress = true)
+    end
+    return
+end
+
+"""
+    add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
+Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Takes a vector of
+sample names if the metadata is not in the same order as samples appear in `PopData.meta`.
+
+#### Arguments
+- `popdata` : The `PopData` object to add information to
+- `sample` : A `Vector{String}` of sample names corresponding to the order of the `metadata` 
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+
+#### Keyword Arguments
+- `name` : String of the name of this new column
+- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
+"""
+function add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true) where T <: AbstractVector
+    length(samples) != length(popdata.meta.name) && error("Provided sample vector (n = $length(samples)) and samples in PopData (n = $length(popdata.meta.name)) have different lengths")
+    length(samples) != length(metadata) && error("Sample names (n = $length(samples)) and metadata vectors (n = $length(metadata)) have different lengths")
+    sort(samples) != sort(popdata.meta.name) && error("Sample names are not identical")
+    @info "Adding $Symbol(name) column to .meta dataframe"
+
+    tmp = DataFrame(:name => samples, Symbol(name) => metadata)
+    popdata.meta = outerjoin(popdata.meta, tmp, on = :name)
+
+    if loci
+        @info "Adding $Symbol(name) column to .meta and .loci dataframes"
+        popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
+        categorical == true && categorical!(popdata.loci, Symbol(name), compress = true)
+    end
+    return
+end
+
 
 """
     locations(data::PopData)
