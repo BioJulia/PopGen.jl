@@ -2,6 +2,7 @@
 /Manifest.toml
 /README.md
 /dev/
+/.github/
 # Dependencies
 /node_modules
 
