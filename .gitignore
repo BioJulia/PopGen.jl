@@ -1,5 +1,6 @@
 .DS_Store
 /Manifest.toml
+/README.md
 /dev/
 # Dependencies
 /node_modules
