@@ -19,20 +19,21 @@ Load a Genepop format file into memory as a PopData object.
 - File is *tab or space delimted* (but not both!)
 
 ### Genepop file example:
-wasp_hive.gen: Wasp populations in New York \n
-Locus1\n
-Locus2\n
-Locus3\n
-pop\n
-Oneida_01,  250230  564568  110100\n
-Oneida_02,  252238  568558  100120\n
-Oneida_03,  254230  564558  090100\n
-pop\n
-Newcomb_01, 254230  564558  080100\n
-Newcomb_02, 000230  564558  090080\n
-Newcomb_03, 254230  000000  090100\n
-Newcomb_04, 254230  564000  090120\n
-
+```
+wasp_hive.gen: Wasp populations in New York
+Locus1
+Locus2
+Locus3
+pop
+Oneida_01,  250230  564568  110100
+Oneida_02,  252238  568558  100120
+Oneida_03,  254230  564558  090100
+pop
+Newcomb_01, 254230  564558  080100
+Newcomb_02, 000230  564558  090080
+Newcomb_03, 254230  000000  090100
+Newcomb_04, 254230  564000  090120
+```
 ## Example
 ```
 waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
@@ -96,7 +97,7 @@ function genepop(
 
     diploid ? type = nothing : type = String
 
-    geno_parse = CSV.read(
+    geno_parse = CSV.File(
         infile,
         delim = delim,
         header = coln,
@@ -137,4 +138,64 @@ function genepop(
     )
 
     PopData(sample_table, geno_parse)
+end
+
+"""
+    popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
+Writes a `PopData` object to a Genepop-formatted file.
+- `data`: the `PopData` object you wish to convert to a Genepop file
+### keyword arguments
+- `filename`: a `String` of the output filename
+- `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
+- `format` : a `String` indicating whether loci should be formatted
+    - vertically (`"v"` or `"vertical"`)
+    - hortizontally (`"h"`, or `"horizontal"`)
+    - Genepop Isolation-By-Distance (`"ibd"`) where each sample is a population with long/lat data prepended
+- `miss` : an `Integer` for how you would like missing values written 
+    - `0` : As a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 
+    - `-9` : As a single value `-9`
+
+```julia
+cats = nancycats();
+fewer_cats = omit(cats, name = samples(cats)[1:10]);
+popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
+```
+"""
+function popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
+    open(filename, "w") do outfile
+        println(outfile, "genepop generated from PopData by PopGen.jl")
+        if format in ["h", "horizontal"]
+            [print(outfile, i, ",") for i in loci(data)[1:end-1]];
+            print(outfile, loci(data)[end], "\n")
+        else
+            [println(outfile,i) for i in loci(data)];
+        end
+        if lowercase(format) != "ibd"
+            println(outfile, "POP")
+            pops = unique(data.loci.population)[1:1]
+            for (keys, sample) in pairs(groupby(data.loci, [:name, :population]))
+                samplename = sample.name[1]
+                sample_ploidy = convert(Int, data.meta.ploidy[data.meta.name .== samplename][1])
+                #return sample_ploidy
+                print(outfile, samplename, ",\t")
+                format_geno = unphase.(sample.genotype, digits = digits, ploidy = sample_ploidy, miss = miss)
+                [print(outfile, i, "\t") for i in format_geno[1:end-1]]
+                print(outfile, format_geno[end], "\n" )
+                if keys.population != pops[end]
+                    println(outfile, "POP")
+                    push!(pops, keys.population)
+                end
+            end
+        else
+            for (keys, sample) in pairs(groupby(data.loci, :name))
+                println(outfile, "POP")
+                long = data.meta[data.meta.name .== keys.name, :longitude][1]
+                lat = data.meta[data.meta.name .== keys.name, :latitude][1]
+                print(outfile, long, "\t", lat, "\t", keys.name, ",\t")
+                format_geno = unphase.(sample.genotype, digits = digits, ploidy = sample_ploidy, miss = miss)
+                [print(outfile, i, "\t") for i in format_geno[1:end-1]]
+                print(outfile, format_geno[end], "\n" )
+            end
+        end
+    end
 end

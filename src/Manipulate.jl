@@ -1,8 +1,67 @@
-#=
-These are commands that are for the general manipulation and viewing of the
-PopData type. The appear in alphabetical order.
-=#
-export locations, locations!, loci, locus, get_genotypes, get_sample_genotypes, missing, populations, population, populations!, population!, reindex, exclude_loci, remove_loci, omit_loci, exclude_samples, remove_samples, omit_samples, samples
+export add_meta!, locations, locations!, loci, locus, get_genotypes, get_genotype, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
+
+"""
+    add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
+Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Metadata 
+must be in the same order as the samples in `PopData.meta`.
+
+#### Arguments
+- `popdata` : The `PopData` object to add information to
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+
+#### Keyword Arguments
+- `name` : String of the name of this new column
+- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
+"""
+function add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
+    length(metadata) != length(popdata.meta.name) && error("Provided metadata vector (n = $length(metadata)) and samples in PopData (n = $length(popdata.meta.name)) have different lengths")
+    @info "Adding $Symbol(name) column to .meta dataframe"
+    # add to meta
+    insertcols!(popdata.meta, Symbol(name) => metadata)
+
+    # add to loci
+    if loci
+        @info "Adding $Symbol(name) column to .meta and .loci dataframes"
+        tmp = DataFrame(:name => popdata.meta.name, Symbol(name) => metadata)
+        popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
+        categorical == true && categorical!(popdata.loci, Symbol(name), compress = true)
+    end
+    return
+end
+
+"""
+    add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
+Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Takes a vector of
+sample names if the metadata is not in the same order as samples appear in `PopData.meta`.
+
+#### Arguments
+- `popdata` : The `PopData` object to add information to
+- `sample` : A `Vector{String}` of sample names corresponding to the order of the `metadata` 
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+
+#### Keyword Arguments
+- `name` : String of the name of this new column
+- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
+"""
+function add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true) where T <: AbstractVector
+    length(samples) != length(popdata.meta.name) && error("Provided sample vector (n = $length(samples)) and samples in PopData (n = $length(popdata.meta.name)) have different lengths")
+    length(samples) != length(metadata) && error("Sample names (n = $length(samples)) and metadata vectors (n = $length(metadata)) have different lengths")
+    sort(samples) != sort(popdata.meta.name) && error("Sample names are not identical")
+    @info "Adding $Symbol(name) column to .meta dataframe"
+
+    tmp = DataFrame(:name => samples, Symbol(name) => metadata)
+    popdata.meta = outerjoin(popdata.meta, tmp, on = :name)
+
+    if loci
+        @info "Adding $Symbol(name) column to .meta and .loci dataframes"
+        popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
+        categorical == true && categorical!(popdata.loci, Symbol(name), compress = true)
+    end
+    return
+end
+
 
 """
     locations(data::PopData)
@@ -48,7 +107,7 @@ function locations!(data::PopData, long::Vector{T}, lat::Vector{T}) where T <: A
     # convert to the right type and use locations!()
     lat_adjust = lat |> Vector{Union{Missing, Float32}}
     long_adjust = long |> Vector{Union{Missing, Float32}}
-    locations!(data, lat = lat_adjust, long = long_adjust)
+    locations!(data, long = long_adjust, lat = lat_adjust)
 end
 
 
@@ -110,9 +169,24 @@ function loci(data::PopData)
     levels(data.loci.locus)
 end
 
+
+"""
+    get_genotype(data::PopObj; sample::String, locus::String)
+Return the genotype of one sample at one locus in a `PopData` object.
+### Example
+```
+cats = nancycats();
+get_genotype(cats, sample = "N115", locus = "fca8")
+```
+"""
+function get_genotype(data::PopData; sample::String, locus::String)
+    @views data.loci[(data.loci.name .== sample) .& (data.loci.locus .== locus), :genotype][1]
+end
+
+
 """
     get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
-Return the genotype(s) of one or more `samples` for one or more
+Return a table of the genotype(s) of one or more `samples` for one or more
 specific `loci` (both as keywords) in a `PopData` object.
 ### Examples
 ```
@@ -123,27 +197,27 @@ get_genotype(cats, sample = "N115" , locus = ["fca8", "fca37"])
 get_genotype(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
 ```
 """
-function get_genotype(data::PopData, sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
+function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
     if typeof(sample) == String
         sample = [sample]
     end
     if typeof(locus) == String
         locus = [locus]
     end
-    @where(data.loci, :name .∈ Ref(sample), :locus .∈ Ref(locus))
+    @view data.loci[(data.loci.name .∈ Ref(sample)) .& (data.loci.locus .∈ Ref(locus)), :] 
 end
 
 
 """
-    get_sample_genotypes(data::PopData, sample::String)
-Return all the genotypes of a specific sample in a `PopData` object.
+    get_genotypes(data::PopData, sample::String)
+Return a vector of all the genotypes of a sample in a `PopData` object.
 ```
 cats = nancycats()
-get_sample_genotypes(cats, "N115")
+get_genotypes(cats, "N115")
 ```
 """
-function get_sample_genotypes(data::PopObj, sample::String)
-    @where(data.loci, :name .== sample)[! , :genotype]
+function get_genotypes(data::PopObj, sample::String)
+    @view data.loci[data.loci.name .== sample, :genotype]
 end
 
 
@@ -157,48 +231,10 @@ locus(gulfsharks(), "contig_475")
 ```
 """
 function locus(data::PopData, locus::String)
-    @where(data.loci, :locus .== locus)[! , :genotype]
+    @view data.loci[data.loci.locus .== locus, :genotype]
+    #@where(data.loci, :locus .== locus)[! , :genotype]
 end
 
-
-#### Find missing ####
-"""
-    missing(data::PopData; by::String = "sample")
-Get missing genotype information in a `PopData`. Specify a mode of operation
-to return a DataFrame corresponding with that missing information.
-
-#### Modes
-- "sample" - returns a count and list of missing loci per individual (default)
-- "pop" - returns a count of missing genotypes per population
-- "locus" - returns a count of missing genotypes per locus
-- "full" - returns a count of missing genotypes per locus per population
-
-### Example:
-```
-missing(gulfsharks(), by = "pop")
-```
-"""
-@inline function Base.missing(data::PopData; by::String = "sample")
-    if by ∈ ["sample", "individual"]
-        return @by(data.loci, :name, missing = count(ismissing, :genotype))
-
-    elseif by ∈ ["pop", "population"]
-        return @by(data.loci, :population, missing = count(ismissing, :genotype))
-
-    elseif by ∈ ["locus", "loci"]
-        return @by(data.loci, :locus, missing = count(ismissing, :genotype))
-
-    elseif by ∈ ["detailed", "full"]
-        return @by(data.loci, [:locus, :population], missing = count(ismissing, :genotype))
-    else
-        @error "Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"
-        missing(data)
-    end
-end
-
-@inline function Base.missing(data::PopData, by::String = "sample")
-    missing(data, by = mode)
-end
 
 """
     populations(data::PopData; listall::Bool = false)
@@ -207,18 +243,19 @@ View unique population ID's and their counts in a `PopData`.
 - `listall = true` displays all samples and their `population` instead (default = `false`)
 """
 @inline function populations(data::PopData; listall::Bool = false)
-    if listall == true
-        return @select(data.meta, :name, :population)
+    if all(ismissing.(data.meta.population)) == true
+        @info "no population data present in PopData"
+        return
+    elseif listall == true
+        return @view data.meta[!, [:name, :population]]
     else
-        if all(ismissing.(data.meta.population)) == true
-            @info "no population data present in PopData"
-            return populations(data, listall = true)
-        end
-        return @by(data.meta, :population, count = length(:population))
+        DataFrames.combine(
+            DataFrames.groupby(data.meta, :population),
+            nrow => :count
+        )
     end
 end
 
-#TODO all the populations! functions
 """
 ```
 # Replace by matching
@@ -247,7 +284,7 @@ populations!(potatoes, potatopops)
 ## Reassign using samples and new population assignments
 Completely reassign populations for each individual. Takes two vectors of strings
 as input: one of the sample names, and the other with their new corresponding
-population name.
+population name. This can be useful to change population names for only some individuals.
 
 \n**Example**
 ```
@@ -266,7 +303,6 @@ function populations!(data::PopData, rename::Dict)
     end
     msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
     recode!(data.loci.population,rename...)
-    show(populations(data))
     return
 end
 
@@ -279,12 +315,14 @@ function populations!(data::PopData, rename::Vector{String})
 end
 
 function populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
-    for (i,j) in zip(samples, populations)
-        data.meta[data.meta.name .== i, :population] .= j
-        data.loci[data.loci.name .== i, :population] .= j
+    meta_pops = deepcopy(populations)
+    meta_df = groupby(data.meta, :name)
+    loci_df = groupby(data.loci, :name)
+    for (sample, new_pop) in zip(samples, populations)
+        meta_df[(name = sample,)].population .= new_pop
+        loci_df[(name = sample,)].population .= new_pop
     end
     droplevels!(data.loci.population)
-    show(populations(data))
     return
 end
 
@@ -293,90 +331,163 @@ const population! = populations!
 const popnames! = populations!
 
 ##### Exclusion #####
-#=
-To have a built-in "undo button", exclusion functions return new PopData objects
-with the specified loci/samples removed rather than overwriting the original.
-=#
 """
-```
-exclude_loci(data::PopData, locus::String)
-exclude_loci(data::PopData, loci::Vector{String})
-```
-Exclude selected loci from a `PopData` object. Returns a new `PopData` object,
-leaving the original intact. Synonymous with `omit_loci` and `remove_loci`.
+    exclude!(data::PopData, kwargs...)
+Edit a `PopData` object in-place by excluding all occurences of the specified information.
+The keywords can be used in any combination. Synonymous with `omit!` and `remove!`.
 
-### Examples
+### Keyword Arguments
+#### `locus`
+A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
+The keyword `loci` also works.
+
+#### `population`
+A `String` or `Vector{String}` of populations you want to remove from the `PopData`
+The keyword `populations` also works.
+
+#### `name`
+A `String` or `Vector{String}` of samples you want to remove from the `PopData`
+The keywords `names`, `sample`, and `samples` also work.
+
+**Examples**
 ```
-new_cats = exclude_loci(nancycats(), "fca8")
-very_new_cats = exclude_loci(nancycats(), ["fca8", "fca23"])
+cats = nancycats();
+exclude!(cats, name = "N100", population = ["1", "15"])
+exclude!(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
+exclude!(cats, names = "N102", loci = "fca8", population = "3")
 ```
 """
-function exclude_loci(data::PopData, locus::String)
-    locus ∉ loci(data) && error("Locus \"$locus\" not found")
-    new_table = @where(data.loci, :locus .!= locus)
-    droplevels!(new_table.locus)
-    return PopData(data.meta, new_table)
-end
-
-function exclude_loci(data::PopData, exloci::Vector{String})
-    msg = ""
-    all_loci = loci(data)
-    for each in exloci
-        if each ∉ all_loci
-            msg *= "\n  locus \"$each\" not found"
+function exclude!(data::PopData; kwargs...)
+    filter_by = Dict(kwargs...)
+    tmp = data
+    filter_params = keys(filter_by) |> collect
+    notices = ""
+    # populations
+    # check for keywords
+    filt_pop = get.(Ref(filter_by), [:population, :populations], nothing)
+    filt_pop = filt_pop[filt_pop .!== nothing]
+    if length(filt_pop) != 0
+        filt_pop = filt_pop[begin]
+        if typeof(filt_pop) == String
+            filt_pop = [filt_pop]
         end
-    end
-    new_table =  @where data.loci :locus .∉ Ref(exloci)
-    msg != "" && printstyled("Warnings:", color = :yellow) ; println(msg)
-    droplevels!(new_table.locus)
-    return PopData(data.meta, new_table)
-end
-
-const omit_loci = exclude_loci
-const remove_loci = exclude_loci
-
-"""
-    exclude_samples(data::PopData, samp_id::Union{Vector{String}})
-Exclude selected samples from a `PopData` object. Returns a new `PopData` object,
-leaving the original intact. Synonymous with `omit_samples` and `remove_samples`.
-
-### Examples
-```
-exclude_samples(nancycats, "N100")
-exclude_samples(nancycats, ["N100", "N102", "N211"])
-```
-"""
-function exclude_samples(data::PopData, samp_id::String)
-    samp_id ∉ samples(data) && error("Sample \"$samp_id\" not found")
-    new_loc_table = @where(data.loci, :name .!= samp_id)
-    new_meta_table = @where(data.meta, :name .!= samp_id)
-    droplevels!(new_loc_table.locus)
-    return PopData(new_meta_table, new_loc_table)
-end
-
-
-function exclude_samples(data::PopData, samp_ids::Vector{String})
-    msg = ""
-    all_samp = samples(data)
-    for each in samp_ids
-        if each ∉ all_samp
-            msg *= "\n  Sample \"$each\" not found"
+        err = filt_pop[filt_pop .∉ Ref(unique(tmp.meta.population))]
+        if length(err) > 0
+            [notices *= "\n  population \"$i\" not found" for i in err]
         end
+        # choose the cheaper method
+        all_pops = levels(tmp.loci.population)
+        if length(filt_pop) < length(all_pops)/2
+            filter!(:population => x -> x ∉ filt_pop, tmp.loci)
+            filter!(:population => x -> x ∉ filt_pop, tmp.meta)
+        else
+            keep = all_pops[all_pops .∉ Ref(filt_pop)]
+            filter!(:population => x -> x in filt_pop, tmp.loci)
+            filter!(:population => x -> x in filt_pop, tmp.meta)
+        end
+        droplevels!(tmp.loci.population)
     end
-    new_loc_table = @where(data.loci, :name .∉  Ref(samp_ids))
-    new_meta_table = @where(data.meta, :name .∉  Ref(samp_ids))
-    msg != "" && printstyled("Warnings:", color = :yellow) ; println(msg)
-    droplevels!(new_loc_table.locus)
-    return PopData(new_meta_table, new_loc_table)
+
+    # samples
+    # check for keywords
+    filt_name = get.(Ref(filter_by), [:name, :names, :sample, :samples], nothing)
+    filt_name = filt_name[filt_name .!== nothing]
+    if length(filt_name) != 0
+        filt_name = filt_name[begin]
+        if typeof(filt_name) == String
+            filt_name = [filt_name]
+        end
+        err = filt_name[filt_name .∉ Ref(tmp.meta.name)]
+        if length(err) > 0
+            [notices *= "\n  sample \"$i\" not found" for i in err]
+        end
+        # choose the cheaper method
+        all_samples = tmp.meta.name
+        if length(filt_name) < length(all_samples)/2
+            filter!(:name => x -> x ∉ filt_name, tmp.loci)
+            filter!(:name => x -> x ∉ filt_name, tmp.meta)
+        else
+            keep = all_samples[all_samples .∉ Ref(filt_name)]
+            filter!(:name => x -> x in keep, tmp.loci)
+            filter!(:name => x -> x in keep, tmp.meta)
+        end
+        droplevels!(tmp.loci.name)
+    end
+
+    # loci
+    # check for keywords
+    filt_loci = get.(Ref(filter_by), [:locus, :loci], nothing)
+    filt_loci = filt_loci[filt_loci .!= nothing]
+    if length(filt_loci) != 0
+        filt_loci = filt_loci[begin]
+        if typeof(filt_loci) == String
+            filt_loci = [filt_loci]
+        end
+        err = filt_loci[filt_loci .∉ Ref(loci(tmp))]
+        if length(err) > 0
+            [notices *= "\n  locus \"$i\" not found" for i in err]
+        end
+        # choose the cheaper method
+        all_loci = loci(tmp)
+        if length(filt_loci) < length(all_loci)/2
+            filter!(:locus => x -> x ∉ filt_loci, tmp.loci)
+        else
+            keep = all_loci[all_loci .∉ Ref(filt_loci)]
+            filter!(:locus => x -> x in keep, tmp.loci)
+        end
+        droplevels!(tmp.loci.locus)
+    end
+
+    # print the notices, if any
+    if notices != ""
+        printstyled("Notices:", bold = true, color = :blue)
+        print(notices, "\n\n")
+    end
+    return tmp
 end
 
-const omit_samples = exclude_samples
-const remove_samples = exclude_samples
+const omit! = exclude!
+const remove! = exclude!
+
+"""
+    exclude(data::PopData, kwargs...)
+Returns a new `PopData` object excluding all occurrences of the specified keywords.
+The keywords can be used in any combination. Synonymous with `omit` and `remove`.
+
+### Keyword Arguments
+#### `locus`
+A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
+The keyword `loci` also works.
+
+#### `population`
+A `String` or `Vector{String}` of populations you want to remove from the `PopData`.
+The keyword `populations` also works.
+
+#### `name`
+A `String` or `Vector{String}` of samples you want to remove from the `PopData`.
+The keywords `names`, `sample`, and `samples` also work.
+
+**Examples**
+```
+cats = nancycats();
+exclude(cats, name = "N100", population = ["1", "15"])
+exclude(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
+exclude(cats, names = "N102", loci = "fca8", population = "3")
+```
+"""
+function exclude(data::PopData; kwargs...)
+    tmp = copy(data)
+    exclude!(tmp; kwargs...)
+    return tmp
+end
+
+const omit = exclude
+const remove = exclude
 
 """
     samples(data::PopData)
 View individual/sample names in a `PopData`
 """
 function samples(data::PopData)
-    data.meta.name
+    @view data.meta[!, :name]
 end

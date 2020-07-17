@@ -3,13 +3,14 @@ This file handles the import/export of delmited file formats
 =#
 
 export delimited, csv
-#TODO update API docs
 """
     delimited(infile::String; delim::Union{Char,String,Regex} = "auto", digits::Int64 = 3, silent::Bool = false)
 Load a delimited-type file into memory as a PopData object. *There should be no empty cells
 in your file*
 ### Arguments
 - `infile` : path to file
+
+### Keyword Arguments
 - `delim` : delimiter characters. By default uses auto-parsing of `CSV.File`
 - `digits` : number of digits denoting each allele (default: `3`)
 - `diploid`  : whether samples are diploid for parsing optimizations (default: `true`)
@@ -36,17 +37,17 @@ blank, otherwise there will be transcription errors! (look at line 3 in the exam
 
 ## Example
 ```
-lizardsCA = Read.delimited("CA_lizards.csv", digits = 3);
+lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
 
 ### Formatting example:
 ```
-name,population,long,lat,Locus1,Locus2,Locus3   \n
-sierra_01,mountain,11.11,-22.22,001001,-9,001001   \n
-sierra_02,mountain,11.12,-22.21,001001,001001,001002   \n
-snbarb_01,coast,,,001001,000000,001002 \n
-snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
-snbarb_03,coast,11.15,,001002,001001,001001 \n
+name,population,long,lat,Locus1,Locus2,Locus3 
+sierra_01,mountain,11.11,-22.22,001001,-9,001001
+sierra_02,mountain,11.12,-22.21,001001,001001,001002
+snbarb_01,coast,,,001001,000000,001002
+snbarb_02,coast,11.14,-22.24,001001,001001,001001
+snbarb_03,coast,11.15,,001002,001001,001001
 ```
 """
 function delimited(
@@ -60,7 +61,7 @@ function delimited(
     diploid ? type = nothing : type = String
     dlm = delim == "auto" ? nothing : delim
 
-    file_parse = CSV.read(infile, delim = dlm, missingstrings = ["-9", ""], type = type) |> DataFrame
+    file_parse = CSV.File(infile, delim = dlm, missingstrings = ["-9", ""], type = type) |> DataFrame
 
     locinames = names(file_parse)[5:end]
 
@@ -90,3 +91,58 @@ function delimited(
 end
 
 const csv = delimited
+
+"""
+    popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
+Write PopData to a text-delimited file.
+### Keyword Arguments
+- `filename`: a `String` of the output filename
+- `digits` : an `Integer` indicating how many digits to format each allele as (e.g. `(1, 2)` => `001002` for `digits = 3`)
+- `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format
+  - `wide` : the standard format CSV for importing into PopGen.jl
+  - `long` : the `loci` table with `longitude` and `latitude` columns added
+- `delim` : the `String` delimiter to use for writing the file
+- `miss` : an `Integer` for how you would like missing values written 
+    - `0` : As a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 
+    - `-9` : As a single value `-9`
+
+### Example
+```julia
+cats = nancycats();
+fewer_cats = omit(cats, name = samples(cats)[1:10]);
+popdata2delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
+```
+"""
+function popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
+    # create empty String column
+    unphased_df = insertcols!(copy(data.loci), :string_geno => fill("", length(data.loci.name)))
+    # grouping to facilitate pulling out ploidy values for coding missing genotypes
+    grp_df = groupby(unphased_df, :name)
+    for sample in grp_df
+        samplename = sample.name[1]
+        sample_ploidy = convert(Int, data.meta.ploidy[data.meta.name .== samplename][1])
+        sample.string_geno .= unphase.(sample.genotype, digits = digits, ploidy = sample_ploidy, miss = miss)
+    end
+    # pop out original genotype column
+    select!(unphased_df, 1, 2, 3, 5)
+    if format == "wide"
+        wide_df = DataFrames.unstack(unphased_df, :locus, :string_geno)
+        insertcols!(wide_df, 3, :longitude => data.meta.longitude, :latitude => data.meta.latitude)
+        CSV.write(filename, wide_df, delim = delim) ;
+        return
+    else
+        out_df = sort(
+            transform(
+                unphased_df, 1:2,
+                3 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :longitude,
+                4 => (i -> Vector{Union{Float32, Missing}}(undef, length(i))) => :latitude, 3:4
+                )
+                    )
+        for i in 1:length(data.meta.name)
+            out_df[out_df.name .== data.meta.name[i], :longitude] .= data.meta.longitude[i]
+            out_df[out_df.name .== data.meta.name[i], :latitude] .= data.meta.latitude[i]
+        end
+        CSV.write(filename, out_df, delim = delim) ;
+        return
+    end
+end

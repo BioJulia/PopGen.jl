@@ -20,12 +20,12 @@ considered it must meet the following guidelines.
   * Contributions are included if the code has been reviewed by at least two
     team members who are **not** the author of the proposed contribution,
     and there is general consensus (or general lack of objections) that it's useful
-    and fits with the intended scope of Bio.jl.
+    and fits with the intended scope of PopGen.jl.
 
-  * Code must be consistent with the prevailing style in Bio.jl, which includes,
+  * Code must be consistent with the prevailing style in PopGen.jl, which includes,
     but is not necessarily limited to the following style guide.
 
-  * Code contributed should be compatible with Julia v0.4.
+  * Code contributed should be compatible with Julia v1.0.
 
 
 ## Style
@@ -74,9 +74,20 @@ considered it must meet the following guidelines.
   * Document functions using bare docstrings before a definition:
 
   ```julia
-  "This function foo's something"
-  foo(x) = 2*x
+"This function foo's something"
+foo(x) = 2*x
   ```
+
+or
+
+```julia
+"""
+This function foo's something
+"""
+foo(x) = 2*x
+```
+
+
 
   * Functions that get or set variables in a type should not be prefixed with 'get' or 'set'. The getter should be named for the variable it sets, and the setter should have the same name as the getter, with the suffix `!`. For exmaple, for the variable `names`:
 

@@ -48,12 +48,10 @@ end
     return @inbounds ishet.(locus)
 end
 
-#TODO add to docs (API)
 
 """
-    gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::U where U<:Signed)
-Calculate overall gene diversity with the adjustment/correction
-given by Nei:
+    gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)
+Calculate overall gene diversity with the adjustment/correction given by Nei:
 
 Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
 - _ñ_ is the number of genotypes for a locus for a population
@@ -64,9 +62,23 @@ Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
     - Hₛ =  ñ/(ñ-1) * (1 - sum(pbar²ᵢ - Het_observed / 2ñ))
 
 (Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press).
+use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 """
-function gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::U where U<:Signed)
-    het_exp - (het_obs/n/2) * n/(n-1)
+@inline function gene_diversity_nei87(het_exp::AbstractFloat, het_obs::AbstractFloat, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+    if corr == true
+        corr_val = n/(n-1)
+    else
+        corr_val = 1
+    end
+    return @fastmath (het_exp - (het_obs/n/2.0)) * corr_val
+end
+
+@inline function gene_diversity_nei87(het_exp::AbstractFloat, het_obs::Missing, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+    return missing
+end
+
+@inline function gene_diversity_nei87(het_exp::Missing, het_obs::AbstractFloat, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+    return missing
 end
 
 """
@@ -87,13 +99,13 @@ end
 Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
-function hetero_e(data::T) where T <: GenoArray
-    1 - sum(@inbounds @avx allele_freq_vec(data) .^ 2)
+@inline function hetero_e(data::T) where T <: GenoArray
+    1.0 - sum(@inbounds allele_freq_vec(data) .^ 2)
 end
 
 
 """
-    heterozygosity(data::PopData, mode::String = "locus")
+    heterozygosity(data::PopData, by::String = "locus")
 Calculate observed and expected heterozygosity in a `PopData` object. For loci,
 heterozygosity is calculated in the Nei fashion, such that heterozygosity is
 calculated as the average over heterozygosity per locus per population.
@@ -104,8 +116,8 @@ calculated as the average over heterozygosity per locus per population.
 ## Example
 heterozygosity(nancycats(), "population" )
 """
-function heterozygosity(data::PopData, mode::String = "locus")
-    if mode ∈ ["locus", "loci"]
+function heterozygosity(data::PopData, by::String = "locus")
+    if by ∈ ["locus", "loci"]
         tmp = DataFrames.combine(
                 groupby(data.loci, [:locus, :population]),
                 :genotype => nonmissing => :n_tmp,
@@ -119,14 +131,14 @@ function heterozygosity(data::PopData, mode::String = "locus")
                 :het_pop_exp => (h_e -> mean(skipmissing(h_e))) => :het_exp
             )
 
-    elseif lowercase(mode) ∈  ["sample", "ind", "individual"]
+    elseif lowercase(by) ∈  ["sample", "ind", "individual"]
         return DataFrames.combine(
                 groupby(data.loci, :name),
                 :genotype => nonmissing => :n,
                 :genotype => hetero_o => :het_obs
             )
 
-    elseif lowercase(mode) ∈  ["pop", "population"]
+    elseif lowercase(by) ∈  ["pop", "population"]
         return DataFrames.combine(
                 groupby(data.loci, :population),
                 :genotype => nonmissing => :n,
@@ -134,7 +146,7 @@ function heterozygosity(data::PopData, mode::String = "locus")
                 :genotype => hetero_e => :het_exp
             )
     else
-        error("please specify mode \"locus\", \"sample\", or \"population\"")
+        error("please specify by = \"locus\", \"sample\", or \"population\"")
     end
 end
 
@@ -144,6 +156,6 @@ const het = heterozygosity
     het_sample(data::PopData, individual::String)
 Calculate the observed heterozygosity for an individual in a `PopData` object.
 """
-function het_sample(data::PopData, individual::String)
+@inline function het_sample(data::PopData, individual::String)
     data.loci[data.loci.name .== individual, :genotype] |> hetero_o
 end

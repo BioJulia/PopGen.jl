@@ -165,7 +165,7 @@ end
 Calculate the probability of observing the particular allele state given each of
 the 9 Jacquard Identity States for all loci Creates Table 1 from Milligan 2002
 """
-function all_loci_Pr_L_S(data::PopObj, ind1::String, ind2::String, alleles::Dict)
+function all_loci_Pr_L_S(data::PopData, ind1::String, ind2::String, alleles::Dict)
     #Need to skip loci where one or both individuals have missing data
     Pr_L_S = []
     for locus in String.(names(data.loci))
@@ -175,6 +175,7 @@ function all_loci_Pr_L_S(data::PopObj, ind1::String, ind2::String, alleles::Dict
 
         if gen1 !== missing && gen2 !== missing
             tmp = pr_l_s(gen1, gen2, alleles[locus])
+            return tmp
             push!(Pr_L_S, tmp)
         end
     end
@@ -241,12 +242,11 @@ function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = t
     #consist of 9 values between 0 and 1 which must also sum to 1
     #is then used to calculate relatedness
 
-    jacquard = Model(with_optimizer(ECOS.Optimizer))
+    jacquard = Model(ECOS.Optimizer)
     @variable(jacquard, Δ[i=1:9])
     @objective(jacquard, Max, sum(log(Pr_L_S * Δ)))
     @constraint(jacquard, con, sum(Δ) == 1)
-    @constraint(jacquard, con_low, Δ .>= 0)
-    @constraint(jacquard, con_high, Δ .<= 1)
+    @constraint(jacquard, con_bounds, 0 .<= Δ .<= 1)
 
 end
 ## Calculate theta and r
@@ -288,39 +288,41 @@ function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles:
 end
 
 """
-    qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
-Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
+    lr_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+Calculates the moments based estimator of pairwise relatedness developed by Lynch & Ritland (1999).
+- Bases allele frequencies on entire population
+- Inbreeding can only be assumed not to exist.
 
-Bases allele frequencies on entire population
-
-Inbreeding can only be assumed not to exist.
-
-See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
+**Citation**
+Lynch, M., & Ritland, K. (1999). Estimation of pairwise relatedness with molecular markers. Genetics, 152(4), 1753-1766.
+https://www.genetics.org/content/152/4/1753.short
 """
-function qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
 
-    n1 = n2 = d1 = d2 = 0
+    n1 = 0.0
+    n2 = 0.0
+    d1 = 0.0
+    d2 = 0.0
 
-    for locus in String.(names(data.loci))
+    for loc in loci(data)
         #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = locus)
-        gen2 = get_genotype(data, sample = ind2, locus = locus)
+        gen1 = get_genotype(data, sample = ind1, locus = loc)
+        gen2 = get_genotype(data, sample = ind2, locus = loc)
 
         #Skip missing
         if gen1 !== missing && gen2 !== missing
-            a = string(gen1[1])
-            b = string(gen1[2])
-            c = string(gen2[1])
-            d = string(gen2[2])
+            a,b = gen1
+            c,d = gen2
+            sym_loc = Symbol(loc)
 
-            n1 = n1 + (Int(a==c) + Int(a==d) + Int(b==c) + Int(b==d) - 2 * (alleles[locus][a] + alleles[locus][b]))
-            n2 = n2 + (Int(a==c) + Int(a==d) + Int(b==c) + Int(b==d) - 2 * (alleles[locus][c] + alleles[locus][d]))
+            n1 += n1 + sum((a,b) .∈ Ref((c,d))) - 2 * (alleles[sym_loc][a] + alleles[sym_loc][b])
+            n2 += n2 + sum((a,b) .∈ Ref((c,d))) - 2 * (alleles[sym_loc][c] + alleles[sym_loc][d])
 
-            d1 = d1 + (2 * (1 + Int(a==b) - alleles[locus][a] - alleles[locus][b]))
-            d2 = d2 + (2 * (1 + Int(c==d) - alleles[locus][c] - alleles[locus][d]))
+            d1 += d1 + (2 * (1 + (a==b) - alleles[sym_loc][a] - alleles[sym_loc][b]))
+            d2 += d2 + (2 * (1 + (c==d) - alleles[sym_loc][c] - alleles[sym_loc][d]))
         end
     end
-    return (n1/d1 + n2/d2)/2
+    return (n1/d1 + n2/d2)/2.0
 end
 
 
@@ -336,57 +338,63 @@ estimator specific feedback and statements when an individual has been compared 
 If the method is able to account for inbreeding in it's calculation then that option may be used
 
 Available methods:
-- `"qg"` : Queller & Goodnight 1989  (diploid only)
+- `"lr"` : Lynch & Ritland 1999  (diploid only)
 """
-#=
-function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
+
+function pairwise_relatedness(data::PopData; method::String = "lr", inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
-    all(data.samples.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
-    allele_frequencies = Dict()
-    for locus in names(data.loci)
-        allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
-    end
-
+    allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
+                            Tuple(allele_freq.(locus.(Ref(data), loci(data))))
+                        )
+    
+    #=
     if !verbose
         n = size(data.samples)[1]
         n = n*(n-1) ÷ 2
         prog = Progress(n, 1)
     end
-
     #Add switch to slightly change output depending on relatednes metric (e.g. convergence doesn't make sense for Moments Estimators)
     if method == "dyadml"
         output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
     end
-    if method == "qg"
-        output = DataFrame(ind1 = [], ind2 = [], relatedness = [])
-    end
+    =#
+    sample_names = samples(data)
+    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
+    relate_vec = zeros(length(sample_pairs))
+    idx = 0
+    if method == "lr"
 
-    for (i,ind1) in enumerate(data.samples.name)
-        i == length(data.samples.name) && break
-        for ind2 in i+1:length(data.samples.name)
-
-            if method == "dyadml"
-                dyad_out = dyadicML_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
-                append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = dyad_out[1], convergence = dyad_out[3]))
-            end
-            if method == "qg"
-                qg_out = qg_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies)
-                append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = qg_out))
-            end
-
-            if !verbose
-                next!(prog)
+        @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
+            #Base.Threads.@threads 
+            @inbounds Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
+                idx += 1
+                #=
+                if method == "dyadml"
+                    dyad_out = dyadicML_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
+                    append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = dyad_out[1], convergence = dyad_out[3]))
+                end
+                =#
+                relate_vec[idx] += lr_relatedness(data, ind1, ind2, alleles = allele_frequencies)
+                #=
+                if !verbose
+                    next!(prog)
+                end
+                =#
             end
         end
+
+        #=
         if verbose
             println("All pairs with ", ind1, " finished")
         end
+        =#
     end
-
-    return output
+    method_colname = Symbol("relatedness_" * method)
+    return DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), method_colname => relate_vec)
 end
-=#
+
 
 #Multithreaded version - requires "Combinatorics" Package
 function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
