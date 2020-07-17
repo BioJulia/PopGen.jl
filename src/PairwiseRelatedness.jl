@@ -335,17 +335,17 @@ estimator specific feedback and statements when an individual has been compared 
 If the method is able to account for inbreeding in it's calculation then that option may be used
 
 Available methods:
-- `"lr"` : Lynch & Ritland 1999  (diploid only)
+- `"qg"` : Queller & Goodknight 1989  (diploid only)
 """
 
-function pairwise_relatedness(data::PopData; method::String = "lr", inbreeding::Bool = true, verbose::Bool = true)
+function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
     all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
-    
+
     #=
     if !verbose
         n = size(data.samples)[1]
@@ -361,10 +361,10 @@ function pairwise_relatedness(data::PopData; method::String = "lr", inbreeding::
     sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
     relate_vec = zeros(length(sample_pairs))
     idx = 0
-    if method == "lr"
+    if method == "qg"
 
         @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-            #Base.Threads.@threads 
+            #Base.Threads.@threads
             @inbounds Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
                 idx += 1
                 #=
