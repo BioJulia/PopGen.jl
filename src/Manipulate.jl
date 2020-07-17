@@ -180,7 +180,7 @@ get_genotype(cats, sample = "N115", locus = "fca8")
 ```
 """
 function get_genotype(data::PopData; sample::String, locus::String)
-    @view data.loci[(data.loci.name .== sample) .& (data.loci.locus .== locus), :genotype] 
+    @views data.loci[(data.loci.name .== sample) .& (data.loci.locus .== locus), :genotype][1]
 end
 
 
