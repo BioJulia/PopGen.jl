@@ -1,4 +1,4 @@
-export add_meta!, locations, locations!, loci, locus, get_genotypes, get_genotypes, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
+export add_meta!, locations, locations!, loci, locus, get_genotypes, get_genotype, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
 
 """
     add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
@@ -169,9 +169,24 @@ function loci(data::PopData)
     levels(data.loci.locus)
 end
 
+
+"""
+    get_genotype(data::PopObj; sample::String, locus::String)
+Return the genotype of one sample at one locus in a `PopData` object.
+### Example
+```
+cats = nancycats();
+get_genotype(cats, sample = "N115", locus = "fca8")
+```
+"""
+function get_genotype(data::PopData; sample::String, locus::String)
+    @view data.loci[(data.loci.name .== sample) .& (data.loci.locus .== locus), :genotype] 
+end
+
+
 """
     get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
-Return the genotype(s) of one or more `samples` for one or more
+Return a table of the genotype(s) of one or more `samples` for one or more
 specific `loci` (both as keywords) in a `PopData` object.
 ### Examples
 ```
@@ -182,7 +197,7 @@ get_genotype(cats, sample = "N115" , locus = ["fca8", "fca37"])
 get_genotype(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
 ```
 """
-function get_genotypes(data::PopData, sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
+function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
     if typeof(sample) == String
         sample = [sample]
     end
@@ -195,10 +210,10 @@ end
 
 """
     get_genotypes(data::PopData, sample::String)
-Return all the genotypes of a specific sample in a `PopData` object.
+Return a vector of all the genotypes of a sample in a `PopData` object.
 ```
 cats = nancycats()
-get_sample_genotypes(cats, "N115")
+get_genotypes(cats, "N115")
 ```
 """
 function get_genotypes(data::PopObj, sample::String)
