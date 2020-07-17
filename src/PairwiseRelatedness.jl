@@ -288,16 +288,13 @@ function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles:
 end
 
 """
-    lr_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
-Calculates the moments based estimator of pairwise relatedness developed by Lynch & Ritland (1999).
+    qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
-
-**Citation**
-Lynch, M., & Ritland, K. (1999). Estimation of pairwise relatedness with molecular markers. Genetics, 152(4), 1753-1766.
-https://www.genetics.org/content/152/4/1753.short
+See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
-function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
 
     n1 = 0.0
     n2 = 0.0
@@ -376,7 +373,7 @@ function pairwise_relatedness(data::PopData; method::String = "lr", inbreeding::
                     append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = dyad_out[1], convergence = dyad_out[3]))
                 end
                 =#
-                relate_vec[idx] += lr_relatedness(data, ind1, ind2, alleles = allele_frequencies)
+                relate_vec[idx] += qg_relatedness(data, ind1, ind2, alleles = allele_frequencies)
                 #=
                 if !verbose
                     next!(prog)
