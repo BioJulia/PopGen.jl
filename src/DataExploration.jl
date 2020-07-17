@@ -57,7 +57,7 @@ function pairwise_identical(data::PopData)
     @inbounds for (sample_n, sample_1) in enumerate(sample_names[1:end-1])
         geno_1 = get_genotypes(data, sample_1)
         len_1 = length(collect(skipmissing(geno_1)))
-        Base.Threads.@threads for sample_2 in sample_names[sample_n+1:end]
+        @inbounds Base.Threads.@threads for sample_2 in sample_names[sample_n+1:end]
             idx += 1
             geno_2 = get_genotypes(data, sample_2)
             len_2 = length(collect(skipmissing(geno_2)))
