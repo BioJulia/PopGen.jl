@@ -49,7 +49,7 @@ end
 #TODO add to docs (Data Exploration page and API)
 function pairwise_identical(data::PopData)
     sample_names = samples(data)
-    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(a)]
+    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
     n = length(sample_pairs)
     perc_ident_vec = Vector{Float64}(undef, n)
     n_vec = Vector{Int}(undef, n)
