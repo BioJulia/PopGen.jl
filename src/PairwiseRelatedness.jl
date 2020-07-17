@@ -330,7 +330,6 @@ Calculates the moments based estimator of pairwise relatedness proposed by Li an
 See equation 7 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
 """
-=#
 function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
 
     n = 0.0
