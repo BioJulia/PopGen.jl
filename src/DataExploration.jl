@@ -49,18 +49,17 @@ end
 #TODO add to docs (Data Exploration page and API)
 function pairwise_identical(data::PopData)
     sample_names = samples(data)
-    samples_2 = @view sample_names[2:end-1]
-    sample_pairs = collect(Iterators.product(samples_2, sample_names)) |> vec
+    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(a)]
     n = length(sample_pairs)
     perc_ident_vec = Vector{Float64}(undef, n)
     n_vec = Vector{Int}(undef, n)
     idx = 0
-    @inbounds for sample_1 in sample_names
-        geno_1 = get_sample_genotypes(data, sample_1)
+    @inbounds for (sample_n, sample_1) in enumerate(sample_names[1:end-1])
+        geno_1 = get_genotypes(data, sample_1)
         len_1 = length(collect(skipmissing(geno_1)))
-        Base.Threads.@threads for sample_2 in sample_names[2:end-1]
+        Base.Threads.@threads for sample_2 in sample_names[sample_n+1:end]
             idx += 1
-            geno_2 = get_sample_genotypes(data, sample_2)
+            geno_2 = get_genotypes(data, sample_2)
             len_2 = length(collect(skipmissing(geno_2)))
             shared_geno = minimum([len_1, len_2])
             shared = sum(skipmissing(geno_1 .== geno_2))
@@ -68,5 +67,5 @@ function pairwise_identical(data::PopData)
             n_vec[idx] = shared_geno
         end
     end
-    DataFrame(:sample_1 => getindex.(sample_pairs, 2), :sample_2 => getindex.(sample_pairs, 1), :identical => perc_ident_vec, :n => n_vec)
+    DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :identical => perc_ident_vec, :n => n_vec)
 end
