@@ -322,6 +322,42 @@ See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of esti
     return (n1/d1 + n2/d2)/2.0
 end
 
+"""
+    ritland_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+Calculates the moments based estimator of pairwise relatedness proposed by Li and Horvitz (1953) and implemented/made popular by Ritland (1996).
+- Bases allele frequencies on entire population
+- Inbreeding can only be assumed not to exist.
+See equation 7 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
+Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
+"""
+=#
+function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+
+    n = 0.0
+    d = 0.0
+    for loc in loci(data)
+        #Extract the pair of interest's genotypes
+        gen1 = get_genotype(data, sample = ind1, locus = loc)
+        gen2 = get_genotype(data, sample = ind2, locus = loc)
+
+        #Skip missing
+        if gen1 !== missing && gen2 !== missing
+            a,b = gen1
+            c,d = gen2
+            sym_loc = Symbol(loc)
+
+            R = 0.0
+            for i in keys(alleles[sym_loc])
+                R += R + ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4 * alleles[sym_loc][i])) #Individual locus relatedness value (eq 7 in paper)
+            end
+
+            n += n + (((2 / ((alleles[sym_loc] |> length) - 1)) * (L - 1)) / ((alleles[sym_loc] |> length) - 1)) #numerator for weighted combination of loci
+            d += d + ((alleles[sym_loc] |> length) - 1) #denominator for weighted combination of loci
+        end
+    end
+    return (n / d)
+end
+
 
 
 """
