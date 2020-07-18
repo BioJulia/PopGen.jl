@@ -294,7 +294,7 @@ Calculates the moments based estimator of pairwise relatedness developed by Quel
 - Inbreeding can only be assumed not to exist.
 See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
-    function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
 
     n1 = 0.0
     n2 = 0.0
@@ -332,6 +332,8 @@ Ritland original citation: https://www.cambridge.org/core/journals/genetics-rese
 """
 function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
 
+    #NEED TO CHECK TO CONFIRM EQUATIONS
+
     n = 0.0
     d = 0.0
     for loc in loci(data)
@@ -366,6 +368,7 @@ See equation 10 in: https://www.nature.com/articles/hdy201752 for variant of est
 Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
 """
 function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #NEED TO CHECK TO CONFIRM EQUATIONS
 
     n = 0.0
     d = 0.0
@@ -388,7 +391,7 @@ function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
 
             RL = (n1 / d1) + (n2 / d2)
 
-            n += n + (RL * ((alleles[sym_loc] |> length) - 1))
+            n += n + RL #JDS - CHECK THIS IS CORRECT
             d += d + ((alleles[sym_loc] |> length) - 1)
         end
     end
