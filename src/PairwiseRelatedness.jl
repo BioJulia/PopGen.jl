@@ -312,11 +312,11 @@ function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
             c,d = gen2
             sym_loc = Symbol(loc)
 
-            n1 += n1 + sum((a,b) .∈ Ref((c,d))) - 2 * (alleles[sym_loc][a] + alleles[sym_loc][b])
-            n2 += n2 + sum((a,b) .∈ Ref((c,d))) - 2 * (alleles[sym_loc][c] + alleles[sym_loc][d])
+            n1 += sum((a,b) .∈ Ref((c,d))) - 2 * (alleles[sym_loc][a] + alleles[sym_loc][b])
+            n2 += sum((a,b) .∈ Ref((c,d))) - 2 * (alleles[sym_loc][c] + alleles[sym_loc][d])
 
-            d1 += d1 + (2 * (1 + (a==b) - alleles[sym_loc][a] - alleles[sym_loc][b]))
-            d2 += d2 + (2 * (1 + (c==d) - alleles[sym_loc][c] - alleles[sym_loc][d]))
+            d1 += (2 * (1 + (a==b) - alleles[sym_loc][a] - alleles[sym_loc][b]))
+            d2 += (2 * (1 + (c==d) - alleles[sym_loc][c] - alleles[sym_loc][d]))
         end
     end
     return (n1/d1 + n2/d2)/2.0
@@ -349,11 +349,11 @@ function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles:
 
             R = 0.0
             for i in keys(alleles[sym_loc])
-                R += R + ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4 * alleles[sym_loc][i])) #Individual locus relatedness value (eq 7 in paper)
+                R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4 * alleles[sym_loc][i])) #Individual locus relatedness value (eq 7 in paper)
             end
 
-            n += n + (((2 / ((alleles[sym_loc] |> length) - 1)) * (L - 1)) / ((alleles[sym_loc] |> length) - 1)) #numerator for weighted combination of loci
-            d += d + ((alleles[sym_loc] |> length) - 1) #denominator for weighted combination of loci
+            n += (((2 / ((alleles[sym_loc] |> length) - 1)) * (L - 1)) / ((alleles[sym_loc] |> length) - 1)) #numerator for weighted combination of loci
+            d += ((alleles[sym_loc] |> length) - 1) #denominator for weighted combination of loci
         end
     end
     return (n / d)
@@ -391,8 +391,8 @@ function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
 
             RL = (n1 / d1) + (n2 / d2)
 
-            n += n + RL #JDS - CHECK THIS IS CORRECT
-            d += d + ((alleles[sym_loc] |> length) - 1)
+            n += RL #JDS - CHECK THIS IS CORRECT
+            d += ((alleles[sym_loc] |> length) - 1)
         end
     end
     return (n / d)
