@@ -296,6 +296,8 @@ See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of esti
 """
 function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
 
+    #NEED TO CHECK TO CONFIRM EQUATIONS
+
     n1 = 0.0
     n2 = 0.0
     d1 = 0.0
@@ -312,8 +314,8 @@ function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
             c,d = gen2
             sym_loc = Symbol(loc)
 
-            n1 += sum((a,b) .∈ Ref((c,d))) - 2 * (alleles[sym_loc][a] + alleles[sym_loc][b])
-            n2 += sum((a,b) .∈ Ref((c,d))) - 2 * (alleles[sym_loc][c] + alleles[sym_loc][d])
+            n1 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2 * (alleles[sym_loc][a] + alleles[sym_loc][b])
+            n2 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2 * (alleles[sym_loc][c] + alleles[sym_loc][d])
 
             d1 += (2 * (1 + (a==b) - alleles[sym_loc][a] - alleles[sym_loc][b]))
             d2 += (2 * (1 + (c==d) - alleles[sym_loc][c] - alleles[sym_loc][d]))
@@ -347,13 +349,16 @@ function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles:
             c,d = gen2
             sym_loc = Symbol(loc)
 
+            A = ((alleles[sym_loc] |> length) - 1)
+
             R = 0.0
             for i in keys(alleles[sym_loc])
                 R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4 * alleles[sym_loc][i])) #Individual locus relatedness value (eq 7 in paper)
             end
+            R = (2 / A) * (R - 1)
 
-            n += (((2 / ((alleles[sym_loc] |> length) - 1)) * (L - 1)) / ((alleles[sym_loc] |> length) - 1)) #numerator for weighted combination of loci
-            d += ((alleles[sym_loc] |> length) - 1) #denominator for weighted combination of loci
+            n += (R * A) #numerator for weighted combination of loci
+            d += A #denominator for weighted combination of loci
         end
     end
     return (n / d)
