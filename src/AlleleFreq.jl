@@ -9,7 +9,7 @@ object.
     len = length(flat_alleles)
     len == 0 && return d
     @inbounds @simd for allele in flat_alleles
-        @inbounds d[allele] = get!(d, allele, 0) + 1/len
+        @inbounds get!(d, allele, 0) + 1/len
     end
     return d
 end
@@ -130,7 +130,7 @@ Return a `Dict` of genotype counts of a single locus in a
     d = Dict{Tuple, Float32}()
     @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
-        d[genotype] = get!(d, genotype, 0) + 1
+        get!(d, genotype, 0) += 1
     end
     return d
 end
@@ -159,7 +159,7 @@ function geno_count_expected(locus::T) where T<:GenoArray
     genos = reverse.(Base.Iterators.product(alle, alle) |> collect |> vec)
     expected = Dict{Tuple, Float64}()
     for (geno, freq) in zip(genos, expected_genotype_freq)
-        expected[geno] = get!(expected, geno, 0.0) + freq
+        get!(expected, geno, 0.0) += freq
     end
 
     return expected
@@ -177,7 +177,7 @@ Return a `Dict` of genotype frequencies of a single locus in a
     d = Dict{Tuple, Float32}()
     @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
-        d[genotype] = get!(d, genotype, 0) + 1
+        get!(d, genotype, 0) += 1
     end
     total = values(d) |> sum    # sum of all non-missing genotypes
     [d[i] = d[i] / total for i in keys(d)] # genotype count/total
@@ -207,7 +207,6 @@ function geno_freq(data::PopData, locus::String, population::Bool=false)
     end
 end
 
-#TODO replace allele creation with Base.Iterators.product
 """
     geno_freq_expected(locus::T) where T<:GenoArray
 Return a `Dict` of the expected genotype frequencies of a single locus in a
@@ -231,7 +230,7 @@ function geno_freq_expected(locus::T) where T<:GenoArray
     # reform genotype frequencies into a Dict
     expected = Dict{Tuple, Float64}()
     for (geno, freq) in zip(genos, expected_genotype_freq)
-        expected[geno] = get!(expected, geno, 0) + freq
+        get!(expected, geno, 0) += freq
     end
 
     return expected

@@ -314,11 +314,11 @@ function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
             c,d = gen2
             sym_loc = Symbol(loc)
 
-            n1 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2 * (alleles[sym_loc][a] + alleles[sym_loc][b])
-            n2 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2 * (alleles[sym_loc][c] + alleles[sym_loc][d])
+            n1 += sum((a == c, a == d, b == c, b == d)) - 2.0 * (alleles[sym_loc][a] + alleles[sym_loc][b])
+            n2 += sum((a == c, a == d, b == c, b == d)) - 2.0 * (alleles[sym_loc][c] + alleles[sym_loc][d])
 
-            d1 += (2 * (1 + (a==b) - alleles[sym_loc][a] - alleles[sym_loc][b]))
-            d2 += (2 * (1 + (c==d) - alleles[sym_loc][c] - alleles[sym_loc][d]))
+            d1 += 2.0 * (1.0 + (a==b) - alleles[sym_loc][a] - alleles[sym_loc][b])
+            d2 += 2.0 * (1.0 + (c==d) - alleles[sym_loc][c] - alleles[sym_loc][d])
         end
     end
     return (n1/d1 + n2/d2)/2.0
@@ -338,6 +338,7 @@ function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles:
 
     n = 0.0
     d = 0.0
+
     for loc in loci(data)
         #Extract the pair of interest's genotypes
         gen1 = get_genotype(data, sample = ind1, locus = loc)
@@ -352,13 +353,15 @@ function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles:
             A = ((alleles[sym_loc] |> length) - 1)
 
             R = 0.0
-            for i in keys(alleles[sym_loc])
-                R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4 * alleles[sym_loc][i])) #Individual locus relatedness value (eq 7 in paper)
+            for allele in keys(alleles[sym_loc])
+                # Individual locus relatedness value (eq 7 in paper)
+                R += ((((a == allele) + (b == allele)) * ((c == allele) + (d == allele))) / (4.0 * alleles[sym_loc][allele])) 
             end
-            R = (2 / A) * (R - 1)
-
-            n += (R * A) #numerator for weighted combination of loci
-            d += A #denominator for weighted combination of loci
+            R = (2 / A) * (R - 1.0)
+            # numerator for weighted combination of loci
+            n += (R * A) 
+            # denominator for weighted combination of loci
+            d += A
         end
     end
     return (n / d)
@@ -377,28 +380,28 @@ function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
 
     n = 0.0
     d = 0.0
-    for loc in loci(data)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
+    #Extract the pair of interest's genotypes
+    gen1 = get_genotypes(data, ind1)
+    gen2 = get_genotypes(data, ind2)
 
-        #Skip missings
-        if gen1 !== missing && gen2 !== missing
-            a,b = gen1
-            c,d = gen2
-            sym_loc = Symbol(loc)
+    # keep only loci where both are not missing
+    # _f implies "filtered"
+    #loc_f, gen1_f, gen2_f = skipmissings(Symbol.(loci(data)), gen1, gen2)
 
-            n1 = alleles[sym_loc][a] * ((b == c) + (b == d)) + alleles[sym_loc][b] * ((a == c) + (a == d)) - 4 * alleles[sym_loc][a] * alleles[sym_loc][b]
-            n2 = alleles[sym_loc][c] * ((d == a) + (d == b)) + alleles[sym_loc][d] * ((c == a) + (c == b)) - 4 * alleles[sym_loc][c] * alleles[sym_loc][d]
+    for (loc,geno1,geno2) in zip(skipmissings(Symbol.(loci(data)), gen1, gen2)...)
+        a,b = geno1
+        c,d = geno2
 
-            d1 = 2 * (1 + (a == b)) * (alleles[sym_loc][a] + alleles[sym_loc][b]) - 8 * alleles[sym_loc][a] * alleles[sym_loc][b]
-            d2 = 2 * (1 + (c == d)) * (alleles[sym_loc][c] + alleles[sym_loc][d]) - 8 * alleles[sym_loc][c] * alleles[sym_loc][d]
+        n1 = alleles[loc][a] * ((b == c) + (b == d)) + alleles[loc][b] * ((a == c) + (a == d)) - 4.0 * alleles[loc][a] * alleles[loc][b]
+        n2 = alleles[loc][c] * ((d == a) + (d == b)) + alleles[loc][d] * ((c == a) + (c == b)) - 4.0 * alleles[loc][c] * alleles[loc][d]
 
-            RL = (n1 / d1) + (n2 / d2)
+        d1 = 2.0 * (1.0 + (a == b)) * (alleles[loc][a] + alleles[loc][b]) - 8.0 * alleles[loc][a] * alleles[loc][b]
+        d2 = 2.0 * (1.0 + (c == d)) * (alleles[loc][c] + alleles[loc][d]) - 8.0 * alleles[loc][c] * alleles[loc][d]
 
-            n += RL #JDS - CHECK THIS IS CORRECT
-            d += ((alleles[sym_loc] |> length) - 1)
-        end
+        RL = (n1 / d1) + (n2 / d2)
+
+        n += RL #JDS - CHECK THIS IS CORRECT
+        d += ((alleles[loc] |> length) - 1)
     end
     return (n / d)
 end
