@@ -76,6 +76,7 @@ function relatedness_moment(data::PopData, ind1::String, ind2::String; alleles::
 end
 
 
+#TODO this is 100% incomplete
 function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
     all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
