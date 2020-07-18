@@ -1,3 +1,154 @@
+#### Simple code versions ####
+"""
+    qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
+- Bases allele frequencies on entire population
+- Inbreeding can only be assumed not to exist.
+See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
+"""
+function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+
+    #NEED TO CHECK TO CONFIRM EQUATIONS
+
+    n1 = 0.0
+    n2 = 0.0
+    d1 = 0.0
+    d2 = 0.0
+
+    for loc in loci(data)
+        #Extract the pair of interest's genotypes
+        gen1 = get_genotype(data, sample = ind1, locus = loc)
+        gen2 = get_genotype(data, sample = ind2, locus = loc)
+
+        #Skip missing
+        if gen1 !== missing && gen2 !== missing
+            a,b = gen1
+            c,d = gen2
+            sym_loc = Symbol(loc)
+
+            n1 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2 * (alleles[sym_loc][a] + alleles[sym_loc][b])
+            n2 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2 * (alleles[sym_loc][c] + alleles[sym_loc][d])
+
+            d1 += (2 * (1 + (a==b) - alleles[sym_loc][a] - alleles[sym_loc][b]))
+            d2 += (2 * (1 + (c==d) - alleles[sym_loc][c] - alleles[sym_loc][d]))
+        end
+    end
+    return (n1/d1 + n2/d2)/2.0
+end
+
+"""
+    ritland_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+Calculates the moments based estimator of pairwise relatedness proposed by Li and Horvitz (1953) and implemented/made popular by Ritland (1996).
+- Bases allele frequencies on entire population
+- Inbreeding can only be assumed not to exist.
+See equation 7 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
+Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
+"""
+function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+
+    #NEED TO CHECK TO CONFIRM EQUATIONS
+
+    n = 0.0
+    d = 0.0
+    for loc in loci(data)
+        #Extract the pair of interest's genotypes
+        gen1 = get_genotype(data, sample = ind1, locus = loc)
+        gen2 = get_genotype(data, sample = ind2, locus = loc)
+
+        #Skip missing
+        if gen1 !== missing && gen2 !== missing
+            a,b = gen1
+            c,d = gen2
+            sym_loc = Symbol(loc)
+
+            A = ((alleles[sym_loc] |> length) - 1)
+
+            R = 0.0
+            for i in keys(alleles[sym_loc])
+                R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4 * alleles[sym_loc][i])) #Individual locus relatedness value (eq 7 in paper)
+            end
+            R = (2 / A) * (R - 1)
+
+            n += (R * A) #numerator for weighted combination of loci
+            d += A #denominator for weighted combination of loci
+        end
+    end
+    return (n / d)
+end
+
+"""
+    lr_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+Calculates the moments based estimator of pairwise relatedness by Ritland (1996).
+- Bases allele frequencies on entire population
+- Inbreeding can only be assumed not to exist.
+See equation 10 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
+Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
+"""
+function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #NEED TO CHECK TO CONFIRM EQUATIONS
+
+    n = 0.0
+    d = 0.0
+    for loc in loci(data)
+        #Extract the pair of interest's genotypes
+        gen1 = get_genotype(data, sample = ind1, locus = loc)
+        gen2 = get_genotype(data, sample = ind2, locus = loc)
+
+        #Skip missings
+        if gen1 !== missing && gen2 !== missing
+            a,b = gen1
+            c,d = gen2
+            sym_loc = Symbol(loc)
+
+            n1 = alleles[sym_loc][a] * ((b == c) + (b == d)) + alleles[sym_loc][b] * ((a == c) + (a == d)) - 4 * alleles[sym_loc][a] * alleles[sym_loc][b]
+            n2 = alleles[sym_loc][c] * ((d == a) + (d == b)) + alleles[sym_loc][d] * ((c == a) + (c == b)) - 4 * alleles[sym_loc][c] * alleles[sym_loc][d]
+
+            d1 = 2 * (1 + (a == b)) * (alleles[sym_loc][a] + alleles[sym_loc][b]) - 8 * alleles[sym_loc][a] * alleles[sym_loc][b]
+            d2 = 2 * (1 + (c == d)) * (alleles[sym_loc][c] + alleles[sym_loc][d]) - 8 * alleles[sym_loc][c] * alleles[sym_loc][d]
+
+            RL = (n1 / d1) + (n2 / d2)
+
+            n += RL #JDS - CHECK THIS IS CORRECT
+            d += ((alleles[sym_loc] |> length) - 1)
+        end
+    end
+    return (n / d)
+end
+
+"""
+    ll_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+Calculates the moments based estimator of pairwise relatedness by Lynch (1988) & improved by Li et al. (1993).
+See equations 13 - 16 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
+"""
+function ll_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #NEED TO CHECK TO CONFIRM EQUATIONS
+
+    n = 0.0
+    d = 0.0
+    for loc in loci(data)
+        #Extract the pair of interest's genotypes
+        gen1 = get_genotype(data, sample = ind1, locus = loc)
+        gen2 = get_genotype(data, sample = ind2, locus = loc)
+
+        #Skip missing
+        if gen1 !== missing && gen2 !== missing
+            a,b = gen1
+            c,d = gen2
+            sym_loc = Symbol(loc)
+
+            Sxy = (1/2) * (((a == c) + (a == d) + (b == c) + (b == d)) / (2 * (1 + (a == b))) + ((a == c) + (a == d) + (b == c) + (b == d)) / (2 * (1 + (c == d))))
+            S0 = 2 * sum(values(alleles[sym_loc]) .^ 2) - sum(values(alleles[sym_loc]) .^ 3)
+
+            n += Sxy - S0
+            d += 1 - S0
+
+        end
+    end
+    return (n / d)
+end
+
+
+
 function QuellerGoodnight(loc::Symbol, geno1::Genotype, geno2::Genotype, alleles::T) where T <: NamedTuple
     a,b = geno1
     c,d = geno2
