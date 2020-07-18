@@ -149,6 +149,8 @@ end
 
 
 
+#### Rework for efficiency ####
+
 function QuellerGoodnight(loc::Symbol, geno1::Genotype, geno2::Genotype, alleles::T) where T <: NamedTuple
     a,b = geno1
     c,d = geno2
