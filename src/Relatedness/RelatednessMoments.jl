@@ -19,7 +19,7 @@ function Ritland(loc::Symbol, geno1::Genotype, geno2::Genotype, alleles::T) wher
     R = 0.0
     for allele in keys(alleles[loc])
         # Individual locus relatedness value (eq 7 in paper)
-        R += ((((a == allele) + (b == allele)) * ((c == allele) + (d == allele))) / (4.0 * alleles[loc][allele])) 
+        R += ((((a == allele) + (b == allele)) * ((c == allele) + (d == allele))) / (4.0 * alleles[loc][allele]))
     end
     R = (2 / A) * (R - 1.0)
     # return numerator,denominator
@@ -69,7 +69,7 @@ function relatedness_moment(data::PopData, ind1::String, ind2::String; alleles::
     end
     if haskey(d, :QuellerGoodnight)
         qg = d[:QuellerGoodnight]
-        d[:QuellerGoodnight][1] = (qg[1]/gq[2]) + (qg[3]/qg[4])
+        d[:QuellerGoodnight][1] = (qg[1]/qg[2]) + (qg[3]/qg[4])
         d[:QuellerGoodnight][2] = 2.0
     end
     return NamedTuple{Tuple(keys(d))}(getindex.(values(d), 1) ./ getindex.(values(d), 2))
