@@ -1,3 +1,5 @@
+export quickstart, size
+
 #TODO change location in API docs
 """
     alleles(locus::T; miss::Bool = false) where T<:GenoArray
@@ -12,6 +14,10 @@ Return an array of all the non-missing alleles of a locus. Use
     end
 end
 
+# TODO add to docs: Utils.jl API
+function Base.size(data::PopData)
+    return (samples = size(data.meta)[1], loci = length(loci(data)))
+end
 
 """
     unique_alleles(locus::T) where T<:GenoArray
