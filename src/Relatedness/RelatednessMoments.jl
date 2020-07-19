@@ -96,10 +96,12 @@ function LynchRitland(data::PopData, ind1::String, ind2::String; alleles::T) whe
         d1 = 2.0 * (1.0 + (a == b)) * (alleles[loc][a] + alleles[loc][b]) - 8.0 * alleles[loc][a] * alleles[loc][b]
         d2 = 2.0 * (1.0 + (c == d)) * (alleles[loc][c] + alleles[loc][d]) - 8.0 * alleles[loc][c] * alleles[loc][d]
 
-        RL = (n1 / d1) + (n2 / d2)
 
-        numerator1 += RL #JDS - CHECK THIS IS CORRECT
-        denominator1 += ((alleles[loc] |> length) - 1)
+        WL1 = ((1 + (a == b)) * (alleles[loc][a] + alleles[loc][b]) - 4 * alleles[loc][a] * alleles[loc][b]) / (2 * alleles[loc][a] * alleles[loc][b])
+        WL2 = ((1 + (c == d)) * (alleles[loc][c] + alleles[loc][d]) - 4 * alleles[loc][c] * alleles[loc][d]) / (2 * alleles[loc][c] * alleles[loc][d])
+
+        numerator1 += ((n1 / d1) * WL1 + (n2 / d2) * WL2)
+        denominator1 += (WL1 + WL2) / 2
     end
     return numerator1 / denominator1
 end
