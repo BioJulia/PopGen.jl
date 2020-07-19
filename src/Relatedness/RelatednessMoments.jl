@@ -137,6 +137,7 @@ function ll_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
             sym_loc = Symbol(loc)
 
             Sxy = (1/2) * (((a == c) + (a == d) + (b == c) + (b == d)) / (2 * (1 + (a == b))) + ((a == c) + (a == d) + (b == c) + (b == d)) / (2 * (1 + (c == d))))
+            #TODO Change to unbiased formulation (eq 25)
             S0 = 2 * sum(values(alleles[sym_loc]) .^ 2) - sum(values(alleles[sym_loc]) .^ 3)
 
             n += Sxy - S0
@@ -185,6 +186,7 @@ Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
 """
 function a_wang(m::Int, alleles::Dict)
+    #TODO Change to unbiased formulation (eq 25)
     sum(values(alleles) .^ m)
 end
 
