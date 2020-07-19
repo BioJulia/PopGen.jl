@@ -158,99 +158,95 @@ function loiselle_relatedness(data::PopData, ind1::String, ind2::String; alleles
     return (2.0 * n / d) + 2.0 / (2 * length(samples(data)) - 1)
 end
 
-"""
-    wang_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
-Calculates the moments based estimator of pairwise relatedness by Wang (2002).
-See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
-"""
-function a_wang(m::Int, alleles::Dict)
+### Wang 2002 helper functions ###
+function a_wang(m::Int, alleles::Dict)::Float64
     #TODO Change to unbiased formulation (eq 25)
     sum(values(alleles) .^ m)
 end
 
 function b_wang(alleles::Dict)
-    2 * a_wang(2, alleles) ^ 2 - a_wang(4, alleles)
+    2.0 * a_wang(2, alleles) ^ 2.0 - a_wang(4, alleles)
 end
 
 function c_wang(alleles::Dict)
-    a_wang(2, alleles) - 2 * a_wang(2, alleles) ^ 2
+    a_wang(2, alleles) - 2.0 * a_wang(2, alleles) ^ 2
 end
 
 function d_wang(alleles::Dict)
-    4 * (a_wang(3, alleles) - a_wang(4, alleles))
+    4.0 * (a_wang(3, alleles) - a_wang(4, alleles))
 end
 
 function e_wang(alleles::Dict)
-    2 * (a_wang(2, alleles) - 3 * a_wang(3, alleles) + 2 * a_wang(4, alleles))
+    2.0 * (a_wang(2, alleles) - 3.0 * a_wang(3, alleles) + 2.0 * a_wang(4, alleles))
 end
 
 function f_wang(alleles::Dict)
-    4 * (a_wang(2, alleles) - a_wang(2, alleles)^2 - 2 * a_wang(3, alleles) + 2 * a_wang(4, alleles))
+    4.0 * (a_wang(2, alleles) - a_wang(2, alleles)^2 - 2.0 * a_wang(3, alleles) + 2.0 * a_wang(4, alleles))
 end
 
 function g_wang(alleles::Dict)
-    1 - 7 * a_wang(2, alleles) + 4 * a_wang(2, alleles)^2 + 10 * a_wang(3, alleles) - 8 * a_wang(4, alleles)
+    1.0 - 7.0 * a_wang(2, alleles) + 4.0 * a_wang(2, alleles)^2 + 10.0 * a_wang(3, alleles) - 8.0 * a_wang(4, alleles)
 end
 
 function u_wang(alleles::Dict)
-    2 * a_wang(2, alleles) - a_wang(3, alleles)
+    2.0 * a_wang(2, alleles) - a_wang(3, alleles)
 end
 
+"""
+    wang_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
+Calculates the moments based estimator of pairwise relatedness by Wang (2002).
+See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
+"""
 function wang_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     r = 0.0
     U = 0.0
-    for loc in loci(data)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
 
-        #Skip missing
-        if gen1 !== missing && gen2 !== missing
-            i,j = gen1
-            k,l = gen2
-            sym_loc = Symbol(loc)
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
 
-            b = b_wang(alleles[sym_loc])
-            c = c_wang(alleles[sym_loc])
-            d = d_wang(alleles[sym_loc])
-            e = e_wang(alleles[sym_loc])
-            f = f_wang(alleles[sym_loc])
-            g = g_wang(alleles[sym_loc])
-            u = u_wang(alleles[sym_loc])
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        i,j = gen1
+        k,l = gen2
+ 
+        b = b_wang(alleles[loc])
+        c = c_wang(alleles[loc])
+        d = d_wang(alleles[loc])
+        e = e_wang(alleles[loc])
+        f = f_wang(alleles[loc])
+        g = g_wang(alleles[loc])
+        u = u_wang(alleles[loc])
 
-            #Which category of dyad
-            # Both alleles shared between individuals either the same or different
-            P1 = 1.0 * ((i == j == k == l) | (i == k & j == l) | (i == l & k == j))
-            # One allele shared between individuals and one is homozygous for that allele
-            P2 = 1.0 * ((i == j == k != l) | (i == j == l != k) | (k == l == i != j) | (k == l == j != i))
-            # One allele shared with the other two being unique
-            P3 = 1.0 * ((i == k + i != j + i != l + j != l) | (i == l + i != k + i != j + j != k) | (j == k + j != i + j != l + l != i) | (j == l + j != i + j != k + k != l))
-            P4 = 1.0 * ((P1 + P2 + P3) == 0)
+        # Which category of dyad
+        # Both alleles shared between individuals either the same or different
+        P1 = 1.0 * ((i == j == k == l) | (i == k & j == l) | (i == l & k == j))
+        # One allele shared between individuals and one is homozygous for that allele
+        P2 = 1.0 * ((i == j == k != l) | (i == j == l != k) | (k == l == i != j) | (k == l == j != i))
+        # One allele shared with the other two being unique
+        P3 = 1.0 * ((i == k + i != j + i != l + j != l) | (i == l + i != k + i != j + j != k) | (j == k + j != i + j != l + l != i) | (j == l + j != i + j != k + k != l))
+        P4 = 1.0 * ((P1 + P2 + P3) == 0)
 
-            #Eq 11
-            V = (1 - b)^2 * (e^2 * f + d * g^2) -
-                (1 - b) * (e * f - d * g)^2 +
-                2 * c * d * f * (1 - b) * (g + e) +
-                c^2 * d * f * (d + f)
+        #Eq 11
+        V = (1.0 - b)^2 * (e^2 * f + d * g^2) -
+            (1.0 - b) * (e * f - d * g)^2 +
+            2.0 * c * d * f * (1.0 - b) * (g + e) +
+            c^2 * d * f * (d + f)
 
-            #Eq 9
-            Φ = (d * f * ((e + g) * (1 - b) + c * (d + f)) * (P1 - 1) +
-                d * (1 - b) * (g * (1 - b - d) + f * (c + e)) * P3 +
-                f * (1 - b) * (e * (1 - b - f) + d * (c + g)) * P2) / V
+        #Eq 9
+        Φ = (d * f * ((e + g) * (1.0 - b) + c * (d + f)) * (P1 - 1.0) +
+            d * (1.0 - b) * (g * (1.0 - b - d) + f * (c + e)) * P3 +
+            f * (1.0 - b) * (e * (1.0 - b - f) + d * (c + g)) * P2) / V
 
-            #Eq 10
-            Δ = (c * d * f * (e + g) * (P1 + 1 - 2 * b) +
-                ((1 - b) * (f * e^2 + d * g^2) - (e * f - d * g)^2) * (P1 - b) +
-                c * (d * g - e * f) * (d * P3 - f * P2) - c^2 * d * f * (P3 + P2 - d - f) -
-                c * (1 - b) * (d * g * P3 + e * f * P2)) / V
+        #Eq 10
+        Δ = (c * d * f * (e + g) * (P1 + 1.0 - 2 * b) +
+            ((1.0 - b) * (f * e^2 + d * g^2) - (e * f - d * g)^2) * (P1 - b) +
+            c * (d * g - e * f) * (d * P3 - f * P2) - c^2 * d * f * (P3 + P2 - d - f) -
+            c * (1.0 - b) * (d * g * P3 + e * f * P2)) / V
 
-            #Eq 1
-            r += (Φ/2 + Δ) / u
-            U += (1/u)
-
-        end
+        #Eq 1.0
+        r += (Φ/2.0 + Δ) / u
+        U += (1.0/u)
     end
     return(r / U)
 end
@@ -353,7 +349,6 @@ function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::
         @inbounds Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
             idx += 1
             relate_vec[idx] += qg_relatedness(data, ind1, ind2, alleles = allele_frequencies)
-
         end
     end
     method_colname = Symbol("relatedness_" * method)
