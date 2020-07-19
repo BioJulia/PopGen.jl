@@ -9,7 +9,7 @@ object.
     len = length(flat_alleles)
     len == 0 && return d
     @inbounds @simd for allele in flat_alleles
-        @inbounds get!(d, allele, 0) + 1/len
+        d[allele] = @inbounds get!(d, allele, 0.0) + 1.0/len
     end
     return d
 end
@@ -62,7 +62,7 @@ function avg_allele_freq(allele_dicts::AbstractVector{T}) where T<:Dict{Int16,Fl
    # populate the sum dict with allele frequency and n for each allele
    @inbounds for allele in all_alleles
        for allele_dict in allele_dicts
-           sum_dict[allele] = get!(sum_dict, allele, (0., 0)) .+ (get!(allele_dict, allele, 0.), 1)
+           @inbounds sum_dict[allele] = get!(sum_dict, allele, (0., 0)) .+ (get!(allele_dict, allele, 0.), 1)
        end
    end
    avg_dict = Dict{Int16, Float32}()
@@ -130,7 +130,7 @@ Return a `Dict` of genotype counts of a single locus in a
     d = Dict{Tuple, Float32}()
     @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
-        get!(d, genotype, 0) += 1
+        d[genotype] =get!(d, genotype, 0.0) = 1.0 
     end
     return d
 end
@@ -159,7 +159,7 @@ function geno_count_expected(locus::T) where T<:GenoArray
     genos = reverse.(Base.Iterators.product(alle, alle) |> collect |> vec)
     expected = Dict{Tuple, Float64}()
     for (geno, freq) in zip(genos, expected_genotype_freq)
-        get!(expected, geno, 0.0) += freq
+        expected[geno] = get!(expected, geno, 0.0) + freq
     end
 
     return expected
@@ -177,7 +177,7 @@ Return a `Dict` of genotype frequencies of a single locus in a
     d = Dict{Tuple, Float32}()
     @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
-        get!(d, genotype, 0) += 1
+        d[genotype] = get!(d, genotype, 0.0) + 1.0
     end
     total = values(d) |> sum    # sum of all non-missing genotypes
     [d[i] = d[i] / total for i in keys(d)] # genotype count/total
@@ -230,7 +230,7 @@ function geno_freq_expected(locus::T) where T<:GenoArray
     # reform genotype frequencies into a Dict
     expected = Dict{Tuple, Float64}()
     for (geno, freq) in zip(genos, expected_genotype_freq)
-        get!(expected, geno, 0) += freq
+        expected[geno] = get!(expected, geno, 0.0) + freq
     end
 
     return expected
