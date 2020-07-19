@@ -130,7 +130,7 @@ Return a `Dict` of genotype counts of a single locus in a
     d = Dict{Tuple, Float32}()
     @inbounds for genotype in skipmissing(locus)
         # sum up non-missing genotypes
-        d[genotype] =get!(d, genotype, 0.0) = 1.0 
+        d[genotype] = get!(d, genotype, 0.0) + 1.0 
     end
     return d
 end
