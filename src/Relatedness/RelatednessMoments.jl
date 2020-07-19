@@ -10,10 +10,10 @@ function QuellerGoodnight(data::PopData, ind1::String, ind2::String; alleles::T)
 
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
-    n1 = 0.0
-    n2 = 0.0
-    d1 = 0.0
-    d2 = 0.0
+    numerator1 = 0.0
+    numerator2 = 0.0
+    denominator1 = 0.0
+    denominator2 = 0.0
 
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
@@ -23,13 +23,13 @@ function QuellerGoodnight(data::PopData, ind1::String, ind2::String; alleles::T)
         c,d = gen2
         loc = Symbol(loc)
 
-        n1 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2.0 * (alleles[loc][a] + alleles[loc][b])
-        n2 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2.0 * (alleles[loc][c] + alleles[loc][d])
+        numerator1 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2.0 * (alleles[loc][a] + alleles[loc][b])
+        numerator2 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2.0 * (alleles[loc][c] + alleles[loc][d])
 
-        d1 += (2.0 * (1.0 + (a==b) - alleles[loc][a] - alleles[loc][b]))
-        d2 += (2.0 * (1.0 + (c==d) - alleles[loc][c] - alleles[loc][d]))
+        denominator1 += (2.0 * (1.0 + (a==b) - alleles[loc][a] - alleles[loc][b]))
+        denominator2 += (2.0 * (1.0 + (c==d) - alleles[loc][c] - alleles[loc][d]))
     end
-    return (n1/d1 + n2/d2)/2.0
+    return (numerator1/denominator1 + numerator2/denominator2)/2.0
 end
 
 """
@@ -44,8 +44,8 @@ function Ritland(data::PopData, ind1::String, ind2::String; alleles::T) where T 
 
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
-    n = 0.0
-    d = 0.0
+    numerator1 = 0.0
+    denominator1 = 0.0
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
 
@@ -58,15 +58,15 @@ function Ritland(data::PopData, ind1::String, ind2::String; alleles::T) where T 
         R = 0.0
         for i in keys(alleles[loc])
             # Individual locus relatedness value (eq 7 in paper)
-            R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4.0 * alleles[loc][i])) 
+            R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4.0 * alleles[loc][i]))
         end
         R = (2.0 / A) * (R - 1.0)
         # numerator for weighted combination of loci
-        n += (R * A)
+        numerator1 += (R * A)
         # denominator for weighted combination of loci
-        d += A 
+        denominator1 += A
     end
-    return n / d
+    return numerator1 / denominator1
 end
 
 """
@@ -80,8 +80,8 @@ Ritland original citation: https://www.cambridge.org/core/journals/genetics-rese
 function LynchRitland(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
-    n = 0.0
-    d = 0.0
+    numerator1 = 0.0
+    denominator1 = 0.0
 
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
@@ -98,10 +98,10 @@ function LynchRitland(data::PopData, ind1::String, ind2::String; alleles::T) whe
 
         RL = (n1 / d1) + (n2 / d2)
 
-        n += RL #JDS - CHECK THIS IS CORRECT
-        d += ((alleles[loc] |> length) - 1)
+        numerator1 += RL #JDS - CHECK THIS IS CORRECT
+        denominator1 += ((alleles[loc] |> length) - 1)
     end
-    return n / d
+    return numerator1 / denominator1
 end
 
 """
@@ -112,9 +112,9 @@ See equations 13 - 16 in: https://www.nature.com/articles/hdy201752 for variant 
 function LynchLi(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
-    n = 0.0
-    d = 0.0
-    
+    numerator1 = 0.0
+    denominator1 = 0.0
+
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
 
@@ -126,23 +126,23 @@ function LynchLi(data::PopData, ind1::String, ind2::String; alleles::T) where T 
         #TODO Change to unbiased formulation (eq 25)
         S0 = 2.0 * sum(values(alleles[loc]) .^ 2) - sum(values(alleles[loc]) .^ 3)
 
-        n += Sxy - S0
-        d += 1.0 - S0
+        numerator1 += Sxy - S0
+        denominator1 += 1.0 - S0
     end
-    return n / d
+    return numerator1 / denominator1
 end
 
 """
     Loiselle(data::PopData, ind1::String, ind2::String; alleles::Dict)
-Calculates the moments based estimator of pairwise relatedness using the estimator propsed by 
+Calculates the moments based estimator of pairwise relatedness using the estimator propsed by
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 See equations 22 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
 function Lioselle(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
-    n = 0.0
-    d = 0.0
+    numerator1 = 0.0
+    denominator1 = 0.0
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
 
@@ -155,7 +155,7 @@ function Lioselle(data::PopData, ind1::String, ind2::String; alleles::T) where T
             d += alleles[loc][allele] * (1.0 - alleles[loc][allele])
         end
     end
-    return (2.0 * n / d) + 2.0 / (2 * length(samples(data)) - 1)
+    return (2.0 * numerator1 / denominator1) + 2.0 / (2 * length(samples(data)) - 1)
 end
 
 ### Wang 2002 helper functions ###
@@ -209,7 +209,7 @@ function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: 
     for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
         i,j = gen1
         k,l = gen2
- 
+
         b = b_wang(alleles[loc])
         c = c_wang(alleles[loc])
         d = d_wang(alleles[loc])
@@ -264,8 +264,11 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
     relate_vec = zeros(length(sample_pairs))
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-        @inbounds Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
+        #@inbounds for ind2 in sample_names[sample_n+1:end]
+        #@inbounds Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
+            #TODO Add column for number of shared and number of missing loci for each pair
             relate_vec[idx] += method(data, ind1, ind2, alleles = allele_frequencies)
         end
     end
