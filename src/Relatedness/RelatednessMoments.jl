@@ -1,12 +1,12 @@
 #### Simple code versions ####
 """
-    qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    QuellerGoodnight(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
 See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
-function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function QuellerGoodnight(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
 
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
@@ -33,14 +33,14 @@ function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
 end
 
 """
-    ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    Ritland(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness proposed by Li and Horvitz (1953) and implemented/made popular by Ritland (1996).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
 See equation 7 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
 """
-function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function Ritland(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
 
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
@@ -66,18 +66,18 @@ function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles:
         # denominator for weighted combination of loci
         d += A 
     end
-    return (n / d)
+    return n / d
 end
 
 """
-    lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    LynchRitland(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness by Ritland (1996).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
 See equation 10 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
 """
-function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function LynchRitland(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     n = 0.0
@@ -101,15 +101,15 @@ function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
         n += RL #JDS - CHECK THIS IS CORRECT
         d += ((alleles[loc] |> length) - 1)
     end
-    return (n / d)
+    return n / d
 end
 
 """
-    ll_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    LynchLi(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness by Lynch (1988) & improved by Li et al. (1993).
 See equations 13 - 16 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
-function ll_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function LynchLi(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     n = 0.0
@@ -129,16 +129,16 @@ function ll_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
         n += Sxy - S0
         d += 1.0 - S0
     end
-    return (n / d)
+    return n / d
 end
 
 """
-    loiselle_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    Loiselle(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness using the estimator propsed by 
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 See equations 22 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
-function loiselle_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function Lioselle(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     n = 0.0
@@ -193,11 +193,11 @@ function u_wang(alleles::Dict)
 end
 
 """
-    wang_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    Wang(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
 """
-function wang_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     r = 0.0
@@ -248,93 +248,11 @@ function wang_relatedness(data::PopData, ind1::String, ind2::String; alleles::T)
         r += (Φ/2.0 + Δ) / u
         U += (1.0/u)
     end
-    return(r / U)
+    return r / U
 end
-
-
-
-#### Rework for efficiency ####
-
-function QuellerGoodnight(loc::Symbol, geno1::Genotype, geno2::Genotype, alleles::T) where T <: NamedTuple
-    a,b = geno1
-    c,d = geno2
-
-    n1 = sum((a == c, a == d, b == c, b == d)) - 2.0 * (alleles[loc][a] + alleles[loc][b])
-    n2 = sum((a == c, a == d, b == c, b == d)) - 2.0 * (alleles[loc][c] + alleles[loc][d])
-
-    d1 = 2.0 * (1.0 + (a==b) - alleles[loc][a] - alleles[loc][b])
-    d2 = 2.0 * (1.0 + (c==d) - alleles[loc][c] - alleles[loc][d])
-    return (n1, d1, n2, d2)
-end
-
-function Ritland(loc::Symbol, geno1::Genotype, geno2::Genotype, alleles::T) where T <: NamedTuple
-    a,b = geno1
-    c,d = geno2
-
-    A = ((alleles[loc] |> length) - 1)
-
-    R = 0.0
-    for allele in keys(alleles[loc])
-        # Individual locus relatedness value (eq 7 in paper)
-        R += ((((a == allele) + (b == allele)) * ((c == allele) + (d == allele))) / (4.0 * alleles[loc][allele]))
-    end
-    R = (2 / A) * (R - 1.0)
-    # return numerator,denominator
-    return ((R * A), A, 0.0, 0.0)
-end
-
-function LynchRitland(loc::Symbol, geno1::Genotype, geno2::Genotype, alleles::T) where T <: NamedTuple
-    a,b = geno1
-    c,d = geno2
-    A = ((alleles[loc] |> length) - 1)
-
-    n1 = alleles[loc][a] * ((b == c) + (b == d)) + alleles[loc][b] * ((a == c) + (a == d)) - 4.0 * alleles[loc][a] * alleles[loc][b]
-    n2 = alleles[loc][c] * ((d == a) + (d == b)) + alleles[loc][d] * ((c == a) + (c == b)) - 4.0 * alleles[loc][c] * alleles[loc][d]
-
-    d1 = 2.0 * (1.0 + (a == b)) * (alleles[loc][a] + alleles[loc][b]) - 8.0 * alleles[loc][a] * alleles[loc][b]
-    d2 = 2.0 * (1.0 + (c == d)) * (alleles[loc][c] + alleles[loc][d]) - 8.0 * alleles[loc][c] * alleles[loc][d]
-
-    RL = (n1 / d1) + (n2 / d2)
-    # return numerator, denominator
-    return (RL, A, 0.0, 0.0)
-end
-
-"""
-    relatedness_moment(data::PopData, ind1::String, ind2::String; alleles::Dict)
-Calculates the moments based estimator of pairwise relatedness by Ritland (1996).
-- Bases allele frequencies on entire population
-- Inbreeding can only be assumed not to exist.
-See equation 10 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
-Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
-"""
-function relatedness_moment(data::PopData, ind1::String, ind2::String; alleles::T, method::Vector{Function}) where T <: NamedTuple
-    #NEED TO CHECK TO CONFIRM EQUATIONS
-    #Extract the pair of interest's genotypes
-    gen1 = get_genotypes(data, ind1)
-    gen2 = get_genotypes(data, ind2)
-
-    d = Dict{Symbol,Vector{Float64}}()
-
-    for (loc,geno1,geno2) in zip(skipmissings(Symbol.(loci(data)), gen1, gen2)...)
-        for mthd in method
-            nu, denm, nu2, denm2 = mthd(loc, geno1, geno2, alleles)
-            get!(d, Symbol(mthd), zeros(4))[1] += nu
-            get!(d, Symbol(mthd), zeros(4))[2] += denm
-            get!(d, Symbol(mthd), zeros(4))[3] += nu2
-            get!(d, Symbol(mthd), zeros(4))[4] += denm2
-        end
-    end
-    if haskey(d, :QuellerGoodnight)
-        qg = d[:QuellerGoodnight]
-        d[:QuellerGoodnight][1] = (qg[1]/qg[2]) + (qg[3]/qg[4])
-        d[:QuellerGoodnight][2] = 2.0
-    end
-    return NamedTuple{Tuple(keys(d))}(getindex.(values(d), 1) ./ getindex.(values(d), 2))
-end
-
 
 #TODO this is 100% incomplete
-function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::Bool = true, verbose::Bool = true)
+function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
     all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
@@ -348,9 +266,9 @@ function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         @inbounds Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
             idx += 1
-            relate_vec[idx] += qg_relatedness(data, ind1, ind2, alleles = allele_frequencies)
+            relate_vec[idx] += method(data, ind1, ind2, alleles = allele_frequencies)
         end
     end
-    method_colname = Symbol("relatedness_" * method)
+    method_colname = Symbol("$method")
     return DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), method_colname => relate_vec)
 end
