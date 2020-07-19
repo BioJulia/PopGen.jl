@@ -40,6 +40,7 @@ using CSV, Distributions, DataFrames
 using FileIO, JLD2
 using MultipleTesting, Random, StatsBase
 using GeneticVariation: VCF, BCF, header
+using Missings: skipmissings
 
 #=
 using Convex,
