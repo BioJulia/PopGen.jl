@@ -1,6 +1,6 @@
 #### Simple code versions ####
 """
-    qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+    qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
@@ -15,29 +15,25 @@ function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
     d1 = 0.0
     d2 = 0.0
 
-    for loc in loci(data)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
 
-        #Skip missing
-        if gen1 !== missing && gen2 !== missing
-            a,b = gen1
-            c,d = gen2
-            sym_loc = Symbol(loc)
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        a,b = gen1
+        c,d = gen2
+        loc = Symbol(loc)
 
-            n1 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2 * (alleles[sym_loc][a] + alleles[sym_loc][b])
-            n2 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2 * (alleles[sym_loc][c] + alleles[sym_loc][d])
+        n1 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2.0 * (alleles[loc][a] + alleles[loc][b])
+        n2 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2.0 * (alleles[loc][c] + alleles[loc][d])
 
-            d1 += (2 * (1 + (a==b) - alleles[sym_loc][a] - alleles[sym_loc][b]))
-            d2 += (2 * (1 + (c==d) - alleles[sym_loc][c] - alleles[sym_loc][d]))
-        end
+        d1 += (2.0 * (1.0 + (a==b) - alleles[loc][a] - alleles[loc][b]))
+        d2 += (2.0 * (1.0 + (c==d) - alleles[loc][c] - alleles[loc][d]))
     end
     return (n1/d1 + n2/d2)/2.0
 end
 
 """
-    ritland_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+    ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness proposed by Li and Horvitz (1953) and implemented/made popular by Ritland (1996).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
@@ -50,34 +46,31 @@ function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles:
 
     n = 0.0
     d = 0.0
-    for loc in loci(data)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
 
-        #Skip missing
-        if gen1 !== missing && gen2 !== missing
-            a,b = gen1
-            c,d = gen2
-            sym_loc = Symbol(loc)
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        a,b = gen1
+        c,d = gen2
 
-            A = ((alleles[sym_loc] |> length) - 1)
+        A = ((alleles[loc] |> length) - 1)
 
-            R = 0.0
-            for i in keys(alleles[sym_loc])
-                R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4 * alleles[sym_loc][i])) #Individual locus relatedness value (eq 7 in paper)
-            end
-            R = (2 / A) * (R - 1)
-
-            n += (R * A) #numerator for weighted combination of loci
-            d += A #denominator for weighted combination of loci
+        R = 0.0
+        for i in keys(alleles[loc])
+            # Individual locus relatedness value (eq 7 in paper)
+            R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4.0 * alleles[loc][i])) 
         end
+        R = (2.0 / A) * (R - 1.0)
+        # numerator for weighted combination of loci
+        n += (R * A)
+        # denominator for weighted combination of loci
+        d += A 
     end
     return (n / d)
 end
 
 """
-    lr_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+    lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness by Ritland (1996).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
@@ -89,34 +82,30 @@ function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
 
     n = 0.0
     d = 0.0
-    for loc in loci(data)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
 
-        #Skip missings
-        if gen1 !== missing && gen2 !== missing
-            a,b = gen1
-            c,d = gen2
-            sym_loc = Symbol(loc)
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
 
-            n1 = alleles[sym_loc][a] * ((b == c) + (b == d)) + alleles[sym_loc][b] * ((a == c) + (a == d)) - 4 * alleles[sym_loc][a] * alleles[sym_loc][b]
-            n2 = alleles[sym_loc][c] * ((d == a) + (d == b)) + alleles[sym_loc][d] * ((c == a) + (c == b)) - 4 * alleles[sym_loc][c] * alleles[sym_loc][d]
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        a,b = gen1
+        c,d = gen2
 
-            d1 = 2 * (1 + (a == b)) * (alleles[sym_loc][a] + alleles[sym_loc][b]) - 8 * alleles[sym_loc][a] * alleles[sym_loc][b]
-            d2 = 2 * (1 + (c == d)) * (alleles[sym_loc][c] + alleles[sym_loc][d]) - 8 * alleles[sym_loc][c] * alleles[sym_loc][d]
+        n1 = alleles[loc][a] * ((b == c) + (b == d)) + alleles[loc][b] * ((a == c) + (a == d)) - 4.0 * alleles[loc][a] * alleles[loc][b]
+        n2 = alleles[loc][c] * ((d == a) + (d == b)) + alleles[loc][d] * ((c == a) + (c == b)) - 4.0 * alleles[loc][c] * alleles[loc][d]
 
-            RL = (n1 / d1) + (n2 / d2)
+        d1 = 2.0 * (1.0 + (a == b)) * (alleles[loc][a] + alleles[loc][b]) - 8.0 * alleles[loc][a] * alleles[loc][b]
+        d2 = 2.0 * (1.0 + (c == d)) * (alleles[loc][c] + alleles[loc][d]) - 8.0 * alleles[loc][c] * alleles[loc][d]
 
-            n += RL #JDS - CHECK THIS IS CORRECT
-            d += ((alleles[sym_loc] |> length) - 1)
-        end
+        RL = (n1 / d1) + (n2 / d2)
+
+        n += RL #JDS - CHECK THIS IS CORRECT
+        d += ((alleles[loc] |> length) - 1)
     end
     return (n / d)
 end
 
 """
-    ll_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+    ll_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness by Lynch (1988) & improved by Li et al. (1993).
 See equations 13 - 16 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
@@ -125,32 +114,28 @@ function ll_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
 
     n = 0.0
     d = 0.0
-    for loc in loci(data)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
+    
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
 
-        #Skip missing
-        if gen1 !== missing && gen2 !== missing
-            a,b = gen1
-            c,d = gen2
-            sym_loc = Symbol(loc)
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        a,b = gen1
+        c,d = gen2
 
-            Sxy = (1/2) * (((a == c) + (a == d) + (b == c) + (b == d)) / (2 * (1 + (a == b))) + ((a == c) + (a == d) + (b == c) + (b == d)) / (2 * (1 + (c == d))))
-            #TODO Change to unbiased formulation (eq 25)
-            S0 = 2 * sum(values(alleles[sym_loc]) .^ 2) - sum(values(alleles[sym_loc]) .^ 3)
+        Sxy = (0.5) * (((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (a == b))) + ((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (c == d))))
+        #TODO Change to unbiased formulation (eq 25)
+        S0 = 2.0 * sum(values(alleles[loc]) .^ 2) - sum(values(alleles[loc]) .^ 3)
 
-            n += Sxy - S0
-            d += 1 - S0
-
-        end
+        n += Sxy - S0
+        d += 1.0 - S0
     end
     return (n / d)
 end
 
 """
-    loiselle_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
-Calculates the moments based estimator of pairwise relatedness using the estimator propsed by Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
+    loiselle_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
+Calculates the moments based estimator of pairwise relatedness using the estimator propsed by 
+Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 See equations 22 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
 function loiselle_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
@@ -158,30 +143,23 @@ function loiselle_relatedness(data::PopData, ind1::String, ind2::String; alleles
 
     n = 0.0
     d = 0.0
-    for loc in loci(data)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
 
-        #Skip missing
-        if gen1 !== missing && gen2 !== missing
-            a,b = gen1
-            c,d = gen2
-            sym_loc = Symbol(loc)
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        a,b = gen1
+        c,d = gen2
 
-            for allele in keys(alleles[sym_loc])
-
-                n += ((sum(gen1 .== allele) / 2) - alleles[sym_loc][allele]) * ((sum(gen2 .== allele) / 2) - alleles[sym_loc][allele])
-                d += alleles[sym_loc][allele] * (1 - alleles[sym_loc][allele])
-
-            end
+        for allele in keys(alleles[loc])
+            n += ((sum(gen1 .== allele) / 2.0) - alleles[loc][allele]) * ((sum(gen2 .== allele) / 2.0) - alleles[loc][allele])
+            d += alleles[loc][allele] * (1.0 - alleles[loc][allele])
         end
     end
-    return (2 * n / d) + 2 / (2 * length(samples(data)) - 1)
+    return (2.0 * n / d) + 2.0 / (2 * length(samples(data)) - 1)
 end
 
 """
-    wang_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+    wang_relatedness(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
 """
@@ -243,9 +221,12 @@ function wang_relatedness(data::PopData, ind1::String, ind2::String; alleles::T)
             u = u_wang(alleles[sym_loc])
 
             #Which category of dyad
-            P1 = 1.0 * ((i == j == k == l) | (i == k & j == l) | (i == l & k == j)) #Both alleles shared between individuals either the same or different
-            P2 = 1.0 * ((i == j == k != l) | (i == j == l != k) | (k == l == i != j) | (k == l == j != i)) #One allele shared between individuals and one is homozygous for that allele
-            P3 = 1.0 * ((i == k + i != j + i != l + j != l) | (i == l + i != k + i != j + j != k) | (j == k + j != i + j != l + l != i) | (j == l + j != i + j != k + k != l)) #One allele shared with the other two being unique
+            # Both alleles shared between individuals either the same or different
+            P1 = 1.0 * ((i == j == k == l) | (i == k & j == l) | (i == l & k == j))
+            # One allele shared between individuals and one is homozygous for that allele
+            P2 = 1.0 * ((i == j == k != l) | (i == j == l != k) | (k == l == i != j) | (k == l == j != i))
+            # One allele shared with the other two being unique
+            P3 = 1.0 * ((i == k + i != j + i != l + j != l) | (i == l + i != k + i != j + j != k) | (j == k + j != i + j != l + l != i) | (j == l + j != i + j != k + k != l))
             P4 = 1.0 * ((P1 + P2 + P3) == 0)
 
             #Eq 11
@@ -323,7 +304,7 @@ function LynchRitland(loc::Symbol, geno1::Genotype, geno2::Genotype, alleles::T)
 end
 
 """
-    relatedness_moment(data::PopObj, ind1::String, ind2::String; alleles::Dict)
+    relatedness_moment(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness by Ritland (1996).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
