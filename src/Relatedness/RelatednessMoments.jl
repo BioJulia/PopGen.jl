@@ -21,13 +21,16 @@ function QuellerGoodnight(data::PopData, ind1::String, ind2::String; alleles::T)
     for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
         a,b = gen1
         c,d = gen2
-        loc = Symbol(loc)
+        ident = ((a == c) + (a == d) + (b == c) + (b == d))
+        fq_a = alleles[loc][a]
+        fq_b = alleles[loc][b]
+        fq_c = alleles[loc][c]
+        fq_d = alleles[loc][d]
+        numerator1 += ident - 2.0 * (fq_a + fq_b)
+        numerator2 += ident - 2.0 * (fq_c + fq_d)
 
-        numerator1 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2.0 * (alleles[loc][a] + alleles[loc][b])
-        numerator2 += ((a == c) + (a == d) + (b == c) + (b == d)) - 2.0 * (alleles[loc][c] + alleles[loc][d])
-
-        denominator1 += (2.0 * (1.0 + (a==b) - alleles[loc][a] - alleles[loc][b]))
-        denominator2 += (2.0 * (1.0 + (c==d) - alleles[loc][c] - alleles[loc][d]))
+        denominator1 += (2.0 * (1.0 + (a==b) - fq_a - fq_b))
+        denominator2 += (2.0 * (1.0 + (c==d) - fq_c - fq_d))
     end
     return (numerator1/denominator1 + numerator2/denominator2)/2.0
 end
@@ -56,7 +59,7 @@ function Ritland(data::PopData, ind1::String, ind2::String; alleles::T) where T 
         A = ((alleles[loc] |> length) - 1)
 
         R = 0.0
-        for i in keys(alleles[loc])
+        for i in unique((a,b,c,d))
             # Individual locus relatedness value (eq 7 in paper)
             R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4.0 * alleles[loc][i]))
         end
@@ -89,12 +92,16 @@ function LynchRitland(data::PopData, ind1::String, ind2::String; alleles::T) whe
     for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
         a,b = gen1
         c,d = gen2
+        fq_a = alleles[loc][a]
+        fq_b = alleles[loc][b]
+        fq_c = alleles[loc][c]
+        fq_d = alleles[loc][d]
 
-        n1 = alleles[loc][a] * ((b == c) + (b == d)) + alleles[loc][b] * ((a == c) + (a == d)) - 4.0 * alleles[loc][a] * alleles[loc][b]
-        n2 = alleles[loc][c] * ((d == a) + (d == b)) + alleles[loc][d] * ((c == a) + (c == b)) - 4.0 * alleles[loc][c] * alleles[loc][d]
+        n1 = fq_a * ((b == c) + (b == d)) + fq_b * ((a == c) + (a == d)) - 4.0 * fq_a * fq_b
+        n2 = fq_c * ((d == a) + (d == b)) + fq_d * ((c == a) + (c == b)) - 4.0 * fq_c * fq_d
 
-        d1 = 2.0 * (1.0 + (a == b)) * (alleles[loc][a] + alleles[loc][b]) - 8.0 * alleles[loc][a] * alleles[loc][b]
-        d2 = 2.0 * (1.0 + (c == d)) * (alleles[loc][c] + alleles[loc][d]) - 8.0 * alleles[loc][c] * alleles[loc][d]
+        d1 = 2.0 * (1.0 + (a == b)) * (fq_a + fq_b) - 8.0 * fq_a * fq_b
+        d2 = 2.0 * (1.0 + (c == d)) * (fq_c + fq_d) - 8.0 * fq_c * fq_d
 
         RL = (n1 / d1) + (n2 / d2)
 
@@ -151,8 +158,9 @@ function Lioselle(data::PopData, ind1::String, ind2::String; alleles::T) where T
         c,d = gen2
 
         for allele in keys(alleles[loc])
-            n += ((sum(gen1 .== allele) / 2.0) - alleles[loc][allele]) * ((sum(gen2 .== allele) / 2.0) - alleles[loc][allele])
-            d += alleles[loc][allele] * (1.0 - alleles[loc][allele])
+            fq = alleles[loc][allele]
+            n += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
+            d += fq * (1.0 - fq)
         end
     end
     return (2.0 * numerator1 / denominator1) + 2.0 / (2 * length(samples(data)) - 1)
