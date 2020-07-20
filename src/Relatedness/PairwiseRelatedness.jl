@@ -275,7 +275,11 @@ included in the calculation of the relatedness coefficient Verbose controls the
 verbosity of the optimization process to find the Maximum likelihood Δ coefficents
 """
 function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, inbreeding::Bool = true, verbose::Bool = true)
-
+    #TODO - calculate inbreeding coeffificients Fx & Fy and include in r calculation
+    #Coancestry Manual
+    #Fx = sum(Δ[1:4])
+    #Fy = sum(Δ[1,2,5,6])
+    #rxy = (2Δ[1] + Δ[3] + Δ[5] + Δ[7] + (1/2)Δ[8]) / sqrt((1 + Fx) * (1 + Fy))
     Pr_L_S = all_loci_Pr_L_S(data, ind1, ind2, alleles)
 
     if !inbreeding
@@ -355,11 +359,11 @@ function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles:
             R = 0.0
             for allele in keys(alleles[sym_loc])
                 # Individual locus relatedness value (eq 7 in paper)
-                R += ((((a == allele) + (b == allele)) * ((c == allele) + (d == allele))) / (4.0 * alleles[sym_loc][allele])) 
+                R += ((((a == allele) + (b == allele)) * ((c == allele) + (d == allele))) / (4.0 * alleles[sym_loc][allele]))
             end
             R = (2 / A) * (R - 1.0)
             # numerator for weighted combination of loci
-            n += (R * A) 
+            n += (R * A)
             # denominator for weighted combination of loci
             d += A
         end
