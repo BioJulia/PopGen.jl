@@ -130,13 +130,15 @@ end
 
 
 """
-    multitest_missing(pvals::Vector{T}, correction::String) where T <: Union{Missing, <:AbstractFloat}
+    multitest_missing(pvals::Vector{T}, method::String) where T <: Union{Missing, <:AbstractFloat}
 Modification to `MultipleTesting.adjust` to include `missing` values in the
-returned array. Missing values are first removed from the array, the appropriate
-correction made, then missing values are re-added to the array at their original
-positions. See MultipleTesting.jl docs for full more detailed information.
-#### example
-`multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
+returned array. See MultipleTesting.jl docs for full more detailed information.
+
+**Example**
+```
+julia> multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")
+
+````
 
 ### `correction` methods (case insensitive)
 - `"bonferroni"` : Bonferroni adjustment
@@ -150,13 +152,7 @@ positions. See MultipleTesting.jl docs for full more detailed information.
 - `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
 """
-@inline function multitest_missing(pvals::Vector{T}, correction::String) where T <: Union{Missing, <:AbstractFloat}
-    # get indices of where original missing are
-    miss_idx = findall(i -> i === missing, pvals)
-
-    # make seperate array for non-missing P vals
-    p_no_miss = x[.!ismissing.(x)]
-
+@inline function multitest_missing(pvals::Vector{T}, method::String) where T <: Union{Missing, <:AbstractFloat}
     # make a dict of all possible tests and their respective functions
     d = Dict(
         "bonferroni" => Bonferroni(),
@@ -171,15 +167,11 @@ positions. See MultipleTesting.jl docs for full more detailed information.
         "fs" => ForwardStop(),
         "bc" => BarberCandes(),
     )
-
-    correct = adjust(p_no_miss, d[lowercase(correction)]) |> Vector{Union{Missing, Float64}}
-
-    # re-add missing to original positions
-    @inbounds for i in miss_idx
-        @inbounds insert!(correct, i, missing)
-    end
-    return correct
+    p_copy = copy(pvals)
+    p_copy[.!ismissing.(p_copy)] .= adjust(p_copy[.!ismissing.(p_copy)] |> Vector{Float64}, d[lowercase(method)])
+    return p_copy
 end
+
 
 """
     nonmissing(vec::T) where T<:AbstractArray
@@ -190,6 +182,29 @@ function nonmissing(vec::T) where T<:AbstractArray
     count(!ismissing, vec)
 end
 
+#TODO add to docs API
+"""
+    pairwise_pairs(smp_names::Vector{String})
+Given a vector of sample names, returns a vector of tuples of unique all x 
+all combinations of sample pairs, excluding self-comparisons.
+
+**Example**
+```
+julia> samps = ["red_1", "red_2", "blue_1", "blue_2"] ;
+
+julia> pairwise_pairs(samps)
+6-element Array{Tuple{String,String},1}:
+ ("red_1", "red_2")
+ ("red_1", "blue_1")
+ ("red_1", "blue_2")
+ ("red_2", "blue_1")
+ ("red_2", "blue_2")
+ ("blue_1", "blue_2")
+```
+"""
+function pairwise_pairs(smp_names::Vector{String})
+    [tuple(smp_names[i], smp_names[j]) for i in 1:length(smp_names)-1 for j in i+1:length(smp_names)]
+end
 
 """
     quickstart()
