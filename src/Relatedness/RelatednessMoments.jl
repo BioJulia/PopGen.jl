@@ -169,38 +169,53 @@ function Lioselle(data::PopData, ind1::String, ind2::String; alleles::T) where T
 end
 
 ### Wang 2002 helper functions ###
-function a_wang(m::Int, alleles::Dict)::Float64
-    #TODO Change to unbiased formulation (eq 25)
+function a_wang_base(m::Int, alleles::Dict)
     sum(values(alleles) .^ m)
 end
 
-function b_wang(alleles::Dict)
-    2.0 * a_wang(2, alleles) ^ 2.0 - a_wang(4, alleles)
+function a_wang(N::Int, alleles::Dict)
+    #unbiased estimator
+    a = Vector{Float64}(undef, 4)
+    a[1] = 0.0
+
+    a[2] = (N * a_wang_base(2, alleles) - 1) / (N - 1)
+
+    a[3] = (N^2 * a_wang_base(3, alleles) - 3 * (N - 1) * a[2] - 1) / ((N - 1) * (N - 2))
+
+    a[4] = (N^3 * a_wang_base(4, alleles) - 6 * (N - 1) * (N - 2) * a[3] - 7 * (N - 1) * a[2] - 1) / (N^3 - 6 * N^2 + 11 * N - 6)
+
+    return(a)
 end
 
-function c_wang(alleles::Dict)
-    a_wang(2, alleles) - 2.0 * a_wang(2, alleles) ^ 2
+#=
+function b_wang(N::Int, alleles::Dict)
+    2.0 * a_wang(2, N, alleles)^2 - a_wang(4, N, alleles)
 end
 
-function d_wang(alleles::Dict)
-    4.0 * (a_wang(3, alleles) - a_wang(4, alleles))
+function c_wang(N::Int, alleles::Dict)
+    a_wang(2, N, alleles) - 2.0 * a_wang(2, N, alleles)^2
 end
 
-function e_wang(alleles::Dict)
-    2.0 * (a_wang(2, alleles) - 3.0 * a_wang(3, alleles) + 2.0 * a_wang(4, alleles))
+function d_wang(N::Int, alleles::Dict)
+    4.0 * (a_wang(3, N, alleles) - a_wang(4, N, alleles))
 end
 
-function f_wang(alleles::Dict)
-    4.0 * (a_wang(2, alleles) - a_wang(2, alleles)^2 - 2.0 * a_wang(3, alleles) + 2.0 * a_wang(4, alleles))
+function e_wang(N::Int, alleles::Dict)
+    2.0 * (a_wang(2, N, alleles) - 3.0 * a_wang(3, N, alleles) + 2.0 * a_wang(4, N, alleles))
 end
 
-function g_wang(alleles::Dict)
-    1.0 - 7.0 * a_wang(2, alleles) + 4.0 * a_wang(2, alleles)^2 + 10.0 * a_wang(3, alleles) - 8.0 * a_wang(4, alleles)
+function f_wang(N::Int, alleles::Dict)
+    4.0 * (a_wang(2, N, alleles) - a_wang(2, N, alleles)^2 - 2.0 * a_wang(3, N, alleles) + 2.0 * a_wang(4, N, alleles))
 end
 
-function u_wang(alleles::Dict)
-    2.0 * a_wang(2, alleles) - a_wang(3, alleles)
+function g_wang(N::Int, alleles::Dict)
+    1.0 - 7.0 * a_wang(2, N, alleles) + 4.0 * a_wang(2, N, alleles)^2 + 10.0 * a_wang(3, N, alleles) - 8.0 * a_wang(4, N, alleles)
 end
+
+function u_wang(N::Int, alleles::Dict)
+    2.0 * a_wang(2, N, alleles) - a_wang(3, N, alleles)
+end
+=#
 
 """
     Wang(data::PopData, ind1::String, ind2::String; alleles::Dict)
@@ -222,13 +237,16 @@ function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: 
         i,j = gen1
         k,l = gen2
 
-        b = b_wang(alleles[loc])
-        c = c_wang(alleles[loc])
-        d = d_wang(alleles[loc])
-        e = e_wang(alleles[loc])
-        f = f_wang(alleles[loc])
-        g = g_wang(alleles[loc])
-        u[loc_id] = u_wang(alleles[loc])
+        N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
+
+        a = a_wang(N, alleles[loc])
+        b = 2.0 * a[2]^2 - a[4]
+        c = a[2] - 2.0 * a[2]^2
+        d = 4.0 * (a[3] - a[4])
+        e = 2.0 * (a[2] - 3.0 * a[3] + 2.0 * a[4])
+        f = 4.0 * (a[2] - a[2]^2 - 2.0 * a[3] + 2.0 * a[4])
+        g = 1.0 - 7.0 * a[2] + 4.0 * a[2]^2 + 10.0 * a[3] - 8.0 * a[4]
+        u[loc_id] = 2 * a[2] - a[3]
 
         # Which category of dyad
         # Both alleles shared between individuals either the same or different
@@ -259,8 +277,90 @@ function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: 
         #Eq 1.0
         r[loc_id] = (Φ/2.0 + Δ)
     end
-    return 1 / (sum(1/u) * u) * r
+    return (1 / (sum(1/u) * u)) * r
 end
+
+function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+    #wang2 uses a different way of weighting the loci - i'm not sure which is intended by wang yet based on his paper
+
+    a2 = Vector{Float64}(undef, length(loci(data)))
+    a3 = Vector{Float64}(undef, length(loci(data)))
+    a4 = Vector{Float64}(undef, length(loci(data)))
+
+    u = Vector{Float64}(undef, length(loci(data)))
+
+    P1 = Vector{Float64}(undef, length(loci(data)))
+    P2 = Vector{Float64}(undef, length(loci(data)))
+    P3 = Vector{Float64}(undef, length(loci(data)))
+    P4 = Vector{Float64}(undef, length(loci(data)))
+
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
+
+    loc_id = 0
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        loc_id += 1
+        i,j = gen1
+        k,l = gen2
+
+        N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
+
+        a = a_wang(N, alleles[loc])
+        a2[loc_id] = a[2]
+        a3[loc_id] = a[3]
+        a4[loc_id] = a[4]
+
+        u[loc_id] = 2 * a[2] - a[3]
+
+        # Which category of dyad
+        # Both alleles shared between individuals either the same or different
+        P1[loc_id] = 1.0 * ((i == j == k == l) | (i == k & j == l) | (i == l & k == j))
+        # One allele shared between individuals and one is homozygous for that allele
+        P2[loc_id] = 1.0 * ((i == j == k != l) | (i == j == l != k) | (k == l == i != j) | (k == l == j != i))
+        # One allele shared with the other two being unique
+        P3[loc_id] = 1.0 * ((i == k + i != j + i != l + j != l) | (i == l + i != k + i != j + j != k) | (j == k + j != i + j != l + l != i) | (j == l + j != i + j != k + k != l))
+        P4[loc_id] = 1.0 * ((P1 + P2 + P3) == 0)
+    end
+    #return (1 / (sum(1/u) * u)) * r
+    w = (1 / (sum(1/u) * u))
+
+
+    P1 = w * P1
+    P2 = w * P2
+    P3 = w * P3
+    a = (0.0, w * a2, w * a3, w * a4)
+    a_sq = (0.0, w * a2.^2, w * a3.^2, w * a4.^2)
+
+    b = 2.0 * a_sq[2] - a[4]
+    c = a[2] - 2.0 * a_sq[2]
+    d = 4.0 * (a[3] - a[4])
+    e = 2.0 * (a[2] - 3.0 * a[3] + 2.0 * a[4])
+    f = 4.0 * (a[2] - a_sq[2] - 2.0 * a[3] + 2.0 * a[4])
+    g = 1.0 - 7.0 * a[2] + 4.0 * a[2]^2 + 10.0 * a[3] - 8.0 * a[4]
+
+
+    #Eq 11
+    V = (1.0 - b)^2 * (e^2 * f + d * g^2) -
+        (1.0 - b) * (e * f - d * g)^2 +
+        2.0 * c * d * f * (1.0 - b) * (g + e) +
+        c^2 * d * f * (d + f)
+
+    #Eq 9
+    Φ = (d * f * ((e + g) * (1.0 - b) + c * (d + f)) * (P1 - 1.0) +
+        d * (1.0 - b) * (g * (1.0 - b - d) + f * (c + e)) * P3 +
+        f * (1.0 - b) * (e * (1.0 - b - f) + d * (c + g)) * P2) / V
+
+    #Eq 10
+    Δ = (c * d * f * (e + g) * (P1 + 1.0 - 2 * b) +
+        ((1.0 - b) * (f * e^2 + d * g^2) - (e * f - d * g)^2) * (P1 - b) +
+        c * (d * g - e * f) * (d * P3 - f * P2) - c^2 * d * f * (P3 + P2 - d - f) -
+        c * (1.0 - b) * (d * g * P3 + e * f * P2)) / V
+
+    r = (Φ/2.0 + Δ)
+    return (r)
+end
+
 
 #TODO this is 100% incomplete
 function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool = true, verbose::Bool = true)
