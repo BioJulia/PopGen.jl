@@ -239,7 +239,7 @@ function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: 
 
         N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
 
-        a = a_wang(N, alleles[loc])
+        a = a_wang(2 * N, alleles[loc])
         b = 2.0 * a[2]^2 - a[4]
         c = a[2] - 2.0 * a[2]^2
         d = 4.0 * (a[3] - a[4])
@@ -306,7 +306,7 @@ function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <:
 
         N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
 
-        a = a_wang(N, alleles[loc])
+        a = a_wang(2 * N, alleles[loc])
         a2[loc_id] = a[2]
         a3[loc_id] = a[3]
         a4[loc_id] = a[4]
