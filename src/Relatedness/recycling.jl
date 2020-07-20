@@ -78,3 +78,38 @@ function relatedness_moment(data::PopData, ind1::String, ind2::String; alleles::
     end
     return NamedTuple{Tuple(keys(d))}(getindex.(values(d), 1) ./ getindex.(values(d), 2))
 end
+
+# matrix version?
+function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+
+    numerator1 = 0.0
+    numerator2 = 0.0
+    denominator1 = 0.0
+    denominator2 = 0.0
+
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
+
+    # drop missing values
+    loc, geno1, geno2 = collect.(skipmissings(Symbol.(loci(data)), geno1, geno2))
+
+    # convert to 2-dimensional matrix for each individual
+    gen1 = hcat(getindex.(geno1, 1), getindex.(geno1, 2))
+    gen2 = hcat(getindex.(geno2, 1), getindex.(geno2, 2))
+    # ((a == c) + (a == d) + (b == c) + (b == d))
+    id_mtx = (gen1 .== gen2) .+ (gen1 .== reverse(gen2, dims = 2)) .* 
+        
+    a,b = gen1
+        c,d = gen2
+
+        ident = ((a == c) + (a == d) + (b == c) + (b == d))
+        numerator1 += ident - 2.0 * (alleles[loc][a] + alleles[loc][b])
+        numerator2 += ident - 2.0 * (alleles[loc][c] + alleles[loc][d])
+
+        denominator1 += (2.0 * (1.0 + (a==b) - alleles[loc][a] - alleles[loc][b]))
+        denominator2 += (2.0 * (1.0 + (c==d) - alleles[loc][c] - alleles[loc][d]))
+    end
+    return (numerator1/denominator1 + numerator2/denominator2)/2.0
+end
