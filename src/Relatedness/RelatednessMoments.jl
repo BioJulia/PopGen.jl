@@ -202,13 +202,15 @@ See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
 function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
-    r = 0.0
-    U = 0.0
+    r = Vector{Float64}(undef, length(loci(data)))
+    u = Vector{Float64}(undef, length(loci(data)))
 
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
 
+    loc_id = 0
     for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        loc_id += 1
         i,j = gen1
         k,l = gen2
 
@@ -218,7 +220,7 @@ function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: 
         e = e_wang(alleles[loc])
         f = f_wang(alleles[loc])
         g = g_wang(alleles[loc])
-        u = u_wang(alleles[loc])
+        u[loc_id] = u_wang(alleles[loc])
 
         # Which category of dyad
         # Both alleles shared between individuals either the same or different
@@ -247,10 +249,9 @@ function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: 
             c * (1.0 - b) * (d * g * P3 + e * f * P2)) / V
 
         #Eq 1.0
-        r += (Φ/2.0 + Δ) / u
-        U += (1.0/u)
+        r[loc_id] = (Φ/2.0 + Δ)
     end
-    return r / U
+    return 1 / (sum(1/u) * u) * r
 end
 
 #TODO this is 100% incomplete
