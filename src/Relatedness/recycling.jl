@@ -99,8 +99,8 @@ function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T
     gen1 = hcat(getindex.(geno1, 1), getindex.(geno1, 2))
     gen2 = hcat(getindex.(geno2, 1), getindex.(geno2, 2))
     # ((a == c) + (a == d) + (b == c) + (b == d))
-    id_mtx = (gen1 .== gen2) .+ (gen1 .== reverse(gen2, dims = 2)) .* 
-        
+    id_mtx = reduce(*, (gen1 .== gen2) .+ (gen1 .== reverse(gen2, dims = 2)), dims = 2)
+    return id_mtx    
     a,b = gen1
         c,d = gen2
 
@@ -113,3 +113,8 @@ function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T
     end
     return (numerator1/denominator1 + numerator2/denominator2)/2.0
 end
+
+mapreduce(x->x^2, +, [1:3;])
+mapreduce(isodd, *, a, dims=1)
+z = (a .== b) .+ (a .== reverse(b, dims = 2))
+mapreduce(x -> x, +, (a .== b) .+ (a .== reverse(b, dims = 2)), dims = 2)
