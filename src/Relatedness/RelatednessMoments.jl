@@ -104,11 +104,11 @@ function LynchRitland(data::PopData, ind1::String, ind2::String; alleles::T) whe
         d2 = 2.0 * (1.0 + (c == d)) * (fq_c + fq_d) - 8.0 * fq_c * fq_d
 
 
-        WL1 = ((1 + (a == b)) * (alleles[loc][a] + alleles[loc][b]) - 4 * alleles[loc][a] * alleles[loc][b]) / (2 * alleles[loc][a] * alleles[loc][b])
-        WL2 = ((1 + (c == d)) * (alleles[loc][c] + alleles[loc][d]) - 4 * alleles[loc][c] * alleles[loc][d]) / (2 * alleles[loc][c] * alleles[loc][d])
+        WL1 = ((1 + (a == b)) * (fq_a + fq_b) - 4 * fq_a * fq_b) / (2 * fq_a * fq_b)
+        WL2 = ((1 + (c == d)) * (fq_c + fq_d) - 4 * fq_c * fq_d) / (2 * fq_c * fq_d)
 
         numerator1 += ((n1 / d1) * WL1 + (n2 / d2) * WL2)
-        denominator1 += (WL1 + WL2) / 2
+        denominator1 += (WL1 + WL2) / 2.0
     end
     return numerator1 / denominator1
 end
