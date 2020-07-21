@@ -14,7 +14,6 @@ Queller, D. C., & Goodnight, K. F. (1989). Estimating relatedness using genetic 
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 """
 function QuellerGoodnight(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
-    #TODO adjustment with eq2 to unbias when estimating relatedness from sample data
     isempty(locus_names) && return missing
 
     numerator1 = 0.0
