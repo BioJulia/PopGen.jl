@@ -223,7 +223,7 @@ function Moran(data::PopData, ind1::String, ind2::String; alleles::T) where T <:
 
     numerator1 = 0.0
     denominator1 = 0.0
-    r = 0.0
+
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
 
@@ -237,9 +237,6 @@ function Moran(data::PopData, ind1::String, ind2::String; alleles::T) where T <:
     end
     return (numerator1 / denominator1)
 end
-
-
-
 
 ### Wang 2002 helper functions ###
 function a_wang_base(m::Int, alleles::Dict)
