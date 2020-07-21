@@ -4,9 +4,6 @@
 Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
 
 -Single Locus Equation:
-```math
-r_xy[a,b; c,d] = \\frac{1}{2}}\\left(\\right)
-```
 -How to combine multiple loci: Multiple loci are combined by independently summing the two numerator and two denominator terms before performing
                                 the final division and averaging the two components.
 
@@ -17,6 +14,7 @@ Queller, D. C., & Goodnight, K. F. (1989). Estimating relatedness using genetic 
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 """
 function QuellerGoodnight(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+    #TODO adjustment with eq2 to unbias when estimating relatedness from sample data
     isempty(locus_names) && return missing
 
     numerator1 = 0.0
@@ -44,7 +42,7 @@ end
 Calculates the moments based estimator of pairwise relatedness proposed by Li and Horvitz (1953) and implemented/made popular by Ritland (1996).
 
 -Single Locus Equation:
--How to combine multiple loci:
+-How to combine multiple loci: A weighted average of individual locus specific estimates weighted by sampling variance
 
 -Assumes no inbreeding
 
@@ -84,7 +82,7 @@ end
 Calculates the moments based estimator of pairwise relatedness by Lynch and Ritland (1999).
 
 -Single Locus Equation:
--How to combine multiple loci:
+-How to combine multiple loci: Weighted average of each term seperately weighted by the sample variance (assuming zero relatedness) and subsequently divided by the average sampling variance
 
 -Assumes no inbreeding
 
@@ -125,7 +123,7 @@ end
 Calculates the moments based estimator of pairwise relatedness by Lynch (1988) & improved by Li et al. (1993).
 
 -Single Locus Equation:
--How to combine multiple loci:
+-How to combine multiple loci: Sum the difference between observed and expected similarity across all loci and then divide by the sum of 1 - the expected similarity
 
 -Assumes no inbreeding
 
@@ -159,8 +157,7 @@ end
 Calculates the moments based estimator of pairwise relatedness using the estimator propsed by
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 
--Single Locus Equation:
--How to combine multiple loci:
+-Multiple Locus Equation:
 
 -Assumes no inbreeding
 
@@ -281,8 +278,7 @@ Moran(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::Na
 Reinterpretation of Moran's I (commonly used for spatial autocorrelation) to estimate genetic relatedness
 by Hardy and Vekemans (1999)
 
--Single Locus Equation:
--How to combine multiple loci:
+-Multiple Locus Equation:
 
 -Assumes no inbreeding
 
@@ -330,9 +326,10 @@ Wang(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::Nam
 Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 
 -Single Locus Equation:
--How to combine multiple loci:
+-How to combine multiple loci: Each individual locus subcomponent (b-g) and each genotypic state (P1-P3) is averaged weighted by the average similarity of unrelated dyads at each locus. Then the values of V, Φ, Δ, and r are calculated
 
 -Assumes no inbreeding
+-Corrected for sampling bias in allele frequencies to get an unbiased estimator
 
 Wang, J. (2002). An estimator for pairwise relatedness using molecular markers. Genetics, 160(3), 1203-1215.
 """
