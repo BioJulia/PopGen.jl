@@ -349,7 +349,6 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
     sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
     relate_vec = zeros(length(sample_pairs))
     shared_loci = similar(relate_vec)
-    missing_loci = similar(shared_loci)
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         #@inbounds for ind2 in sample_names[sample_n+1:end]
@@ -361,12 +360,15 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
             geno2 = get_genotypes(data, ind2)
 
             missing_loci_tmp = sum((ismissing.(geno1) .+ ismissing.(geno2)) .!= 0)
-            missing_loci[idx] = missing_loci_tmp
             shared_loci[idx] = length(geno1) - missing_loci_tmp
-            
-            relate_vec[idx] += method(data, ind1, ind2, alleles = allele_frequencies)
+
+            if missing_loci_tmp == length(geno1)
+                relate_vec[idx] = NaN
+            else
+                relate_vec[idx] = method(data, ind1, ind2, alleles = allele_frequencies)
+            end
         end
     end
     method_colname = Symbol("$method")
-    return DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :missing_loci => missing_loci, :shared_loci => shared_loci, method_colname => relate_vec)
+    return DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :shared_loci => shared_loci, method_colname => relate_vec)
 end
