@@ -355,7 +355,7 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
         #@inbounds Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
-            #TODO If no shared loci return missing for relatedness
+            #TODO Progress Bar
             geno1 = get_genotypes(data, ind1)
             geno2 = get_genotypes(data, ind2)
 
