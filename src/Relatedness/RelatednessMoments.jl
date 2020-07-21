@@ -1,6 +1,6 @@
 #### Simple code versions ####
 """
-    QuellerGoodnight(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple) 
 Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
@@ -30,7 +30,7 @@ function QuellerGoodnight(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles
 end
 
 """
-    Ritland(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    Ritland(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple) 
 Calculates the moments based estimator of pairwise relatedness proposed by Li and Horvitz (1953) and implemented/made popular by Ritland (1996).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
@@ -64,7 +64,7 @@ function Ritland(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) wher
 end
 
 """
-    LynchRitland(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    LynchRitland(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple) 
 Calculates the moments based estimator of pairwise relatedness by Ritland (1996).
 - Bases allele frequencies on entire population
 - Inbreeding can only be assumed not to exist.
@@ -99,7 +99,7 @@ function LynchRitland(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U)
 end
 
 """
-    LynchLi(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    LynchLi(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple) 
 Calculates the moments based estimator of pairwise relatedness by Lynch (1988) & improved by Li et al. (1993).
 See equations 13 - 16 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
@@ -124,7 +124,7 @@ function LynchLi(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) wher
 end
 
 """
-    Loiselle(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    Loiselle(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple) 
 Calculates the moments based estimator of pairwise relatedness using the estimator propsed by
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 See equations 22 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
@@ -146,7 +146,7 @@ function Loiselle(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) whe
 end
 
 """
-    LiHorvitz(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    LiHorvitz(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple) 
 Allele sharing index described by Li and Horvitz (1953)
 """
 function LiHorvitz(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
@@ -166,7 +166,7 @@ function LiHorvitz(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) wh
 end
 
 """
-    Lynch(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    Lynch(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple) 
 Allele sharing index described by Lynch (1988)
 """
 function Lynch(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
@@ -186,7 +186,7 @@ function Lynch(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where 
 end
 
 """
-    Blouin(data::PopData, ind1::String, ind2::String; alleles::Dict)
+    Blouin(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple) 
 Allele sharing index described by Blouin (1996)
 """
 function Blouin(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
@@ -206,7 +206,7 @@ function Blouin(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where
 end
 
 """
-    Moran(data::PopData, ind1::String, ind2::String; alleles::Dict)
+Moran(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple) 
 Reinterpretation of Moran's I (commonly used for spatial autocorrelation) to estimate genetic relatedness
 by Hardy and Vekemans (1999)
 """
@@ -244,11 +244,11 @@ function a_wang(N::Int, alleles::Dict)
 
     a[4] = (N^3 * a_wang_base(4, alleles) - 6 * (N - 1) * (N - 2) * a[3] - 7 * (N - 1) * a[2] - 1) / (N^3 - 6 * N^2 + 11 * N - 6)
 
-    return(a)
+    return a
 end
 
 """
-    Wang(data::PopData, ind1::String, ind2::String; alleles::Dict)
+Wang(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
 """
@@ -324,7 +324,7 @@ function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T
         c * (1.0 - b) * (d * g * P3 + e * f * P2)) / V
 
     r = (Φ/2.0 + Δ)
-    return (r)
+    return r
 end
 
 
@@ -346,7 +346,6 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
             #TODO Progress Bar
-            geno1 = get_genotypes(data, ind1)
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair

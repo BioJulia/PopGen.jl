@@ -185,16 +185,30 @@ end
 
 
 """
+    get_genotypes(data::PopData, sample::String)
+Return a vector of all the genotypes of a sample in a `PopData` object. To return a
+single genotype at a locus, see `get_genotype`.
+```
+cats = nancycats()
+get_genotypes(cats, "N115")
+```
+"""
+function get_genotypes(data::PopObj, sample::String)
+    @view data.loci[data.loci.name .== sample, :genotype]
+end
+
+
+"""
     get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
 Return a table of the genotype(s) of one or more `samples` for one or more
 specific `loci` (both as keywords) in a `PopData` object.
 ### Examples
 ```
 cats = nancycats();
-get_genotype(cats, sample = "N115" , locus = "fca8")
-get_genotypes(cats, sample = ["N1", "N2"] , locus = "fca8")
-get_genotype(cats, sample = "N115" , locus = ["fca8", "fca37"])
-get_genotype(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
+get_genotypes(cats, sample = "N115" , locus = "fca8")
+get_genotypes(cats, sample = ["N115", "N7"] , locus = "fca8")
+get_genotypes(cats, sample = "N115" , locus = ["fca8", "fca37"])
+get_genotypes(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
 ```
 """
 function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
@@ -205,19 +219,6 @@ function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, loc
         locus = [locus]
     end
     @view data.loci[(data.loci.name .∈ Ref(sample)) .& (data.loci.locus .∈ Ref(locus)), :] 
-end
-
-
-"""
-    get_genotypes(data::PopData, sample::String)
-Return a vector of all the genotypes of a sample in a `PopData` object.
-```
-cats = nancycats()
-get_genotypes(cats, "N115")
-```
-"""
-function get_genotypes(data::PopObj, sample::String)
-    @view data.loci[data.loci.name .== sample, :genotype]
 end
 
 
