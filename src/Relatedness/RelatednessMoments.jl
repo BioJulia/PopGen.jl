@@ -352,7 +352,7 @@ function bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, B::Int64, 
     return Mean, Median, SE, quants[1], quants[2]
 end
 
-
+#TODO Make possible to pass in a set of allele frequencies - i.e. only want to pass one pair but have allele freqs from full dataset
 
 #TODO this is 100% incomplete
 function pairwise_relatedness(data::PopData; method::Function, B::Int64 = 0, width::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool = true, verbose::Bool = true)
@@ -404,7 +404,7 @@ function relatedness_no_boot(data::PopData; method::Union{Function, Vector{Funct
                         )
     sample_names = samples(data)
     sample_pairs = pairwise_pairs(sample_names)
-    
+
     if eltype(method) != Function
         method = [method]
     end
@@ -444,7 +444,7 @@ function relatedness_bootstrap(data::PopData; method::Union{Function, Vector{Fun
                         )
     sample_names = samples(data)
     sample_pairs = pairwise_pairs(sample_names)
-    
+
     if eltype(method) != Function
         method = [method]
     end
@@ -490,7 +490,7 @@ function relatedness_bootstrap(data::PopData; method::Union{Function, Vector{Fun
         out_df[:, boot_lower_colnames[i]] = boot_lowers[i]
         out_df[:, boot_upper_colnames[i]] = boot_uppers[i]
     end
-    
+
     return out_df
 end
 
