@@ -329,11 +329,33 @@ end
 
 
 #Bootstrap Utilities
+function bootstrap_locus(data::PopData, method::Function, ind1::String, ind2::String, B::Int64)
+    relate_vec_boot = Vector{Union{Missing,Float64}}(undef, B)
+
+    for b in 1:B
+        loci_sample = sample(loci(data), length(loci(data)))
+        geno1_sample = map(i -> get_genotype(data, sample = ind1, locus = i), loci_sample)
+        geno2_sample = map(i -> get_genotype(data, sample = ind2, locus = i), loci_sample)
+        loc_samp,gen_samp1,gen_samp2 = collect.(skipmissings(Symbol.(loci_sample), geno1_sample, geno2_sample))
+
+        relate_vec_boot[b] = method(gen_samp1, gen_samp2, loc_samp, alleles = allele_frequencies)
+    end
+    return relate_vec_boot
+end
+
+function bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, B::Int64, width::Tuple{Float64, Float64})
+    Mean = mean(boot_out)
+    Median = median(boot_out)
+    SE = sqrt(sum((boot_out - (boot_out / B)).^2) / (B - 1))
+    quants = quantile(boot_out, width)
+
+    return Mean, Median, SE, quants[1], quants[2]
+end
 
 
 
 #TODO this is 100% incomplete
-function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool = true, verbose::Bool = true)
+function pairwise_relatedness(data::PopData; method::Function, B::Int64 = 0, width::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
     all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
@@ -344,6 +366,9 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
     sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
     relate_vec = Vector{Union{Missing,Float64}}(undef, length(sample_pairs))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
+
+    boot_mean, boot_median, boot_se, boot_lower, boot_upper = similar(relate_vec)
+
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
@@ -359,10 +384,9 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
             shared_loci[idx] = length(loc)
             relate_vec[idx] = method(gen1, gen2, loc, alleles = allele_frequencies)
 
-            #TODO Bootstrap loop
-
-
-            #TODO Bootstrap post-process
+            # bootstrap estimates
+            boot_out = bootstrap_locus(data, method, ind1, ind2, B)
+            boot_mean[idx], boot_median[idx], boot_se[idx], boot_lower[idx], boot_upper[idx] = bootstrap_summary(boot_out, B, width)
         end
     end
     method_colname = Symbol("$method")
