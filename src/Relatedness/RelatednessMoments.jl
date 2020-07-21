@@ -39,7 +39,7 @@ Ritland original citation: https://www.cambridge.org/core/journals/genetics-rese
 """
 function Ritland(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
-    
+
     numerator1 = 0.0
     denominator1 = 0.0
 
@@ -105,7 +105,7 @@ See equations 13 - 16 in: https://www.nature.com/articles/hdy201752 for variant 
 """
 function LynchLi(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
-    
+
     numerator1 = 0.0
     denominator1 = 0.0
 
@@ -174,7 +174,7 @@ function Lynch(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where 
 
     Sxy = Vector{Float64}(undef, length(loci(data)))
     loc_id = 0
-    
+
     for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         loc_id += 1
         i,j = gen1
@@ -191,7 +191,7 @@ Allele sharing index described by Blouin (1996)
 """
 function Blouin(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
-    
+
     Mxy = Vector{Float64}(undef, length(loci(data)))
     loc_id = 0
 
@@ -345,12 +345,13 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
-            #TODO If no shared loci return missing for relatedness
+            #TODO Progress Bar
+            geno1 = get_genotypes(data, ind1)
             geno2 = get_genotypes(data, ind2)
-            
+
             # filter out loci missing in at least one individual in the pair
             loc,gen1,gen2 = collect.(skipmissings(Symbol.(loci(data)), geno1, geno2))
-            
+
             # populate shared_loci array
             shared_loci[idx] = length(loc)
             relate_vec[idx] = method(gen1, gen2, loc, alleles = allele_frequencies)
