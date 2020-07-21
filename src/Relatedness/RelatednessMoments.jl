@@ -147,7 +147,7 @@ Calculates the moments based estimator of pairwise relatedness using the estimat
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 See equations 22 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
-function Lioselle(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function Loiselle(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     numerator1 = 0.0
