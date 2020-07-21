@@ -266,17 +266,17 @@ function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: 
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     P1 = Vector{Float64}(undef, length(loci(data)))
-    P2 = Vector{Float64}(undef, length(loci(data)))
-    P3 = Vector{Float64}(undef, length(loci(data)))
-    P4 = Vector{Float64}(undef, length(loci(data)))
+    P2 = similar(P1)
+    P3 = similar(P1)
+    P4 = similar(P1)
 
-    u = Vector{Float64}(undef, length(loci(data)))
-    b = Vector{Float64}(undef, length(loci(data)))
-    c = Vector{Float64}(undef, length(loci(data)))
-    d = Vector{Float64}(undef, length(loci(data)))
-    e = Vector{Float64}(undef, length(loci(data)))
-    f = Vector{Float64}(undef, length(loci(data)))
-    g = Vector{Float64}(undef, length(loci(data)))
+    u = similar(P1)
+    b = similar(P1)
+    c = similar(P1)
+    d = similar(P1)
+    e = similar(P1)
+    f = similar(P1)
+    g = similar(P1)
 
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
