@@ -347,7 +347,7 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
                         )
     sample_names = samples(data)
     sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
-    relate_vec = Vector{Float64}(undef, length(sample_pairs))
+    relate_vec = Vector{Union{Missing, Float64}}(undef, length(sample_pairs))
     shared_loci = similar(relate_vec)
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
@@ -363,7 +363,7 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
             shared_loci[idx] = length(geno1) - missing_loci_tmp
 
             if missing_loci_tmp == length(geno1)
-                relate_vec[idx] = NaN
+                relate_vec[idx] = missing
             else
                 relate_vec[idx] = method(data, ind1, ind2, alleles = allele_frequencies)
             end
