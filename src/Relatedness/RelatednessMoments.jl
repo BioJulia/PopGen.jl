@@ -404,7 +404,7 @@ function pairwise_relatedness(data::PopData; method::Union{Function, Vector{Func
                         )
     sample_names = samples(data)
     sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
-    
+
     if eltype(method) != Function
         method = [method]
     end
