@@ -346,7 +346,6 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
             #TODO Progress Bar
-            geno1 = get_genotypes(data, ind1)
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair
