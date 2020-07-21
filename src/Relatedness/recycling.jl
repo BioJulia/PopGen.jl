@@ -99,10 +99,19 @@ function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T
     gen1 = hcat(getindex.(geno1, 1), getindex.(geno1, 2))
     gen2 = hcat(getindex.(geno2, 1), getindex.(geno2, 2))
     # ((a == c) + (a == d) + (b == c) + (b == d))
-    id_mtx = reduce(*, (gen1 .== gen2) .+ (gen1 .== reverse(gen2, dims = 2)), dims = 2)
-    return id_mtx    
+    id_mtx = reduce(*, (gen1 .== gen2) + (gen1 .== reverse(gen2, dims = 2)), dims = 2)
+    a_b_frqs = [alleles[loc[i]][gen1[i,j]] for i in 1:size(gen1)[1], j in 1:2]
+    c_d_frqs = [alleles[loc[i]][gen2[i,j]] for i in 1:size(gen2)[1], j in 1:2]
+    
+    numerator1 = reduce(+, id_mtx - (2 * reduce(+, a_b_frqs, dims = 2))) 
+    numerator2 = reduce(+, id_mtx - (2 * reduce(+, c_d_frqs, dims = 2)))
+    # reduce(+,)
+    denominator1 = 2.0 * (1.0 + map(x ->x[1] == x[2],eachrow(gen1)) - foldl(-, eachcol(a_b_frqs)))
+    denominator2 = 2.0 * (1.0 + map(x ->x[1] == x[2],eachrow(gen2)) - foldl(-, eachcol(a_b_frqs)))
+    #return [alleles[loc[i]][gen1[i,j]] for i in 1:size(gen1)[1], j in 1:2]
+    return numerator2
     a,b = gen1
-        c,d = gen2
+    c,d = gen2
 
         ident = ((a == c) + (a == d) + (b == c) + (b == d))
         numerator1 += ident - 2.0 * (alleles[loc][a] + alleles[loc][b])
@@ -110,7 +119,7 @@ function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T
 
         denominator1 += (2.0 * (1.0 + (a==b) - alleles[loc][a] - alleles[loc][b]))
         denominator2 += (2.0 * (1.0 + (c==d) - alleles[loc][c] - alleles[loc][d]))
-    end
+
     return (numerator1/denominator1 + numerator2/denominator2)/2.0
 end
 
