@@ -355,6 +355,9 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
             # populate shared_loci array
             shared_loci[idx] = length(loc)
             relate_vec[idx] = method(gen1, gen2, loc, alleles = allele_frequencies)
+
+            #TODO Bootstrap loop
+            #TODO Bootstrap post-process
         end
     end
     method_colname = Symbol("$method")
