@@ -6,23 +6,20 @@ Calculates the moments based estimator of pairwise relatedness developed by Quel
 - Inbreeding can only be assumed not to exist.
 See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
-function QuellerGoodnight(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function QuellerGoodnight(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+    isempty(locus_names) && return missing
+
     numerator1 = 0.0
     numerator2 = 0.0
     denominator1 = 0.0
     denominator2 = 0.0
 
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
-
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         a,b = gen1
         c,d = gen2
         ident = ((a == c) + (a == d) + (b == c) + (b == d))
-        fq_a = alleles[loc][a]
-        fq_b = alleles[loc][b]
-        fq_c = alleles[loc][c]
-        fq_d = alleles[loc][d]
+        fq_a, fq_b, fq_c, fq_d = map(i -> alleles[loc][i], (a,b,c,d))
+
         numerator1 += ident - 2.0 * (fq_a + fq_b)
         numerator2 += ident - 2.0 * (fq_c + fq_d)
 
@@ -40,13 +37,13 @@ Calculates the moments based estimator of pairwise relatedness proposed by Li an
 See equation 7 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
 """
-function Ritland(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function Ritland(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+    isempty(locus_names) && return missing
+    
     numerator1 = 0.0
     denominator1 = 0.0
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
 
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         a,b = gen1
         c,d = gen2
 
@@ -74,14 +71,13 @@ Calculates the moments based estimator of pairwise relatedness by Ritland (1996)
 See equation 10 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
 """
-function LynchRitland(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function LynchRitland(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+    isempty(locus_names) && return missing
+
     numerator1 = 0.0
     denominator1 = 0.0
 
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
-
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         a,b = gen1
         c,d = gen2
         fq_a, fq_b, fq_c, fq_d = map(i -> alleles[loc][i], (a,b,c,d))
@@ -107,14 +103,13 @@ end
 Calculates the moments based estimator of pairwise relatedness by Lynch (1988) & improved by Li et al. (1993).
 See equations 13 - 16 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
-function LynchLi(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function LynchLi(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+    isempty(locus_names) && return missing
+    
     numerator1 = 0.0
     denominator1 = 0.0
 
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
-
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         a,b = gen1
         c,d = gen2
 
@@ -134,13 +129,13 @@ Calculates the moments based estimator of pairwise relatedness using the estimat
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 See equations 22 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
-function Loiselle(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function Loiselle(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+    isempty(locus_names) && return missing
+
     numerator1 = 0.0
     denominator1 = 0.0
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
 
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         for allele in keys(alleles[loc])
             fq = alleles[loc][allele]
             numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
@@ -154,13 +149,13 @@ end
     LiHorvitz(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Allele sharing index described by Li and Horvitz (1953)
 """
-function LiHorvitz(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function LiHorvitz(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+    isempty(locus_names) && return missing
+
     Bxy = Vector{Float64}(undef, length(loci(data)))
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
 
     loc_id = 0
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         loc_id += 1
         i,j = gen1
         k,l = gen2
@@ -174,13 +169,13 @@ end
     Lynch(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Allele sharing index described by Lynch (1988)
 """
-function Lynch(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    Sxy = Vector{Float64}(undef, length(loci(data)))
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
+function Lynch(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+    isempty(locus_names) && return missing
 
+    Sxy = Vector{Float64}(undef, length(loci(data)))
     loc_id = 0
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+    
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         loc_id += 1
         i,j = gen1
         k,l = gen2
@@ -194,13 +189,13 @@ end
     Blouin(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Allele sharing index described by Blouin (1996)
 """
-function Blouin(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function Blouin(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+    isempty(locus_names) && return missing
+    
     Mxy = Vector{Float64}(undef, length(loci(data)))
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
-
     loc_id = 0
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         loc_id += 1
         i,j = gen1
         k,l = gen2
@@ -215,16 +210,14 @@ end
 Reinterpretation of Moran's I (commonly used for spatial autocorrelation) to estimate genetic relatedness
 by Hardy and Vekemans (1999)
 """
-function Moran(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function Moran(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+    isempty(locus_names) && return missing
 
     numerator1 = 0.0
     denominator1 = 0.0
 
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
-
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         for allele in keys(alleles[loc])
             fq = alleles[loc][allele]
             numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
@@ -259,17 +252,15 @@ end
 Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
 """
-function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
+    isempty(locus_names) && return missing
     P1 = Vector{Float64}(undef, length(loci(data)))
     P2, P3, P4, u, b, c, d, e, f, g = map(i -> similar(P1), 1:10)
-
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
-
     loc_id = 0
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         loc_id += 1
         i,j = gen1
         k,l = gen2
@@ -347,26 +338,22 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
                         )
     sample_names = samples(data)
     sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
-    relate_vec = Vector{Float64}(undef, length(sample_pairs))
-    shared_loci = similar(relate_vec)
+    relate_vec = Vector{Union{Missing,Float64}}(undef, length(sample_pairs))
+    shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-        #@inbounds for ind2 in sample_names[sample_n+1:end]
-        #@inbounds Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
+        geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
             #TODO If no shared loci return missing for relatedness
-            geno1 = get_genotypes(data, ind1)
             geno2 = get_genotypes(data, ind2)
-
-            missing_loci_tmp = sum((ismissing.(geno1) .+ ismissing.(geno2)) .!= 0)
-            shared_loci[idx] = length(geno1) - missing_loci_tmp
-
-            if missing_loci_tmp == length(geno1)
-                relate_vec[idx] = NaN
-            else
-                relate_vec[idx] = method(data, ind1, ind2, alleles = allele_frequencies)
-            end
+            
+            # filter out loci missing in at least one individual in the pair
+            loc,gen1,gen2 = collect.(skipmissings(Symbol.(loci(data)), geno1, geno2))
+            
+            # populate shared_loci array
+            shared_loci[idx] = length(loc)
+            relate_vec[idx] = method(gen1, gen2, loc, alleles = allele_frequencies)
         end
     end
     method_colname = Symbol("$method")
