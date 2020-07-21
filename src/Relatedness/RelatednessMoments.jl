@@ -156,9 +156,6 @@ function Loiselle(data::PopData, ind1::String, ind2::String; alleles::T) where T
     geno2 = get_genotypes(data, ind2)
 
     for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
-        a,b = gen1
-        c,d = gen2
-
         for allele in keys(alleles[loc])
             fq = alleles[loc][allele]
             numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
@@ -233,6 +230,33 @@ function Blouin(data::PopData, ind1::String, ind2::String; alleles::T) where T <
     end
     return mean(Mxy)
 end
+
+"""
+    Moran(data::PopData, ind1::String, ind2::String; alleles::Dict)
+Reinterpretation of Moran's I (commonly used for spatial autocorrelation) to estimate genetic relatedness
+by Hardy and Vekemans (1999)
+"""
+function Moran(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+
+    numerator1 = 0.0
+    denominator1 = 0.0
+    r = 0.0
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
+
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        for allele in keys(alleles[loc])
+            fq = alleles[loc][allele]
+            numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
+            denominator1 += ((sum(gen1 .== allele) / 2.0) - fq)^2
+        end
+        denominator1 += (1 / (length(alleles[loc]) - 1))
+    end
+    return (numerator1 / denominator1)
+end
+
+
 
 
 ### Wang 2002 helper functions ###
@@ -374,6 +398,7 @@ end
 
 function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+    #THIS IS THE BETTER VERSION OF WANG
 
     P1 = Vector{Float64}(undef, length(loci(data)))
     P2 = Vector{Float64}(undef, length(loci(data)))
@@ -480,6 +505,7 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
             #TODO Add column for number of shared and number of missing loci for each pair
+            #TODO If no shared loci return missing for relatedness
             relate_vec[idx] += method(data, ind1, ind2, alleles = allele_frequencies)
         end
     end
