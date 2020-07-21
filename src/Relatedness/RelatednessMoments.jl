@@ -7,9 +7,6 @@ Calculates the moments based estimator of pairwise relatedness developed by Quel
 See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
 function QuellerGoodnight(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
     numerator1 = 0.0
     numerator2 = 0.0
     denominator1 = 0.0
@@ -44,9 +41,6 @@ See equation 7 in: https://www.nature.com/articles/hdy201752 for variant of esti
 Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
 """
 function Ritland(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
     numerator1 = 0.0
     denominator1 = 0.0
     geno1 = get_genotypes(data, ind1)
@@ -81,8 +75,6 @@ See equation 10 in: https://www.nature.com/articles/hdy201752 for variant of est
 Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
 """
 function LynchRitland(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
     numerator1 = 0.0
     denominator1 = 0.0
 
@@ -119,8 +111,6 @@ Calculates the moments based estimator of pairwise relatedness by Lynch (1988) &
 See equations 13 - 16 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
 function LynchLi(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
     numerator1 = 0.0
     denominator1 = 0.0
 
@@ -148,17 +138,12 @@ Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 See equations 22 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
 """
 function Loiselle(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
     numerator1 = 0.0
     denominator1 = 0.0
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
 
     for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
-        a,b = gen1
-        c,d = gen2
-
         for allele in keys(alleles[loc])
             fq = alleles[loc][allele]
             numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
@@ -173,8 +158,6 @@ end
 Allele sharing index described by Li and Horvitz (1953)
 """
 function LiHorvitz(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
     Bxy = Vector{Float64}(undef, length(loci(data)))
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
@@ -195,8 +178,6 @@ end
 Allele sharing index described by Lynch (1988)
 """
 function Lynch(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
     Sxy = Vector{Float64}(undef, length(loci(data)))
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
@@ -217,8 +198,6 @@ end
 Allele sharing index described by Blouin (1996)
 """
 function Blouin(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
     Mxy = Vector{Float64}(undef, length(loci(data)))
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
@@ -233,6 +212,33 @@ function Blouin(data::PopData, ind1::String, ind2::String; alleles::T) where T <
     end
     return mean(Mxy)
 end
+
+"""
+    Moran(data::PopData, ind1::String, ind2::String; alleles::Dict)
+Reinterpretation of Moran's I (commonly used for spatial autocorrelation) to estimate genetic relatedness
+by Hardy and Vekemans (1999)
+"""
+function Moran(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+
+    numerator1 = 0.0
+    denominator1 = 0.0
+    r = 0.0
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
+
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        for allele in keys(alleles[loc])
+            fq = alleles[loc][allele]
+            numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
+            denominator1 += ((sum(gen1 .== allele) / 2.0) - fq)^2
+        end
+        denominator1 += (1 / (length(alleles[loc]) - 1))
+    end
+    return (numerator1 / denominator1)
+end
+
+
 
 
 ### Wang 2002 helper functions ###
@@ -254,125 +260,12 @@ function a_wang(N::Int, alleles::Dict)
     return(a)
 end
 
-#=
-function b_wang(N::Int, alleles::Dict)
-    2.0 * a_wang(2, N, alleles)^2 - a_wang(4, N, alleles)
-end
-
-function c_wang(N::Int, alleles::Dict)
-    a_wang(2, N, alleles) - 2.0 * a_wang(2, N, alleles)^2
-end
-
-function d_wang(N::Int, alleles::Dict)
-    4.0 * (a_wang(3, N, alleles) - a_wang(4, N, alleles))
-end
-
-function e_wang(N::Int, alleles::Dict)
-    2.0 * (a_wang(2, N, alleles) - 3.0 * a_wang(3, N, alleles) + 2.0 * a_wang(4, N, alleles))
-end
-
-function f_wang(N::Int, alleles::Dict)
-    4.0 * (a_wang(2, N, alleles) - a_wang(2, N, alleles)^2 - 2.0 * a_wang(3, N, alleles) + 2.0 * a_wang(4, N, alleles))
-end
-
-function g_wang(N::Int, alleles::Dict)
-    1.0 - 7.0 * a_wang(2, N, alleles) + 4.0 * a_wang(2, N, alleles)^2 + 10.0 * a_wang(3, N, alleles) - 8.0 * a_wang(4, N, alleles)
-end
-
-function u_wang(N::Int, alleles::Dict)
-    2.0 * a_wang(2, N, alleles) - a_wang(3, N, alleles)
-end
-=#
-
 """
     Wang(data::PopData, ind1::String, ind2::String; alleles::Dict)
 Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
 """
 function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
-    a2 = Vector{Float64}(undef, length(loci(data)))
-    a3 = similar(a2)
-    a4 = similar(a2)
-
-    u = similar(a2)
-
-    P1 = similar(a2)
-    P2 = similar(a2)
-    P3 = similar(a2)
-    P4 = similar(a2)
-
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
-
-    loc_id = 0
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
-        loc_id += 1
-        i,j = gen1
-        k,l = gen2
-
-        N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
-
-        a = a_wang(2 * N, alleles[loc])
-        a2[loc_id] = a[2]
-        a3[loc_id] = a[3]
-        a4[loc_id] = a[4]
-
-        u[loc_id] = 2 * a[2] - a[3]
-
-        # Which category of dyad
-        Sxy = ((i ∈ gen2) + (j ∈ gen2) + (k ∈ gen1) + (l ∈ gen1)) / 4
-
-        # Both alleles shared between individuals either the same or different
-        P1[loc_id] = 1.0 * (Sxy == 1)
-        # One allele shared between individuals and one is homozygous for that allele
-        P2[loc_id] = 1.0 * (Sxy == (3/4))
-        # One allele shared with the other two being unique
-        P3[loc_id] = 1.0 * (Sxy == (1/2))
-        P4[loc_id] = 1.0 * ((P1 + P2 + P3) == 0)
-    end
-    #return (1 / (sum(1/u) * u)) * r
-    w = (1 / (sum(1/u) * u))
-
-
-    P1 = w * P1
-    P2 = w * P2
-    P3 = w * P3
-    a = (0.0, w * a2, w * a3, w * a4)
-    a2_sq =  w * (a2.^2)
-
-    b = 2.0 * a2_sq - a[4]
-    c = a[2] - 2.0 * a2_sq + a[4]
-    d = 4.0 * (a[3] - a[4])
-    e = 2.0 * (a[2] - 3.0 * a[3] + 2.0 * a[4])
-    f = 4.0 * (a[2] - a2_sq - 2.0 * a[3] + 2.0 * a[4])
-    g = 1.0 - 7.0 * a[2] + 4.0 * a2_sq + 10.0 * a[3] - 8.0 * a[4]
-
-
-    #Eq 11
-    V = (1.0 - b)^2 * (e^2 * f + d * g^2) -
-        (1.0 - b) * (e * f - d * g)^2 +
-        2.0 * c * d * f * (1.0 - b) * (g + e) +
-        c^2 * d * f * (d + f)
-
-    #Eq 9
-    Φ = (d * f * ((e + g) * (1.0 - b) + c * (d + f)) * (P1 - 1.0) +
-        d * (1.0 - b) * (g * (1.0 - b - d) + f * (c + e)) * P3 +
-        f * (1.0 - b) * (e * (1.0 - b - f) + d * (c + g)) * P2) / V
-
-    #Eq 10
-    Δ = (c * d * f * (e + g) * (P1 + 1.0 - 2 * b) +
-        ((1.0 - b) * (f * e^2 + d * g^2) - (e * f - d * g)^2) * (P1 - b) +
-        c * (d * g - e * f) * (d * P3 - f * P2) - c^2 * d * f * (P3 + P2 - d - f) -
-        c * (1.0 - b) * (d * g * P3 + e * f * P2)) / V
-
-    r = (Φ/2.0 + Δ)
-    return (r)
-end
-
-
-function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     P1 = Vector{Float64}(undef, length(loci(data)))
@@ -460,8 +353,6 @@ function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <:
 end
 
 
-
-
 #TODO this is 100% incomplete
 function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
@@ -480,6 +371,7 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
             #TODO Add column for number of shared and number of missing loci for each pair
+            #TODO If no shared loci return missing for relatedness
             relate_vec[idx] += method(data, ind1, ind2, alleles = allele_frequencies)
         end
     end
