@@ -292,65 +292,6 @@ See https://www.genetics.org/content/genetics/160/3/1203.full.pdf
 function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
-    r = Vector{Float64}(undef, length(loci(data)))
-    u = Vector{Float64}(undef, length(loci(data)))
-
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
-
-    loc_id = 0
-    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
-        loc_id += 1
-        i,j = gen1
-        k,l = gen2
-
-        N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
-
-        a = a_wang(2 * N, alleles[loc])
-        b = 2.0 * a[2]^2 - a[4]
-        c = a[2] - 2.0 * a[2]^2
-        d = 4.0 * (a[3] - a[4])
-        e = 2.0 * (a[2] - 3.0 * a[3] + 2.0 * a[4])
-        f = 4.0 * (a[2] - a[2]^2 - 2.0 * a[3] + 2.0 * a[4])
-        g = 1.0 - 7.0 * a[2] + 4.0 * a[2]^2 + 10.0 * a[3] - 8.0 * a[4]
-        u[loc_id] = 2 * a[2] - a[3]
-
-        # Which category of dyad
-        # Both alleles shared between individuals either the same or different
-        P1 = 1.0 * ((i == j == k == l) | (i == k & j == l) | (i == l & k == j))
-        # One allele shared between individuals and one is homozygous for that allele
-        P2 = 1.0 * ((i == j == k != l) | (i == j == l != k) | (k == l == i != j) | (k == l == j != i))
-        # One allele shared with the other two being unique
-        P3 = 1.0 * ((i == k + i != j + i != l + j != l) | (i == l + i != k + i != j + j != k) | (j == k + j != i + j != l + l != i) | (j == l + j != i + j != k + k != l))
-        P4 = 1.0 * ((P1 + P2 + P3) == 0)
-
-        #Eq 11
-        V = (1.0 - b)^2 * (e^2 * f + d * g^2) -
-            (1.0 - b) * (e * f - d * g)^2 +
-            2.0 * c * d * f * (1.0 - b) * (g + e) +
-            c^2 * d * f * (d + f)
-
-        #Eq 9
-        Φ = (d * f * ((e + g) * (1.0 - b) + c * (d + f)) * (P1 - 1.0) +
-            d * (1.0 - b) * (g * (1.0 - b - d) + f * (c + e)) * P3 +
-            f * (1.0 - b) * (e * (1.0 - b - f) + d * (c + g)) * P2) / V
-
-        #Eq 10
-        Δ = (c * d * f * (e + g) * (P1 + 1.0 - 2 * b) +
-            ((1.0 - b) * (f * e^2 + d * g^2) - (e * f - d * g)^2) * (P1 - b) +
-            c * (d * g - e * f) * (d * P3 - f * P2) - c^2 * d * f * (P3 + P2 - d - f) -
-            c * (1.0 - b) * (d * g * P3 + e * f * P2)) / V
-
-        #Eq 1.0
-        r[loc_id] = (Φ/2.0 + Δ)
-    end
-    return (1 / (sum(1/u) * u)) * r
-end
-
-function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-    #wang2 uses a different way of weighting the loci - i'm not sure which is intended by wang yet based on his paper
-
     a2 = Vector{Float64}(undef, length(loci(data)))
     a3 = Vector{Float64}(undef, length(loci(data)))
     a4 = Vector{Float64}(undef, length(loci(data)))
@@ -381,12 +322,14 @@ function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <:
         u[loc_id] = 2 * a[2] - a[3]
 
         # Which category of dyad
+        Sxy = ((i ∈ gen2) + (j ∈ gen2) + (k ∈ gen1) + (l ∈ gen1)) / 4
+
         # Both alleles shared between individuals either the same or different
-        P1[loc_id] = 1.0 * ((i == j == k == l) | (i == k & j == l) | (i == l & k == j))
+        P1[loc_id] = 1.0 * (Sxy == 1)
         # One allele shared between individuals and one is homozygous for that allele
-        P2[loc_id] = 1.0 * ((i == j == k != l) | (i == j == l != k) | (k == l == i != j) | (k == l == j != i))
+        P2[loc_id] = 1.0 * (Sxy == (3/4))
         # One allele shared with the other two being unique
-        P3[loc_id] = 1.0 * ((i == k + i != j + i != l + j != l) | (i == l + i != k + i != j + j != k) | (j == k + j != i + j != l + l != i) | (j == l + j != i + j != k + k != l))
+        P3[loc_id] = 1.0 * (Sxy == (1/2))
         P4[loc_id] = 1.0 * ((P1 + P2 + P3) == 0)
     end
     #return (1 / (sum(1/u) * u)) * r
@@ -397,14 +340,14 @@ function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <:
     P2 = w * P2
     P3 = w * P3
     a = (0.0, w * a2, w * a3, w * a4)
-    a_sq = (0.0, w * a2.^2, w * a3.^2, w * a4.^2)
+    a2_sq =  w * (a2.^2)
 
-    b = 2.0 * a_sq[2] - a[4]
-    c = a[2] - 2.0 * a_sq[2]
+    b = 2.0 * a2_sq - a[4]
+    c = a[2] - 2.0 * a2_sq + a[4]
     d = 4.0 * (a[3] - a[4])
     e = 2.0 * (a[2] - 3.0 * a[3] + 2.0 * a[4])
-    f = 4.0 * (a[2] - a_sq[2] - 2.0 * a[3] + 2.0 * a[4])
-    g = 1.0 - 7.0 * a[2] + 4.0 * a[2]^2 + 10.0 * a[3] - 8.0 * a[4]
+    f = 4.0 * (a[2] - a2_sq - 2.0 * a[3] + 2.0 * a[4])
+    g = 1.0 - 7.0 * a[2] + 4.0 * a2_sq + 10.0 * a[3] - 8.0 * a[4]
 
 
     #Eq 11
@@ -427,6 +370,96 @@ function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <:
     r = (Φ/2.0 + Δ)
     return (r)
 end
+
+
+function Wang2(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+
+    P1 = Vector{Float64}(undef, length(loci(data)))
+    P2 = Vector{Float64}(undef, length(loci(data)))
+    P3 = Vector{Float64}(undef, length(loci(data)))
+    P4 = Vector{Float64}(undef, length(loci(data)))
+
+    u = Vector{Float64}(undef, length(loci(data)))
+    b = Vector{Float64}(undef, length(loci(data)))
+    c = Vector{Float64}(undef, length(loci(data)))
+    d = Vector{Float64}(undef, length(loci(data)))
+    e = Vector{Float64}(undef, length(loci(data)))
+    f = Vector{Float64}(undef, length(loci(data)))
+    g = Vector{Float64}(undef, length(loci(data)))
+
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
+
+    loc_id = 0
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        loc_id += 1
+        i,j = gen1
+        k,l = gen2
+
+        N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
+
+        a = a_wang(2 * N, alleles[loc])
+        a2_sq = a[2] ^ 2
+
+        u[loc_id] = 2 * a[2] - a[3]
+
+        # Which category of dyad
+        Sxy = ((i ∈ gen2) + (j ∈ gen2) + (k ∈ gen1) + (l ∈ gen1)) / 4
+
+        # Both alleles shared between individuals either the same or different
+        P1[loc_id] = 1.0 * (Sxy == 1)
+        # One allele shared between individuals and one is homozygous for that allele
+        P2[loc_id] = 1.0 * (Sxy == (3/4))
+        # One allele shared with the other two being unique
+        P3[loc_id] = 1.0 * (Sxy == (1/2))
+        P4[loc_id] = 1.0 * ((P1 + P2 + P3) == 0)
+
+        b[loc_id] = (2.0 * a2_sq - a[4])
+        c[loc_id] = (a[2] - 2.0 * a2_sq + a[4])
+        d[loc_id] = (4.0 * (a[3] - a[4]))
+        e[loc_id] = (2.0 * (a[2] - 3.0 * a[3] + 2.0 * a[4]))
+        f[loc_id] = (4.0 * (a[2] - a2_sq - 2.0 * a[3] + 2.0 * a[4]))
+        g[loc_id] = (1.0 - 7.0 * a[2] + 4.0 * a2_sq + 10.0 * a[3] - 8.0 * a[4])
+
+    end
+    #return (1 / (sum(1/u) * u)) * r
+    w = (1 / (sum(1/u) * u))
+
+
+    P1 = w * P1
+    P2 = w * P2
+    P3 = w * P3
+
+    b = w * b
+    c = w * c
+    d = w * d
+    e = w * e
+    f = w * f
+    g = w * g
+
+    #Eq 11
+    V = (1.0 - b)^2 * (e^2 * f + d * g^2) -
+        (1.0 - b) * (e * f - d * g)^2 +
+        2.0 * c * d * f * (1.0 - b) * (g + e) +
+        c^2 * d * f * (d + f)
+
+    #Eq 9
+    Φ = (d * f * ((e + g) * (1.0 - b) + c * (d + f)) * (P1 - 1.0) +
+        d * (1.0 - b) * (g * (1.0 - b - d) + f * (c + e)) * P3 +
+        f * (1.0 - b) * (e * (1.0 - b - f) + d * (c + g)) * P2) / V
+
+    #Eq 10
+    Δ = (c * d * f * (e + g) * (P1 + 1.0 - 2 * b) +
+        ((1.0 - b) * (f * e^2 + d * g^2) - (e * f - d * g)^2) * (P1 - b) +
+        c * (d * g - e * f) * (d * P3 - f * P2) - c^2 * d * f * (P3 + P2 - d - f) -
+        c * (1.0 - b) * (d * g * P3 + e * f * P2)) / V
+
+    r = (Φ/2.0 + Δ)
+    return (r)
+end
+
+
 
 
 #TODO this is 100% incomplete
