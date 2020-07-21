@@ -84,10 +84,7 @@ function LynchRitland(data::PopData, ind1::String, ind2::String; alleles::T) whe
     for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
         a,b = gen1
         c,d = gen2
-        fq_a = alleles[loc][a]
-        fq_b = alleles[loc][b]
-        fq_c = alleles[loc][c]
-        fq_d = alleles[loc][d]
+        fq_a, fq_b, fq_c, fq_d = map(i -> alleles[loc][i], (a,b,c,d))
 
         n1 = fq_a * ((b == c) + (b == d)) + fq_b * ((a == c) + (a == d)) - 4.0 * fq_a * fq_b
         n2 = fq_c * ((d == a) + (d == b)) + fq_d * ((c == a) + (c == b)) - 4.0 * fq_c * fq_d
@@ -266,17 +263,7 @@ function Wang(data::PopData, ind1::String, ind2::String; alleles::T) where T <: 
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     P1 = Vector{Float64}(undef, length(loci(data)))
-    P2 = similar(P1)
-    P3 = similar(P1)
-    P4 = similar(P1)
-
-    u = similar(P1)
-    b = similar(P1)
-    c = similar(P1)
-    d = similar(P1)
-    e = similar(P1)
-    f = similar(P1)
-    g = similar(P1)
+    P2, P3, P4, u, b, c, d, e, f, g = map(i -> similar(P1), 1:10)
 
     geno1 = get_genotypes(data, ind1)
     geno2 = get_genotypes(data, ind2)
