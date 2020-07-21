@@ -152,7 +152,7 @@ Allele sharing index described by Li and Horvitz (1953)
 function LiHorvitz(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
-    Bxy = Vector{Float64}(undef, length(loci(data)))
+    Bxy = Vector{Float64}(undef, length(locus_names))
 
     loc_id = 0
     for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
@@ -172,7 +172,7 @@ Allele sharing index described by Lynch (1988)
 function Lynch(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
-    Sxy = Vector{Float64}(undef, length(loci(data)))
+    Sxy = Vector{Float64}(undef, length(locus_names))
     loc_id = 0
 
     for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
@@ -192,7 +192,7 @@ Allele sharing index described by Blouin (1996)
 function Blouin(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
-    Mxy = Vector{Float64}(undef, length(loci(data)))
+    Mxy = Vector{Float64}(undef, length(locus_names))
     loc_id = 0
 
     for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
@@ -361,4 +361,84 @@ function pairwise_relatedness(data::PopData; method::Function, inbreeding::Bool 
     end
     method_colname = Symbol("$method")
     return DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :shared_loci => shared_loci, method_colname => relate_vec)
+end
+
+
+
+function pairwise_relatedness(data::PopData; method::Union{Function, Vector{Function}}, inbreeding::Bool = true, verbose::Bool = true)
+    # check that dataset is entirely diploid
+    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+
+    allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
+                            Tuple(allele_freq.(locus.(Ref(data), loci(data))))
+                        )
+    sample_names = samples(data)
+    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
+    
+    if eltype(method) != Function
+        method = [method]
+    end
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
+    shared_loci = Vector{Int}(undef, length(sample_pairs))
+    idx = 0
+    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
+        geno1 = get_genotypes(data, ind1)
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
+            idx += 1
+            #TODO Progress Bar
+            geno2 = get_genotypes(data, ind2)
+
+            # filter out loci missing in at least one individual in the pair
+            loc,gen1,gen2 = collect.(skipmissings(Symbol.(loci(data)), geno1, geno2))
+
+            # populate shared_loci array
+            shared_loci[idx] = length(loc)
+            [relate_vecs[i][idx] = mth(gen1, gen2, loc, alleles = allele_frequencies) for (i,mth) in enumerate(method)]
+
+            #TODO Bootstrap loop
+            #TODO Bootstrap post-process
+        end
+    end
+    method_colnames = [Symbol("$i") for i in method]
+    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
+    [out_df[:, mth] = relate_vecs[i] for (i, mth) in enumerate(method_colnames)]
+    return out_df
+end
+
+
+#dictionary implementation
+function pairwise_relatedness3(data::PopData; method::Vector{Function}, inbreeding::Bool = true, verbose::Bool = true)
+    # check that dataset is entirely diploid
+    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+
+    allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
+                            Tuple(allele_freq.(locus.(Ref(data), loci(data))))
+                        )
+    sample_names = samples(data)
+    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
+    relate_vecs = Dict([i => Vector{Union{Missing,Float64}}(undef, length(sample_pairs)) for i in Symbol.(method)]...)
+    shared_loci = Vector{Int}(undef, length(sample_pairs))
+    idx = 0
+    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
+        geno1 = get_genotypes(data, ind1)
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
+            idx += 1
+            #TODO Progress Bar
+            geno2 = get_genotypes(data, ind2)
+
+            # filter out loci missing in at least one individual in the pair
+            loc,gen1,gen2 = collect.(skipmissings(Symbol.(loci(data)), geno1, geno2))
+
+            # populate shared_loci array
+            shared_loci[idx] = length(loc)
+            [relate_vecs[Symbol(mthd)][idx] = mthd(gen1, gen2, loc, alleles = allele_frequencies) for mthd in method]
+
+            #TODO Bootstrap loop
+            #TODO Bootstrap post-process
+        end
+    end
+    method_colnames = [Symbol("$i") for i in method]
+    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci, relate_vecs...)
+   # [out_df[:, mth] = relate_vecs[i] for (i, mth) in enumerate(method_colnames)]
+    #return out_df
 end
