@@ -244,7 +244,7 @@ function a_wang(N::Int, alleles::Dict)
 
     a[4] = (N^3 * a_wang_base(4, alleles) - 6 * (N - 1) * (N - 2) * a[3] - 7 * (N - 1) * a[2] - 1) / (N^3 - 6 * N^2 + 11 * N - 6)
 
-    return(a)
+    return a
 end
 
 """
@@ -324,7 +324,7 @@ function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T
         c * (1.0 - b) * (d * g * P3 + e * f * P2)) / V
 
     r = (Φ/2.0 + Δ)
-    return (r)
+    return r
 end
 
 
