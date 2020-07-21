@@ -161,12 +161,79 @@ function Loiselle(data::PopData, ind1::String, ind2::String; alleles::T) where T
 
         for allele in keys(alleles[loc])
             fq = alleles[loc][allele]
-            n += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
-            d += fq * (1.0 - fq)
+            numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
+            denominator1 += fq * (1.0 - fq)
         end
     end
-    return (2.0 * numerator1 / denominator1) + 2.0 / (2 * length(samples(data)) - 1)
+    return numerator1 / denominator1 + 2.0 / (2 * length(samples(data)) - 1)
 end
+
+"""
+    LiHorvitz(data::PopData, ind1::String, ind2::String; alleles::Dict)
+Allele sharing index described by Li and Horvitz (1953)
+"""
+function LiHorvitz(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+
+    Bxy = Vector{Float64}(undef, length(loci(data)))
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
+
+    loc_id = 0
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        loc_id += 1
+        i,j = gen1
+        k,l = gen2
+
+        Bxy[loc_id] = sum([i, j] .∈ [k,l]') / 4
+    end
+    return mean(Bxy)
+end
+
+"""
+    Lynch(data::PopData, ind1::String, ind2::String; alleles::Dict)
+Allele sharing index described by Lynch (1988)
+"""
+function Lynch(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+
+    Sxy = Vector{Float64}(undef, length(loci(data)))
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
+
+    loc_id = 0
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        loc_id += 1
+        i,j = gen1
+        k,l = gen2
+
+        Sxy[loc_id] = ((i ∈ gen2) + (j ∈ gen2) + (k ∈ gen1) + (l ∈ gen1)) / 4
+    end
+    return mean(Sxy)
+end
+
+"""
+    Blouin(data::PopData, ind1::String, ind2::String; alleles::Dict)
+Allele sharing index described by Blouin (1996)
+"""
+function Blouin(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+
+    Mxy = Vector{Float64}(undef, length(loci(data)))
+    geno1 = get_genotypes(data, ind1)
+    geno2 = get_genotypes(data, ind2)
+
+    loc_id = 0
+    for (loc,gen1,gen2) in zip(skipmissings(Symbol.(loci(data)), geno1, geno2)...)
+        loc_id += 1
+        i,j = gen1
+        k,l = gen2
+
+        Mxy[loc_id] = (((i ∈ gen2) & (k ∈ gen1)) + ((j ∈ gen2) & (l ∈ gen1))) / 2
+    end
+    return mean(Mxy)
+end
+
 
 ### Wang 2002 helper functions ###
 function a_wang_base(m::Int, alleles::Dict)
