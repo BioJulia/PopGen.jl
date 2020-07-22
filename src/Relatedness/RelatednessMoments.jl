@@ -328,7 +328,7 @@ function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
 
     isempty(locus_names) && return missing
-    P1 = Vector{Float64}(undef, length(loci(data)))
+    P1 = Vector{Float64}(undef, length(locus_names))
     P2, P3, P4, u, b, c, d, e, f, g = map(i -> similar(P1), 1:10)
     loc_id = 0
 
@@ -535,8 +535,6 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
             shared_loci[idx] = length(loc)
             [relate_vecs[i][idx] = mth(gen1, gen2, loc, alleles = allele_frequencies) for (i,mth) in enumerate(method)]
 
-            #TODO Bootstrap loop
-            #TODO Bootstrap post-process
             update!(p, idx)
         end
     end
