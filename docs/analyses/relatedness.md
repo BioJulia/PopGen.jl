@@ -28,6 +28,9 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
 ::: 
 
 ## Calculate Relatedness
+This can take a while, especially if performing bootstrapping; we provide a
+progress bar via `ProgressMeter.jl` so you can move on and focus on other things.
+ 
 <Tabs
   block={true}
   defaultValue="all"
