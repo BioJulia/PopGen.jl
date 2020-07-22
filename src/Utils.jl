@@ -1,4 +1,4 @@
-export quickstart, size
+export quickstart, size, drop_monomorphic, drop_monomorphic!
 
 #TODO change location in API docs
 """
@@ -69,6 +69,48 @@ end
 
 function Base.copy(data::PopData)
     PopData(copy.([data.meta,data.loci])...)
+end
+
+"""
+    drop_monomorphic(data::PopData)
+Return a `PopData` object omitting any monomorphic loci. Will inform you which
+loci were removed.
+"""
+function drop_monomorphic(data::PopData)
+    rm_loci = Vector{String}()
+    for (loc, loc_sdf) in pairs(groupby(data.loci, :locus))
+        length(unique(@view loc_sdf[:, :genotype])) == 1 && push!(rm_loci, loc.locus)
+    end
+
+    if length(rm_loci) == 0
+        return data
+    elseif length(rm_loci) == 1
+        @info "Dropping monomorphic locus " * rm_loci[1]
+    else
+        @info "Dropping $(length(rm_loci)) monomorphic loci" * "\n $rm_loci"
+    end
+    exclude(data, locus = rm_loci)
+end
+
+
+"""
+    drop_monomorphic!(data::PopData)
+Edit a `PopData` object in place by omitting any monomorphic loci. Will inform you which
+loci were removed.
+"""
+function drop_monomorphic!(data::PopData)
+    rm_loci = Vector{String}()
+    for (loc, loc_sdf) in pairs(groupby(data.loci, :locus))
+        length(unique(@view loc_sdf[:, :genotype])) == 1 && push!(rm_loci, loc.locus)
+    end
+    if length(rm_loci) == 0
+        return data
+    elseif length(rm_loci) == 1
+        @info "Dropping monomorphic locus " * rm_loci[1]
+    else
+        @info "Dropping $(length(rm_loci)) monomorphic loci" * "\n $rm_loci"
+    end
+    exclude!(data, locus = rm_loci)
 end
 
 

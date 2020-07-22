@@ -10,6 +10,8 @@ Load a Genepop format file into memory as a PopData object.
 - `popsep::String` : word that separates populations in `infile` (default: "POP")
 - `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
 - `silent::Bool`   : whether to print file information during import (default: `true`)
+- `allow_monomorphic::Bool` : whether to keep monomorphic loci in the dataset (default: `false`)
+
 
 ### File must follow standard Genepop formatting:
 - First line is a comment (and skipped)
@@ -38,7 +40,6 @@ Newcomb_04, 254230  564000  090120
 ```
 waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
 ```
-
 """
 function genepop(
     infile::String;
@@ -46,6 +47,7 @@ function genepop(
     popsep::String = "POP",
     diploid::Bool = true,
     silent::Bool = false,
+    allow_monomorphic::Bool = false
 )
     # open the file as lines of strings to suss out loci names, pop idx, and popcounts
     gpop_readlines = readlines(infile)
@@ -136,8 +138,12 @@ function genepop(
         latitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts)),
         longitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts))
     )
-
-    PopData(sample_table, geno_parse)
+    if allow_monomorphic 
+        pd_out = PopData(sample_table, geno_parse)
+    else
+        pd_out = drop_monomorphic!(PopData(sample_table, geno_parse))
+    end
+    return pd_out
 end
 
 """

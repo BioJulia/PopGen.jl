@@ -78,7 +78,7 @@ include("Heterozygosity.jl")
 include("SummaryInfo.jl")
 #Analyses
 include("HardyWeinberg.jl")
-#include(PairwiseRelatedness.jl)  # not yet ready
+#include(RelatednessMoments.jl)  # not yet ready
 #include(PlotRecipes.jl)  # not yet ready
 
 end # module PopGen

@@ -1,11 +1,4 @@
-#=
-This file handles the import/export of Variant Call Format files
-=#
-
 export bcf, vcf
-
-infile = "/home/pdimens/PopGen.jl/data/source/filtered_oyster.vcf"
-
 """
     bcf(infile::String; silent::Bool = false)
 Load a BCF file into memory as a PopObj object. Population and [optional]
@@ -13,7 +6,7 @@ location information need to be provided separately. Use `silent=true` to supres
 printing during file loading.
 - `infile` : path to VCF file
 """
-function bcf(infile::String; silent::Bool = false)
+function bcf(infile::String; silent::Bool = false, allow_monomorphic::Bool = false)
     vcf_file = BCF.Reader(open(infile, "r"))
 
     # get sample names from header
@@ -85,7 +78,13 @@ function bcf(infile::String; silent::Bool = false)
         latitude = loc_xy,
         longitude = loc_xy
     )
-    PopData(samples_df, geno_parse)
+
+    if allow_monomorphic 
+        pd_out = PopData(samples_df, geno_parse)
+    else
+        pd_out = drop_monomorphic!(PopData(samples_df, geno_parse))
+    end
+    return pd_out
 end
 
 ### VCF parsing ###
@@ -97,7 +96,7 @@ location information need to be provided separately. Use `silent=true` to supres
 printing during file loading.
 - `infile` : path to VCF file
 """
-function vcf(infile::String, silent::Bool = false)
+function vcf(infile::String, silent::Bool = false, allow_monomorphic::Bool = false)
     vcf_file = VCF.Reader(open(infile, "r"))
 
     # get sample names from header
@@ -169,5 +168,10 @@ function vcf(infile::String, silent::Bool = false)
         latitude = loc_xy,
         longitude = loc_xy
     )
-    PopData(samples_df, geno_parse)
+    if allow_monomorphic 
+        pd_out = PopData(samples_df, geno_parse)
+    else
+        pd_out = drop_monomorphic!(PopData(samples_df, geno_parse))
+    end
+    return pd_out
 end
