@@ -17,6 +17,8 @@ in your file*
 - `digits` : number of digits denoting each allele (default: `3`)
 - `diploid`  : whether samples are diploid for parsing optimizations (default: `true`)
 - `silent`   : whether to print file information during import (default: `true`)
+- `allow_monomorphic` : whether to keep monomorphic loci in the dataset (default: `false`)
+
 #### File formatting:
 - The first row is column names (names don't matter)
 - The columns must be in this order:

@@ -43,6 +43,14 @@ copy(data::PopData)
 ```
 Creates a copy of `PopData`.
 
+### `drop_monomorphic(data::PopData)`
+Return a `PopData` object omitting any monomorphic loci. Will inform you which loci were removed.
+
+
+### `drop_monomorphic!(data::PopData)`
+Edit a `PopData` object in place by omitting any monomorphic loci. Will inform you which loci were removed.
+
+
 ### `nonmissing`
 ```julia
 nonmissing(vec::T) where T<:AbstractArray

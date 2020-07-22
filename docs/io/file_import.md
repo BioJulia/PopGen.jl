@@ -13,10 +13,12 @@ Currently, PopGen.jl provides four different file parsers with which to create `
 | Variant Call Format           | `vcf()`               |
 | Variant Call Format (bzipped) | `bcf()`               |
 
-You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_from()`.
+You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_from()`. This wrapper is also aliased with the more-explicit name `file_import()`. Feel free to use whichever you like best.
 
-:::note file_import alias
-The name `read_from` is short and sweet, but isn't the most descriptive, so we provide a more explicitly-named alias `file_import()`. Feel free to use whichever you like best.
+::: note monomorphic loci
+By default, the file reading methods drop monomorphic loci and inform you which were removed, so do not be alarmed if the number of loci in your `PopData` is different from the source data. You can disable this
+behavior with the argument `allow_monomorphic = true`. Monomorphic loci are removed by default because they
+can give spurious/misleading results for some analyses, such as relatedness estimators.
 :::
 
 ## `read_from()`
