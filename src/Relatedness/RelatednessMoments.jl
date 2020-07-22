@@ -7,7 +7,6 @@ Calculates the moments based estimator of pairwise relatedness developed by Quel
 - Single Locus Equation:
 - How to combine multiple loci: 
     - Multiple loci are combined by independently summing the two numerator and two denominator terms before performing the final division and averaging the two components.
-
 - Assumes no inbreeding
 See equation 3 in Wang(2017) for variant of estimator used.
 
