@@ -37,6 +37,7 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
   ]
 }>
 <TabItem value="a">
+
 ```julia
 relatedness(data::PopData; method::Function, iterations::Int64, interval::Tuple(Float64, Float64))
 relatedness(data::PopData; method::Vector{Function}, iterations::Int64, interval::Tuple(Float64, Float64))
@@ -48,6 +49,7 @@ of bootstrap iterations you wish to perform for each pair. The default confidenc
 
 </TabItem>
 <TabItem value="s">
+
 ```julia
 relatedness(data::PopData, sample_names::Vector{String}; method::Function, iterations::Int64, interval::Tuple(Float64, Float64))
 relatedness(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int64, interval::Tuple(Float64, Float64))
