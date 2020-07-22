@@ -655,7 +655,7 @@ function relatedness(data::PopData; method::Union{Function, Vector{Function}}, i
         end
     end
     if errs != ""
-        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help")
+        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help.")
     end
 
     if iterations > 0
@@ -720,7 +720,7 @@ function relatedness(data::PopData, sample_names::Vector{String}; method::Union{
         end
     end
     if errs != ""
-        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help")
+        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help.")
     end
     if iterations > 0
         relatedness_bootstrap(data, sample_names, method = method, iterations = iterations, interval = interval)
