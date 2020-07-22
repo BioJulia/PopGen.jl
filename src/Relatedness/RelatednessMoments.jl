@@ -1,13 +1,14 @@
-#### Simple code versions ####
+export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, Horvitz, LiHorvitz, Moran, Blouin, Loiselle, Wang, relatedness
+
 """
     QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
 
--Single Locus Equation:
--How to combine multiple loci: Multiple loci are combined by independently summing the two numerator and two denominator terms before performing
-                                the final division and averaging the two components.
+- Single Locus Equation:
+- How to combine multiple loci: 
+    - Multiple loci are combined by independently summing the two numerator and two denominator terms before performing the final division and averaging the two components.
 
--Assumes no inbreeding
+- Assumes no inbreeding
 See equation 3 in Wang(2017) for variant of estimator used.
 
 Queller, D. C., & Goodnight, K. F. (1989). Estimating relatedness using genetic markers. Evolution, 43(2), 258-275.
@@ -40,10 +41,9 @@ end
     Ritland(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness proposed by Li and Horvitz (1953) and implemented/made popular by Ritland (1996).
 
--Single Locus Equation:
--How to combine multiple loci: A weighted average of individual locus specific estimates weighted by sampling variance
-
--Assumes no inbreeding
+- Single Locus Equation:
+- How to combine multiple loci: A weighted average of individual locus specific estimates weighted by sampling variance
+- Assumes no inbreeding
 
 See equation 7 in: Wang (2017) for variant of estimator used
 
@@ -80,10 +80,9 @@ end
     LynchRitland(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness by Lynch and Ritland (1999).
 
--Single Locus Equation:
--How to combine multiple loci: Weighted average of each term seperately weighted by the sample variance (assuming zero relatedness) and subsequently divided by the average sampling variance
-
--Assumes no inbreeding
+- Single Locus Equation:
+- How to combine multiple loci: Weighted average of each term seperately weighted by the sample variance (assuming zero relatedness) and subsequently divided by the average sampling variance
+- Assumes no inbreeding
 
 See equation 10 in Wang (2017) for variant of estimator used
 
@@ -121,10 +120,9 @@ end
     LynchLi(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness by Lynch (1988) & improved by Li et al. (1993).
 
--Single Locus Equation:
--How to combine multiple loci: Sum the difference between observed and expected similarity across all loci and then divide by the sum of 1 - the expected similarity
-
--Assumes no inbreeding
+- Single Locus Equation:
+- How to combine multiple loci: Sum the difference between observed and expected similarity across all loci and then divide by the sum of 1 - the expected similarity
+- Assumes no inbreeding
 
 See equations 13 - 16 in Wang (2017) for variant of estimator used
 
@@ -156,9 +154,8 @@ end
 Calculates the moments based estimator of pairwise relatedness using the estimator propsed by
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 
--Multiple Locus Equation:
-
--Assumes no inbreeding
+- Multiple Locus Equation:
+- Assumes no inbreeding
 
 See equations 22 in: Wang(2017) for variant of estimator used
 
@@ -187,12 +184,11 @@ end
 Allele sharing index described by Li and Horvitz (1953)
 
 -Single Locus Equation: If all alleles are the same between individuals (eg. AA x AA) then 1.
-                        If two alleles are shared between individuals (eg.  AA x AB or AB x AB) then 0.5.
-                        If only one allele is shared between individuals (eg. AB x AC) then 0.25.
-                        If no alleles are shared (eg. AB x CD) then 0.
--How to combine multiple loci: Single locus estimates are simply averaged together
-
--Assumes no inbreeding
+    - If two alleles are shared between individuals (eg.  AA x AB or AB x AB) then 0.5.
+    - If only one allele is shared between individuals (eg. AB x AC) then 0.25.
+    - If no alleles are shared (eg. AB x CD) then 0.
+- How to combine multiple loci: Single locus estimates are simply averaged together
+- Assumes no inbreeding
 
 Li, C. C., & Horvitz, D. G. (1953). Some methods of estimating the inbreeding coefficient. American journal of human genetics, 5(2), 107.
 """
@@ -216,13 +212,12 @@ end
     Lynch(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Allele sharing index described by Lynch (1988)
 
--Single Locus Equation: If all alleles are the same between individuals (eg. AA x AA) then 1.
-                        If both individuals are heterozygous with the same alleles or one is homozygous for the shared allele (eg. AB x AB or AA x AB) then 0.75.
-                        If only one allele is shared between individuals (eg. AB x AC) then 0.5.
-                        If no alleles are shared (eg. AB x CD) then 0.
--How to combine multiple loci: Single locus estimates are simply averaged together
-
--Assumes no inbreeding
+- Single Locus Equation: If all alleles are the same between individuals (eg. AA x AA) then 1.
+    - If both individuals are heterozygous with the same alleles or one is homozygous for the shared allele (eg. AB x AB or AA x AB) then 0.75.
+    - If only one allele is shared between individuals (eg. AB x AC) then 0.5.
+    - If no alleles are shared (eg. AB x CD) then 0.
+- How to combine multiple loci: Single locus estimates are simply averaged together
+- Assumes no inbreeding
 
 Lynch, M. (1988). Estimation of relatedness by DNA fingerprinting. Molecular biology and evolution, 5(5), 584-599.
 """
@@ -246,13 +241,12 @@ end
     Blouin(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Allele sharing index described by Blouin (1996)
 
--Single Locus Equation: The number of alleles shared between individuals over ploidy.
-                        If both allele positions are shared (e.g. AA x AA or AB x AB) then 1
-                        If one allele position is shared (e.g. AB x AC) then 0.5
-                        If neither allele position is shared (e.g. AB x CD) then 0
--How to combine multiple loci: Single locus estimates are simply averaged together
-
--Assumes no inbreeding
+- Single Locus Equation: The number of alleles shared between individuals over ploidy.
+    - If both allele positions are shared (e.g. AA x AA or AB x AB) then 1
+    - If one allele position is shared (e.g. AB x AC) then 0.5
+    - If neither allele position is shared (e.g. AB x CD) then 0
+- How to combine multiple loci: Single locus estimates are simply averaged together
+- Assumes no inbreeding
 
 Blouin, M. S., Parsons, M., Lacaille, V., & Lotz, S. (1996). Use of microsatellite loci to classify individuals by relatedness. Molecular ecology, 5(3), 393-401.
 """
@@ -273,13 +267,12 @@ function Blouin(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where
 end
 
 """
-Moran(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
+    Moran(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Reinterpretation of Moran's I (commonly used for spatial autocorrelation) to estimate genetic relatedness
 by Hardy and Vekemans (1999)
 
--Multiple Locus Equation:
-
--Assumes no inbreeding
+- Multiple Locus Equation:
+- Assumes no inbreeding
 
 Hardy, O. J., & Vekemans, X. (1999). Isolation by distance in a continuous population: reconciliation between spatial autocorrelation analysis and population genetics models. Heredity, 83(2), 145-154.
 """
@@ -433,8 +426,21 @@ function bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, B::Int64, 
 end
 
 function relatedness(data::PopData; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
+        # check that dataset is entirely diploid
+        all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+
     if eltype(method) != Function
         method = [method]
+    end
+
+    errs = ""
+    for i in Symbol.(method)
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Horvitz, :Loiselle, :Blouin, :Moran, :LiHorvitz]
+            errs *= "$i is not a valid method\n"
+        end
+    end
+    if errs != ""
+        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help")
     end
 
     if iterations > 0
@@ -445,10 +451,20 @@ function relatedness(data::PopData; method::Union{Function, Vector{Function}}, i
 end
 
 function relatedness(data::PopData, sample_names::Vector{String}; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
+    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    
     if eltype(method) != Function
         method = [method]
     end
-
+    errs = ""
+    for i in Symbol.(method)
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Horvitz, :Loiselle, :Blouin, :Moran, :LiHorvitz]
+            errs *= "$i is not a valid method\n"
+        end
+    end
+    if errs != ""
+        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help")
+    end
     if iterations > 0
         relatedness_bootstrap(data, sample_names, method = method, iterations = iterations, intervals = intervals)
     else
@@ -458,9 +474,6 @@ end
 
 
 function relatedness_no_boot(data::PopData; method::Vector{Function})
-    # check that dataset is entirely diploid
-    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
@@ -483,9 +496,6 @@ function relatedness_no_boot(data::PopData; method::Vector{Function})
             # populate shared_loci array
             shared_loci[idx] = length(loc)
             [relate_vecs[i][idx] = mth(gen1, gen2, loc, alleles = allele_frequencies) for (i,mth) in enumerate(method)]
-
-            #TODO Bootstrap loop
-            #TODO Bootstrap post-process
         end
     end
     method_colnames = [Symbol("$i") for i in method]
@@ -495,9 +505,6 @@ function relatedness_no_boot(data::PopData; method::Vector{Function})
 end
 
 function relatedness_bootstrap(data::PopData; method::Vector{Function}, iterations::Int = 100, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
-    # check that dataset is entirely diploid
-    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
@@ -505,7 +512,7 @@ function relatedness_bootstrap(data::PopData; method::Vector{Function}, iteratio
     sample_pairs = pairwise_pairs(sample_names)
 
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
-    boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> copy(relate_vecs), 1:5)
+    boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> deepcopy(relate_vecs), 1:5)
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
@@ -525,17 +532,14 @@ function relatedness_bootstrap(data::PopData; method::Vector{Function}, iteratio
                 boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
                 boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, intervals)
             end
-
-            #TODO Bootstrap loop
-            #TODO Bootstrap post-process
         end
     end
     method_colnames = [Symbol("$i") for i in method]
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
     boot_median_colnames = [Symbol("$i"*"_median") for i in method]
-    boot_se_colnames = [Symbol("$i"*"SE") for i in method]
-    boot_lower_colnames = [Symbol("$i"*"CI_"*"$intervals[1]") for i in method]
-    boot_upper_colnames = [Symbol("$i"*"CI_"*"$intervals[2]") for i in method]
+    boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
+    boot_lower_colnames = [Symbol("$i"*"_CI_"*"$intervals[1]") for i in method]
+    boot_upper_colnames = [Symbol("$i"*"_CI_"*"$intervals[2]") for i in method]
 
     out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
     for (i, mth) in enumerate(method_colnames)
@@ -553,9 +557,6 @@ end
 
 
 function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::Vector{Function})
-    # check that dataset is entirely diploid
-    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
@@ -594,9 +595,6 @@ end
 
 
 function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int = 100, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
-    # check that dataset is entirely diploid
-    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
@@ -607,7 +605,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     end
 
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
-    boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> copy(relate_vecs), 1:5)
+    boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> deepcopy(relate_vecs), 1:5)
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
@@ -627,17 +625,14 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
                 boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
                 boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, intervals)
             end
-
-            #TODO Bootstrap loop
-            #TODO Bootstrap post-process
         end
     end
     method_colnames = [Symbol("$i") for i in method]
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
     boot_median_colnames = [Symbol("$i"*"_median") for i in method]
-    boot_se_colnames = [Symbol("$i"*"SE") for i in method]
-    boot_lower_colnames = [Symbol("$i"*"CI_"*"$(intervals[1])") for i in method]
-    boot_upper_colnames = [Symbol("$i"*"CI_"*"$(intervals[2])") for i in method]
+    boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
+    boot_lower_colnames = [Symbol("$i"*"_CI_"*"$(intervals[1])") for i in method]
+    boot_upper_colnames = [Symbol("$i"*"_CI_"*"$(intervals[2])") for i in method]
 
     out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
     for (i, mth) in enumerate(method_colnames)
