@@ -425,7 +425,7 @@ function bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, B::Int64, 
 end
 
 
-function relatedness_no_boot(data::PopData; method::Vector{Function})
+function relatedness_no_boot(data::PopData; method::F) where F
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
@@ -456,7 +456,7 @@ function relatedness_no_boot(data::PopData; method::Vector{Function})
     return out_df
 end
 
-function relatedness_bootstrap(data::PopData; method::Vector{Function}, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975))
+function relatedness_bootstrap(data::PopData; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
@@ -508,16 +508,13 @@ end
 
 
 
-function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::Vector{Function})
+function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F) where F
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
     
     sample_pairs = pairwise_pairs(sample_names)
 
-    if eltype(method) != Function
-        method = [method]
-    end
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
@@ -546,16 +543,12 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
 end
 
 
-function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975))
+function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
     sample_pairs = pairwise_pairs(sample_names)
     
-    if eltype(method) != Function
-        method = [method]
-    end
-
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> deepcopy(relate_vecs), 1:5)
     shared_loci = Vector{Int}(undef, length(sample_pairs))
@@ -640,17 +633,19 @@ julia> relatedness(cats, method = [Loiselle, Moran], iterations = 100);
 julia> relatedness(cats, method = [Loiselle, Moran], iterations = 100, interval = (0.5, 0.95));
 ```
 """
-function relatedness(data::PopData; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975))
+function relatedness(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
     # check that dataset is entirely diploid
     all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
+    # make the methods a vector if they aren't already
     if eltype(method) != Function
         method = [method]
     end
 
+    # check for valid methods
     errs = ""
     for i in Symbol.(method)
-        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Horvitz, :Loiselle, :Blouin, :Moran, :LiHorvitz]
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz]
             errs *= "$i is not a valid method\n"
         end
     end
@@ -707,7 +702,7 @@ julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], ite
 julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.5, 0.95));
 ```
 """
-function relatedness(data::PopData, sample_names::Vector{String}; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975))
+function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
     all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
     if eltype(method) != Function
@@ -715,7 +710,7 @@ function relatedness(data::PopData, sample_names::Vector{String}; method::Union{
     end
     errs = ""
     for i in Symbol.(method)
-        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Horvitz, :Loiselle, :Blouin, :Moran, :LiHorvitz]
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz]
             errs *= "$i is not a valid method\n"
         end
     end
