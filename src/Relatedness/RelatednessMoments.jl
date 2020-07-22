@@ -424,53 +424,6 @@ function bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, B::Int64, 
     return Mean, Median, SE, quants[1], quants[2]
 end
 
-function relatedness(data::PopData; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
-        # check that dataset is entirely diploid
-        all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-
-    if eltype(method) != Function
-        method = [method]
-    end
-
-    errs = ""
-    for i in Symbol.(method)
-        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Horvitz, :Loiselle, :Blouin, :Moran, :LiHorvitz]
-            errs *= "$i is not a valid method\n"
-        end
-    end
-    if errs != ""
-        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help")
-    end
-
-    if iterations > 0
-        relatedness_bootstrap(data, method = method, iterations = iterations, intervals = intervals)
-    else
-        relatedness_no_boot(data, method = method)
-    end
-end
-
-function relatedness(data::PopData, sample_names::Vector{String}; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
-    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-    
-    if eltype(method) != Function
-        method = [method]
-    end
-    errs = ""
-    for i in Symbol.(method)
-        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Horvitz, :Loiselle, :Blouin, :Moran, :LiHorvitz]
-            errs *= "$i is not a valid method\n"
-        end
-    end
-    if errs != ""
-        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help")
-    end
-    if iterations > 0
-        relatedness_bootstrap(data, sample_names, method = method, iterations = iterations, intervals = intervals)
-    else
-        relatedness_no_boot(data, sample_names, method = method)
-    end
-end
-
 
 function relatedness_no_boot(data::PopData; method::Vector{Function})
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
@@ -503,7 +456,7 @@ function relatedness_no_boot(data::PopData; method::Vector{Function})
     return out_df
 end
 
-function relatedness_bootstrap(data::PopData; method::Vector{Function}, iterations::Int = 100, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
+function relatedness_bootstrap(data::PopData; method::Vector{Function}, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975))
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
@@ -529,7 +482,7 @@ function relatedness_bootstrap(data::PopData; method::Vector{Function}, iteratio
             for (i, mthd) in enumerate(method)
                 relate_vecs[i][idx] = mthd(gen1, gen2, loc, alleles = allele_frequencies)
                 boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
-                boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, intervals)
+                boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, interval)
             end
         end
     end
@@ -537,8 +490,8 @@ function relatedness_bootstrap(data::PopData; method::Vector{Function}, iteratio
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
     boot_median_colnames = [Symbol("$i"*"_median") for i in method]
     boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
-    boot_lower_colnames = [Symbol("$i"*"_CI_"*"$intervals[1]") for i in method]
-    boot_upper_colnames = [Symbol("$i"*"_CI_"*"$intervals[2]") for i in method]
+    boot_lower_colnames = [Symbol("$i"*"_CI_"*"$interval[1]") for i in method]
+    boot_upper_colnames = [Symbol("$i"*"_CI_"*"$interval[2]") for i in method]
 
     out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
     for (i, mth) in enumerate(method_colnames)
@@ -593,7 +546,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
 end
 
 
-function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int = 100, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
+function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975))
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
@@ -622,7 +575,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
             for (i, mthd) in enumerate(method)
                 relate_vecs[i][idx] = mthd(gen1, gen2, loc, alleles = allele_frequencies)
                 boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
-                boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, intervals)
+                boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, interval)
             end
         end
     end
@@ -630,8 +583,8 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
     boot_median_colnames = [Symbol("$i"*"_median") for i in method]
     boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
-    boot_lower_colnames = [Symbol("$i"*"_CI_"*"$(intervals[1])") for i in method]
-    boot_upper_colnames = [Symbol("$i"*"_CI_"*"$(intervals[2])") for i in method]
+    boot_lower_colnames = [Symbol("$i"*"_CI_"*"$(interval[1])") for i in method]
+    boot_upper_colnames = [Symbol("$i"*"_CI_"*"$(interval[2])") for i in method]
 
     out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
     for (i, mth) in enumerate(method_colnames)
@@ -644,4 +597,134 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     end
 
     return out_df
+end
+
+
+"""
+    relatedness(data::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64})
+    relatedness(data::PopData; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64})
+
+Return a dataframe of pairwise relatedness estimates for all individuals in a `PopData` object.
+To calculate means, median, standard error, and confidence intervals using bootstrapping,
+set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
+of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%), however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
+**Note:** samples must be diploid.
+### methods
+There are several estimators available and are listed below. `relatedness` takes the
+function names as arguments (**case sensitive**), therefore do not use quotes or colons
+in specifying the methods. Methods can be supplied as a vector. 
+
+**Tip** since the methods correspond to function names, they will tab-autocomplete when 
+inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
+- `QuellerGoodnight`
+- `Ritland`
+- `Lynch`
+- `LynchRitland`
+- `LynchLi`
+- `Loiselle`
+- `LiHorvitz`
+- `Blouin`
+- `Moran`
+- `Wang`
+
+**Examples**
+```juila
+julia> cats = nancycats();
+
+julia> relatedness(cats, method = Ritland);
+
+julia> relatedness(cats, method = [Ritland, Wang]);
+
+julia> relatedness(cats, method = [Loiselle, Moran], iterations = 100);
+
+julia> relatedness(cats, method = [Loiselle, Moran], iterations = 100, interval = (0.5, 0.95));
+```
+"""
+function relatedness(data::PopData; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975))
+    # check that dataset is entirely diploid
+    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+
+    if eltype(method) != Function
+        method = [method]
+    end
+
+    errs = ""
+    for i in Symbol.(method)
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Horvitz, :Loiselle, :Blouin, :Moran, :LiHorvitz]
+            errs *= "$i is not a valid method\n"
+        end
+    end
+    if errs != ""
+        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help")
+    end
+
+    if iterations > 0
+        relatedness_bootstrap(data, method = method, iterations = iterations, interval = interval)
+    else
+        relatedness_no_boot(data, method = method)
+    end
+end
+
+
+"""
+    relatedness(data::PopData, sample_names::Vector{String}; method::Function, iterations::Int64, interval::Tuple{Float64, Float64})
+    relatedness(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64})
+
+Return a dataframe of pairwise relatedness estimates for all pairs of the supplied sample names in a `PopData` object.
+To calculate means, median, standard error, and confidence intervals using bootstrapping,
+set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
+of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%),
+however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
+**Note:** samples must be diploid.
+### methods
+There are several estimators available and are listed below. `relatedness` takes the
+function names as arguments (**case sensitive**), therefore do not use quotes or colons
+in specifying the methods. Methods can be supplied as a vector.
+
+**Tip:** since the methods correspond to function names, they will tab-autocomplete when 
+inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
+- `QuellerGoodnight`
+- `Ritland`
+- `Lynch`
+- `LynchRitland`
+- `LynchLi`
+- `Loiselle`
+- `LiHorvitz`
+- `Blouin`
+- `Moran`
+- `Wang`
+
+**Examples**
+```
+julia> cats = nancycats();
+
+julia> relatedness(cats, ["N7", "N111", "N115"], method = Ritland);
+
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang]);
+
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100);
+
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.5, 0.95));
+```
+"""
+function relatedness(data::PopData, sample_names::Vector{String}; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975))
+    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+
+    if eltype(method) != Function
+        method = [method]
+    end
+    errs = ""
+    for i in Symbol.(method)
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Horvitz, :Loiselle, :Blouin, :Moran, :LiHorvitz]
+            errs *= "$i is not a valid method\n"
+        end
+    end
+    if errs != ""
+        error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help")
+    end
+    if iterations > 0
+        relatedness_bootstrap(data, sample_names, method = method, iterations = iterations, interval = interval)
+    else
+        relatedness_no_boot(data, sample_names, method = method)
+    end
 end
