@@ -435,11 +435,12 @@ function relatedness_no_boot(data::PopData; method::F) where F
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
+    p = Progress(length(sample_pairs), 1)
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
-            #TODO Progress Bar
+            
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair
@@ -448,6 +449,7 @@ function relatedness_no_boot(data::PopData; method::F) where F
             # populate shared_loci array
             shared_loci[idx] = length(loc)
             [relate_vecs[i][idx] = mth(gen1, gen2, loc, alleles = allele_frequencies) for (i,mth) in enumerate(method)]
+        update!(p, idx)
         end
     end
     method_colnames = [Symbol("$i") for i in method]
@@ -467,11 +469,12 @@ function relatedness_bootstrap(data::PopData; method::F, iterations::Int = 100, 
     boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> deepcopy(relate_vecs), 1:5)
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
+    p = Progress(length(sample_pairs), 1)
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
-        #=@inbounds @sync Base.Threads.@spawn=# for ind2 in sample_names[sample_n+1:end]
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
-            #TODO Progress Bar
+            
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair
@@ -484,14 +487,15 @@ function relatedness_bootstrap(data::PopData; method::F, iterations::Int = 100, 
                 boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
                 boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, interval)
             end
+        update!(p, idx)
         end
     end
+    CI_percent = convert(Int64, round(interval[2] - interval[1], digits = 2) * 100)
     method_colnames = [Symbol("$i") for i in method]
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
     boot_median_colnames = [Symbol("$i"*"_median") for i in method]
     boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
-    boot_lower_colnames = [Symbol("$i"*"_CI_"*"$interval[1]") for i in method]
-    boot_upper_colnames = [Symbol("$i"*"_CI_"*"$interval[2]") for i in method]
+    boot_CI_colnames = [Symbol("$i"*"_CI_"*"$CI_percent") for i in method]
 
     out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
     for (i, mth) in enumerate(method_colnames)
@@ -499,13 +503,11 @@ function relatedness_bootstrap(data::PopData; method::F, iterations::Int = 100, 
         out_df[:, boot_mean_colnames[i]] = boot_means[i]
         out_df[:, boot_median_colnames[i]] = boot_medians[i]
         out_df[:, boot_se_colnames[i]] = boot_ses[i]
-        out_df[:, boot_lower_colnames[i]] = boot_lowers[i]
-        out_df[:, boot_upper_colnames[i]] = boot_uppers[i]
+        out_df[:, boot_CI_colnames[i]] = Tuple.(zip(boot_lowers[i], boot_uppers[i]))
     end
 
     return out_df
 end
-
 
 
 function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F) where F
@@ -518,11 +520,12 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
+    p = Progress(length(sample_pairs), 1)
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
-            #TODO Progress Bar
+            
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair
@@ -534,6 +537,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
 
             #TODO Bootstrap loop
             #TODO Bootstrap post-process
+            update!(p, idx)
         end
     end
     method_colnames = [Symbol("$i") for i in method]
@@ -553,11 +557,12 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> deepcopy(relate_vecs), 1:5)
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
+    p = Progress(length(sample_pairs), 1)
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
-            #TODO Progress Bar
+            
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair
@@ -570,14 +575,15 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
                 boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
                 boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, interval)
             end
+            update!(p, idx)
         end
     end
+    CI_percent = convert(Int64, round(interval[2] - interval[1], digits = 2) * 100)
     method_colnames = [Symbol("$i") for i in method]
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
     boot_median_colnames = [Symbol("$i"*"_median") for i in method]
     boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
-    boot_lower_colnames = [Symbol("$i"*"_CI_"*"$(interval[1])") for i in method]
-    boot_upper_colnames = [Symbol("$i"*"_CI_"*"$(interval[2])") for i in method]
+    boot_CI_colnames = [Symbol("$i"*"_CI_"*"$CI_percent") for i in method]
 
     out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
     for (i, mth) in enumerate(method_colnames)
@@ -585,8 +591,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
         out_df[:, boot_mean_colnames[i]] = boot_means[i]
         out_df[:, boot_median_colnames[i]] = boot_medians[i]
         out_df[:, boot_se_colnames[i]] = boot_ses[i]
-        out_df[:, boot_lower_colnames[i]] = boot_lowers[i]
-        out_df[:, boot_upper_colnames[i]] = boot_uppers[i]
+        out_df[:, boot_CI_colnames[i]] = Tuple.(zip(boot_lowers[i], boot_uppers[i]))
     end
 
     return out_df
