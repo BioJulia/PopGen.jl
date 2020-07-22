@@ -409,7 +409,7 @@ end
 
 
 #Bootstrap Utilities
-function bootstrap_locus(data::PopData, method::Function, ind1::String, ind2::String, B::Int64)
+function bootstrap_locus(data::PopData, method::Function, ind1::String, ind2::String, B::Int64, allele_frq::NamedTuple)
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, B)
 
     for b in 1:B
@@ -418,7 +418,7 @@ function bootstrap_locus(data::PopData, method::Function, ind1::String, ind2::St
         geno2_sample = map(i -> get_genotype(data, sample = ind2, locus = i), loci_sample)
         loc_samp,gen_samp1,gen_samp2 = collect.(skipmissings(Symbol.(loci_sample), geno1_sample, geno2_sample))
 
-        relate_vec_boot[b] = method(gen_samp1, gen_samp2, loc_samp, alleles = allele_frequencies)
+        relate_vec_boot[b] = method(gen_samp1, gen_samp2, loc_samp, alleles = allele_frq)
     end
     return relate_vec_boot
 end
@@ -432,10 +432,32 @@ function bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, B::Int64, 
     return Mean, Median, SE, quants[1], quants[2]
 end
 
-#TODO Make possible to pass in a set of allele frequencies - i.e. only want to pass one pair but have allele freqs from full dataset
+function relatedness(data::PopData; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
+    if eltype(method) != Function
+        method = [method]
+    end
 
-#TODO this is 100% incomplete
-function pairwise_relatedness(data::PopData; method::Function, B::Int64 = 0, width::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool = true, verbose::Bool = true)
+    if iterations > 0
+        relatedness_bootstrap(data, method = method, iterations = iterations, intervals = intervals)
+    else
+        relatedness_no_boot(data, method = method)
+    end
+end
+
+function relatedness(data::PopData, sample_names::Vector{String}; method::Union{Function, Vector{Function}}, iterations::Int64 = 0, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
+    if eltype(method) != Function
+        method = [method]
+    end
+
+    if iterations > 0
+        relatedness_bootstrap(data, sample_names, method = method, iterations = iterations, intervals = intervals)
+    else
+        relatedness_no_boot(data, sample_names, method = method)
+    end
+end
+
+
+function relatedness_no_boot(data::PopData; method::Vector{Function})
     # check that dataset is entirely diploid
     all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
@@ -443,12 +465,10 @@ function pairwise_relatedness(data::PopData; method::Function, B::Int64 = 0, wid
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
     sample_names = samples(data)
-    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
-    relate_vec = Vector{Union{Missing,Float64}}(undef, length(sample_pairs))
+    sample_pairs = pairwise_pairs(sample_names)
+
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
-
-    boot_mean, boot_median, boot_se, boot_lower, boot_upper = similar(relate_vec)
-
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
@@ -462,20 +482,19 @@ function pairwise_relatedness(data::PopData; method::Function, B::Int64 = 0, wid
 
             # populate shared_loci array
             shared_loci[idx] = length(loc)
-            relate_vec[idx] = method(gen1, gen2, loc, alleles = allele_frequencies)
+            [relate_vecs[i][idx] = mth(gen1, gen2, loc, alleles = allele_frequencies) for (i,mth) in enumerate(method)]
 
-            # bootstrap estimates
-            boot_out = bootstrap_locus(data, method, ind1, ind2, B)
-            boot_mean[idx], boot_median[idx], boot_se[idx], boot_lower[idx], boot_upper[idx] = bootstrap_summary(boot_out, B, width)
+            #TODO Bootstrap loop
+            #TODO Bootstrap post-process
         end
     end
-    method_colname = Symbol("$method")
-    return DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :shared_loci => shared_loci, method_colname => relate_vec)
+    method_colnames = [Symbol("$i") for i in method]
+    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
+    [out_df[:, mth] = relate_vecs[i] for (i, mth) in enumerate(method_colnames)]
+    return out_df
 end
 
-
-
-function relatedness_no_boot(data::PopData; method::Union{Function, Vector{Function}})
+function relatedness_bootstrap(data::PopData; method::Vector{Function}, iterations::Int = 100, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
     # check that dataset is entirely diploid
     all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
@@ -483,6 +502,64 @@ function relatedness_no_boot(data::PopData; method::Union{Function, Vector{Funct
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
     sample_names = samples(data)
+    sample_pairs = pairwise_pairs(sample_names)
+
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
+    boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> copy(relate_vecs), 1:5)
+    shared_loci = Vector{Int}(undef, length(sample_pairs))
+    idx = 0
+    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
+        geno1 = get_genotypes(data, ind1)
+        #=@inbounds @sync Base.Threads.@spawn=# for ind2 in sample_names[sample_n+1:end]
+            idx += 1
+            #TODO Progress Bar
+            geno2 = get_genotypes(data, ind2)
+
+            # filter out loci missing in at least one individual in the pair
+            loc,gen1,gen2 = collect.(skipmissings(Symbol.(loci(data)), geno1, geno2))
+
+            # populate shared_loci array
+            shared_loci[idx] = length(loc)
+            for (i, mthd) in enumerate(method)
+                relate_vecs[i][idx] = mthd(gen1, gen2, loc, alleles = allele_frequencies)
+                boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
+                boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, intervals)
+            end
+
+            #TODO Bootstrap loop
+            #TODO Bootstrap post-process
+        end
+    end
+    method_colnames = [Symbol("$i") for i in method]
+    boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
+    boot_median_colnames = [Symbol("$i"*"_median") for i in method]
+    boot_se_colnames = [Symbol("$i"*"SE") for i in method]
+    boot_lower_colnames = [Symbol("$i"*"CI_"*"$intervals[1]") for i in method]
+    boot_upper_colnames = [Symbol("$i"*"CI_"*"$intervals[2]") for i in method]
+
+    out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
+    for (i, mth) in enumerate(method_colnames)
+        out_df[:, mth] = relate_vecs[i]
+        out_df[:, boot_mean_colnames[i]] = boot_means[i]
+        out_df[:, boot_median_colnames[i]] = boot_medians[i]
+        out_df[:, boot_se_colnames[i]] = boot_ses[i]
+        out_df[:, boot_lower_colnames[i]] = boot_lowers[i]
+        out_df[:, boot_upper_colnames[i]] = boot_uppers[i]
+    end
+
+    return out_df
+end
+
+
+
+function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::Vector{Function})
+    # check that dataset is entirely diploid
+    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+
+    allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
+                            Tuple(allele_freq.(locus.(Ref(data), loci(data))))
+                        )
+    
     sample_pairs = pairwise_pairs(sample_names)
 
     if eltype(method) != Function
@@ -515,21 +592,22 @@ function relatedness_no_boot(data::PopData; method::Union{Function, Vector{Funct
     return out_df
 end
 
-function relatedness_bootstrap(data::PopData; method::Union{Function, Vector{Function}}, iterations::Int = 100, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
+
+function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int = 100, intervals::Tuple{Float64, Float64} = (0.025, 0.975))
     # check that dataset is entirely diploid
-    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
                         )
-    sample_names = samples(data)
     sample_pairs = pairwise_pairs(sample_names)
-
+    
     if eltype(method) != Function
         method = [method]
     end
+
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
-    boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> similar(relate_vecs), 1:5)
+    boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> copy(relate_vecs), 1:5)
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
@@ -545,8 +623,8 @@ function relatedness_bootstrap(data::PopData; method::Union{Function, Vector{Fun
             # populate shared_loci array
             shared_loci[idx] = length(loc)
             for (i, mthd) in enumerate(method)
-                relate_vecs[i][idx] = mth(gen1, gen2, loc, alleles = allele_frequencies)
-                boot_out = bootstrap_locus(data, methd, ind1, ind2, iterations)
+                relate_vecs[i][idx] = mthd(gen1, gen2, loc, alleles = allele_frequencies)
+                boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
                 boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_lowers[i][idx], boot_uppers[i][idx] = bootstrap_summary(boot_out, iterations, intervals)
             end
 
@@ -558,8 +636,8 @@ function relatedness_bootstrap(data::PopData; method::Union{Function, Vector{Fun
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
     boot_median_colnames = [Symbol("$i"*"_median") for i in method]
     boot_se_colnames = [Symbol("$i"*"SE") for i in method]
-    boot_lower_colnames = [Symbol("$i"*"CI_"*"$intervals[1]") for i in method]
-    boot_upper_colnames = [Symbol("$i"*"CI_"*"$intervals[2]") for i in method]
+    boot_lower_colnames = [Symbol("$i"*"CI_"*"$(intervals[1])") for i in method]
+    boot_upper_colnames = [Symbol("$i"*"CI_"*"$(intervals[2])") for i in method]
 
     out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
     for (i, mth) in enumerate(method_colnames)
@@ -572,42 +650,4 @@ function relatedness_bootstrap(data::PopData; method::Union{Function, Vector{Fun
     end
 
     return out_df
-end
-
-
-#dictionary implementation
-function pairwise_relatedness3(data::PopData; method::Vector{Function}, inbreeding::Bool = true, verbose::Bool = true)
-    # check that dataset is entirely diploid
-    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-
-    allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
-                            Tuple(allele_freq.(locus.(Ref(data), loci(data))))
-                        )
-    sample_names = samples(data)
-    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
-    relate_vecs = Dict([i => Vector{Union{Missing,Float64}}(undef, length(sample_pairs)) for i in Symbol.(method)]...)
-    shared_loci = Vector{Int}(undef, length(sample_pairs))
-    idx = 0
-    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-        geno1 = get_genotypes(data, ind1)
-        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
-            idx += 1
-            #TODO Progress Bar
-            geno2 = get_genotypes(data, ind2)
-
-            # filter out loci missing in at least one individual in the pair
-            loc,gen1,gen2 = collect.(skipmissings(Symbol.(loci(data)), geno1, geno2))
-
-            # populate shared_loci array
-            shared_loci[idx] = length(loc)
-            [relate_vecs[Symbol(mthd)][idx] = mthd(gen1, gen2, loc, alleles = allele_frequencies) for mthd in method]
-
-            #TODO Bootstrap loop
-            #TODO Bootstrap post-process
-        end
-    end
-    method_colnames = [Symbol("$i") for i in method]
-    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci, relate_vecs...)
-   # [out_df[:, mth] = relate_vecs[i] for (i, mth) in enumerate(method_colnames)]
-    #return out_df
 end

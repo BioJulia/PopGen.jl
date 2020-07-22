@@ -202,7 +202,7 @@ julia> pairwise_pairs(samps)
  ("blue_1", "blue_2")
 ```
 """
-function pairwise_pairs(smp_names::Vector{String})
+function pairwise_pairs(smp_names::AbstractVector{String})
     [tuple(smp_names[i], smp_names[j]) for i in 1:length(smp_names)-1 for j in i+1:length(smp_names)]
 end
 
