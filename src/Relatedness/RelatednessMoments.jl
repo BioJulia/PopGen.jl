@@ -481,7 +481,7 @@ function relatedness_bootstrap(data::PopData; method::Union{Function, Vector{Fun
     boot_lower_colnames = [Symbol("$i"*"CI_"*"$intervals[1]") for i in method]
     boot_upper_colnames = [Symbol("$i"*"CI_"*"$intervals[2]") for i in method]
 
-    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
+    out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
     for (i, mth) in enumerate(method_colnames)
         out_df[:, mth] = relate_vecs[i]
         out_df[:, boot_mean_colnames[i]] = boot_means[i]
