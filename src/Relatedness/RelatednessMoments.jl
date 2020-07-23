@@ -435,7 +435,7 @@ function relatedness_no_boot(data::PopData; method::F) where F
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
-    p = Progress(length(sample_pairs), 1)
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
@@ -469,7 +469,7 @@ function relatedness_bootstrap(data::PopData; method::F, iterations::Int = 100, 
     boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> deepcopy(relate_vecs), 1:5)
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
-    p = Progress(length(sample_pairs), 1)
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
@@ -520,7 +520,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
-    p = Progress(length(sample_pairs), 1)
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
@@ -555,7 +555,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     boot_means, boot_medians, boot_ses, boot_lowers, boot_uppers = map(i -> deepcopy(relate_vecs), 1:5)
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     idx = 0
-    p = Progress(length(sample_pairs), 1)
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
