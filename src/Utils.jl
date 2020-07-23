@@ -167,6 +167,7 @@ function nonmissing(vec::T) where T<:AbstractArray
     count(!ismissing, vec)
 end
 
+#TODO add to API docs
 """
     nonmissing(data::PopData, locus::String)
 Convenience function to count the number of non-`missing` samples
