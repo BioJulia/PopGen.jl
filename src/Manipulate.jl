@@ -1,4 +1,4 @@
-export add_meta!, locations, locations!, loci, locus, get_genotypes, get_genotype, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
+export add_meta!, locations, locations!, loci, genotypes, get_genotypes, get_genotype, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
 
 """
     add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
@@ -223,17 +223,16 @@ end
 
 
 """
-    locus(data::PopData, locus::Union{String, Symbol})
+    genotypes(data::PopData, locus::Union{String, Symbol})
 Convenience wrapper to return a vector of all the genotypes of a single locus
 
 ### Example
 ```
-locus(gulfsharks(), "contig_475")
+genotypes(gulfsharks(), "contig_475")
 ```
 """
-function locus(data::PopData, locus::String)
+function genotypes(data::PopData, locus::String)
     @view data.loci[data.loci.locus .== locus, :genotype]
-    #@where(data.loci, :locus .== locus)[! , :genotype]
 end
 
 
