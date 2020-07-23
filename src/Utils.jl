@@ -79,7 +79,7 @@ loci were removed.
 function drop_monomorphic(data::PopData)
     rm_loci = Vector{String}()
     for (loc, loc_sdf) in pairs(groupby(data.loci, :locus))
-        length(unique(@view loc_sdf[:, :genotype])) == 1 && push!(rm_loci, loc.locus)
+        length(unique(skipmissing(loc_sdf[:, :genotype]))) == 1 && push!(rm_loci, loc.locus)
     end
 
     if length(rm_loci) == 0
@@ -101,7 +101,7 @@ loci were removed.
 function drop_monomorphic!(data::PopData)
     rm_loci = Vector{String}()
     for (loc, loc_sdf) in pairs(groupby(data.loci, :locus))
-        length(unique(@view loc_sdf[:, :genotype])) == 1 && push!(rm_loci, loc.locus)
+        length(unique(skipissing(loc_sdf[:, :genotype]))) == 1 && push!(rm_loci, loc.locus)
     end
     if length(rm_loci) == 0
         return data
