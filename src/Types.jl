@@ -76,13 +76,8 @@ function Base.show(io::IO, data::PopData)
     print(io, "  Populations: ") ; printstyled(io, length(unique(data.meta.population)), "\n", bold = true)
 
     if ismissing.(data.meta.longitude) |> all == true
-        print(io, "  Longitude:") ; printstyled(io, " absent\n", color = :yellow)
+        print(io, "  Coordinates:") ; printstyled(io, " absent\n", color = :yellow)
     else
-        println(io, "  Longitude: present with ", count(i -> i === missing, data.meta.longitude), " missing")
-    end
-    if ismissing.(data.meta.longitude) |> all == true
-        print(io, "  Latitude:") ; printstyled(io, " absent\n", color = :yellow)
-    else
-        println(io, "  Latitude: present with ", count(i -> i === missing, data.meta.latitude), " missing")
+        println(io, "  Coordinates: present with ", count(i -> i === missing, data.meta.longitude), " missing")
     end
 end
