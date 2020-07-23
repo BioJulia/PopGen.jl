@@ -1,4 +1,4 @@
-export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, Horvitz, LiHorvitz, Moran, Blouin, Loiselle, Wang, relatedness
+export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran, Blouin, Loiselle, Wang, relatedness
 
 """
     QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
