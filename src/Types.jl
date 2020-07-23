@@ -77,7 +77,9 @@ function Base.show(io::IO, data::PopData)
 
     if ismissing.(data.meta.longitude) |> all == true
         print(io, "  Coordinates:") ; printstyled(io, " absent\n", color = :yellow)
+    elseif ismissing.(data.meta.longitude) |> all == false
+        println(io, "  Coordinates: present")
     else
-        println(io, "  Coordinates: present with ", count(i -> i === missing, data.meta.longitude), " missing")
+        println(io, "  Coordinates: present (", count(i -> i === missing, data.meta.longitude), " missing)")
     end
 end
