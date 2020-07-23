@@ -47,25 +47,52 @@ missing(gulfsharks(), by = "pop")
 end
 
 #TODO add to docs (Data Exploration page and API)
+
+"""
+    pairwise_identical(data::PopData)
+Return a table of the percent of identical genotypes that are identical for each locus
+between pairs of individuals.
+"""
 function pairwise_identical(data::PopData)
     sample_names = samples(data)
-    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
+    pairwise_identical(data, sample_names)
+end
+
+"""
+    pairwise_identical(data::PopData, sample_names::Vector{String})
+Return a table of the percent of identical genotypes that are identical for each locus
+between all pairs of provided individuals.
+"""
+function pairwise_identical(data::PopData, sample_names::Vector{String})
+    errs = ""
+    all_samples = samples(data)
+    if sample_names != all_samples
+        for i in sample_names
+            if i ∉ all_samples
+                errs *= " $i,"
+            end
+        end
+        errs != "" && error("Samples not found in the PopData: " * errs)
+    end
+    sample_pairs = pairwise_pairs(sample_names)
     n = length(sample_pairs)
     perc_ident_vec = Vector{Float64}(undef, n)
     n_vec = Vector{Int}(undef, n)
     idx = 0
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
     @inbounds for (sample_n, sample_1) in enumerate(sample_names[1:end-1])
         geno_1 = get_genotypes(data, sample_1)
         len_1 = length(collect(skipmissing(geno_1)))
-        @inbounds Base.Threads.@threads for sample_2 in sample_names[sample_n+1:end]
+        @inbounds @sync Base.Threads.@spawn for sample_2 in sample_names[sample_n+1:end]
             idx += 1
             geno_2 = get_genotypes(data, sample_2)
             len_2 = length(collect(skipmissing(geno_2)))
             shared_geno = minimum([len_1, len_2])
             shared = sum(skipmissing(geno_1 .== geno_2))
-            perc_ident_vec[idx] = round(shared/shared_geno, digits = 2)
-            n_vec[idx] = shared_geno
+            @inbounds perc_ident_vec[idx] = round(shared/shared_geno, digits = 2)
+            @inbounds n_vec[idx] = shared_geno
         end
+    update!(p, idx)
     end
-    DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :identical => perc_ident_vec, :n => n_vec)
+    DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :identical => perc_ident_vec, :n => n_vec)
 end
