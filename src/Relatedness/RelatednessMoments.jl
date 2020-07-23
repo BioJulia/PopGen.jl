@@ -13,7 +13,7 @@ See equation 3 in Wang(2017) for variant of estimator used.
 Queller, D. C., & Goodnight, K. F. (1989). Estimating relatedness using genetic markers. Evolution, 43(2), 258-275.
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 """
-function QuellerGoodnight(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function QuellerGoodnight(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
     numerator1 = 0.0
@@ -49,7 +49,7 @@ See equation 7 in: Wang (2017) for variant of estimator used
 Ritland, K. (1996). Estimators for pairwise relatedness and individual inbreeding coefficients. Genetics Research, 67(2), 175-185.
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 """
-function Ritland(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function Ritland(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
     numerator1 = 0.0
@@ -88,7 +88,7 @@ See equation 10 in Wang (2017) for variant of estimator used
 Lynch, M., & Ritland, K. (1999). Estimation of pairwise relatedness with molecular markers. Genetics, 152(4), 1753-1766.
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 """
-function LynchRitland(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function LynchRitland(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
     numerator1 = 0.0
@@ -128,7 +128,7 @@ See equations 13 - 16 in Wang (2017) for variant of estimator used
 Li, C. C., Weeks, D. E., & Chakravarti, A. (1993). Similarity of DNA fingerprints due to chance and relatedness. Human heredity, 43(1), 45-52.
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 """
-function LynchLi(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function LynchLi(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
     numerator1 = 0.0
@@ -162,7 +162,7 @@ Loiselle, B. A., Sork, V. L., Nason, J., & Graham, C. (1995). Spatial genetic st
 Heuertz, M., Vekemans, X., Hausman, J. F., Palada, M., & Hardy, O. J. (2003). Estimating seed vs. pollen dispersal from spatial genetic structure in the common ash. Molecular Ecology, 12(9), 2483-2495.
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 """
-function Loiselle(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function Loiselle(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
     numerator1 = 0.0
@@ -191,7 +191,7 @@ Allele sharing index described by Li and Horvitz (1953)
 
 Li, C. C., & Horvitz, D. G. (1953). Some methods of estimating the inbreeding coefficient. American journal of human genetics, 5(2), 107.
 """
-function LiHorvitz(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function LiHorvitz(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
     Bxy = Vector{Float64}(undef, length(locus_names))
@@ -220,7 +220,7 @@ Allele sharing index described by Lynch (1988)
 
 Lynch, M. (1988). Estimation of relatedness by DNA fingerprinting. Molecular biology and evolution, 5(5), 584-599.
 """
-function Lynch(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function Lynch(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
     Sxy = Vector{Float64}(undef, length(locus_names))
@@ -249,7 +249,7 @@ Allele sharing index described by Blouin (1996)
 
 Blouin, M. S., Parsons, M., Lacaille, V., & Lotz, S. (1996). Use of microsatellite loci to classify individuals by relatedness. Molecular ecology, 5(3), 393-401.
 """
-function Blouin(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function Blouin(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
     Mxy = Vector{Float64}(undef, length(locus_names))
@@ -275,7 +275,7 @@ by Hardy and Vekemans (1999)
 
 Hardy, O. J., & Vekemans, X. (1999). Isolation by distance in a continuous population: reconciliation between spatial autocorrelation analysis and population genetics models. Heredity, 83(2), 145-154.
 """
-function Moran(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function Moran(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
     isempty(locus_names) && return missing
 
@@ -324,20 +324,20 @@ Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 
 Wang, J. (2002). An estimator for pairwise relatedness using molecular markers. Genetics, 160(3), 1203-1215.
 """
-function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T <: GenoArray where U <: NamedTuple
+function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-
+    kw_dict = Dict(kwargs...)
     isempty(locus_names) && return missing
     P1 = Vector{Float64}(undef, length(locus_names))
     P2, P3, P4, u, b, c, d, e, f, g = map(i -> similar(P1), 1:10)
     loc_id = 0
 
-    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
+    for (loc,gen1,gen2, N) in zip(locus_names, ind1, ind2, kw_dict[:loc_n])
         loc_id += 1
         i,j = gen1
         k,l = gen2
 
-        N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
+        #N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
 
         a = a_wang(2 * N, alleles[loc])
         a2_sq = a[2] ^ 2
@@ -399,18 +399,19 @@ function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}; alleles::U) where T
     return r
 end
 
-
 #Bootstrap Utilities
-function bootstrap_locus(data::PopData, method::F, ind1::String, ind2::String, B::Int64, allele_frq::NamedTuple) where F
-    relate_vec_boot = Vector{Union{Missing,Float64}}(undef, B)
-
-    @inbounds @sync Base.Threads.@spawn for b in 1:B
-        loci_sample = sample(loci(data), length(loci(data)))
+function bootstrap_locus(data::PopData, method::F, ind1::String, ind2::String, iterations::Int64, allele_frq::NamedTuple) where F
+    relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
+    loc_names = loci(data)
+    n_loc = length(loci(data))
+    for b in 1:iterations
+        loci_sample = sample(loc_names, n_loc)
+        n_per_loci = map(i -> nonmissing(data, i), loci_sample)
         geno1_sample = map(i -> get_genotype(data, sample = ind1, locus = i), loci_sample)
         geno2_sample = map(i -> get_genotype(data, sample = ind2, locus = i), loci_sample)
-        loc_samp,gen_samp1,gen_samp2 = collect.(skipmissings(Symbol.(loci_sample), geno1_sample, geno2_sample))
+        loc_samp,gen_samp1,gen_samp2, n_per_loc = collect.(skipmissings(Symbol.(loci_sample), geno1_sample, geno2_sample, n_per_loci))
 
-        relate_vec_boot[b] = method(gen_samp1, gen_samp2, loc_samp, alleles = allele_frq)
+        relate_vec_boot[b] = method(gen_samp1, gen_samp2, loc_samp, allele_frq, loc_n = n_per_loc)
     end
     return relate_vec_boot
 end
@@ -426,29 +427,27 @@ end
 
 
 function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F) where F
-    allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
-                            Tuple(allele_freq.(locus.(Ref(data), loci(data))))
-                        )
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
-
+    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
-    idx = 0
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
-        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
+        @inbounds @sync Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
             idx += 1
             
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair
-            loc,gen1,gen2 = collect.(skipmissings(loci_names, geno1, geno2))
+            loc,gen1,gen2, n_per_loc = collect.(skipmissings(loci_names, geno1, geno2, n_per_loci))
 
             # populate shared_loci array
             @inbounds shared_loci[idx] = length(loc)
-            @inbounds [relate_vecs[i][idx] = mth(gen1, gen2, loc, alleles = allele_frequencies) for (i,mth) in enumerate(method)]
+            @inbounds [relate_vecs[i][idx] = mth(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc) for (i,mth) in enumerate(method)]
 
             update!(p, idx)
         end
@@ -461,33 +460,31 @@ end
 
 
 function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
-    allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
-                            Tuple(allele_freq.(locus.(Ref(data), loci(data))))
-                        )
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
-    
+    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
-
+        
     shared_loci = Vector{Int}(undef, length(sample_pairs))
-    idx = 0
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
-        @inbounds #=@sync Base.Threads.@threads=# for ind2 in sample_names[sample_n+1:end]
+        @inbounds @sync Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
             idx += 1
             
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair
-            loc,gen1,gen2 = collect.(skipmissings(loci_names, geno1, geno2))
+            loc,gen1,gen2, n_per_loc = collect.(skipmissings(loci_names, geno1, geno2, n_per_loci))
 
             # populate shared_loci array
             @inbounds shared_loci[idx] = length(loc)
             @inbounds for (i, mthd) in enumerate(method)
-                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, alleles = allele_frequencies)
+                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc)
                 boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
                 @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, iterations, interval)
             end
