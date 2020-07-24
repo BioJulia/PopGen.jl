@@ -5,7 +5,7 @@ export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran
 Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
 
 - Single Locus Equation:
-- How to combine multiple loci: 
+- How to combine multiple loci:
     - Multiple loci are combined by independently summing the two numerator and two denominator terms before performing the final division and averaging the two components.
 - Assumes no inbreeding
 See equation 3 in Wang(2017) for variant of estimator used.
@@ -439,7 +439,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
             idx += 1
-            
+
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair
@@ -467,7 +467,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
-        
+
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     idx = 0
@@ -475,7 +475,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
         geno1 = get_genotypes(data, ind1)
         @inbounds @sync Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
             idx += 1
-            
+
             geno2 = get_genotypes(data, ind2)
 
             # filter out loci missing in at least one individual in the pair
@@ -527,14 +527,14 @@ end
 Return a dataframe of pairwise relatedness estimates for all individuals in a `PopData` object.
 To calculate means, median, standard error, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
-of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%), however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
+of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%), however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
 **Note:** samples must be diploid.
 ### methods
 There are several estimators available and are listed below. `relatedness` takes the
 function names as arguments (**case sensitive**), therefore do not use quotes or colons
-in specifying the methods. Methods can be supplied as a vector. 
+in specifying the methods. Methods can be supplied as a vector.
 
-**Tip** since the methods correspond to function names, they will tab-autocomplete when 
+**Tip** since the methods correspond to function names, they will tab-autocomplete when
 inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
 - `QuellerGoodnight`
 - `Ritland`
@@ -573,7 +573,7 @@ end
 Return a dataframe of pairwise relatedness estimates for all pairs of the supplied sample names in a `PopData` object.
 To calculate means, median, standard error, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
-of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%),
+of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%),
 however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
 **Note:** samples must be diploid.
 ### methods
@@ -581,7 +581,7 @@ There are several estimators available and are listed below. `relatedness` takes
 function names as arguments (**case sensitive**), therefore do not use quotes or colons
 in specifying the methods. Methods can be supplied as a vector.
 
-**Tip:** since the methods correspond to function names, they will tab-autocomplete when 
+**Tip:** since the methods correspond to function names, they will tab-autocomplete when
 inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
 - `QuellerGoodnight`
 - `Ritland`
