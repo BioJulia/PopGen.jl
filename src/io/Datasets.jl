@@ -37,7 +37,7 @@ end
 """
     gulfsharks()
 Returns a `PopObj` corresponding the Blacknose shark dataset as used in
-Dimens et al. 2019. This is a mid-sized SNV dataset of 2212 haplotypes 
+Dimens et al. 2019. This is a mid-sized SNV dataset of 2209 haplotypes 
 in 212 individuals, across 7 populations.
 
 Example:
