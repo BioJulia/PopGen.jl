@@ -61,6 +61,37 @@ end
 
 
 """
+    Loiselle(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
+Calculates the moments based estimator of pairwise relatedness using the estimator propsed by
+Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
+
+- Multiple Locus Equation:
+- Assumes no inbreeding
+
+See equations 22 in: Wang(2017) for variant of estimator used
+
+Loiselle, B. A., Sork, V. L., Nason, J., & Graham, C. (1995). Spatial genetic structure of a tropical understory shrub, <i>Psychotria officinalis</i> (Rubiaceae). American journal of botany, 82(11), 1420-1425.
+Heuertz, M., Vekemans, X., Hausman, J. F., Palada, M., & Hardy, O. J. (2003). Estimating seed vs. pollen dispersal from spatial genetic structure in the common ash. Molecular Ecology, 12(9), 2483-2495.
+Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
+"""
+function Loiselle(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
+    isempty(locus_names) && return missing
+    d_kw = Dict(kwargs...)
+    numerator1 = 0.0
+    denominator1 = 0.0
+
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
+        for allele in keys(alleles[loc])
+            fq = alleles[loc][allele]
+            numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
+            denominator1 += fq * (1.0 - fq)
+        end
+    end
+    return numerator1 / denominator1 + 2.0 / (2 * d_kw[:n_samples] - 1)
+end
+
+
+"""
     Lynch(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Allele sharing index described by Lynch (1988)
 
@@ -162,36 +193,6 @@ function LynchRitland(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U;
         denominator1 += (WL1 + WL2) / 2.0
     end
     return numerator1 / denominator1
-end
-
-"""
-    Loiselle(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
-Calculates the moments based estimator of pairwise relatedness using the estimator propsed by
-Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
-
-- Multiple Locus Equation:
-- Assumes no inbreeding
-
-See equations 22 in: Wang(2017) for variant of estimator used
-
-Loiselle, B. A., Sork, V. L., Nason, J., & Graham, C. (1995). Spatial genetic structure of a tropical understory shrub, <i>Psychotria officinalis</i> (Rubiaceae). American journal of botany, 82(11), 1420-1425.
-Heuertz, M., Vekemans, X., Hausman, J. F., Palada, M., & Hardy, O. J. (2003). Estimating seed vs. pollen dispersal from spatial genetic structure in the common ash. Molecular Ecology, 12(9), 2483-2495.
-Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
-"""
-function Loiselle(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
-    isempty(locus_names) && return missing
-
-    numerator1 = 0.0
-    denominator1 = 0.0
-
-    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
-        for allele in keys(alleles[loc])
-            fq = alleles[loc][allele]
-            numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
-            denominator1 += fq * (1.0 - fq)
-        end
-    end
-    return numerator1 / denominator1 + 2.0 / (2 * length(samples(data)) - 1)
 end
 
 
@@ -410,6 +411,7 @@ end
 #Bootstrap Utilities
 function bootstrap_locus(data::PopData, method::F, ind1::String, ind2::String, iterations::Int64, allele_frq::NamedTuple) where F
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
+    n_samples = length(samples(data))
     loc_names = loci(data)
     n_loc = length(loci(data))
     for b in 1:iterations
@@ -419,7 +421,7 @@ function bootstrap_locus(data::PopData, method::F, ind1::String, ind2::String, i
         geno2_sample = map(i -> get_genotype(data, sample = ind2, locus = i), loci_sample)
         loc_samp,gen_samp1,gen_samp2, n_per_loc = collect.(skipmissings(Symbol.(loci_sample), geno1_sample, geno2_sample, n_per_loci))
 
-        relate_vec_boot[b] = method(gen_samp1, gen_samp2, loc_samp, allele_frq, loc_n = n_per_loc)
+        relate_vec_boot[b] = method(gen_samp1, gen_samp2, loc_samp, allele_frq, loc_n = n_per_loc, n_samples = n_samples)
     end
     return relate_vec_boot
 end
@@ -436,6 +438,7 @@ end
 
 function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F) where F
     loci_names = Symbol.(loci(data))
+    n_samples = length(samples(data))
     sample_pairs = pairwise_pairs(sample_names)
     n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
@@ -455,7 +458,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
 
             # populate shared_loci array
             @inbounds shared_loci[idx] = length(loc)
-            @inbounds [relate_vecs[i][idx] = mth(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc) for (i,mth) in enumerate(method)]
+            @inbounds [relate_vecs[i][idx] = mth(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples) for (i,mth) in enumerate(method)]
 
             update!(p, idx)
         end
@@ -470,6 +473,7 @@ end
 function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
+    n_samples = length(samples(data))
     n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
@@ -492,7 +496,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
             # populate shared_loci array
             @inbounds shared_loci[idx] = length(loc)
             @inbounds for (i, mthd) in enumerate(method)
-                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc)
+                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples)
                 boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
                 @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, iterations, interval)
             end
