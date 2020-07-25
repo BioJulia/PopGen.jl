@@ -217,13 +217,37 @@ function Moran(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs
         for allele in keys(alleles[loc])
             fq = alleles[loc][allele]
             numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
-            denominator1 += ((sum(gen1 .== allele) / 2.0) - fq)^2
+            #denominator1 += ((sum(gen1 .== allele) / 2.0) - fq)^2
+            denominator1 += (((sum(gen1 .== allele) / 2.0) - fq)^2 + ((sum(gen2 .== allele) / 2.0) - fq)^2) / 2.0
         end
-        denominator1 += (1 / (length(alleles[loc]) - 1))
+        #denominator1 += (1 / (length(alleles[loc]) - 1))
     end
     return (numerator1 / denominator1)
 end
 
+function Moran_experimental(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+    isempty(locus_names) && return missing
+
+    numerator1 = Vector{Float64}(undef, length(locus_names))
+    denominator1 = similar(numerator1)
+
+    numerator1 = numerator1 .* 0.0
+    denominator1 = denominator1 .* 0.0
+
+    idx = 0
+    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
+        idx += 1
+        for allele in keys(alleles[loc])
+            fq = alleles[loc][allele]
+            numerator1[idx] += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
+            denominator1[idx] += (((sum(gen1 .== allele) / 2.0) - fq)^2) #+ ((sum(gen2 .== allele) / 2.0) - fq)^2)  / 2
+        end
+        denominator1[idx] += (1 / (length(alleles[loc]) - 1))
+    end
+
+    return mean(numerator1 ./ denominator1)
+end
 
 """
     QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
