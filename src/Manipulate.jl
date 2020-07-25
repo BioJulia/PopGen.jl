@@ -194,7 +194,7 @@ get_genotypes(cats, "N115")
 ```
 """
 function get_genotypes(data::PopObj, sample::String)
-    @view data.loci[data.loci.name .== sample, :genotype]
+    data.loci[data.loci.name .== sample, :genotype]
 end
 
 
