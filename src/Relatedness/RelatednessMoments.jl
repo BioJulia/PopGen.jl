@@ -448,7 +448,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
-        @inbounds @sync Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
 
             geno2 = get_genotypes(data, ind2)
@@ -485,7 +485,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
-        @inbounds @sync Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
 
             geno2 = get_genotypes(data, ind2)
