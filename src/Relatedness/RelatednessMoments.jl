@@ -308,16 +308,15 @@ end
 
 function a_wang(N::Int, alleles::Dict)
     #unbiased estimator
-    a = Vector{Float64}(undef, 4)
-    a[1] = 0.0
+    a = 0.0
 
-    a[2] = (N * a_wang_base(2, alleles) - 1) / (N - 1)
+    b = (N * a_wang_base(2, alleles) - 1) / (N - 1)
 
-    a[3] = (N^2 * a_wang_base(3, alleles) - 3 * (N - 1) * a[2] - 1) / ((N - 1) * (N - 2))
+    c = (N^2 * a_wang_base(3, alleles) - 3 * (N - 1) * b - 1) / ((N - 1) * (N - 2))
 
-    a[4] = (N^3 * a_wang_base(4, alleles) - 6 * (N - 1) * (N - 2) * a[3] - 7 * (N - 1) * a[2] - 1) / (N^3 - 6 * N^2 + 11 * N - 6)
+    d = (N^3 * a_wang_base(4, alleles) - 6 * (N - 1) * (N - 2) * c - 7 * (N - 1) * b - 1) / (N^3 - 6 * N^2 + 11 * N - 6)
 
-    return a
+    return [a, b, c, d]
 end
 
 
@@ -335,8 +334,8 @@ Wang, J. (2002). An estimator for pairwise relatedness using molecular markers. 
 """
 function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
-    kw_dict = Dict(kwargs...)
     isempty(locus_names) && return missing
+    kw_dict = Dict(kwargs...)
     P1 = Vector{Float64}(undef, length(locus_names))
     P2, P3, P4, u, b, c, d, e, f, g = map(i -> similar(P1), 1:10)
     loc_id = 0
@@ -448,7 +447,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
-        @inbounds @sync Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
 
             geno2 = get_genotypes(data, ind2)
@@ -485,7 +484,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = get_genotypes(data, ind1)
-        @inbounds @sync Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
 
             geno2 = get_genotypes(data, ind2)
