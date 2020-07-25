@@ -123,7 +123,35 @@ function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T
     return (numerator1/denominator1 + numerator2/denominator2)/2.0
 end
 
-mapreduce(x->x^2, +, [1:3;])
-mapreduce(isodd, *, a, dims=1)
-z = (a .== b) .+ (a .== reverse(b, dims = 2))
-mapreduce(x -> x, +, (a .== b) .+ (a .== reverse(b, dims = 2)), dims = 2)
+function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F) where F
+    loci_names = Symbol.(loci(data))
+    n_samples = length(samples(data))
+    sample_pairs = pairwise_pairs(sample_names)
+    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    allele_frequencies = allele_freq(data)
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
+    shared_loci = Vector{Int}(undef, length(sample_pairs))
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    idx = 0
+    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
+        geno1 = get_genotypes(data, ind1)
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
+            idx += 1
+
+            geno2 = get_genotypes(data, ind2)
+
+            # filter out loci missing in at least one individual in the pair
+            loc,gen1,gen2, n_per_loc = collect.(skipmissings(loci_names, geno1, geno2, n_per_loci))
+
+            # populate shared_loci array
+            @inbounds shared_loci[idx] = length(loc)
+            @inbounds [relate_vecs[i][idx] = mth(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples) for (i,mth) in enumerate(method)]
+
+            update!(p, idx)
+        end
+    end
+    method_colnames = [Symbol("$i") for i in method]
+    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
+    [out_df[:, mth] = relate_vecs[i] for (i, mth) in enumerate(method_colnames)]
+    return out_df
+end
