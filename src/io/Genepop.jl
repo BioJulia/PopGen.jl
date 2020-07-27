@@ -106,7 +106,8 @@ function genepop(
         datarow = pop_idx[1] + 1,
         comment = popsep,
         missingstrings = ["-9", ""],
-        type = type
+        type = type,
+        ignorerepeated = true
     ) |> DataFrame
 
     popnames = string.(collect(1:length(popcounts)))
