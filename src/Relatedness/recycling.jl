@@ -52,7 +52,7 @@ function relatedness_no_boot_gdf(data::PopData, sample_names::Vector{String}; me
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
-    popdata_idx = groupby(data, :name)
+    popdata_idx = groupby(data.loci, :name)
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = popdata_idx[(ind1,)].genotype
@@ -75,4 +75,32 @@ function relatedness_no_boot_gdf(data::PopData, sample_names::Vector{String}; me
     out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
     [out_df[:, mth] = relate_vecs[i] for (i, mth) in enumerate(method_colnames)]
     return out_df
+end
+
+function relatedness2(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    errs = ""
+    all_samples = samples(data)
+    if sample_names != all_samples
+        for i in sample_names
+            if i ∉ all_samples
+                errs *= " $i,"
+            end
+        end
+        errs != "" && error("Samples not found in the PopData: " * errs)
+    end
+    if eltype(method) != Function
+        method = [method]
+    end
+    for i in Symbol.(method)
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz]
+            errs *= "$i is not a valid method\n"
+        end
+    end
+    errs != "" && error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help.")
+    if iterations > 0
+        relatedness_bootstrap(data, sample_names, method = method, iterations = iterations, interval = interval)
+    else
+        relatedness_no_boot_gdf(data, sample_names, method = method)
+    end
 end

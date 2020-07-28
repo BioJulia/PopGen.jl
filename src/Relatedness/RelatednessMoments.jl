@@ -468,13 +468,14 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    popdata_idx = groupby(data.loci, :name)
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-        geno1 = get_genotypes(data, ind1)
+        geno1 = popdata_idx[(ind1,)].genotype
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
 
-            geno2 = get_genotypes(data, ind2)
+            geno2 = popdata_idx[(ind2,)].genotype
 
             # filter out loci missing in at least one individual in the pair
             loc,gen1,gen2, n_per_loc = collect.(skipmissings(loci_names, geno1, geno2, n_per_loci))
@@ -502,16 +503,16 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
-
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    popdata_idx = groupby(data.loci, :name)
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-        geno1 = get_genotypes(data, ind1)
+        geno1 = popdata_idx[(ind1,)].genotype
         @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
             idx += 1
 
-            geno2 = get_genotypes(data, ind2)
+            geno2 = popdata_idx[(ind2,)].genotype
 
             # filter out loci missing in at least one individual in the pair
             loc,gen1,gen2, n_per_loc = collect.(skipmissings(loci_names, geno1, geno2, n_per_loci))

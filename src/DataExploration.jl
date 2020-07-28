@@ -54,7 +54,7 @@ Return a table of the percent of identical genotypes that are identical for each
 between pairs of individuals.
 """
 function pairwise_identical(data::PopData)
-    sample_names = samples(data)
+    sample_names = collect(samples(data))
     pairwise_identical(data, sample_names)
 end
 
@@ -78,14 +78,15 @@ function pairwise_identical(data::PopData, sample_names::Vector{String})
     n = length(sample_pairs)
     perc_ident_vec = Vector{Float64}(undef, n)
     n_vec = Vector{Int}(undef, n)
+    popdata_idx = groupby(data.loci, :name)
     idx = 0
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     @inbounds for (sample_n, sample_1) in enumerate(sample_names[1:end-1])
-        geno_1 = get_genotypes(data, sample_1)
+        geno_1 = popdata_idx[(sample_1,)].genotype
         len_1 = length(collect(skipmissing(geno_1)))
         @inbounds @sync Base.Threads.@spawn for sample_2 in sample_names[sample_n+1:end]
             idx += 1
-            geno_2 = get_genotypes(data, sample_2)
+            geno_2 = popdata_idx[(sample_2,)].genotype
             len_2 = length(collect(skipmissing(geno_2)))
             shared_geno = minimum([len_1, len_2])
             shared = sum(skipmissing(geno_1 .== geno_2))
