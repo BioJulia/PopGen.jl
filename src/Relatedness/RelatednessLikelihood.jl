@@ -4,12 +4,12 @@ using ECOS
 
 
 """
-    pr_l_s(x::Tuple, y::Tuple, loc::Symbol, alleles::Dict)
+    probability_state_table(x::Tuple, y::Tuple, loc::Symbol, alleles::Dict)
 Calculate the probability of observing the particular allele state given each of
 the 9 Jacquard Identity States for a single locus to create Table 1 from
 Milligan 2003.
 """
-function pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
+function probability_state_table(x::Tuple, y::Tuple, alleles::Dict)
     #TODO Improve how groups are decided based on how similar things are done with moments estimators
     #=
     Calculate Pr(Li | Sj)
@@ -139,7 +139,7 @@ function dyadicLikelihood(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles
     idx = 0
     for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         idx += 1
-        Pr_Ls[idx, :] = pr_l_s(gen1, gen2, allele_frequencies[loc])
+        Pr_Ls[idx, :] = probability_state_table(gen1, gen2, allele_frequencies[loc])
     end
 
     Δ = Δ_optim(Pr_Ls)
