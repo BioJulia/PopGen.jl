@@ -43,64 +43,41 @@ function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T
 end
 
 
-function relatedness_no_boot_gdf(data::PopData, sample_names::Vector{String}; method::F) where F
-    loci_names = Symbol.(loci(data))
-    n_samples = length(samples(data))
-    sample_pairs = pairwise_pairs(sample_names)
-    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
-    allele_frequencies = allele_freq(data)
-    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
-    shared_loci = Vector{Int}(undef, length(sample_pairs))
-    p = Progress(length(sample_pairs), dt = 1, color = :blue)
-    popdata_idx = groupby(data.loci, :name)
-    idx = 0
-    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-        geno1 = popdata_idx[(ind1,)].genotype
-        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
-            idx += 1
+function bootstrap_relatedness_before(data::PopData, ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
+    loci_gdf = groupby(data.loci, :locus)
+    relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
+    n_loc = length(locus_names)
+    for iter in 1:iterations
+        # bootstrap the indices
+        boot_idx = rand(1:n_loc, n_loc)
+        # sample the source vectors with the resampled/bootstrapped indices
+        ind1_boot, ind2_boot, loc_boot = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names])
+        #n_per_loci = map(i -> nonmissing(data, i), loc_boot)
+        # faster/cheaper n counting
+        n_per_loci = map(i -> nonmissing(loci_gdf[(i,)].genotype, loc_boot))
+        loc_samp,gen_samp1,gen_samp2, n_per_loc = collect.(skipmissings(Symbol.(loc_boot), ind1_boot, ind2_boot, n_per_loci))
 
-            geno2 = popdata_idx[(ind2,)].genotype
-
-            # filter out loci missing in at least one individual in the pair
-            loc,gen1,gen2, n_per_loc = collect.(skipmissings(loci_names, geno1, geno2, n_per_loci))
-
-            # populate shared_loci array
-            @inbounds shared_loci[idx] = length(loc)
-            @inbounds [relate_vecs[i][idx] = mth(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples) for (i,mth) in enumerate(method)]
-
-            update!(p, idx)
-        end
+        relate_vec_boot[iter] = method(gen_samp1, gen_samp2, loc_samp, alleles, loc_n = n_per_loc, n_samples = n_loc)
     end
-    method_colnames = [Symbol("$i") for i in method]
-    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
-    [out_df[:, mth] = relate_vecs[i] for (i, mth) in enumerate(method_colnames)]
-    return out_df
+    return relate_vec_boot
 end
 
-function relatedness2(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
-    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-    errs = ""
-    all_samples = samples(data)
-    if sample_names != all_samples
-        for i in sample_names
-            if i ∉ all_samples
-                errs *= " $i,"
-            end
-        end
-        errs != "" && error("Samples not found in the PopData: " * errs)
+## bootstrap after removing missing
+function bootstrap_relatedness_after(data::PopData, ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
+    loci_gdf = groupby(data.loci, :locus)
+    relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
+    shared_loci, ind1_geno, ind2_geno = collect.(skipmissings(Symbol.(loc_boot), ind1_boot, ind2_boot))
+    n_loci = length(shared_loci)
+    for iter in 1:iterations
+        # bootstrap the indices
+        boot_idx = rand(1:n_loc, n_loc)
+        # sample the source vectors with the resampled/bootstrapped indices
+        ind1_boot, ind2_boot, loc_boot = map(i -> getindex(i, boot_idx), [ind1_geno, ind2_geno, shared_loci])
+        #n_per_loci = map(i -> nonmissing(data, i), loc_boot)
+        # faster/cheaper n counting
+        n_per_loci = map(i -> nonmissing(loci_gdf[(i,)].genotype, loc_boot))
+
+        relate_vec_boot[iter] = method(gen_samp1, gen_samp2, loc_samp, alleles, loc_n = n_per_loc, n_samples = n_loci)
     end
-    if eltype(method) != Function
-        method = [method]
-    end
-    for i in Symbol.(method)
-        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz]
-            errs *= "$i is not a valid method\n"
-        end
-    end
-    errs != "" && error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help.")
-    if iterations > 0
-        relatedness_bootstrap(data, sample_names, method = method, iterations = iterations, interval = interval)
-    else
-        relatedness_no_boot_gdf(data, sample_names, method = method)
-    end
+    return relate_vec_boot
 end

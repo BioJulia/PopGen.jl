@@ -197,7 +197,7 @@ function get_genotypes(data::PopObj, sample::String)
     data.loci[data.loci.name .== sample, :genotype]
 end
 
-
+#TODO raname kwarg to `name`
 """
     get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
 Return a table of the genotype(s) of one or more `samples` for one or more
