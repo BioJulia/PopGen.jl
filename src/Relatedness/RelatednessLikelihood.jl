@@ -134,6 +134,7 @@ Calculates the maximum likelihood based relatedness using all available loci fol
 Milligan, B. G. (2003). Maximum-likelihood estimation of relatedness. Genetics, 163(3), 1153-1167.
 """
 function dyadicLikelihood(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
+    #TODO Add inbreeding toggle
     Pr_Ls = Array{Float64}(undef, length(locus_names), 9)
 
     idx = 0
