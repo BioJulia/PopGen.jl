@@ -659,7 +659,7 @@ function relatedness(data::PopData, sample_names::Vector{String}; method::F, ite
         method = [method]
     end
     for i in Symbol.(method)
-        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz]
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz, :dyadicLikelihood]
             errs *= "$i is not a valid method\n"
         end
     end
