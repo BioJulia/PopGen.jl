@@ -122,35 +122,6 @@ function Δ_optim(Pr_L_S::Array{Float64,2}, verbose::Bool = false)
     # converge and/or use multiple random starts to confirm not a local maxima
 end
 
-"""
-dyadicLikelihood(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
-Calculates the maximum likelihood based relatedness using all available loci following following Milligan (2002)
-
--Single Locus Equation:
--How to combine multiple loci: NA inherently multi-locus
-
--Assumes inbreeding can be present
-
-Milligan, B. G. (2003). Maximum-likelihood estimation of relatedness. Genetics, 163(3), 1153-1167.
-"""
-function dyadicLikelihood(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
-    #TODO Add inbreeding toggle
-    Pr_Ls = Array{Float64}(undef, length(locus_names), 9)
-
-    idx = 0
-    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
-        idx += 1
-        Pr_Ls[idx, :] = probability_state_table(gen1, gen2, allele_frequencies[loc])
-    end
-
-    Δ = Δ_optim(Pr_Ls)
-
-    θ = Δ[1][1] + 0.5 * (Δ[1][3] + Δ[1][5] + Δ[1][7]) + 0.25 * Δ[1][8]
-    return 2 * θ#, Δ[1], Δ[2] #secondary outputs for convergence & Δvalues if we want
-end
-
-
-
 #### No inbreeding assumption
 function Δ_optim_noInbreeding(Pr_L_S::Array{Float64,2}, verbose::Bool = false)
     #Δ is what needs to be optimized
@@ -175,6 +146,41 @@ function Δ_optim_noInbreeding(Pr_L_S::Array{Float64,2}, verbose::Bool = false)
     # converge and/or use multiple random starts to confirm not a local maxima
 end
 
+
+"""
+dyadicLikelihood(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
+Calculates the maximum likelihood based relatedness using all available loci following following Milligan (2002)
+
+-Single Locus Equation:
+-How to combine multiple loci: NA inherently multi-locus
+
+-Assumes inbreeding can be present
+
+Milligan, B. G. (2003). Maximum-likelihood estimation of relatedness. Genetics, 163(3), 1153-1167.
+"""
+function dyadicLikelihood(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
+    kw_dict = Dict(kwargs...)
+    Pr_Ls = Array{Float64}(undef, length(locus_names), 9)
+
+    idx = 0
+    @inbounds for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
+        idx += 1
+        Pr_Ls[idx, :] = probability_state_table(gen1, gen2, allele_frequencies[loc])
+    end
+
+    if kw_dict[:inbreeding] == true
+        Δ = Δ_optim(Pr_Ls)
+        θ = Δ[1][1] + 0.5 * (Δ[1][3] + Δ[1][5] + Δ[1][7]) + 0.25 * Δ[1][8]
+    else
+        Δ = Δ_optim_noInbreeding(Pr_Ls)
+        θ = (0.5 * Δ[1][1] + 0.25 * Δ[1][2])
+    end
+    return 2 * θ#, Δ[1], Δ[2] #secondary outputs for convergence & Δvalues if we want
+end
+
+
+
+#= should be redundant now
 function dyadicLikelihood_noInbreeding(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     #TODO Add inbreeding toggle
     Pr_Ls = Array{Float64}(undef, length(locus_names), 9)
@@ -191,3 +197,4 @@ function dyadicLikelihood_noInbreeding(ind1::T, ind2::T, locus_names::Vector{Sym
     θ = (0.5 * Δ[1][1] + 0.25 * Δ[1][2])
     return 2 * θ#, Δ[1], Δ[2] #secondary outputs for convergence & Δvalues if we want
 end
+=#
