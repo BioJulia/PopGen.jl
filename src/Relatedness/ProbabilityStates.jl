@@ -1,3 +1,13 @@
+S1 = [1 2; 1 3; 1 4; 2 3; 2 4; 3 4]
+S2 = [1 2; 3 4]
+S3 = [1 2; 1 3; 2 3]
+S4 = [1 2]
+S5 = [1 3; 1 4; 3 4]
+S6 = [3 4]
+S7 = [1 3; 2 4]
+S8 = [1 3]
+S9 = [1 3][[1 3][:,1] .!= 1, :]
+
 function get_jaquard_state(ind1::T, ind2::T) where T <: Tuple
     the_shared = [intersect(ind1, ind2)...,0]
     the_lone = [setdiff(ind1, ind2)..., setdiff(ind2, ind1)...,0]
