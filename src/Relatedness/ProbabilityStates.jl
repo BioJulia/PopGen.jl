@@ -1,3 +1,105 @@
+## Method 1
+
+function get_uncondensed_state(ind1::T, ind2::T) where T <: Tuple
+    i,j = ind1
+    k,l = ind2
+
+    δ = Array{Bool}(undef, 15)
+    δ[1] = (i == j == k == l)
+    δ[2] = (i == j == k) & (i != l)
+    δ[3] = (i == j == l) & (i != k)
+    δ[4] = (i == k == l) & (i != j)
+    δ[5] = (j == k == l) & (i != j)
+    δ[6] = (i == j) & (k == l) & (i != k)
+    δ[7] = (i == j) & (k != l) & (i != k) & (i != l)
+    δ[8] = (k == l) & (i != j) & (i != k) & (j != k)
+    δ[9] = (i == k) & (j == l) & (i != j) & (k != l)
+    δ[10] = (i == k) & (j != l) & (i != j) & (k != l)
+    δ[11] = (j == l) & (i != k) & (i != j) & (k != l)
+    δ[12] = (i == l) & (j == k) & (i != j) & (k != l)
+    δ[13] = (i == l) & (j != k) & (i != j) & (k != l)
+    δ[14] = (i != l) & (j == k) & (i != j) & (k != l)
+    δ[15] = (i != j) & (i != k) & (i != l) & (j != k) & (j != l) & (k != l)
+
+    # return [δ[1], δ[6], δ[2] | δ[3], δ[7], δ[4] | δ[5], δ[8], δ[9] | δ[12], δ[10] | δ[11] | δ[13] | δ[14], δ[15]]
+    return δ
+end
+
+function s1(p)
+    return [p[1], p[1]^2, p[1]^2, p[1]^3, p[1]^2, p[1]^3, p[1]^2, p[1]^3, p[1]^4]
+end
+
+function s2(p)
+    return [0.0, 0.0, prod(p[[1,4]]), 2.0 * prod(p[[1,4]]) * p[1], 0.0, 0.0, 0.0, prod(p[[1,4]]) * p[1], 2.0 * prod(p[[1,4]]) * p[1]^2] #D3/S2
+end
+
+function s3(p)
+    return [0.0, 0.0, prod(p[[1,3]]), 2.0 * prod(p[[1,3]]) * p[1], 0.0, 0.0, 0.0, prod(p[[1,3]]) * p[1], 2.0 * prod(p[[1,3]]) * p[1]^2] #D3/S3
+end
+
+function s4(p)
+    return [0.0, 0.0, 0.0, 0.0, prod(p), 2.0 * prod(p[[1,2]]) * p[1], 0.0, prod(p[[1,2]]) *p[1], 2.0 * prod(p[[1,2]]) * p[1]^2] #D5/S4
+end
+
+function s5(p)
+    return [0.0, 0.0, 0.0, 0.0, prod(p), 2.0 * prod(p[[1,2]]) * p[2], 0.0, prod(p[[1,2]]) *p[2], 2.0 * prod(p[[1,2]]) * p[2]^2] #D5/S5
+end
+
+function s6(p)
+    return [0.0, prod(p[[1,3]]), 0.0, prod(p[[1,3]]) * p[3], 0.0, prod(p[[1,3]]) * p[1], 0.0, 0.0, prod(p[[1,3]])^2] #D2/S6
+end
+
+function s7(p)
+    return [0.0, 0.0, 0.0, 2.0 * prod(p[[1,3,4]]), 0.0, 0.0, 0.0, 0.0, 2.0 * prod(p[[1,3,4]]) * p[1]] #D4/S7
+end
+
+function s8(p)
+    return [0.0, 0.0, 0.0, 0.0, 0.0, 2.0 * prod(p[[1,2,3]]), 0.0, 0.0, 2.0 * prod(p[[1,2,3]]) * p[3]] #D6/S8
+end
+
+function s9(p)
+    return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0 * prod(p[[1,2]]), prod(p[[1,2]]) * sum(p[[1,2]]), 4.0 * prod(p[[1,2]])^2] #D7/S9
+end
+
+function s10(p)
+    return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, prod(p[[1,2,4]]), 4.0 * prod(p[[1,2,4]]) * p[1]] #D8/S10
+end
+
+function s11(p)
+    return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, prod(p[[1,2,3]]), 4.0 * prod(p[[1,2,3]]) * p[2]] #D8/S11
+end
+
+function s12(p)
+    return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0 * prod(p[[1,2]]), prod(p[[1,2]]) * sum(p[[1,2]]), 4.0 * prod(p[[1,2]])^2] #D7/S12
+end
+
+function s13(p)
+    return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, prod(p[[1,2,3]]), 4.0 * prod(p[[1,2,3]]) * p[1]] #D8/S13
+end
+
+function s14(p)
+    return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, prod(p[[1,2,4]]), 4.0 * prod(p[[1,2,4]]) * p[2]] #D8/S14
+end
+
+function s15(p)
+    return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0 * prod(p)] #D9/S15
+end
+
+δ = (s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15)
+
+
+function probability_states(ind1::T, ind2::T, alleles::Dict) where T <: Tuple
+    i,j = ind1
+    k,l = ind2
+    p = [alleles[i], alleles[j], alleles[k], alleles[l]]
+
+    return δ[findall(get_uncondensed_state(ind1, ind2))...](p)
+end
+
+
+
+
+## Method 2
 S1 = [1 2; 1 3; 1 4; 2 3; 2 4; 3 4]
 S2 = [1 2; 3 4]
 S3 = [1 2; 1 3; 2 3]
