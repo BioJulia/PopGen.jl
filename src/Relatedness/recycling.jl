@@ -43,7 +43,7 @@ function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T
 end
 
 
-function bootstrap_relatedness_before(data::PopData, ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
+function bootstrap_genos_all(data::PopData, ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
     loci_gdf = groupby(data.loci, :locus)
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
     n_loc = length(locus_names)
@@ -52,9 +52,8 @@ function bootstrap_relatedness_before(data::PopData, ind1::T, ind2::T, locus_nam
         boot_idx = rand(1:n_loc, n_loc)
         # sample the source vectors with the resampled/bootstrapped indices
         ind1_boot, ind2_boot, loc_boot = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names])
-        #n_per_loci = map(i -> nonmissing(data, i), loc_boot)
         # faster/cheaper n counting
-        n_per_loci = map(i -> nonmissing(loci_gdf[(i,)].genotype, loc_boot))
+        n_per_loci = map(i -> nonmissing(loci_gdf[(i,)].genotype), string.(loc_boot))
         loc_samp,gen_samp1,gen_samp2, n_per_loc = collect.(skipmissings(loc_boot, ind1_boot, ind2_boot, n_per_loci))
 
         relate_vec_boot[iter] = method(gen_samp1, gen_samp2, loc_samp, alleles, loc_n = n_per_loc, n_samples = n_loc)
@@ -64,7 +63,7 @@ end
 
 ## bootstrap after removing missing
 ## replace data::PopData with data::GroupDataFrame?
-function bootstrap_relatedness_after(data::PopData, ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
+function bootstrap_genos_nonmissing(data::PopData, ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
     loci_gdf = groupby(data.loci, :locus)
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
     n_loc = length(locus_names)
@@ -74,7 +73,7 @@ function bootstrap_relatedness_after(data::PopData, ind1::T, ind2::T, locus_name
         # sample the source vectors with the resampled/bootstrapped indices
         ind1_boot, ind2_boot, loc_boot = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names])
         # faster/cheaper n counting
-        n_per_loci = map(i -> nonmissing(loci_gdf[(i,)].genotype, loc_boot))
+        n_per_loci = map(i -> nonmissing(loci_gdf[(i,)].genotype), loc_boot)
 
         relate_vec_boot[iter] = method(ind1_boot, ind2_boot, loc_boot, alleles, loc_n = n_per_loci, n_samples = n_loc)
     end
@@ -83,7 +82,9 @@ end
 
 
 
-function relatedness_bootstrap_before(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+
+
+function relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
     n_samples = length(samples(data))
@@ -111,8 +112,8 @@ function relatedness_bootstrap_before(data::PopData, sample_names::Vector{String
 
             @inbounds for (i, mthd) in enumerate(method)
                 @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples)
-                boot_out = bootstrap_locus_before(data, mthd, geno1, geno2, loci_names, allele_frequencies, method = mthd, iterations = iterations)
-                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, iterations, interval)
+                boot_out = bootstrap_genos_all(data, geno1, geno2, loci_names, allele_frequencies, method = mthd, iterations = iterations)
+                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, interval)
             end
             update!(p, idx)
         end
@@ -136,7 +137,7 @@ function relatedness_bootstrap_before(data::PopData, sample_names::Vector{String
     return out_df
 end
 
-function relatedness_bootstrap_after(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
     n_samples = length(samples(data))
@@ -164,8 +165,8 @@ function relatedness_bootstrap_after(data::PopData, sample_names::Vector{String}
             
             @inbounds for (i, mthd) in enumerate(method)
                 @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples)
-                boot_out = bootstrap_locus_before(data, mthd, gen1, gen2, loc, allele_frequencies, method = mthd, iterations = iterations)
-                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, iterations, interval)
+                boot_out = bootstrap_genos_nonmissing(data, gen1, gen2, loc, allele_frequencies, method = mthd, iterations = iterations)
+                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, interval)
             end
             update!(p, idx)
         end
@@ -188,6 +189,76 @@ function relatedness_bootstrap_after(data::PopData, sample_names::Vector{String}
 
     return out_df
 end
+
+function relatedness_boot_all(data::PopData; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+    sample_names = samples(data) |> collect
+    relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
+end
+function relatedness_boot_nonmissing(data::PopData; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+    sample_names = samples(data) |> collect
+    relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval)
+end
+
+function relatedness2(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
+    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    errs = ""
+    all_samples = samples(data)
+    if sample_names != all_samples
+        for i in sample_names
+            if i ∉ all_samples
+                errs *= " $i,"
+            end
+        end
+        errs != "" && error("Samples not found in the PopData: " * errs)
+    end
+    if eltype(method) != Function
+        method = [method]
+    end
+    for i in Symbol.(method)
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz, :dyadicLikelihood]
+            errs *= "$i is not a valid method\n"
+        end
+    end
+    errs != "" && error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help.")
+    if iterations > 0
+        if bootmethod == "all"
+            relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
+        elseif bootmethod == "nonmissing"
+            relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval)
+        else
+            throw(ArgumentError("Please choose from resample methods \"all\" or \"nonmissing\""))
+        end
+    else
+        relatedness_no_boot(data, sample_names, method = method)
+    end
+end
+
+
+function relatedness2(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), bootmethod::String = "before") where F
+    sample_names = samples(data) |> collect
+    relatedness2(data, sample_names, method = method, iterations = iterations, interval = interval, bootmethod = bootmethod)
+end
+
+
+
+
+
+
+
+
+
+
+#################################################
+
+
+
+
+
+
+
+
+
+
 
 
 

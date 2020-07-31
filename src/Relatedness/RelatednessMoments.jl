@@ -449,11 +449,14 @@ function bootstrap_locus(data::PopData, method::F, ind1::String, ind2::String, i
     return relate_vec_boot
 end
 
-function bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, B::Int64, width::Tuple{Float64, Float64})
-    Mean = mean(boot_out)
-    Median = median(boot_out)
-    SE = sqrt(sum((boot_out - (boot_out / B)).^2) / (B - 1))
-    quants = quantile(boot_out, width)
+function bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
+    all(ismissing.(boot_out)) == true && return missing, missing, missing, missing
+    boot_skipmissing = collect(skipmissing(boot_out))
+    n_nonmiss = length(boot_skipmissing)
+    Mean = mean(boot_skipmissing)
+    Median = median(boot_skipmissing)
+    SE = sqrt(sum((boot_skipmissing - (boot_skipmissing / n_nonmiss)).^2) / (n_nonmiss - 1))
+    quants = quantile(boot_skipmissing, width)
 
     return Mean, Median, SE, quants
 end
@@ -551,14 +554,14 @@ function relatedness_no_boot(data::PopData; method::F) where F
     relatedness_no_boot(data, sample_names, method = method)
 end
 
-function relatedness_bootstrap(data::PopData; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+function relatedness_bootstrap(data::PopData; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
     sample_names = samples(data) |> collect
-    relatedness_bootstrap(data, sample_names, method = method, iterations = iterations, interval = interval)
+    relatedness_bootstrap(data, sample_names, method = method, iterations = iterations, interval = interval, resample = resample)
 end
 
 """
-    relatedness(data::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64})
-    relatedness(data::PopData; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64})
+    relatedness(data::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String = "all")
+    relatedness(data::PopData; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String = "all")
 
 Return a dataframe of pairwise relatedness estimates for all individuals in a `PopData` object.
 To calculate means, median, standard error, and confidence intervals using bootstrapping,
@@ -596,15 +599,15 @@ julia> relatedness(cats, method = [Loiselle, Moran], iterations = 100);
 julia> relatedness(cats, method = [Loiselle, Moran], iterations = 100, interval = (0.5, 0.95));
 ```
 """
-function relatedness(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+function relatedness(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
     sample_names = samples(data) |> collect
     relatedness(data, sample_names, method = method, iterations = iterations, interval = interval)
 end
 
 
 """
-    relatedness(data::PopData, sample_names::Vector{String}; method::Function, iterations::Int64, interval::Tuple{Float64, Float64})
-    relatedness(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64})
+    relatedness(data::PopData, sample_names::Vector{String}; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
+    relatedness(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
 
 Return a dataframe of pairwise relatedness estimates for all pairs of the supplied sample names in a `PopData` object.
 To calculate means, median, standard error, and confidence intervals using bootstrapping,
@@ -612,6 +615,7 @@ set `iterations = n` where `n` is an integer greater than `0` (the default) corr
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%),
 however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
 **Note:** samples must be diploid.
+
 ### methods
 There are several estimators available and are listed below. `relatedness` takes the
 function names as arguments (**case sensitive**), therefore do not use quotes or colons
@@ -630,6 +634,15 @@ inputting them. For more information on a specific method, please see the respec
 - `Moran`
 - `Wang`
 
+### resample methods
+There are two available resampling methods, `"all"` (default) and `"nonmissing"`.
+- `"all"` : resamples all loci for a pair of individuals and then drops missing loci between them (recommended)
+    - pro: better resampling variation
+    - con: by chance some iterations may have a lot of missing loci that have to be dropped
+- `"nonmissing"` : resamples only the shared non-missing loci between the pair
+    - pro: every iteration guarantees the same number of loci compared between the pair
+    - con: too-tight confidence intervals due to less possible variation
+
 **Examples**
 ```
 julia> cats = nancycats();
@@ -643,7 +656,7 @@ julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], ite
 julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.5, 0.95));
 ```
 """
-function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
     all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
     errs = ""
     all_samples = samples(data)
