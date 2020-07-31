@@ -4,22 +4,21 @@ function get_uncondensed_state(ind1::T, ind2::T) where T <: Tuple
     i,j = ind1
     k,l = ind2
 
-    δ = Array{Bool}(undef, 15)
-    δ[1] = (i == j == k == l)
-    δ[2] = (i == j == k) & (i != l)
-    δ[3] = (i == j == l) & (i != k)
-    δ[4] = (i == k == l) & (i != j)
-    δ[5] = (j == k == l) & (i != j)
-    δ[6] = (i == j) & (k == l) & (i != k)
-    δ[7] = (i == j) & (k != l) & (i != k) & (i != l)
-    δ[8] = (k == l) & (i != j) & (i != k) & (j != k)
-    δ[9] = (i == k) & (j == l) & (i != j) & (k != l)
-    δ[10] = (i == k) & (j != l) & (i != j) & (k != l)
-    δ[11] = (j == l) & (i != k) & (i != j) & (k != l)
-    δ[12] = (i == l) & (j == k) & (i != j) & (k != l)
-    δ[13] = (i == l) & (j != k) & (i != j) & (k != l)
-    δ[14] = (i != l) & (j == k) & (i != j) & (k != l)
-    δ[15] = (i != j) & (i != k) & (i != l) & (j != k) & (j != l) & (k != l)
+    δ = 1 * (i == j == k == l) +
+    2 * ((i == j == k) & (i != l)) +
+    3 * ((i == j == l) & (i != k)) +
+    4 * ((i == k == l) & (i != j)) +
+    5 * ((j == k == l) & (i != j)) +
+    6 * ((i == j) & (k == l) & (i != k)) +
+    7 * ((i == j) & (k != l) & (i != k) & (i != l)) +
+    8 * ((k == l) & (i != j) & (i != k) & (j != k)) +
+    9 * ((i == k) & (j == l) & (i != j) & (k != l)) +
+    10 * ((i == k) & (j != l) & (i != j) & (k != l)) +
+    11 * ((j == l) & (i != k) & (i != j) & (k != l)) +
+    12 * ((i == l) & (j == k) & (i != j) & (k != l)) +
+    13 * ((i == l) & (j != k) & (i != j) & (k != l)) +
+    14 * ((i != l) & (j == k) & (i != j) & (k != l)) +
+    15 * ((i != j) & (i != k) & (i != l) & (j != k) & (j != l) & (k != l))
 
     # return [δ[1], δ[6], δ[2] | δ[3], δ[7], δ[4] | δ[5], δ[8], δ[9] | δ[12], δ[10] | δ[11] | δ[13] | δ[14], δ[15]]
     return δ
@@ -63,7 +62,7 @@ function probability_states(ind1::T, ind2::T, alleles::Dict) where T <: Tuple
     k,l = ind2
     p = [alleles[i], alleles[j], alleles[k], alleles[l]]
 
-    return δ[findall(get_uncondensed_state(ind1, ind2))...](p)
+    return δ[get_uncondensed_state(ind1, ind2)](p)
 end
 
 
