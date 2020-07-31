@@ -7,11 +7,11 @@ end
 
 function probability_state(genos::JacquardPair, state::genos.state, alleles::Dict)::Vector{Float64}
     if state == 1
-    p = alleles[genos.genotype1[1]]
-    [p, p^2, p^2, p^3, p^2, p^3, p^2, p^3, p^4]
+        p = alleles[genos.genotype1[1]]
+        [p, p^2, p^2, p^3, p^2, p^3, p^2, p^3, p^4]
     elseif state == 2
         p = (alleles[genos.genotype1[1]], alleles[genos.genotype2[1]])
-        [0.0, prod(p), 0.0, prod(p) * p[2], 0.0, prod(p) * p[1], 0.0, 0.0, prod(p) * prod(p)]
+        [0.0, prod(p), 0.0, prod(p) * p[2], 0.0, prod(p) * p[1], 0.0, 0.0, prod(p)^2]
 
     elseif state == 3
         p = (alleles[genos.genotype1[1]], alleles[genos.genotype2[2]])
@@ -31,7 +31,7 @@ function probability_state(genos::JacquardPair, state::genos.state, alleles::Dic
 
     elseif state == 7
         p = (alleles[genos.genotype1[1]], alleles[genos.genotype1[2]])
-        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0 * prod(p), prod(p) * sum(p), 4.0 * prod(p) * prod(p)]
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0 * prod(p), prod(p) * sum(p), 4.0 * prod(p)^2]
 
     elseif state == 8
         p = (alleles[genos.genotype1[1]], alleles[genos.genotype1[2]], alleles[genos.genotype2[2]])
