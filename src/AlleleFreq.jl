@@ -73,6 +73,7 @@ function avg_allele_freq(allele_dicts::AbstractVector{T}) where T<:Dict{Int16,Fl
    # remove any dicts with no entries (i.e. from a group without that locus)
    allele_dicts = allele_dicts[length.(allele_dicts) .> 0]
    # create a list of all the alleles
+   #TODO replace with union?
    all_alleles = keys.(allele_dicts) |> Base.Iterators.flatten |> collect |> unique
    # populate the sum dict with allele frequency and n for each allele
    @inbounds for allele in all_alleles
