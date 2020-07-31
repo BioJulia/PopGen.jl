@@ -10,35 +10,35 @@ function probability_state(genos::JacquardPair, state::genos.state, alleles::Dic
     p = alleles[genos.genotype1[1]]
     [p, p^2, p^2, p^3, p^2, p^3, p^2, p^3, p^4]
     elseif state == 2
-        p = (alleles[x[1]], alleles[y[1]])
+        p = (alleles[genos.genotype1[1]], alleles[genos.genotype2[1]])
         [0.0, prod(p), 0.0, prod(p) * p[2], 0.0, prod(p) * p[1], 0.0, 0.0, prod(p) * prod(p)]
 
     elseif state == 3
-        p = (alleles[x[1]], alleles[y[2]])
+        p = (alleles[genos.genotype1[1]], alleles[genos.genotype2[2]])
         [0.0, 0.0, prod(p), 2.0 * prod(p) * p[1], 0.0, 0.0, 0.0, prod(p) * p[1], 2.0 * prod(p) * p[1]^2]
 
     elseif state == 4
-        p = (alleles[x[1]], alleles[y[1]], alleles[y[2]])
+        p = (alleles[genos.genotype1[1]], alleles[genos.genotype2[1]], alleles[genos.genotype2[2]])
         [0.0, 0.0, 0.0, 2.0 * prod(p), 0.0, 0.0, 0.0, 0.0, 2.0 * prod(p) * p[1]]
 
     elseif state == 5
-        p = (alleles[x[1]], alleles[x[2]])
+        p = (alleles[genos.genotype1[1]], alleles[genos.genotype1[2]])
         [0.0, 0.0, 0.0, 0.0, prod(p), 2.0 * prod(p) * p[1], 0.0, prod(p) *p[1], 2.0 * prod(p) * p[1]^2]
 
     elseif state == 6
-        p = (alleles[y[1]], alleles[x[1]], alleles[x[2]])
+        p = (alleles[genos.genotype2[1]], alleles[genos.genotype1[1]], alleles[genos.genotype1[2]])
         [0.0, 0.0, 0.0, 0.0, 0.0, 2.0 * prod(p), 0.0, 0.0, 2.0 * prod(p) * p[1]]
 
     elseif state == 7
-        p = (alleles[x[1]], alleles[x[2]])
+        p = (alleles[genos.genotype1[1]], alleles[genos.genotype1[2]])
         [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0 * prod(p), prod(p) * sum(p), 4.0 * prod(p) * prod(p)]
 
     elseif state == 8
-        p = (alleles[x[1]], alleles[x[2]], alleles[y[2]])
+        p = (alleles[genos.genotype1[1]], alleles[genos.genotype1[2]], alleles[genos.genotype2[2]])
         [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, prod(p), 4.0 * prod(p) * p[1]]
 
     elseif state == 9
-        p = (alleles[x[1]], alleles[x[2]], alleles[y[1]], alleles[y[2]])
+        p = (alleles[genos.genotype1[1]], alleles[genos.genotype1[2]], alleles[genos.genotype2[1]], alleles[genos.genotype2[2]])
         [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0 * prod(p)]
     else
         [-9.0, -9.0, -9.0, -9.0, -9.0, -9.0, -9.0, -9.0, -9.0]
