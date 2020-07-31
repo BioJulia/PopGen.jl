@@ -1,6 +1,6 @@
 ## Method 1
 
-function get_uncondensed_state(ind1::T, ind2::T) where T <: Tuple
+function get_uncondensed_state(i::T, j::T, k::T, l::T) where T <: Int
     i,j = ind1
     k,l = ind2
 
@@ -93,7 +93,7 @@ function probability_states(ind1::T, ind2::T, alleles::Dict) where T <: Tuple
     k,l = ind2
     p = [alleles[i], alleles[j], alleles[k], alleles[l]]
 
-    return δ[findall(get_uncondensed_state(ind1, ind2))...](p)
+    return δ[findall(get_uncondensed_state(i,j,k,l))...](p)
 end
 
 
