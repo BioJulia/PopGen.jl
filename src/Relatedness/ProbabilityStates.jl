@@ -1,3 +1,23 @@
+function get_jaquard_state(ind1::T, ind2::T) where T <: Tuple
+    the_shared = [intersect(ind1, ind2)...,0]
+    the_lone = [setdiff(ind1, ind2)..., setdiff(ind2, ind1)...,0]
+
+    ind1_resort = [ind1[(sum(ind1 .∈ the_shared',dims=2) .>= 1)[:,1]]..., ind1[(sum(ind1 .∈ the_lone',dims=2) .>= 1)[:,1]]...]
+    ind2_resort = [ind2[(sum(ind2 .∈ the_shared',dims=2) .>= 1)[:,1]]..., ind2[(sum(ind2 .∈ the_lone',dims=2) .>= 1)[:,1]]...]
+
+    adj_mat = Array{Int8}(undef, 6, 2)
+    idx = 0
+    for i in collect(1:3)
+        for j in (i + 1):4
+            idx += 1
+            adj_mat[idx,1:2] = [i,j] .* (1.0 * ([ind1_resort..., ind2_resort...][i] == [ind1_resort..., ind2_resort...][j]))
+        end
+    end
+    return adj_mat[adj_mat[:,1] .> 0,:]
+end
+
+
+
 ## Single type?
 struct JaqcuardPair
     genotype1::Genotype
