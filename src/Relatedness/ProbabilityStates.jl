@@ -8,7 +8,7 @@ function get_jaquard_state(ind1::T, ind2::T) where T <: Tuple
     adj_mat = Array{Int8}(undef, 6, 2)
     idx = 0
     for i in collect(1:3)
-        for j in (i + 1):4
+        for j in collect((i + 1):4)
             idx += 1
             adj_mat[idx,1:2] = [i,j] .* (1.0 * ([ind1_resort..., ind2_resort...][i] == [ind1_resort..., ind2_resort...][j]))
         end
