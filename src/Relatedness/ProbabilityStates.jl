@@ -8,7 +8,7 @@ S7 = [1 3; 2 4]
 S8 = [1 3]
 S9 = [1 3][[1 3][:,1] .!= 1, :]
 
-function get_jaquard_state(ind1::T, ind2::T) where T <: Tuple
+function get_jacquard _state(ind1::T, ind2::T) where T <: Tuple
     the_shared = [intersect(ind1, ind2)...,0]
     the_lone = [setdiff(ind1, ind2)..., setdiff(ind2, ind1)...,0]
 
@@ -26,7 +26,7 @@ end
 
 
 ## Single type?
-struct JaqcuardPair
+struct JacquardPair
     genotype1::Genotype
     genotype2::Genotype
     state::Int
