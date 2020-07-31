@@ -7,8 +7,9 @@ S6 = [3 4]
 S7 = [1 3; 2 4]
 S8 = [1 3]
 S9 = [1 3][[1 3][:,1] .!= 1, :]
+ibd_states = [S1, S2, S3, S4, S5, S6, S7, S8, S9]
 
-function get_jacquard_state(ind1::T, ind2::T) where T <: Tuple
+function get_jacquard_state(ind1::T, ind2::T, ibd_states = ibd_states) where T <: Tuple
     the_shared = [intersect(ind1, ind2)...,0]
     the_lone = [setdiff(ind1, ind2)..., setdiff(ind2, ind1)...,0]
 
@@ -21,7 +22,13 @@ function get_jacquard_state(ind1::T, ind2::T) where T <: Tuple
         idx += 1
         adj_mat[idx,1:2] = [i,j] .* (1.0 * ([ind1_resort..., ind2_resort...][i] == [ind1_resort..., ind2_resort...][j]))
     end
-    return adj_mat[adj_mat[:,1] .> 0,:]
+    adj_mat = adj_mat[adj_mat[:,1] .> 0,:]
+
+    jaq_state = 0
+    for i in 1:9
+        jaq_state += i * (adj_mat == ibd_states[i])
+    end
+    return jaq_state
 end
 
 
