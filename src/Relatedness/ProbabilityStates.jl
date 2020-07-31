@@ -39,7 +39,8 @@ struct JacquardPair
     state::Int
 end
 
-function probability_state(genos::JacquardPair, state::genos.state, alleles::Dict)::Vector{Float64}
+function probability_state(genos::JacquardPair, alleles::Dict)::Vector{Float64}
+    state = genos.state
     if state == 1
         p = alleles[genos.genotype1[1]]
         [p, p^2, p^2, p^3, p^2, p^3, p^2, p^3, p^4]
