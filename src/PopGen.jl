@@ -68,17 +68,18 @@ include("io/Datasets.jl")
 # utility functions
 include("Utils.jl")
 include("Permutations.jl")
-# manipulation and exploration
-include("DataExploration.jl")
-include("Manipulate.jl")
 # allele frequency and heterozygosity functions
 include("AlleleFreq.jl")
 include("Heterozygosity.jl")
+# manipulation and exploration
+include("DataExploration.jl")
+include("Manipulate.jl")
 # summary information
 include("SummaryInfo.jl")
 #Analyses
 include("HardyWeinberg.jl")
-#include(RelatednessMoments.jl)  # not yet ready
+#include("Relatedness/MomentsBootstrap.jl")
+#include("Relatedness/RelatednessMoments.jl")
 #include(PlotRecipes.jl)  # not yet ready
 
 end # module PopGen
