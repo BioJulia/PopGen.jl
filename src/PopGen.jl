@@ -45,7 +45,6 @@ using GeneticVariation: VCF, BCF, header
 using Convex,
       ECOS,
       LinearAlgebra,
-      ProgressMeter,
 =#
 
 #   o O       o O       o O       o O       o O
