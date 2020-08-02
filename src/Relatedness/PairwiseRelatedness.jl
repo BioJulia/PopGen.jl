@@ -1,3 +1,6 @@
+## THIS FILE IS DEPRECATED ##
+
+
 export relatedness, pairwise_relatedness, kinship
 
 #=TODO

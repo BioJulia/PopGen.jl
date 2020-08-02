@@ -233,7 +233,7 @@ end
 Convenience function to count the number of non-`missing` values
 in a vector.
 """
-function nonmissing(vec::T) where T<:AbstractArray
+@inline function nonmissing(vec::T) where T<:AbstractArray
     count(!ismissing, vec)
 end
 
@@ -243,9 +243,19 @@ end
 Convenience function to count the number of non-`missing` samples
 at a locus.
 """
-function nonmissing(data::PopData, locus::String)
+@inline function nonmissing(data::PopData, locus::String)
     data.loci[data.loci.locus .== locus, :genotype] |> nonmissing
 end
+
+"""
+    nonmissings(vec1::AbstractVector, vec2::AbstractVector)
+Return a vector of indices where neither input vectors have a `missing` value, i.e. an
+intersection of the indices of their non-missing elements.
+"""
+@inline function nonmissings(vec1::T, vec2::T) where T <: AbstractVector
+    intersect(map(i -> findall(!ismissing, i), (vec1, vec2))...)
+end
+
 
 #TODO add to docs API
 """
@@ -267,7 +277,7 @@ julia> pairwise_pairs(samps)
  ("blue_1", "blue_2")
 ```
 """
-function pairwise_pairs(smp_names::AbstractVector{String})
+@inline function pairwise_pairs(smp_names::AbstractVector{String})
     [tuple(smp_names[i], smp_names[j]) for i in 1:length(smp_names)-1 for j in i+1:length(smp_names)]
 end
 

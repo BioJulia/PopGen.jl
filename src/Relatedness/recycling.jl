@@ -185,15 +185,6 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
     return out_df
 end
 
-function relatedness_boot_all(data::PopData; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
-    sample_names = samples(data) |> collect
-    relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
-end
-function relatedness_boot_nonmissing(data::PopData; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
-    sample_names = samples(data) |> collect
-    relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval)
-end
-
 function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
     all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
     errs = ""
