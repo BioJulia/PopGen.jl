@@ -1,563 +1,344 @@
-## THIS FILE IS DEPRECATED ##
-
-
-export relatedness, pairwise_relatedness, kinship
-
-#=TODO
-
-    Solve dyadic optimization issues
-        combined backtracking failure - need to isolate and find cause
-            #N111 N83
-            #N63 N64
-        ~1/3 - 1/5 not with optimal solution in cats dataset
-    Multithread
-
-=#
-
-#= Would be good to include
-
-    Implement alternative relatedness metrics
-
-    Warning if a not implemented (or typo) of method included
-
-    Streamline output
-
-=#
+export relatedness
 
 """
-    pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
-Calculate the probability of observing the particular allele state given each of
-the 9 Jacquard Identity States for a single locus to create Table 1 from
-Milligan 2003.
+    bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
+
+Return the mean, median, standard error, and quantiles (given by `witdth`) of relatedness resampling.
 """
-function pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
-    #= Example
-    cats = nancycats()
-    cat1=get_genotype(cats, sample = "N100", locus = "fca23")
-    cat2=get_genotype(cats, sample = "N111", locus = "fca23")
-    allele = allele_freq(cats.loci.fca23)
-    pr_l_s(cat1, cat2, allele)
-    =#
-    #=
-    Calculate Pr(Li | Sj)
-    If the allele identity falls into this class (L1-L9), generate the
-    probabilities of it belonging to each of the different classes and
-    return that array of 9 distinct probabilities
-    =#
+@inline function bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
+    all(ismissing.(boot_out)) == true && return missing, missing, missing, missing
+    boot_skipmissing = collect(skipmissing(boot_out))
+    n_nonmiss = length(boot_skipmissing)
+    Mean = mean(boot_skipmissing)
+    Median = median(boot_skipmissing)
+    SE = sqrt(sum((boot_skipmissing - (boot_skipmissing / n_nonmiss)).^2) / (n_nonmiss - 1))
+    quants = quantile(boot_skipmissing, width)
 
+    return Mean, Median, SE, quants
+end
 
-    ## class L1 -  AᵢAᵢ AᵢAᵢ ##
-    if x[1] == x[2] == y[1] == y[2]
-        x = string.(x)
-        y = string.(y)
+"""
+    bootstrap_genos_all(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
 
-        p = alleles[x[1]]
-        [p, p^2, p^2, p^3, p^2, p^3, p^2, p^3, p^4]
-
-    ## class L2 - AᵢAᵢ AⱼAⱼ ##
-    elseif (x[1] == x[2]) & (y[1] == y[2]) & (x[1] != y[1])
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[1]], alleles[y[1]])
-        [0, prod(p), 0, prod(p) * p[2], 0, prod(p) * p[1], 0, 0, prod(p) * prod(p)]
-
-    ## class L3a - AᵢAᵢ AᵢAⱼ ## - has issues because of allele order
-    elseif ((x[1] == x[2] == y[1]) & (x[1] != y[2]))
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[1]], alleles[y[2]])
-        [0, 0, prod(p), 2 * prod(p) * p[1], 0, 0, 0, prod(p) * p[1], 2 * prod(p) * p[1]^2]
-
-    ## class L3b - AᵢAᵢ AⱼAᵢ ## - has issues because of allele order
-    elseif ((x[1] == x[2] == y[2]) & (x[1] != y[1]))
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[1]], alleles[y[1]])
-        [0, 0, prod(p), 2 * prod(p) * p[1], 0, 0, 0, prod(p) * p[1], 2 * prod(p) * p[1]^2]
-
-    ## class L4 - AᵢAᵢ AⱼAₖ ##
-    elseif (x[1] == x[2]) & (y[1] != y[2]) & (x[1] != y[1]) & (x[1] != y[2])
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[1]], alleles[y[1]], alleles[y[2]])
-        [0, 0, 0, 2 * prod(p), 0, 0, 0, 0, 2 * prod(p) * p[1]]
-
-    ## L5a - AiAj AiAi ## - has issues because of allele order
-    elseif ((x[1] == y[1] == y[2]) & (x[1] != x[2]))
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[1]], alleles[x[2]])
-        [0, 0, 0, 0, prod(p), 2 * prod(p) * p[1], 0, prod(p) *p[1], 2 * prod(p) * p[1]^2]
-
-    ## L5b - AjAi AiAi ## - has issues because of allele order
-    elseif (x[2] == y[1] == y[2] & (x[1] != x[2]))
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[2]], alleles[x[1]])
-        [0, 0, 0, 0, prod(p), 2 * prod(p) * p[1], 0, prod(p) *p[1], 2 * prod(p) * p[1]^2]
-
-    ## L6 - AjAk AiAi ##
-    elseif (x[1] != x[2]) & (y[1] == y[2]) & (x[1] != y[1]) & (x[2] != y[1])
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[y[1]], alleles[x[1]], alleles[x[2]])
-        [0, 0, 0, 0, 0, 2 * prod(p), 0, 0, 2 * prod(p) * p[1]]
-
-    ## L7 - AiAj AiAj ##
-    elseif (x[1] == y[1]) & (x[2] == y[2]) & (x[1] != x[2])
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[1]], alleles[x[2]])
-        [0, 0, 0, 0, 0, 0, 2 * prod(p), prod(p) * sum(p), 4 * prod(p) * prod(p)]
-
-    ## L8a - AiAj AiAk ##  - has issues because of allele order
-    elseif ((x[1] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[2] != y[2]))
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[1]], alleles[x[2]], alleles[y[2]])
-        [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
-
-    ## L8b - AjAi AkAi ##  - has issues because of allele order
-    elseif ((x[2] == y[2]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[1]))
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[2]], alleles[x[1]], alleles[y[1]])
-        [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
-
-    ## L8c - AjAi AiAk ##  - has issues because of allele order
-    elseif ((x[2] == y[1]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[2]))
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[2]], alleles[x[1]], alleles[y[2]])
-        [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
-
-    ## L8d - AiAj AkAi ##  - has issues because of allele order
-    elseif ((x[1] == y[2]) & (x[1] != x[2]) & (y[1] != y[2]) & (x[1] != y[1]))
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[1]], alleles[x[2]], alleles[y[1]])
-        [0, 0, 0, 0, 0, 0, 0, prod(p), 4 * prod(p) * p[1]]
-
-    ## L9 - AiAj AkAl ##
-    elseif (x[1] != x[2]) & (x[1] != y[1]) & (x[1] != y[2]) & (x[2] != y[1]) & (x[2] != y[2]) & (y[1] != x[2])
-        x = string.(x)
-        y = string.(y)
-
-        p = (alleles[x[1]], alleles[x[2]], alleles[y[1]], alleles[y[2]])
-        [0, 0, 0, 0, 0, 0, 0, 0, 4 * prod(p)]
-    else
-        [-9, -9, -9, -9, -9, -9, -9, -9, -9]
+Perform `iterations` number of bootstrap resampling iterations of all genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
+of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `relatedness_boot_all`.
+"""
+@inline function bootstrap_genos_all(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
+    relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
+    n_loc = length(locus_names)
+    for iter in 1:iterations
+        # bootstrap the indices
+        boot_idx = rand(1:n_loc, n_loc)
+        # sample the source vectors with the resampled/bootstrapped indices
+        ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
+        # get index for genotype appearing missing in at least one individual in the pair
+        keep_idx = nonmissings(ind1_boot, ind2_boot)
+        relate_vec_boot[iter] = method(ind1_boot[keep_idx], ind2_boot[keep_idx], loc_boot[keep_idx], alleles, loc_n = n_per_loci[keep_idx], n_samples = n_loc)
     end
+    return relate_vec_boot
 end
 
 
 """
-    all_loci_Pr_L_S(data::PopObj, ind1::String, ind2::String, alleles::Dict)
-Calculate the probability of observing the particular allele state given each of
-the 9 Jacquard Identity States for all loci Creates Table 1 from Milligan 2002
-"""
-function all_loci_Pr_L_S(data::PopData, ind1::String, ind2::String, alleles::Dict)
-    #Need to skip loci where one or both individuals have missing data
-    Pr_L_S = []
-    for locus in String.(names(data.loci))
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = locus)
-        gen2 = get_genotype(data, sample = ind2, locus = locus)
+    bootstrap_genos_nonmissing(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
 
-        if gen1 !== missing && gen2 !== missing
-            tmp = pr_l_s(gen1, gen2, alleles[locus])
-            return tmp
-            push!(Pr_L_S, tmp)
-        end
+Perform `iterations` number of bootstrap resampling iterations of only shared (nonmissing) genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
+of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `relatedness_boot_nonmissing`.
+"""
+@inline function bootstrap_genos_nonmissing(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
+    relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
+    n_loc = length(locus_names)
+    for iter in 1:iterations
+        # bootstrap the indices
+        boot_idx = rand(1:n_loc, n_loc)
+        # sample the source vectors with the resampled/bootstrapped indices
+        ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
+        # faster/cheaper n counting
+        relate_vec_boot[iter] = method(ind1_boot, ind2_boot, loc_boot, alleles, loc_n = n_per_loci, n_samples = n_loc)
     end
-    return transpose(hcat(Pr_L_S...))
-end
-
-#Pr_L_S_inbreeding = all_loci_Pr_L_S(ind1, ind2, data, allele_frequencies)
-
-
-"""
-    no_inbreeding(Pr_L_S::LinearAlgebra.Transpose{Float64,Array{Float64,2}})
-Remove Jacquard States which can only be the result of inbreeding
-"""
-function no_inbreeding(Pr_L_S::Transpose{Float64,Array{Float64,2}})
-    for i in 1:6
-        Pr_L_S[:,i] = 0 .* Pr_L_S[:,i]
-    end
-    return Pr_L_S
-end
-
-#Pr_L_S_noinbreeding = dyadic_ML(data, allele_frequencies) |> no_inbreeding
-
-
-## Calculate Δ coefficients
-#Need to either maximize this sum or use it as the likelihood in a bayesian model and sample from the posterior.
-#currently only maximum likelihood optimization
-
-
-"""
-    Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool)
-Takes the probability of the allelic state given the identity by descent from
-all available loci (either allowing for inbreeding or not) and calculated the
-maximum likelihood Δ coefficients
-"""
-function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = true)
-    #Δ is what needs to be optimized
-    #consist of 9 values between 0 and 1 which must also sum to 1
-    #is then used to calculate relatedness
-
-    Δ = Variable(8)
-    #problem = maximize(sum(log(Pr_L_S * vcat(1 - sum(Δ), Δ))))
-    problem = maximize(sum(Pr_L_S * vcat(1 - sum(Δ), Δ)))
-    problem.constraints += 0 <= 1 - sum(Δ)
-    problem.constraints += 1 - sum(Δ) <= 1
-    problem.constraints += 0 <= Δ[1:8]
-    problem.constraints += Δ[1:8] <= 1
-
-    #shifted from actual relatedness calculations because the 1 - sum(Δ) goes at beginning
-    # problem.constraints += 2 * ((1 - sum(Δ)) + 0.5 * (Δ[2] + Δ[4] + Δ[6]) + 0.25 * Δ[7]) <= 1
-    # problem.constraints += 0 <= 2 * ((1 - sum(Δ)) + 0.5 * (Δ[2] + Δ[4] + Δ[6]) + 0.25 * Δ[7])
-
-    Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit = 100), verbose = verbose) #maxit=100,
-    #Convex.solve!(problem, ECOSSolver(verbose = verbose, maxit=100, feastol=5e-6, reltol = 1e-3, reltol_inacc = 5e-2), verbose = verbose)
-    #Convex.solve!(problem, SCSSolver(verbose = verbose, max_iters = 100), verbose = verbose)
-
-    vcat(1-sum(Δ.value), Δ.value), problem.status
-    # Should probably include some output that confirms that it did in fact
-    # converge and/or use multiple random starts to confirm not a local maxima
-end
-
-# JuMP variant
-function Δ_optim(Pr_L_S::Transpose{Float64,Array{Float64,2}}, verbose::Bool = true)
-    #Δ is what needs to be optimized
-    #consist of 9 values between 0 and 1 which must also sum to 1
-    #is then used to calculate relatedness
-
-    jacquard = Model(ECOS.Optimizer)
-    @variable(jacquard, Δ[i=1:9])
-    @objective(jacquard, Max, sum(log(Pr_L_S * Δ)))
-    @constraint(jacquard, con, sum(Δ) == 1)
-    @constraint(jacquard, con_bounds, 0 .<= Δ .<= 1)
-
-end
-## Calculate theta and r
-"""
-    relatedness_dyadicML(Δ::Array{Float64,2})
-Takes the Δ coefficents (with or without inbreeding allowed) and calculates the coefficient of relatedness
-"""
-function relatedness_from_Δ(Δ::Array{Float64,2})
-    θ = Δ[1] + 0.5 * (Δ[3] + Δ[5] + Δ[7]) + 0.25 * Δ[8]
-    2 * θ
-end
-
-#relatedness_dyadicML(Δ_inbreeding)
-#relatedness_dyadicML(Δ_noinbreeding)
-#Relatedness R package appears to have a bug. When allow.inbreeding = TRUE the relatedness value is the same as when I assume no inbreeding
-#when you set allow.inbreeding = FALSE then the relatedness calculated is the same as when I assume there is inbreeding
-
-
-"""
-    dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, inbreeding::Bool = true, verbose::Bool = true)
-Calculates the dyadic maximum likelihood relatedness using all available loci following
-Milligan 2002 dyadic relatedness - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1462494/pdf/12663552.pdf
-
-Inbreeding can either be assumed not to occur (inbreeding = false) or be
-included in the calculation of the relatedness coefficient Verbose controls the
-verbosity of the optimization process to find the Maximum likelihood Δ coefficents
-"""
-function dyadicML_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict, inbreeding::Bool = true, verbose::Bool = true)
-    #TODO - calculate inbreeding coeffificients Fx & Fy and include in r calculation
-    #Coancestry Manual
-    #Fx = sum(Δ[1:4])
-    #Fy = sum(Δ[1,2,5,6])
-    #rxy = (2Δ[1] + Δ[3] + Δ[5] + Δ[7] + (1/2)Δ[8]) / sqrt((1 + Fx) * (1 + Fy))
-    Pr_L_S = all_loci_Pr_L_S(data, ind1, ind2, alleles)
-
-    if !inbreeding
-        no_inbreeding(Pr_L_S)
-    end
-
-    Δ,convergence = Δ_optim(Pr_L_S, verbose)
-
-    return relatedness_from_Δ(Δ), Δ, convergence
+    return relate_vec_boot
 end
 
 """
-    qg_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
-Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
-- Bases allele frequencies on entire population
-- Inbreeding can only be assumed not to exist.
-See equation 3 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
+    relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64}) where F
+
+Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
+the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `relatedness`.
 """
-function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-
-    #NEED TO CHECK TO CONFIRM EQUATIONS
-
-    n1 = 0.0
-    n2 = 0.0
-    d1 = 0.0
-    d2 = 0.0
-
-    for loc in loci(data)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
-
-        #Skip missing
-        if gen1 !== missing && gen2 !== missing
-            a,b = gen1
-            c,d = gen2
-            sym_loc = Symbol(loc)
-
-            n1 += sum((a == c, a == d, b == c, b == d)) - 2.0 * (alleles[sym_loc][a] + alleles[sym_loc][b])
-            n2 += sum((a == c, a == d, b == c, b == d)) - 2.0 * (alleles[sym_loc][c] + alleles[sym_loc][d])
-
-            d1 += 2.0 * (1.0 + (a==b) - alleles[sym_loc][a] - alleles[sym_loc][b])
-            d2 += 2.0 * (1.0 + (c==d) - alleles[sym_loc][c] - alleles[sym_loc][d])
-        end
-    end
-    return (n1/d1 + n2/d2)/2.0
-end
-
-"""
-    ritland_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
-Calculates the moments based estimator of pairwise relatedness proposed by Li and Horvitz (1953) and implemented/made popular by Ritland (1996).
-- Bases allele frequencies on entire population
-- Inbreeding can only be assumed not to exist.
-See equation 7 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
-Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
-"""
-function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-
-    #NEED TO CHECK TO CONFIRM EQUATIONS
-
-    n = 0.0
-    d = 0.0
-
-    for loc in loci(data)
-        #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
-
-        #Skip missing
-        if gen1 !== missing && gen2 !== missing
-            a,b = gen1
-            c,d = gen2
-            sym_loc = Symbol(loc)
-
-            A = ((alleles[sym_loc] |> length) - 1)
-
-            R = 0.0
-            for allele in keys(alleles[sym_loc])
-                # Individual locus relatedness value (eq 7 in paper)
-                R += ((((a == allele) + (b == allele)) * ((c == allele) + (d == allele))) / (4.0 * alleles[sym_loc][allele]))
-            end
-            R = (2 / A) * (R - 1.0)
-            # numerator for weighted combination of loci
-            n += (R * A)
-            # denominator for weighted combination of loci
-            d += A
-        end
-    end
-    return (n / d)
-end
-
-"""
-    lr_relatedness(data::PopObj, ind1::String, ind2::String; alleles::Dict)
-Calculates the moments based estimator of pairwise relatedness by Ritland (1996).
-- Bases allele frequencies on entire population
-- Inbreeding can only be assumed not to exist.
-See equation 10 in: https://www.nature.com/articles/hdy201752 for variant of estimator used
-Ritland original citation: https://www.cambridge.org/core/journals/genetics-research/article/estimators-for-pairwise-relatedness-and-individual-inbreeding-coefficients/9AE218BF6BF09CCCE18121AA63561CF7
-"""
-function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
-    #NEED TO CHECK TO CONFIRM EQUATIONS
-
-    n = 0.0
-    d = 0.0
-    #Extract the pair of interest's genotypes
-    gen1 = get_genotypes(data, ind1)
-    gen2 = get_genotypes(data, ind2)
-
-    # keep only loci where both are not missing
-    # _f implies "filtered"
-    #loc_f, gen1_f, gen2_f = skipmissings(Symbol.(loci(data)), gen1, gen2)
-
-    for (loc,geno1,geno2) in zip(skipmissings(Symbol.(loci(data)), gen1, gen2)...)
-        a,b = geno1
-        c,d = geno2
-
-        n1 = alleles[loc][a] * ((b == c) + (b == d)) + alleles[loc][b] * ((a == c) + (a == d)) - 4.0 * alleles[loc][a] * alleles[loc][b]
-        n2 = alleles[loc][c] * ((d == a) + (d == b)) + alleles[loc][d] * ((c == a) + (c == b)) - 4.0 * alleles[loc][c] * alleles[loc][d]
-
-        d1 = 2.0 * (1.0 + (a == b)) * (alleles[loc][a] + alleles[loc][b]) - 8.0 * alleles[loc][a] * alleles[loc][b]
-        d2 = 2.0 * (1.0 + (c == d)) * (alleles[loc][c] + alleles[loc][d]) - 8.0 * alleles[loc][c] * alleles[loc][d]
-
-        RL = (n1 / d1) + (n2 / d2)
-
-        n += RL #JDS - CHECK THIS IS CORRECT
-        d += ((alleles[loc] |> length) - 1)
-    end
-    return (n / d)
-end
-
-
-"""
-    pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
-Calculates various pairwise relatedness measures between all pairs of individuals based on the entire sample population
-allele frequency
-
-If verbose is set to false then there is a progress bar. If set to true then there is
-estimator specific feedback and statements when an individual has been compared to all other pairs
-
-If the method is able to account for inbreeding in it's calculation then that option may be used
-
-Available methods:
-- `"qg"` : Queller & Goodknight 1989  (diploid only)
-"""
-
-function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::Bool = true, verbose::Bool = true)
-    # check that dataset is entirely diploid
-    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-
-    allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
-                            Tuple(allele_freq.(locus.(Ref(data), loci(data))))
-                        )
-
-    #=
-    if !verbose
-        n = size(data.samples)[1]
-        n = n*(n-1) ÷ 2
-        prog = Progress(n, 1)
-    end
-    #Add switch to slightly change output depending on relatednes metric (e.g. convergence doesn't make sense for Moments Estimators)
-    if method == "dyadml"
-        output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
-    end
-    =#
-    sample_names = samples(data)
-    sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
-    relate_vec = zeros(length(sample_pairs))
+function relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+    loci_names = Symbol.(loci(data))
+    sample_pairs = pairwise_pairs(sample_names)
+    n_samples = length(samples(data))
+    allele_frequencies = allele_freq(data)
+    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
+    boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
+    boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
+    shared_loci = Vector{Int}(undef, length(sample_pairs))
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    popdata_idx = groupby(data.loci, :name)
     idx = 0
-    if method == "qg"
+    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
+        geno1 = popdata_idx[(ind1,)].genotype
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
+            idx += 1
+            geno2 = popdata_idx[(ind2,)].genotype
 
-        @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-            #Base.Threads.@threads
-            @inbounds Base.Threads.@threads for ind2 in sample_names[sample_n+1:end]
-                idx += 1
-                #=
-                if method == "dyadml"
-                    dyad_out = dyadicML_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
-                    append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = dyad_out[1], convergence = dyad_out[3]))
-                end
-                =#
-                relate_vec[idx] += qg_relatedness(data, ind1, ind2, alleles = allele_frequencies)
-                #=
-                if !verbose
-                    next!(prog)
-                end
-                =#
+            # get index for genotype appearing missing in at least one individual in the pair
+            keep_idx = nonmissings(geno1, geno2)
+            # generate nonmissing genotype data 
+            gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
+
+            # populate shared_loci array
+            @inbounds shared_loci[idx] = length(loc)
+
+            @inbounds for (i, mthd) in enumerate(method)
+                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loci, n_samples = n_samples)
+                boot_out = bootstrap_genos_all(geno1, geno2, loci_names, n_per_loci, allele_frequencies, method = mthd, iterations = iterations)
+                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, interval)
+            end
+            update!(p, idx)
+        end
+    end
+    method_colnames = [Symbol("$i") for i in method]
+    boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
+    boot_median_colnames = [Symbol("$i"*"_median") for i in method]
+    boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
+    CI_percent = convert(Int64, round(interval[2] - interval[1], digits = 2) * 100)
+    boot_CI_colnames = [Symbol("$i"*"_CI_"*"$CI_percent") for i in method]
+
+    out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
+    @inbounds for (i, mth) in enumerate(method_colnames)
+        out_df[:, mth] = relate_vecs[i]
+        out_df[:, boot_mean_colnames[i]] = boot_means[i]
+        out_df[:, boot_median_colnames[i]] = boot_medians[i]
+        out_df[:, boot_se_colnames[i]] = boot_ses[i]
+        out_df[:, boot_CI_colnames[i]] = boot_CI[i]
+    end
+
+    return out_df
+end
+
+
+"""
+    relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64}) where F
+
+Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
+the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `relatedness`.
+"""
+function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+    loci_names = Symbol.(loci(data))
+    sample_pairs = pairwise_pairs(sample_names)
+    n_samples = length(samples(data))
+    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    allele_frequencies = allele_freq(data)
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
+    boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
+    boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
+    shared_loci = Vector{Int}(undef, length(sample_pairs))
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    popdata_idx = groupby(data.loci, :name)
+    idx = 0
+    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
+        @inbounds geno1 = popdata_idx[(ind1,)].genotype
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
+            idx += 1
+            @inbounds geno2 = popdata_idx[(ind2,)].genotype
+
+            # get index for genotype appearing missing in at least one individual in the pair
+            keep_idx = nonmissings(geno1, geno2)
+            # generate nonmissing genotype data 
+            gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
+
+            # populate shared_loci array
+            @inbounds shared_loci[idx] = length(loc)
+            
+            @inbounds for (i, mthd) in enumerate(method)
+                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples)
+                boot_out = bootstrap_genos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations)
+                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, interval)
+            end
+            update!(p, idx)
+        end
+    end
+    method_colnames = [Symbol("$i") for i in method]
+    boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
+    boot_median_colnames = [Symbol("$i"*"_median") for i in method]
+    boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
+    CI_percent = convert(Int64, round(interval[2] - interval[1], digits = 2) * 100)
+    boot_CI_colnames = [Symbol("$i"*"_CI_"*"$CI_percent") for i in method]
+
+    out_df = DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
+    @inbounds for (i, mth) in enumerate(method_colnames)
+        out_df[:, mth] = relate_vecs[i]
+        out_df[:, boot_mean_colnames[i]] = boot_means[i]
+        out_df[:, boot_median_colnames[i]] = boot_medians[i]
+        out_df[:, boot_se_colnames[i]] = boot_ses[i]
+        out_df[:, boot_CI_colnames[i]] = boot_CI[i]
+    end
+
+    return out_df
+end
+
+"""
+    relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F) where F
+
+Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. 
+This is an internal function with arguments provided by `relatedness`.
+"""
+function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F) where F
+    loci_names = Symbol.(loci(data))
+    n_samples = length(samples(data))
+    sample_pairs = pairwise_pairs(sample_names)
+    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    allele_frequencies = allele_freq(data)
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
+    shared_loci = Vector{Int}(undef, length(sample_pairs))
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    popdata_idx = groupby(data.loci, :name)
+    idx = 0
+    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
+        @inbounds geno1 = popdata_idx[(ind1,)].genotype
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
+            idx += 1
+            @inbounds geno2 = popdata_idx[(ind2,)].genotype
+
+            # get index for genotype appearing missing in at least one individual in the pair
+            keep_idx = nonmissings(geno1, geno2)
+            
+            # populate shared_loci array
+            @inbounds shared_loci[idx] = length(keep_idx)
+            @inbounds [relate_vecs[i][idx] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples) for (i,mth) in enumerate(method)]
+
+            update!(p, idx)
+        end
+    end
+    method_colnames = [Symbol("$i") for i in method]
+    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
+    [out_df[:, mth] = relate_vecs[i] for (i, mth) in enumerate(method_colnames)]
+    return out_df
+end
+
+
+"""
+    relatedness(data::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
+    relatedness(data::PopData; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
+    # to specify individuals for comparison
+    relatedness(data::PopData, sample_names::Vector{String}; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
+    relatedness(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
+
+Return a dataframe of pairwise relatedness estimates for all or select pairs of samples in a `PopData` object. **Note:** samples must be diploid.
+
+### estimator methods
+There are several estimators available and are listed below. `relatedness` takes the
+function names as arguments (**case sensitive**), therefore do not use quotes or colons
+in specifying the methods. Methods can be supplied as a vector.
+- `Blouin`
+- `LiHorvitz`
+- `Loiselle`
+- `Lynch`
+- `LynchLi`
+- `LynchRitland`
+- `Moran`
+- `QuellerGoodnight`
+- `Ritland`
+- `Wang`
+
+For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
+
+### bootstrap methods
+To calculate means, median, standard error, and confidence intervals using bootstrapping,
+set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
+of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%),
+however that can be changed by supplying a `Tuple` of `(low, high)` to the keyword `interval`.
+There are two available resampling methods, `"all"` (default) and `"nonmissing"`.
+- `"all"` : resamples all loci for a pair of individuals and then drops missing loci between them (recommended)
+    - speed: slower
+    - pro: better resampling variation
+    - con: by chance some iterations may have a lot of missing loci that have to be dropped
+- `"nonmissing"` : resamples only the shared non-missing loci between the pair
+    - speed: faster
+    - pro: every iteration guarantees the same number of loci compared between the pair
+    - con: too-tight confidence intervals due to less possible variation
+
+**Examples**
+```
+julia> cats = nancycats();
+
+julia> relatedness(cats, method = Ritland, iterations = 100);
+27966×8 DataFrame. Omitted printing of 2 columns
+│ Row   │ sample_1 │ sample_2 │ n_loci │ Ritland    │ Ritland_mean │ Ritland_median │
+│       │ String   │ String   │ Int64  │ Float64?   │ Float64?     │ Float64?       │
+├───────┼──────────┼──────────┼────────┼────────────┼──────────────┼────────────────┤
+│ 1     │ N215     │ N216     │ 8      │ 0.258824   │ 0.274537     │ 0.266457       │
+│ 2     │ N215     │ N217     │ 8      │ 0.193238   │ 0.191591     │ 0.180821       │
+│ 3     │ N215     │ N218     │ 8      │ 0.127497   │ 0.119988     │ 0.105559       │
+│ 4     │ N215     │ N219     │ 8      │ 0.0453471  │ 0.0558557    │ 0.0573132      │
+│ 5     │ N215     │ N220     │ 8      │ 0.108251   │ 0.12274      │ 0.110878       │
+│ 6     │ N215     │ N221     │ 8      │ 0.205139   │ 0.206509     │ 0.204635       │
+⋮
+│ 27961 │ N297     │ N281     │ 7      │ -0.0487076 │ -0.052506    │ -0.0549532     │
+│ 27962 │ N297     │ N289     │ 7      │ 0.154745   │ 0.170053     │ 0.169637       │
+│ 27963 │ N297     │ N290     │ 7      │ 0.189647   │ 0.19302      │ 0.189994       │
+│ 27964 │ N281     │ N289     │ 8      │ 0.0892068  │ 0.0914532    │ 0.0775897      │
+│ 27965 │ N281     │ N290     │ 7      │ 0.104614   │ 0.107821     │ 0.115087       │
+│ 27966 │ N289     │ N290     │ 7      │ 0.0511663  │ 0.0498539    │ 0.0547733      │
+
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang]);
+3×5 DataFrame
+│ Row │ sample_1 │ sample_2 │ n_loci │ Ritland    │ Wang      │
+│     │ String   │ String   │ Int64  │ Float64?   │ Float64?  │
+├─────┼──────────┼──────────┼────────┼────────────┼───────────┤
+│ 1   │ N7       │ N111     │ 9      │ -0.129432  │ -0.395806 │
+│ 2   │ N7       │ N115     │ 9      │ -0.0183925 │ 0.0024775 │
+│ 3   │ N111     │ N115     │ 9      │ 0.0240152  │ 0.183966  │
+
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975));
+3×13 DataFrame. Omitted printing of 7 columns
+│ Row │ sample_1 │ sample_2 │ n_loci │ Loiselle   │ Loiselle_mean │ Loiselle_median │
+│     │ String   │ String   │ Int64  │ Float64?   │ Float64?      │ Float64?        │
+├─────┼──────────┼──────────┼────────┼────────────┼───────────────┼─────────────────┤
+│ 1   │ N7       │ N111     │ 9      │ -0.101618  │ 0.0141364     │ 0.00703954      │
+│ 2   │ N7       │ N115     │ 9      │ -0.0428898 │ 0.0743497     │ 0.0798708       │
+│ 3   │ N111     │ N115     │ 9      │ 0.13681    │ 0.266043      │ 0.257748        │
+```
+"""
+function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
+    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    errs = ""
+    all_samples = samples(data)
+    if sample_names != all_samples
+        for i in sample_names
+            if i ∉ all_samples
+                errs *= " $i,"
             end
         end
-
-        #=
-        if verbose
-            println("All pairs with ", ind1, " finished")
-        end
-        =#
+        errs != "" && error("Samples not found in the PopData: " * errs)
     end
-    method_colname = Symbol("relatedness_" * method)
-    return DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), method_colname => relate_vec)
+    if eltype(method) != Function
+        method = [method]
+    end
+    for i in Symbol.(method)
+        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz, :dyadicLikelihood]
+            errs *= "$i is not a valid method\n"
+        end
+    end
+    errs != "" && error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help.")
+    if iterations > 0
+        if resample == "all"
+            relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
+        elseif resample == "nonmissing"
+            relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval)
+        else
+            throw(ArgumentError("Please choose from resample methods \"all\" or \"nonmissing\""))
+        end
+    else
+        relatedness_no_boot(data, sample_names, method = method)
+    end
 end
 
 
-#Multithreaded version - requires "Combinatorics" Package
-function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = true, verbose::Bool = true)
-    # check that dataset is entirely diploid
-    all(data.samples.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-
-    allele_frequencies = Dict()
-    for locus in names(data.loci)
-        allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
-    end
-
-    n = size(data.samples)[1]
-    n = n*(n-1) ÷ 2
-
-    if !verbose
-        prog = Progress(n, 1)
-    end
-
-    #Add switch to slightly change output depending on relatednes metric (e.g. convergence doesn't make sense for Moments Estimators)
-    if method == "dyadml"
-        output = DataFrame([String, String, Float64, Float64, Float64, Symbol], Symbol.(["Ind1", "Ind2", "I", "thread", "relatedness", "convergence"]), n)
-    end
-    if method == "qg"
-        #output = DataFrame(ind1 = [], ind2 = [], relatedness = [])
-        output = DataFrame([String, String, Float64, Float64, Float64], Symbol.(["Ind1", "Ind2", "I", "thread", "relatedness"]), n)
-    end
-
-    pairs = combinations(data.samples.name, 2) |> collect #This line requires Combinatorics pacakge
-
-    Threads.@threads for i in 1:n
-        ind1 = pairs[i][1]
-        ind2 = pairs[i][2]
-
-        output[i, :I] = i
-        output[i, :Ind1] = ind1
-        output[i, :Ind2] = ind2
-        output[i, :thread] = Threads.threadid()
-        if method == "qg"
-            output[i, :relatedness] = qg_relatedness(data, ind1, ind2, alleles = allele_frequencies)
-        end
-        if method == "dyadml"
-            dyad_out = dyadicML_relatedness(data, ind1, ind2, alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
-            output[i, :relatedness] = dyad_out[1]
-            output[i, :convergence] = dyad_out[3]
-        end
-
-        next!(prog)
-    end
-    return output
+function relatedness(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
+    sample_names = samples(data) |> collect
+    relatedness(data, sample_names, method = method, iterations = iterations, interval = interval, resample = resample)
 end
-
-
-
-const relatedness = pairwise_relatedness
-const kinship = pairwise_relatedness
-
-# - `"dyadml"` : Milligan 2002 Dyadic Maximum Likelihood relatedness estimator
-
-#=
-cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
-cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
-
-
-cat_rel_qg = pairwise_relatedness(nancycats(), method = "qg", verbose = false)
-=#
-
-#=
-Testing area
-cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
-
-cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
-
-count(cat_rel_noInbreeding[i,4] == :Optimal for i in 1:27966)
-count(cat_rel_Inbreeding[i,4] == :Optimal for i in 1:27966)
-
-
-"N100"
-"N106"
-=#

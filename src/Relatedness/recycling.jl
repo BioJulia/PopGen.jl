@@ -1,3 +1,5 @@
+## THIS IS A SCRATCH-WORK FILE  -- PAVEL ##
+
 # matrix version?
 function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T) where T <: NamedTuple
 

@@ -77,7 +77,7 @@ include("Manipulate.jl")
 include("SummaryInfo.jl")
 #Analyses
 include("HardyWeinberg.jl")
-#include("Relatedness/MomentsBootstrap.jl")
+#include("Relatedness/PairwiseRelatedness.jl")
 #include("Relatedness/RelatednessMoments.jl")
 #include(PlotRecipes.jl)  # not yet ready
 
