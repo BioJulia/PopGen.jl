@@ -1,7 +1,7 @@
 export relatedness
 
 """
-    bootstrap_summary(boot_out::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
+    bootstrap_summary(::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
 
 Return the mean, median, standard error, and quantiles (given by `witdth`) of relatedness resampling.
 """
@@ -60,7 +60,7 @@ of the relatedness estimate given by method `method`. This is an internal functi
 end
 
 """
-    relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64}) where F
+    relatedness_boot_all(::PopData, sample_names::Vector{String}; method::Function, iterations::Int, interval::Tuple{Float64, Float64})
 
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `relatedness`.
@@ -121,12 +121,12 @@ end
 
 
 """
-    relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64}) where F
+    relatedness_boot_nonmissing(::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64}) where F
 
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `relatedness`.
 """
-function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
     n_samples = length(samples(data))
@@ -181,7 +181,7 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
 end
 
 """
-    relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F) where F
+    relatedness_no_boot(::PopData, sample_names::Vector{String}; method::F) where F
 
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. 
 This is an internal function with arguments provided by `relatedness`.
@@ -221,18 +221,23 @@ end
 
 
 """
-    relatedness(data::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
-    relatedness(data::PopData; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
-    # to specify individuals for comparison
-    relatedness(data::PopData, sample_names::Vector{String}; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
-    relatedness(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
+    # compare all samples
+    relatedness(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
 
-Return a dataframe of pairwise relatedness estimates for all or select pairs of samples in a `PopData` object. **Note:** samples must be diploid.
+```
+# to compare specific samples
+relatedness(::PopData, samples; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
+```
+Return a dataframe of pairwise relatedness estimates for all or select pairs of `samples` in a `PopData` object using 
+method(s) `F` where `F` is one or several of the methods listed below. If no bootstrapping is required, then the only 
+necessary keyword to provide is `method = ` (see examples below). **Note:** samples must be diploid.
 
-### estimator methods
-There are several estimators available and are listed below. `relatedness` takes the
+### Estimator methods
+The available estimators are listed below. `relatedness` takes the
 function names as arguments (**case sensitive**), therefore do not use quotes or colons
-in specifying the methods. Methods can be supplied as a vector.
+in specifying the methods. Multiple methods can be supplied as a vector. All of these methods will tab-autocomplete.
+For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
+
 - `Blouin`
 - `LiHorvitz`
 - `Loiselle`
@@ -244,15 +249,17 @@ in specifying the methods. Methods can be supplied as a vector.
 - `Ritland`
 - `Wang`
 
-For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
-
-### bootstrap methods
+### Bootstrapping
 To calculate means, median, standard error, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%),
-however that can be changed by supplying a `Tuple` of `(low, high)` to the keyword `interval`.
-There are two available resampling methods, `"all"` (default) and `"nonmissing"`.
-- `"all"` : resamples all loci for a pair of individuals and then drops missing loci between them (recommended)
+however that can be changed by supplying a `Tuple` of `(low, high)` to the keyword `interval`. The returned DataFrame
+will have 5 columns per `method` with bootstrapped parameters having the naming convention of `Method_parameter`. The output
+may have more columns than will fit on your screen, so `DataFrames.names(out_df)` may be useful to see a list of the column names.
+
+#### Resampling methods
+There are two available resampling methods, `"all"` (default  & recommended) and `"nonmissing"`.
+- `"all"` : resamples all loci for a pair of individuals and then drops missing loci between them
     - speed: slower
     - pro: better resampling variation
     - con: by chance some iterations may have a lot of missing loci that have to be dropped
@@ -265,26 +272,25 @@ There are two available resampling methods, `"all"` (default) and `"nonmissing"`
 ```
 julia> cats = nancycats();
 
-julia> relatedness(cats, method = Ritland, iterations = 100);
-27966×8 DataFrame. Omitted printing of 2 columns
-│ Row   │ sample_1 │ sample_2 │ n_loci │ Ritland    │ Ritland_mean │ Ritland_median │
-│       │ String   │ String   │ Int64  │ Float64?   │ Float64?     │ Float64?       │
-├───────┼──────────┼──────────┼────────┼────────────┼──────────────┼────────────────┤
-│ 1     │ N215     │ N216     │ 8      │ 0.258824   │ 0.274537     │ 0.266457       │
-│ 2     │ N215     │ N217     │ 8      │ 0.193238   │ 0.191591     │ 0.180821       │
-│ 3     │ N215     │ N218     │ 8      │ 0.127497   │ 0.119988     │ 0.105559       │
-│ 4     │ N215     │ N219     │ 8      │ 0.0453471  │ 0.0558557    │ 0.0573132      │
-│ 5     │ N215     │ N220     │ 8      │ 0.108251   │ 0.12274      │ 0.110878       │
-│ 6     │ N215     │ N221     │ 8      │ 0.205139   │ 0.206509     │ 0.204635       │
+julia> relatedness(cats, method = Ritland)
+27966×4 DataFrame
+│ Row   │ sample_1 │ sample_2 │ n_loci │ Ritland    │
+│       │ String   │ String   │ Int64  │ Float64?   │
+├───────┼──────────┼──────────┼────────┼────────────┤
+│ 1     │ N215     │ N216     │ 8      │ 0.258824   │
+│ 2     │ N215     │ N217     │ 8      │ 0.193238   │
+│ 3     │ N215     │ N218     │ 8      │ 0.127497   │
+│ 4     │ N215     │ N219     │ 8      │ 0.0453471  │
+│ 5     │ N215     │ N220     │ 8      │ 0.108251   │
 ⋮
-│ 27961 │ N297     │ N281     │ 7      │ -0.0487076 │ -0.052506    │ -0.0549532     │
-│ 27962 │ N297     │ N289     │ 7      │ 0.154745   │ 0.170053     │ 0.169637       │
-│ 27963 │ N297     │ N290     │ 7      │ 0.189647   │ 0.19302      │ 0.189994       │
-│ 27964 │ N281     │ N289     │ 8      │ 0.0892068  │ 0.0914532    │ 0.0775897      │
-│ 27965 │ N281     │ N290     │ 7      │ 0.104614   │ 0.107821     │ 0.115087       │
-│ 27966 │ N289     │ N290     │ 7      │ 0.0511663  │ 0.0498539    │ 0.0547733      │
+│ 27961 │ N297     │ N281     │ 7      │ -0.0487076 │
+│ 27962 │ N297     │ N289     │ 7      │ 0.154745   │
+│ 27963 │ N297     │ N290     │ 7      │ 0.189647   │
+│ 27964 │ N281     │ N289     │ 8      │ 0.0892068  │
+│ 27965 │ N281     │ N290     │ 7      │ 0.104614   │
+│ 27966 │ N289     │ N290     │ 7      │ 0.0511663  │
 
-julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang]);
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
 3×5 DataFrame
 │ Row │ sample_1 │ sample_2 │ n_loci │ Ritland    │ Wang      │
 │     │ String   │ String   │ Int64  │ Float64?   │ Float64?  │
@@ -293,7 +299,7 @@ julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang]);
 │ 2   │ N7       │ N115     │ 9      │ -0.0183925 │ 0.0024775 │
 │ 3   │ N111     │ N115     │ 9      │ 0.0240152  │ 0.183966  │
 
-julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975));
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975))
 3×13 DataFrame. Omitted printing of 7 columns
 │ Row │ sample_1 │ sample_2 │ n_loci │ Loiselle   │ Loiselle_mean │ Loiselle_median │
 │     │ String   │ String   │ Int64  │ Float64?   │ Float64?      │ Float64?        │
@@ -301,6 +307,23 @@ julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], ite
 │ 1   │ N7       │ N111     │ 9      │ -0.101618  │ 0.0141364     │ 0.00703954      │
 │ 2   │ N7       │ N115     │ 9      │ -0.0428898 │ 0.0743497     │ 0.0798708       │
 │ 3   │ N111     │ N115     │ 9      │ 0.13681    │ 0.266043      │ 0.257748        │
+
+
+julia> DataFrames.names(ans)
+13-element Array{String,1}:
+ "sample_1"
+ "sample_2"
+ "n_loci"
+ "Loiselle"
+ "Loiselle_mean"
+ "Loiselle_median"
+ "Loiselle_SE"
+ "Loiselle_CI_95"
+ "Moran"
+ "Moran_mean"
+ "Moran_median"
+ "Moran_SE"
+ "Moran_CI_95"
 ```
 """
 function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
@@ -308,22 +331,15 @@ function relatedness(data::PopData, sample_names::Vector{String}; method::F, ite
     errs = ""
     all_samples = samples(data)
     if sample_names != all_samples
-        for i in sample_names
-            if i ∉ all_samples
-                errs *= " $i,"
-            end
-        end
+        [errs *= "$i," for i in sample_names if i ∉ all_samples]
         errs != "" && error("Samples not found in the PopData: " * errs)
     end
     if eltype(method) != Function
         method = [method]
     end
-    for i in Symbol.(method)
-        if i ∉ [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz, :dyadicLikelihood]
-            errs *= "$i is not a valid method\n"
-        end
-    end
-    errs != "" && error(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help.")
+    relate_mthds = [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz, :dyadicLikelihood]
+    [errs *= "$i is not a valid method\n" for i in Symbol.(method) if i ∉ relate_mthds]
+    errs != "" && throw(ArgumentError(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help."))
     if iterations > 0
         if resample == "all"
             relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
