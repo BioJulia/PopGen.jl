@@ -23,7 +23,7 @@ end
 Perform `iterations` number of bootstrap resampling iterations of all genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
 of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `relatedness_boot_all`.
 """
-@inline function bootstrap_genos_all(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
+@inline function bootstrap_genos_all(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool) where T <: GenoArray where U <: NamedTuple where F
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
     n_loc = length(locus_names)
     for iter in 1:iterations
@@ -33,7 +33,7 @@ of the relatedness estimate given by method `method`. This is an internal functi
         ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
         # get index for genotype appearing missing in at least one individual in the pair
         keep_idx = nonmissings(ind1_boot, ind2_boot)
-        relate_vec_boot[iter] = method(ind1_boot[keep_idx], ind2_boot[keep_idx], loc_boot[keep_idx], alleles, loc_n = n_per_loci[keep_idx], n_samples = n_loc)
+        relate_vec_boot[iter] = method(ind1_boot[keep_idx], ind2_boot[keep_idx], loc_boot[keep_idx], alleles, loc_n = n_per_loci[keep_idx], n_samples = n_loc, inbreeding = inbreeding)
     end
     return relate_vec_boot
 end
@@ -45,7 +45,7 @@ end
 Perform `iterations` number of bootstrap resampling iterations of only shared (nonmissing) genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
 of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `relatedness_boot_nonmissing`.
 """
-@inline function bootstrap_genos_nonmissing(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int) where T <: GenoArray where U <: NamedTuple where F
+@inline function bootstrap_genos_nonmissing(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool) where T <: GenoArray where U <: NamedTuple where F
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
     n_loc = length(locus_names)
     for iter in 1:iterations
@@ -54,7 +54,7 @@ of the relatedness estimate given by method `method`. This is an internal functi
         # sample the source vectors with the resampled/bootstrapped indices
         ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
         # faster/cheaper n counting
-        relate_vec_boot[iter] = method(ind1_boot, ind2_boot, loc_boot, alleles, loc_n = n_per_loci, n_samples = n_loc)
+        relate_vec_boot[iter] = method(ind1_boot, ind2_boot, loc_boot, alleles, loc_n = n_per_loci, n_samples = n_loc, inbreeding = inbreeding)
     end
     return relate_vec_boot
 end
@@ -65,7 +65,7 @@ end
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `relatedness`.
 """
-function relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+function relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
     n_samples = length(samples(data))
@@ -93,8 +93,8 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
             @inbounds shared_loci[idx] = length(loc)
 
             @inbounds for (i, mthd) in enumerate(method)
-                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loci, n_samples = n_samples)
-                boot_out = bootstrap_genos_all(geno1, geno2, loci_names, n_per_loci, allele_frequencies, method = mthd, iterations = iterations)
+                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loci, n_samples = n_samples, inbreeding = inbreeding)
+                boot_out = bootstrap_genos_all(geno1, geno2, loci_names, n_per_loci, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
                 @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, interval)
             end
             update!(p, idx)
@@ -126,7 +126,7 @@ end
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `relatedness`.
 """
-function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
+function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
     n_samples = length(samples(data))
@@ -154,8 +154,8 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
             @inbounds shared_loci[idx] = length(loc)
             
             @inbounds for (i, mthd) in enumerate(method)
-                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples)
-                boot_out = bootstrap_genos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations)
+                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
+                boot_out = bootstrap_genos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
                 @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, interval)
             end
             update!(p, idx)
@@ -186,7 +186,7 @@ end
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. 
 This is an internal function with arguments provided by `relatedness`.
 """
-function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F) where F
+function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     n_samples = length(samples(data))
     sample_pairs = pairwise_pairs(sample_names)
@@ -208,7 +208,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
             
             # populate shared_loci array
             @inbounds shared_loci[idx] = length(keep_idx)
-            @inbounds [relate_vecs[i][idx] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples) for (i,mth) in enumerate(method)]
+            @inbounds [relate_vecs[i][idx] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding) for (i,mth) in enumerate(method)]
 
             update!(p, idx)
         end
@@ -222,7 +222,7 @@ end
 
 """
     # compare all samples
-    relatedness(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
+    relatedness(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
 
 ```
 # to compare specific samples
@@ -239,6 +239,7 @@ in specifying the methods. Multiple methods can be supplied as a vector. All of 
 For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
 
 - `Blouin`
+- `dyadicLikelihood`
 - `LiHorvitz`
 - `Loiselle`
 - `Lynch`
@@ -248,6 +249,10 @@ For more information on a specific method, please see the respective docstring (
 - `QuellerGoodnight`
 - `Ritland`
 - `Wang`
+
+### Inbreeding
+Use the `inbreeding` keyword to specify whether to allow inbreeding (`true`) or not (`false`, default).
+This is only relevant for the `dyadicLikelihood` method.
 
 ### Bootstrapping
 To calculate means, median, standard error, and confidence intervals using bootstrapping,
@@ -326,7 +331,7 @@ julia> DataFrames.names(ans)
  "Moran_CI_95"
 ```
 """
-function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
+function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
     all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
     errs = ""
     all_samples = samples(data)
@@ -342,19 +347,19 @@ function relatedness(data::PopData, sample_names::Vector{String}; method::F, ite
     errs != "" && throw(ArgumentError(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help."))
     if iterations > 0
         if resample == "all"
-            relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
+            relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
         elseif resample == "nonmissing"
-            relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval)
+            relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
         else
             throw(ArgumentError("Please choose from resample methods \"all\" or \"nonmissing\""))
         end
     else
-        relatedness_no_boot(data, sample_names, method = method)
+        relatedness_no_boot(data, sample_names, method = method, inbreeding = inbreeding)
     end
 end
 
 
-function relatedness(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
+function relatedness(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
     sample_names = samples(data) |> collect
-    relatedness(data, sample_names, method = method, iterations = iterations, interval = interval, resample = resample)
+    relatedness(data, sample_names, method = method, iterations = iterations, interval = interval, resample = resample, inbreeding = inbreeding)
 end
