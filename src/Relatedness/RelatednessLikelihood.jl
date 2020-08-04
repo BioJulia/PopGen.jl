@@ -165,7 +165,7 @@ function dyadicLikelihood(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles
     idx = 0
     @inbounds for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
         idx += 1
-        Pr_Ls[idx, :] = probability_state_table(gen1, gen2, allele_frequencies[loc])
+        Pr_Ls[idx, :] = probability_state_table(gen1, gen2, alleles[loc])
     end
 
     if kw_dict[:inbreeding] == true
