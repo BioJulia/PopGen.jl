@@ -172,6 +172,7 @@ function dyadicLikelihood(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles
         Δ = Δ_optim(Pr_Ls)
         θ = Δ[1][1] + 0.5 * (Δ[1][3] + Δ[1][5] + Δ[1][7]) + 0.25 * Δ[1][8]
     else
+        Pr_Ls = Pr_Ls[:, 7:9]
         Δ = Δ_optim_noInbreeding(Pr_Ls)
         θ = (0.5 * Δ[1][1] + 0.25 * Δ[1][2])
     end
