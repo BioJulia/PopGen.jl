@@ -40,12 +40,9 @@ using CSV, Distributions, DataFrames
 using FileIO, JLD2, ProgressMeter
 using MultipleTesting, Random, StatsBase
 using GeneticVariation: VCF, BCF, header
+using Convex,ECOS
+# using LinearAlgebra
 
-#=
-using Convex,
-      ECOS,
-      LinearAlgebra,
-=#
 
 #   o O       o O       o O       o O       o O
 # o | | O   o | | O   o | | O   o | | O   o | | O
