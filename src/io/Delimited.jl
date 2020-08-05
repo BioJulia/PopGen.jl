@@ -73,7 +73,7 @@ function delimited(
     transform!(geno_parse, :genotype => (i -> phase.(i, geno_type, digits)) => :genotype)
 
     if !silent
-        @info "\n$(abspath(infile))\n$(length(meta[!, 1])) samples across $(length(unique(meta[!,2]))) populations detected\n$(length(locinames)) loci detected"
+        @info "\n$(abspath(infile))\n$(length(meta[!, 1])) samples from $(length(unique(meta[!,2]))) populations detected\n$(length(locinames)) loci detected"
     end
 
     # make sure levels are sorted by order of appearance
