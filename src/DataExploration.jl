@@ -50,8 +50,7 @@ end
 
 """
     pairwise_identical(data::PopData)
-Return a table of the percent of identical genotypes that are identical for each locus
-between pairs of individuals.
+Return a table of the percent of identical genotypes at each locus between pairs of individuals.
 """
 function pairwise_identical(data::PopData)
     sample_names = collect(samples(data))
@@ -60,7 +59,7 @@ end
 
 """
     pairwise_identical(data::PopData, sample_names::Vector{String})
-Return a table of the percent of identical genotypes that are identical for each locus
+Return a table of the percent of identical genotypes at each locus
 between all pairs of provided individuals.
 """
 function pairwise_identical(data::PopData, sample_names::Vector{String})
