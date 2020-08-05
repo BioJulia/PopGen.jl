@@ -67,11 +67,7 @@ function pairwise_identical(data::PopData, sample_names::Vector{String})
     errs = ""
     all_samples = samples(data)
     if sample_names != all_samples
-        for i in sample_names
-            if i ∉ all_samples
-                errs *= " $i,"
-            end
-        end
+        [errs *= "\n  $i" for i in sample_names if i ∉ all_samples]
         errs != "" && error("Samples not found in the PopData: " * errs)
     end
     sample_pairs = pairwise_pairs(sample_names)
@@ -81,19 +77,18 @@ function pairwise_identical(data::PopData, sample_names::Vector{String})
     popdata_idx = groupby(data.loci, :name)
     idx = 0
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
-    @inbounds for (sample_n, sample_1) in enumerate(sample_names[1:end-1])
-        geno_1 = popdata_idx[(sample_1,)].genotype
+    @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
+        print(Base.Threads.threadid())
+        @inbounds geno_1 = popdata_idx[(sample_pairs[i][1],)].genotype
+        @inbounds geno_2 = popdata_idx[(sample_pairs[i][2],)].genotype
         len_1 = length(collect(skipmissing(geno_1)))
-        @inbounds @sync Base.Threads.@spawn for sample_2 in sample_names[sample_n+1:end]
-            idx += 1
-            geno_2 = popdata_idx[(sample_2,)].genotype
-            len_2 = length(collect(skipmissing(geno_2)))
+        len_2 = length(collect(skipmissing(geno_2)))
+        shared_geno = minimum([len_1, len_2])
             shared_geno = minimum([len_1, len_2])
             shared = sum(skipmissing(geno_1 .== geno_2))
-            @inbounds perc_ident_vec[idx] = round(shared/shared_geno, digits = 2)
-            @inbounds n_vec[idx] = shared_geno
-        end
-    update!(p, idx)
+            @inbounds perc_ident_vec[i] = round(shared/shared_geno, digits = 2)
+            @inbounds n_vec[i] = shared_geno
+        next!(p)
     end
     DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :identical => perc_ident_vec, :n => n_vec)
 end
