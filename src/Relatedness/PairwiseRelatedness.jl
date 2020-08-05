@@ -77,28 +77,22 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
-    idx = 0
-    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-        geno1 = popdata_idx[(ind1,)].genotype
-        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
-            idx += 1
-            geno2 = popdata_idx[(ind2,)].genotype
-
-            # get index for genotype appearing missing in at least one individual in the pair
-            keep_idx = nonmissings(geno1, geno2)
-            # generate nonmissing genotype data 
-            gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
-
-            # populate shared_loci array
-            @inbounds shared_loci[idx] = length(loc)
-
-            @inbounds for (i, mthd) in enumerate(method)
-                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loci, n_samples = n_samples, inbreeding = inbreeding)
-                boot_out = bootstrap_genos_all(geno1, geno2, loci_names, n_per_loci, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
-                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, interval)
-            end
-            update!(p, idx)
+    @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
+        #@inbounds sample_1 = sample_pairs[i][1]
+        #@inbounds sample_2 = sample_pairs[i][2]
+        @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
+        @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
+        # get index for genotype appearing missing in at least one individual in the pair
+        keep_idx = nonmissings(geno1, geno2)
+        # generate nonmissing genotype data 
+        gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
+        @inbounds shared_loci[i] = length(keep_idx)
+        @inbounds for (j, mthd) in enumerate(method)
+            @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loci, n_samples = n_samples, inbreeding = inbreeding)
+            boot_out = bootstrap_genos_all(geno1, geno2, loci_names, n_per_loci, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
+            @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = bootstrap_summary(boot_out, interval)
         end
+        next!(p)
     end
     method_colnames = [Symbol("$i") for i in method]
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
@@ -115,7 +109,6 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
         out_df[:, boot_se_colnames[i]] = boot_ses[i]
         out_df[:, boot_CI_colnames[i]] = boot_CI[i]
     end
-
     return out_df
 end
 
@@ -138,28 +131,22 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
-    idx = 0
-    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-        @inbounds geno1 = popdata_idx[(ind1,)].genotype
-        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
-            idx += 1
-            @inbounds geno2 = popdata_idx[(ind2,)].genotype
-
-            # get index for genotype appearing missing in at least one individual in the pair
-            keep_idx = nonmissings(geno1, geno2)
-            # generate nonmissing genotype data 
-            gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
-
-            # populate shared_loci array
-            @inbounds shared_loci[idx] = length(loc)
-            
-            @inbounds for (i, mthd) in enumerate(method)
-                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
-                boot_out = bootstrap_genos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
-                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, interval)
-            end
-            update!(p, idx)
+    @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
+        #@inbounds sample_1 = sample_pairs[i][1]
+        #@inbounds sample_2 = sample_pairs[i][2]
+        @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
+        @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
+        # get index for genotype appearing missing in at least one individual in the pair
+        keep_idx = nonmissings(geno1, geno2)
+        # generate nonmissing genotype data 
+        gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
+        @inbounds shared_loci[i] = length(keep_idx)
+        @inbounds for (j, mthd) in enumerate(method)
+            @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
+            boot_out = bootstrap_genos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
+            @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = bootstrap_summary(boot_out, interval)
         end
+        next!(p)
     end
     method_colnames = [Symbol("$i") for i in method]
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
@@ -176,7 +163,6 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
         out_df[:, boot_se_colnames[i]] = boot_ses[i]
         out_df[:, boot_CI_colnames[i]] = boot_CI[i]
     end
-
     return out_df
 end
 
@@ -196,22 +182,15 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
-    idx = 0
-    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
-        @inbounds geno1 = popdata_idx[(ind1,)].genotype
-        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
-            idx += 1
-            @inbounds geno2 = popdata_idx[(ind2,)].genotype
-
-            # get index for genotype appearing missing in at least one individual in the pair
-            keep_idx = nonmissings(geno1, geno2)
-            
-            # populate shared_loci array
-            @inbounds shared_loci[idx] = length(keep_idx)
-            @inbounds [relate_vecs[i][idx] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding) for (i,mth) in enumerate(method)]
-
-            update!(p, idx)
-        end
+    @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
+        #@inbounds sample_1 = sample_pairs[i][1]
+        #@inbounds sample_2 = sample_pairs[i][2]
+        @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
+        @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
+        keep_idx = nonmissings(geno1, geno2)
+        @inbounds shared_loci[i] = length(keep_idx)
+        @inbounds [relate_vecs[j][i] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding) for (j,mth) in enumerate(method)]
+        next!(p)
     end
     method_colnames = [Symbol("$i") for i in method]
     out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
