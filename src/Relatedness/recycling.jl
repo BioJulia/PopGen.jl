@@ -45,6 +45,95 @@ function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T
 end
 
 
+
+function relatedness_no_boot_fix(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
+    loci_names = Symbol.(loci(data))
+    n_samples = length(samples(data))
+    sample_pairs = pairwise_pairs(sample_names)
+    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    allele_frequencies = allele_freq(data)
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
+    shared_loci = Vector{Int}(undef, length(sample_pairs))
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    popdata_idx = groupby(data.loci, :name)
+    idx = Base.Threads.Atomic{Int}()
+    @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
+        @inbounds geno1 = popdata_idx[(ind1,)].genotype
+        @inbounds @sync Base.Threads.@spawn for ind2 in sample_names[sample_n+1:end]
+            Base.Threads.atomic_add!(idx, 1)
+            @inbounds geno2 = popdata_idx[(ind2,)].genotype
+
+            # get index for genotype appearing missing in at least one individual in the pair
+            keep_idx = nonmissings(geno1, geno2)
+            
+            # populate shared_loci array
+            @inbounds shared_loci[idx.value] = length(keep_idx)
+            @inbounds [relate_vecs[i][idx.value] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding) for (i,mth) in enumerate(method)]
+
+            update!(p, idx.value)
+        end
+    end
+    method_colnames = [Symbol("$i") for i in method]
+    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
+    [out_df[:, mth] = relate_vecs[i] for (i, mth) in enumerate(method_colnames)]
+    return out_df
+end
+
+
+function relatedness2(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
+    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    errs = ""
+    all_samples = samples(data)
+    if sample_names != all_samples
+        [errs *= "$i," for i in sample_names if i ∉ all_samples]
+        errs != "" && error("Samples not found in the PopData: " * errs)
+    end
+    if eltype(method) != Function
+        method = [method]
+    end
+    relate_mthds = [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz, :dyadicLikelihood]
+    [errs *= "$i is not a valid method\n" for i in Symbol.(method) if i ∉ relate_mthds]
+    errs != "" && throw(ArgumentError(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help."))
+    if iterations > 0
+        if resample == "all"
+            relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
+        elseif resample == "nonmissing"
+            relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
+        else
+            throw(ArgumentError("Please choose from resample methods \"all\" or \"nonmissing\""))
+        end
+    else
+        relatedness_no_boot_fix(data, sample_names, method = method, inbreeding = inbreeding)
+    end
+end
+
+
+function relatedness(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
+    sample_names = samples(data) |> collect
+    relatedness2(data, sample_names, method = method, iterations = iterations, interval = interval, resample = resample, inbreeding = inbreeding)
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # method using kwargs and Symbols as methods. Incomplete.
 function relatedness(data::PopData, sample_names::Vector{String}; kwargs...)
     #method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
@@ -80,7 +169,7 @@ end
 
 
 
-
+#= functions as Symbols for arguments
 
 julia> function do_thing(x, operation::Symbol)
            getfield(@__MODULE__, operation)(x)
@@ -96,7 +185,7 @@ ERROR: UndefVarError: sdfgsdfsdf not defined
 Stacktrace:
  [1] do_thing(::Int64, ::Symbol) at ./REPL[26]:2
  [2] top-level scope at REPL[28]:1
-
+=#
 
 
 
