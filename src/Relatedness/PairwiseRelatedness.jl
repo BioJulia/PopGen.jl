@@ -226,11 +226,11 @@ end
 
 ```
 # to compare specific samples
-relatedness(::PopData, samples; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String)
+relatedness(::PopData, samples; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
 ```
 Return a dataframe of pairwise relatedness estimates for all or select pairs of `samples` in a `PopData` object using 
 method(s) `F` where `F` is one or several of the methods listed below. If no bootstrapping is required, then the only 
-necessary keyword to provide is `method = ` (see examples below). **Note:** samples must be diploid.
+necessary keyword to provide is `method = ` and `inbreeding = ` for the `dyadicLikelihood` method (see examples below). **Note:** samples must be diploid.
 
 ### Estimator methods
 The available estimators are listed below. `relatedness` takes the
@@ -255,7 +255,7 @@ Use the `inbreeding` keyword to specify whether to allow inbreeding (`true`) or 
 This is only relevant for the `dyadicLikelihood` method.
 
 ### Bootstrapping
-To calculate means, median, standard error, and confidence intervals using bootstrapping,
+To calculate means, medians, standard errors, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%),
 however that can be changed by supplying a `Tuple` of `(low, high)` to the keyword `interval`. The returned DataFrame
