@@ -117,12 +117,13 @@ function f_stat_p(data::PopData; nperm::Int = 1000)
         :FST => Vector{Float64}(undef, nperm-1),
         :FST′ => Vector{Float64}(undef, nperm-1)
         )
-        
-    @sync Base.Threads.@spawn for n in 1:nperm-1
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    Base.Threads.@threads for n in 1:nperm-1
         tmp = copy(data.loci)
         tmp_f = FST_global(permute_samples!(tmp, popnames))
         perm_dict[:FST][n] = tmp_f[:FST]
         perm_dict[:FST′][n] = tmp_f[:FST′]
+    next!(p)
     end
 
     @inbounds for (k,v) in perm_dict
