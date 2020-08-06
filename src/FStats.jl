@@ -96,9 +96,9 @@ end
         groupby(het_df, :locus)
     )
 
-    HT = mean(@inbounds 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count))
-    DST = mean(@inbounds HT .- n_df.HS)
-    DST′ = mean(@inbounds n_df.count ./ (n_df.count .- 1) .* DST)
+    HT = mean(@inbounds 1.0 .- n_df.avg_freq + (n_df.HS / n_df.mn / n_df.count) - (n_df.Het_obs / 2.0 / n_df.mn / n_df.count))
+    DST = mean(@inbounds HT - n_df.HS)
+    DST′ = mean(@inbounds n_df.count / (n_df.count .- 1) * DST)
     HT′ = mean(@inbounds n_df.HS .+ DST′)
 
     return Dict{Symbol, Float64}(
