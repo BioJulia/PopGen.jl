@@ -78,8 +78,6 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
     @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
-        #@inbounds sample_1 = sample_pairs[i][1]
-        #@inbounds sample_2 = sample_pairs[i][2]
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
         # get index for genotype appearing missing in at least one individual in the pair
@@ -132,8 +130,6 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
     @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
-        #@inbounds sample_1 = sample_pairs[i][1]
-        #@inbounds sample_2 = sample_pairs[i][2]
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
         # get index for genotype appearing missing in at least one individual in the pair
@@ -183,8 +179,6 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
     @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
-        #@inbounds sample_1 = sample_pairs[i][1]
-        #@inbounds sample_2 = sample_pairs[i][2]
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
         keep_idx = nonmissings(geno1, geno2)
@@ -212,7 +206,7 @@ method(s) `F` where `F` is one or several of the methods listed below. If no boo
 necessary keyword to provide is `method = ` and `inbreeding = ` for the `dyadicLikelihood` method (see examples below). **Note:** samples must be diploid.
 
 ### Estimator methods
-The available estimators are listed below. `relatedness` takes the
+The available estimators are listed below and are functions themselves. `relatedness` takes the
 function names as arguments (**case sensitive**), therefore do not use quotes or colons
 in specifying the methods. Multiple methods can be supplied as a vector. All of these methods will tab-autocomplete.
 For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
@@ -237,9 +231,10 @@ This is only relevant for the `dyadicLikelihood` method.
 To calculate means, medians, standard errors, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%),
-however that can be changed by supplying a `Tuple` of `(low, high)` to the keyword `interval`. The returned DataFrame
-will have 5 columns per `method` with bootstrapped parameters having the naming convention of `Method_parameter`. The output
-may have more columns than will fit on your screen, so `DataFrames.names(out_df)` may be useful to see a list of the column names.
+however that can be changed by supplying the keyword `interval = (low, high)` where `low` and `high` are the intervals you want 
+(as `AbstractFloat`). The returned DataFrame will have 5 columns per `method` with bootstrapped parameters having the naming
+convention of `Method_parameter`. The output may have more columns than will fit on your screen, so `DataFrames.names(out_df)`
+may be useful to see a list of the column names.
 
 #### Resampling methods
 There are two available resampling methods, `"all"` (default  & recommended) and `"nonmissing"`.
@@ -264,12 +259,7 @@ julia> relatedness(cats, method = Ritland)
 │ 1     │ N215     │ N216     │ 8      │ 0.258824   │
 │ 2     │ N215     │ N217     │ 8      │ 0.193238   │
 │ 3     │ N215     │ N218     │ 8      │ 0.127497   │
-│ 4     │ N215     │ N219     │ 8      │ 0.0453471  │
-│ 5     │ N215     │ N220     │ 8      │ 0.108251   │
 ⋮
-│ 27961 │ N297     │ N281     │ 7      │ -0.0487076 │
-│ 27962 │ N297     │ N289     │ 7      │ 0.154745   │
-│ 27963 │ N297     │ N290     │ 7      │ 0.189647   │
 │ 27964 │ N281     │ N289     │ 8      │ 0.0892068  │
 │ 27965 │ N281     │ N290     │ 7      │ 0.104614   │
 │ 27966 │ N289     │ N290     │ 7      │ 0.0511663  │
