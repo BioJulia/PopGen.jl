@@ -1,12 +1,20 @@
 export bcf, vcf
+
 """
     bcf(infile::String; ; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
-Load a BCF file into memory as a PopObj object. Population and [optional]
-location information need to be provided separately. 
+Load a BCF file into memory as a PopData object. Population information needs to be provided separately. 
 - `infile` : path to BCF file (can be gzipped)
 - `rename_snp` : true/false of whether to simplify marker names to "snp_#" (default: `false`)
 - `allow_monomorphic` : true/false of whether to keep monomorphic loci (default: `false`)
-- `silent`: true/false of whether to print extra file information (default: `false`)
+- `silent`: true/false of whether to print extra file information (default: `false`).
+Alleles are recoded according to the following schema:
+
+|Base| | Allele |
+|:---:|:---:|:---:|
+| A | => | 1 |
+| T | => | 2 |
+| C | => | 3 |
+| G | => | 4 |
 """
 function bcf(infile::String; rename_snp::Bool = false, silent::Bool = false, allow_monomorphic::Bool = false)
     bases = (A = Int8(1), T = Int8(2), C = Int8(3), G = Int8(4), miss = Int8(0))
@@ -58,12 +66,19 @@ end
 
 """
     vcf(infile::String; ; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
-Load a VCF file into memory as a PopObj object. Population and [optional]
-location information need to be provided separately. 
+Load a VCF file into memory as a PopData object. Population information needs to be provided separately. 
 - `infile` : path to VCF file (can be gzipped)
 - `rename_snp` : true/false of whether to simplify marker names to `snp_#` (default: `false`)
 - `allow_monomorphic` : true/false of whether to keep monomorphic loci (default: `false`)
 - `silent`: true/false of whether to print extra file information (default: `false`)
+Alleles are recoded according to the following schema:
+
+|Base| | Allele |
+|:---:|:---:|:---:|
+| A | => | 1 |
+| T | => | 2 |
+| C | => | 3 |
+| G | => | 4 |
 """
 function vcf(infile::String; rename_snp::Bool = false, silent::Bool = false, allow_monomorphic::Bool = false)
     bases = (A = Int8(1), T = Int8(2), C = Int8(3), G = Int8(4), miss = Int8(0))
