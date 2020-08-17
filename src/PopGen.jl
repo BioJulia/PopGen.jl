@@ -37,7 +37,7 @@ module PopGen
 #   O o       O o       O o       O o       O o
 
 using CSV, Distributions, DataFrames
-using FileIO, JLD2, ProgressMeter
+using FileIO, GZip, JLD2, ProgressMeter
 using MultipleTesting, Random, StatsBase
 using GeneticVariation: VCF, BCF, header
 using Convex,ECOS
