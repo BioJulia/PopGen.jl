@@ -72,7 +72,7 @@ function Base.show(io::IO, data::PopData)
         print(io, "\n")
     end
     print(io, "  Samples: ") ; printstyled(io, length(data.meta.name), "\n", bold = true)
-    print(io, "  Loci: ") ; printstyled(io, length(levels(data.loci.locus)), "\n", bold = true)
+    print(io, "  Loci: ") ; printstyled(io, length(unique(data.loci.locus)), "\n", bold = true)
     print(io, "  Populations: ") ; printstyled(io, length(unique(data.meta.population)), "\n", bold = true)
 
     if ismissing.(data.meta.longitude) |> all == true

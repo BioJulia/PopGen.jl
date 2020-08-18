@@ -115,30 +115,32 @@ function genepop(
     insertcols!(geno_parse, 2, :population => popnames)
     geno_parse.name .= replace.(geno_parse.name, "," => "")
     geno_type = determine_marker(geno_parse, digits)
+    sample_table = DataFrame(
+        name = geno_parse.name,
+        population = geno_parse.population,
+        latitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts)),
+        longitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts))
+    )
     # wide to long format
     geno_parse = DataFrames.stack(geno_parse, DataFrames.Not([:name, :population]))
     rename!(geno_parse, [:name, :population, :locus, :genotype])
-    categorical!(geno_parse, [:name, :population, :locus], compress = true)
+    select!(
+        geno_parse, 
+        :name => PooledArray => :name, 
+        :population => PooledArray => :population, 
+        :locus => (i -> PooledArray(Array(i))) => :locus, 
+        :genotype
+    )
+    #categorical!(geno_parse, [:name, :population, :locus], compress = true)
     geno_parse.genotype = map(i -> phase.(i, geno_type, digits), geno_parse.genotype)
-    #return geno_parse
-
-    # make sure levels are sorted by order of appearance
-    levels!(geno_parse.locus, unique(geno_parse.locus))
-    levels!(geno_parse.name, unique(geno_parse.name))
-
+    
     ploidy = DataFrames.combine(
         groupby(dropmissing(geno_parse), :name),
         :genotype => find_ploidy => :ploidy
     ).ploidy
 
-    # take a piece of the genotype table out and create a new table with the ploidy
-    sample_table = DataFrame(
-        name = levels(geno_parse.name),
-        population = popnames,
-        ploidy = ploidy,
-        latitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts)),
-        longitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts))
-    )
+    # Add the ploidy info to the meta df
+    insertcols!(sample_table, 3, :ploidy => ploidy)
     if allow_monomorphic 
         pd_out = PopData(sample_table, geno_parse)
     else

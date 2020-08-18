@@ -69,16 +69,17 @@ function delimited(
     geno_type = determine_marker(file_parse, digits)
     geno_parse = DataFrames.stack(file_parse, DataFrames.Not(1:2))
     rename!(geno_parse, [:name, :population, :locus, :genotype])
-    categorical!(geno_parse, [:name, :population, :locus], compress = true)
-    transform!(geno_parse, :genotype => (i -> phase.(i, geno_type, digits)) => :genotype)
+    #categorical!(geno_parse, [:name, :population, :locus], compress = true)
+    select!(geno_parse,
+        :name => (i -> PooledArray(Array(i))) => :name,
+        :population => (i -> PooledArray(Array(i))) => :population,
+        :locus => (i -> PooledArray(Array(i))) => :locus, 
+        :genotype => (i -> phase.(i, geno_type, digits)) => :genotype
+    )
 
     if !silent
         @info "\n$(abspath(infile))\n$(length(meta[!, 1])) samples from $(length(unique(meta[!,2]))) populations detected\n$(length(locinames)) loci detected"
     end
-
-    # make sure levels are sorted by order of appearance
-    levels!(geno_parse.locus, unique(geno_parse.locus))
-    levels!(geno_parse.name, unique(geno_parse.name))
 
     ploidy = DataFrames.combine(
         groupby(dropmissing(geno_parse), :name),

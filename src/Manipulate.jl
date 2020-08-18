@@ -166,7 +166,7 @@ end
 Returns an array of strings of the loci names in a `PopData` object.
 """
 function loci(data::PopData)
-    levels(data.loci.locus)
+    unique(data.loci.locus)
 end
 
 
@@ -295,14 +295,14 @@ populations!(potatoes, ["potato_1", "potato_2"], ["north_russet", "south_russet"
 function populations!(data::PopData, rename::Dict)
     msg = ""
     @inbounds for key in keys(rename)
-        if key ∉ levels(data.loci.population)
+        if key ∉ unique(data.meta.population)
             msg *= "  Population \"$key\" not found in PopData\n"
         else
             replace!(data.meta.population, key => rename[key])
+            replace!(data.loci.population.pool, key => rename[key])
         end
     end
     msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
-    recode!(data.loci.population,rename...)
     return
 end
 
@@ -319,10 +319,11 @@ function populations!(data::PopData, samples::Vector{String}, populations::Vecto
     meta_df = groupby(data.meta, :name)
     loci_df = groupby(data.loci, :name)
     for (sample, new_pop) in zip(samples, populations)
-        meta_df[(name = sample,)].population .= new_pop
-        loci_df[(name = sample,)].population .= new_pop
+        meta_df[(name = sample,)].population = new_pop
+        loci_df[(name = sample,)].population = new_pop
     end
-    droplevels!(data.loci.population)
+    # drop old levels
+    data.loci.population = data.loci.population |> Array |> PooledArray
     return
 end
 
@@ -376,7 +377,7 @@ function exclude!(data::PopData; kwargs...)
             [notices *= "\n  population \"$i\" not found" for i in err]
         end
         # choose the cheaper method
-        all_pops = levels(tmp.loci.population)
+        all_pops = unique(tmp.meta.population)
         if length(filt_pop) < length(all_pops)/2
             filter!(:population => x -> x ∉ filt_pop, tmp.loci)
             filter!(:population => x -> x ∉ filt_pop, tmp.meta)
@@ -385,7 +386,7 @@ function exclude!(data::PopData; kwargs...)
             filter!(:population => x -> x in filt_pop, tmp.loci)
             filter!(:population => x -> x in filt_pop, tmp.meta)
         end
-        droplevels!(tmp.loci.population)
+        tmp.loci.population = tmp.loci.population |> Array |> PooledArray
     end
 
     # samples
@@ -411,7 +412,7 @@ function exclude!(data::PopData; kwargs...)
             filter!(:name => x -> x in keep, tmp.loci)
             filter!(:name => x -> x in keep, tmp.meta)
         end
-        droplevels!(tmp.loci.name)
+        tmp.loci.name = tmp.loci.name |> Array |> PooledArray
     end
 
     # loci
@@ -435,7 +436,7 @@ function exclude!(data::PopData; kwargs...)
             keep = all_loci[all_loci .∉ Ref(filt_loci)]
             filter!(:locus => x -> x in keep, tmp.loci)
         end
-        droplevels!(tmp.loci.locus)
+        tmp.loci.locus = tmp.loci.locus |> Array |> PooledArray
     end
 
     # print the notices, if any
