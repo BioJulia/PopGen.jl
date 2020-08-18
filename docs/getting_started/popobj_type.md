@@ -90,33 +90,33 @@ Location data is optional for `PopData`. There are functions that use location i
 
 ## Genotype Information
 
-The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions. It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are `CategoricalValue`  from [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.loci` can be directly accessed with `PopData.loci.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below.
+The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions. It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are each a special type of compressed vector from [PooledArrays.jl](https://github.com/JuliaData/PooledArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.loci` can be directly accessed with `PopData.loci.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below. For clarity, the columns will be represented below as though they are regular vectors.
 
 ### name
 
-`::Vector{CategoricalValue{String}}`
+`::Vector{String}`
 
-The sample name, stored as a `CategoricalValue{String}`. Fundamentally, this acts like the `name` column of the `meta` table, except when deleting entries and a few uncommon edge cases.
+The sample name, stored as a `PooledArray` of eltype `String`. Fundamentally, this acts like the `name` column of the `meta` table, except when deleting entries and a few uncommon edge cases.
 
 ### population
 
-`::Vector{CategoricalValue{String}}`
+`::Vector{String}`
 
-The population ID associated with that sample, stored as a `CategoricalValue{String}`. Fundamentally, this acts like the `population` column of the `meta` table, except when deleting entries and a few uncommon edge cases.
+The population ID associated with that sample,stored as a `PooledArray` of eltype `String`. Fundamentally, this acts like the `population` column of the `meta` table, except when deleting entries and a few uncommon edge cases.
 
 ### locus
 
-`::Vector{CategoricalValue{String}}`
+`::Vector{String}`
 
-The locus associated with the genotype, stored as a `CategoricalValue{String}`.
+The locus associated with the genotype, stored as a `PooledArray` of eltype `String`.
 
 ### genotype
 
 `::Vector{Union{Missing,Genotype}}`
 
-The genotypes of the `loci` are an array of type `Genotype`, which is an alias for a built-in Julia Tuple type with each value corresponding to an allele (read below to disentangle what that type actually is). For the most part, it looks like this:
+The genotypes of the `loci` are an array of type `Genotype`, which is [an alias](/getting_started/other_types.md) for a built-in Julia Tuple type with each value corresponding to an allele. For the most part, it looks like this:
 
-```julia tab="genotype example"
+```julia
 [(0,1), (0,0), missing, (1,2)]
 ```
 

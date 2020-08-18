@@ -20,7 +20,7 @@ The package is currently unregistered while it's under active early development.
 Invoke the package manager with `]` in the REPL and use
 
 ```julia
-add "https://github.com/pdimens/PopGen.jl"
+add PopGen
 ```
 
 ![install](/PopGen.jl/img/install_repl.gif)
@@ -30,7 +30,7 @@ add "https://github.com/pdimens/PopGen.jl"
 
 ```julia
 using Pkg
-Pkg.add(PackageSpec(url="https://github.com/pdimens/PopGen.jl", rev="master"))
+Pkg.add("PopGen")
 ```
 
 ![install](/PopGen.jl/img/install_jupyter.gif)

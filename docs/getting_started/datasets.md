@@ -25,33 +25,31 @@ cats = dataset("nancycats")
 
 We include the familiar nancycats microsatellite data, as featured in [adegenet](http://adegenet.r-forge.r-project.org), for easy importing into PopGen.jl as `PopData`. As an alternative to `datasets`, you can invoke the `nancycats()`  command without any arguments.
 
-```
-julia> ncats = nancycats() ; summary(ncats)
+```julia
+julia> ncats = nancycats()
 PopData Object
   Marker type: Microsatellite
   Ploidy: 2
   Number of individuals: 237
   Number of loci: 9
   Populations: 17
-  Longitude: absent
-  Latitude: absent
+  Coordinates: absent
 ```
 
-The spatial coordinates provided for the dataset in `adegenet` are completely unfamiliar to us (and some geospatial folks we spoke to), so they have been omitted.  If you recognize what coordinate system has 485.111 appear in Nancy, France, please let us know!
+The spatial coordinates provided for the dataset in `adegenet` are completely unfamiliar to us (and some geospatial folks we spoke to), so they have been omitted. If you recognize what coordinate system has 485.111 appear in Nancy, France, please let us know!
 
 ### gulfsharks
 
-We also include the SNP dataset used in Dimens *et al.* 2019 "[A genomic assessment of movement and gene flow around the South Florida vicariance zone in the migratory coastal blacknose shark, *Carcharhinus acronotus*](https://link.springer.com/article/10.1007/s00227-019-3533-1)" since it was already on hand. Like `nancycats`, we provide a convenient function to load these data into PopGen.jl as `PopData`. As an alternative to `datasets`, you can invoke the `gulfsharks()` command without any arguments. 
+We also include the SNP dataset used in [Dimens *et al.* 2019](https://link.springer.com/article/10.1007/s00227-019-3533-1) since it was already on hand. Like `nancycats`, we provide a convenient function to load these data into PopGen.jl as `PopData`. As an alternative to `datasets`, you can invoke the `gulfsharks()` command without any arguments. 
 
 ```julia
-julia> sharks = gulfsharks() ; summary(sharks)
+julia> sharks = gulfsharks()
 PopData Object
   Marker type: SNP
   Ploidy: 2
   Number of individuals: 212
-  Number of loci: 2213
+  Number of loci: 2209
   Populations: 7
-  Longitude: present with 0 missing
-  Latitude: present with 0 missing
+  Coordinates: present with 0 missing
 ```
 

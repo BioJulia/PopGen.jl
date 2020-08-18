@@ -17,7 +17,7 @@ The goal of calculating relatedness from molecular markers is to accurately esti
 
 ![Jacquard IBD](/PopGen.jl/img/jacquard_identitiies.jpg)
 
-Broadly speaking there are two different ways of estimating genetic relatedness using molecular markers, methods of moments, and likelihood estimators. Generally, moments estimators will be faster but aren't constrained to being between the theoretical minimum and maximum values of 0 and 1. The likelihood estimators use likelihood functions derived from the set of Jacquard Identity States (above) to determine the most likely inheritance pattern. One difference between the two classes is [generally] moments estimators require an assumption of no inbreeding, while that assumption isn't necessarily required for likelihood estimators (though it does simplify the math). It is increasingly common to use multiple estimators on pairs, simulated from your molecular markers, with a known relationships to determine the most appropriate estimator to use with your given data.
+Broadly speaking there are two different ways of estimating genetic relatedness using molecular markers: methods of moments, and likelihood estimators. Generally, moments estimators will be faster but aren't constrained to being between the theoretical minimum and maximum values of 0 and 1. The likelihood estimators use likelihood functions derived from the set of Jacquard Identity States (above) to determine the most likely inheritance pattern. One difference between the two classes is (generally) moments estimators require an assumption of no inbreeding, while that assumption isn't necessarily required for likelihood estimators (though it does simplify the math). It is increasingly common to use multiple estimators on pairs, simulated from your molecular markers, with known relationships to determine the most appropriate estimator to use with your data.
 
 PopGen.jl implements a wide variety of moments-based estimators: Blouin, Li & Horvitz, Loiselle, Lynch, Lynch/Li, Lynch & Ritland, Moran, Queller & Goodnight, Ritland, and Wang. Along with these, we provide an option to estimate mean, median, standard error, and confidence intervals using bootstrapping.
 
@@ -28,8 +28,6 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
 ::: 
 
 ## Calculate Relatedness
-This can take a while, especially if performing bootstrapping; we provide a
-progress bar via `ProgressMeter.jl` so you can move on and focus on other things.
  
 <Tabs
   block={true}
@@ -130,7 +128,6 @@ julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = Ritland, iterat
 </TabItem>
 </Tabs>
 
-Read **Relatedness Estimators** below for more in-depth information regarding each estimator.
 
 ## Relatedness Estimators
 ### Blouin
@@ -167,4 +164,4 @@ The moments based estimator developed by [Wang (year)](). Call `method = Wang` t
 
 ---------------------
 ## Acknowledgements
-
+The relatedness methods were dutifully written and verified against R analogues by Jason Selwyn. These anaylses can take a while, especially if performing bootstrapping; so we provide a progress bar via `ProgressMeter.jl` so you can move on and focus on other things. 
