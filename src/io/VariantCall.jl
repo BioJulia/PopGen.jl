@@ -1,7 +1,7 @@
 using .GeneticVariation
+using .GZip
 
 export bcf, vcf
-
 
 """
     openvcf(::String)
@@ -24,7 +24,9 @@ end
     bcf(infile::String; ; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
 Load a BCF file into memory as a PopData object. Population information needs to be provided separately. 
 - `infile` : path to BCF file (can be gzipped)
-- `rename_snp` : true/false of whether to simplify marker names to "snp_#" (default: `false`)
+
+**Keyword Arguments**
+- `rename_loci` : true/false of whether to simplify loci names to "snp_#" (default: `false`)
 - `allow_monomorphic` : true/false of whether to keep monomorphic loci (default: `false`)
 - `silent`: true/false of whether to print extra file information (default: `false`).
 Alleles are recoded according to the following schema:
@@ -35,18 +37,27 @@ Alleles are recoded according to the following schema:
 | T | => | 2 |
 | C | => | 3 |
 | G | => | 4 |
+
+### Mixed-ploidy data
+If importing mixed-ploidy data (such as poolseq), you will need to perform an additional
+step to convert the genotype column into the correct `GenoArray` type:
+```julia
+julia> mydata = bcf("path/to/file.bcf", silent = true, rename_loci = true) ;
+
+julia> mydata.loci.genotype =  mydata.loci.genotype |> Array{Union{Missing, NTuple}}
 """
-function bcf(infile::String; rename_snp::Bool = false, silent::Bool = false, allow_monomorphic::Bool = false)
+function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, allow_monomorphic::Bool = false)
     bases = (A = Int8(1), T = Int8(2), C = Int8(3), G = Int8(4), miss = Int8(0))
-    #TODO @require for GeneticVariation and GZip
     stream = BCF.Reader(openvcf(infile))
     nmarkers = countlines(openvcf(infile)) - length(BCF.header(stream)) - 1
     sample_ID = header(stream).sampleID
     nsamples = length(sample_ID)
     loci_names = fill("marker", nmarkers)
     geno_df = DataFrame(:name => sample_ID, :population =>  "missing")
-    @info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
-    for record in stream
+    if !silent
+        @info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
+    end
+        for record in stream
         ref_alt = Dict(-1 => "miss", 0 => BCF.ref(record), [i => j for (i,j) in enumerate(BCF.alt(record))]...)
         raw_geno = BCF.genotype(record, 1:nsamples, "GT")
         conv_geno = map(raw_geno) do rg
@@ -61,15 +72,27 @@ function bcf(infile::String; rename_snp::Bool = false, silent::Bool = false, all
         rnm = append!([:name, :population], [Symbol.("snp_" * i) for i in string.(1:nmarkers)])
         rename!(geno_df, rnm)
     end
-    #insertcols!(geno_df, 1, :name => sample_ID, :population => "missing")
     stacked_geno_df = DataFrames.stack(geno_df, DataFrames.Not(1:2))
     rename!(stacked_geno_df, [:name, :population, :locus, :genotype])
-    # replace (0,0) as missing
-    select!(stacked_geno_df, :name, :population, :locus, :genotype => (i -> replace(i, (0,0) => missing)) => :genotype)
+    # set columns as PooledArrays
+    select!(
+        stacked_geno_df, 
+        :name => PooledArray => :name, 
+        :population => PooledArray => :population, 
+        :locus => (i -> PooledArray(i |> Array{String})) => :locus, 
+        :genotype
+    )
+    # replace missing genotypes as missing
+    stacked_geno_df.genotype = map(stacked_geno_df.genotype) do geno
+        if all(0 .== geno)
+            return missing
+        else
+            return geno
+        end
+    end
     sort!(stacked_geno_df, [:name, :locus])
     # ploidy finding
-    gdf = DataFrames.groupby(stacked_geno_df, :name)
-    meta_df = DataFrames.combine(gdf,
+    meta_df = DataFrames.combine(DataFrames.groupby(stacked_geno_df, :name),
         :genotype => (i -> Int8(length(first(skipmissing(i))))) => :ploidy    
     )
     insertcols!(meta_df, 2, :population => "missing")
@@ -88,9 +111,11 @@ end
     vcf(infile::String; ; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
 Load a VCF file into memory as a PopData object. Population information needs to be provided separately. 
 - `infile` : path to VCF file (can be gzipped)
-- `rename_snp` : true/false of whether to simplify marker names to `snp_#` (default: `false`)
+
+**Keyword Arguments**
+- `rename_loci` : true/false of whether to simplify loci names to "snp_#" (default: `false`)
 - `allow_monomorphic` : true/false of whether to keep monomorphic loci (default: `false`)
-- `silent`: true/false of whether to print extra file information (default: `false`)
+- `silent`: true/false of whether to print extra file information (default: `false`).
 Alleles are recoded according to the following schema:
 
 |Base| | Allele |
@@ -99,17 +124,28 @@ Alleles are recoded according to the following schema:
 | T | => | 2 |
 | C | => | 3 |
 | G | => | 4 |
+
+### Mixed-ploidy data
+If importing mixed-ploidy data (such as poolseq), you will need to perform an additional
+step to convert the genotype column into the correct `GenoArray` type:
+```julia
+julia> mydata = vcf("path/to/file.vcf", silent = true, rename_loci = true) ;
+
+julia> mydata.loci.genotype =  mydata.loci.genotype |> Array{Union{Missing, NTuple}}
+
+```
 """
 function vcf(infile::String; rename_snp::Bool = false, silent::Bool = false, allow_monomorphic::Bool = false)
     bases = (A = Int8(1), T = Int8(2), C = Int8(3), G = Int8(4), miss = Int8(0))
-    #TODO @require for GeneticVariation and GZip
     stream = VCF.Reader(openvcf(infile))
     nmarkers = countlines(openvcf(infile)) - length(VCF.header(stream)) - 1
     sample_ID = header(stream).sampleID
     nsamples = length(sample_ID)
     loci_names = fill("marker", nmarkers)
     geno_df = DataFrame(:name => sample_ID, :population =>  "missing")
-    @info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
+    if !silent
+        @info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
+    end
     for record in stream
         ref_alt = Dict(-1 => "miss", 0 => VCF.ref(record), [i => j for (i,j) in enumerate(VCF.alt(record))]...)
         raw_geno = VCF.genotype(record, 1:nsamples, "GT")
@@ -125,15 +161,27 @@ function vcf(infile::String; rename_snp::Bool = false, silent::Bool = false, all
         rnm = append!([:name, :population], [Symbol.("snp_" * i) for i in string.(1:nmarkers)])
         rename!(geno_df, rnm)
     end
-    #insertcols!(geno_df, 1, :name => sample_ID, :population => "missing")
     stacked_geno_df = DataFrames.stack(geno_df, DataFrames.Not(1:2))
     rename!(stacked_geno_df, [:name, :population, :locus, :genotype])
-    # replace (0,0) as missing
-    select!(stacked_geno_df, :name, :population, :locus, :genotype => (i -> replace(i, (0,0) => missing)) => :genotype)
+    # set columns as PooledArrays
+    select!(
+        stacked_geno_df, 
+        :name => PooledArray => :name, 
+        :population => PooledArray => :population, 
+        :locus => (i -> PooledArray(i |> Array{String})) => :locus, 
+        :genotype
+    )
+    # replace missing genotypes as missing
+    stacked_geno_df.genotype = map(stacked_geno_df.genotype) do geno
+        if all(0 .== geno)
+            return missing
+        else
+            return geno
+        end
+    end
     sort!(stacked_geno_df, [:name, :locus])
     # ploidy finding
-    gdf = DataFrames.groupby(stacked_geno_df, :name)
-    meta_df = DataFrames.combine(gdf,
+    meta_df = DataFrames.combine(DataFrames.groupby(stacked_geno_df, :name),
         :genotype => (i -> Int8(length(first(skipmissing(i))))) => :ploidy    
     )
     insertcols!(meta_df, 2, :population => "missing")
