@@ -9,7 +9,8 @@ inferred from the file extension (case insensitive): \n
 | :------------------ | :--------------------- | :------------ |
 | delimited           | `.csv`, `.txt`, `.tsv` | `?delimited`  |
 | genepop             | `.gen`, `.genepop`     | `?genepop`    |
-| variant call format | `.vcf`, `.bcf`         | `?vcf, ?bcf`  |
+| variant call format (vcf) | `.vcf`, `.vcf.gz`| `?vcf`  |
+| variant call format (bcf) | `.bcf`, `.bcf.gz`| `?bcf`  |
 
 This function uses the same keyword arguments (and defaults) as the file importing
 functions it wraps; please see their respective docstrings in the Julia help console.
