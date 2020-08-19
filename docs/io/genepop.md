@@ -21,7 +21,7 @@ genepop(infile; kwargs...)
 - `digits::Integer`: number of digits denoting each allele (default: `3`)
 - `popsep::String` : word that separates populations in `infile` (default: "POP")
 - `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
-- `silent::Bool`   : whether to print file information during import (default: `true`)
+- `silent::Bool`   : whether to print file information during import (default: `false`)
 
 :::info population names
 By default, the file reader will assign numbers as population ID's (as Strings) in order of appearance in the genepop file. Use the `populations!` function to rename these with your own population ID's.

@@ -24,20 +24,23 @@ module.exports = {
     ],
     "Analyses":[
       "analyses/hardyweinberg",
-      //"analyses/relatedness"
+      "analyses/relatedness"
     ],
     "API": [
       "api/api",
       "api/allelefreq",
       "api/datasets",
+      "api/dataexploration",
       "api/delimited",
       "api/genepop",
       "api/hardyweinberg",
       "api/heterozygosity",
       "api/ioutils",
       "api/manipulate",
+      "api/pairwiserelatedness",
       "api/permutations",
       "api/read",
+      "api/relatednessmoments",
       "api/summaryinfo",
       "api/types",
       "api/utils",

@@ -39,7 +39,8 @@ blank, otherwise there will be transcription errors! (look at line 3 in the exam
 ```
 lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
-### Formatting example
+#### Formatting example
+
 ```
 name,population,long,lat,Locus1,Locus2,Locus3
 sierra_01,mountain,11.11,-22.22,001001,-9,001001
@@ -48,13 +49,15 @@ snbarb_01,coast,,,001001,001001,001002
 snbarb_02,coast,11.14,-22.24,001001,001001,001001
 snbarb_03,coast,11.15,,001002,001001,001001
 ```
-```
+
 **Example**
 ```julia
 lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
 
-### popdata2delimtied
+----
+
+### `popdata2delimtied`
 ```julia
 popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
 ```

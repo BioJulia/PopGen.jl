@@ -126,7 +126,7 @@ This can be done fairly easily using DataFramesMeta macro `@where`
 julia> @where(sharks.loci, :name .== "cc_001")
 2213×4 DataFrame
 │ Row  │ name   │ population     │ locus        │ genotype │
-│      │ Cat…   │ Categorical…   │ Categorical… │ Tuple…?  │
+│      │ Str…   │ String         │ String       │ Tuple…?  │
 ├──────┼────────┼────────────────┼──────────────┼──────────┤
 │ 1    │ cc_001 │ Cape Canaveral │ contig_35208 │ (1, 2)   │
 │ 2    │ cc_001 │ Cape Canaveral │ contig_23109 │ (1, 1)   │
@@ -151,7 +151,7 @@ julia> @where(sharks.loci, :name .== "cc_001")
 julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]))
 4426×4 DataFrame
 │ Row  │ name   │ population     │ locus        │ genotype │
-│      │ Cat…   │ Categorical…   │ Categorical… │ Tuple…?  │
+│      │ Str…   │ String         │ String       │ Tuple…?  │
 ├──────┼────────┼────────────────┼──────────────┼──────────┤
 │ 1    │ cc_001 │ Cape Canaveral │ contig_35208 │ (1, 2)   │
 │ 2    │ cc_002 │ Cape Canaveral │ contig_35208 │ (1, 2)   │
@@ -178,7 +178,7 @@ It also means that you can combine different queries with commas. Here is an exa
 julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]), :locus .== "contig_2784")
 2×4 DataFrame
 │ Row │ name   │ population     │ locus       │ genotype │
-│     │ Cat…   │ Categorical…   │ Cat…        │ Tuple…?  │
+│     │ Str…   │ String         │ String      │ Tuple…?  │
 ├─────┼────────┼────────────────┼─────────────┼──────────┤
 │ 1   │ cc_001 │ Cape Canaveral │ contig_2784 │ (1, 1)   │
 │ 2   │ cc_002 │ Cape Canaveral │ contig_2784 │ (1, 1)   │
@@ -219,7 +219,7 @@ Get missing genotype information in a `PopData`. Specify a mode of operation usi
 julia> missing(sharks)
 212×2 DataFrame
 │ Row │ name    │ missing │
-│     │ Cat…    │ Int64   │
+│     │ String  │ Int64   │
 ├─────┼─────────┼─────────┤
 │ 1   │ cc_001  │ 124     │
 │ 2   │ cc_002  │ 94      │
@@ -244,7 +244,7 @@ julia> missing(sharks)
 julia> missing(sharks, by = "pop")
 7×2 DataFrame
 │ Row │ population     │ missing │
-│     │ Categorical…   │ Int64   │
+│     │ String         │ Int64   │
 ├─────┼────────────────┼─────────┤
 │ 1   │ Florida Keys   │ 1246    │
 │ 2   │ Cape Canaveral │ 666     │
@@ -262,7 +262,7 @@ julia> missing(sharks, by = "pop")
 julia> missing(sharks, by = "locus")
 2213×2 DataFrame
 │ Row  │ locus        │ missing │
-│      │ Categorical… │ Int64   │
+│      │ String       │ Int64   │
 ├──────┼──────────────┼─────────┤
 │ 1    │ contig_35208 │ 0       │
 │ 2    │ contig_23109 │ 6       │
@@ -287,7 +287,7 @@ julia> missing(sharks, by = "locus")
 julia> missing(sharks, by = "full")
 15491×3 DataFrame
 │ Row   │ locus        │ population     │ missing │
-│       │ Categorical… │ Categorical…   │ Int64   │
+│       │ String       │ String         │ Int64   │
 ├───────┼──────────────┼────────────────┼─────────┤
 │ 1     │ contig_35208 │ Cape Canaveral │ 0       │
 │ 2     │ contig_35208 │ Georgia        │ 0       │

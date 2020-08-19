@@ -26,6 +26,8 @@ file_import("bos_tauros.csv", silent = true)
 read_from("juglans_nigra.vcf")
 ```
 
+----
+
 ### `write_to`
 ```julia
 write_to(data::PopData; filename::String, kwargs...)
@@ -47,6 +49,8 @@ cats = nancycats();
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
 write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
+
+----
 
 ### `popdata2jld2`
 ```julia

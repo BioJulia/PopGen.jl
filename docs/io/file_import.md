@@ -15,7 +15,7 @@ Currently, PopGen.jl provides four different file parsers with which to create `
 
 You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_from()`. This wrapper is also aliased with the more-explicit name `file_import()`. Feel free to use whichever you like best.
 
-::: note monomorphic loci
+:::note monomorphic loci
 By default, the file reading methods drop monomorphic loci and inform you which were removed, so do not be alarmed if the number of loci in your `PopData` is different from the source data. You can disable this
 behavior with the argument `allow_monomorphic = true`. Monomorphic loci are removed by default because they
 can give spurious/misleading results for some analyses, such as relatedness estimators.
@@ -50,7 +50,7 @@ Accepted extensions: `.gen`, `.genepop`
 - first row is a comment and skipped
 - then comes list of all loci, usually 1-per-line
   - sometimes horizontally arranged and separated by commas
-- populations separated by a word like `"POP"`
+- populations separated by a word like `POP`
 - sample names followed by a **comma, then a tab or space**
 - genotypes separated by **tabs** or **spaces**
 - genotypes represented as a combination of ploidy x _n_-digits
@@ -61,6 +61,6 @@ Accepted extensions: `.gen`, `.genepop`
 
 ### [Variant Call Format](variantcall.md)
 
-Accepted extensions: `.vcf`, `.bcf`
+Accepted extensions: `.vcf`, `vcf.gz`, `.bcf`, `.bcf.gz`
 
 This format is **much** more complex and variable depending on which variant caller produced the file. If you're super duper interested in the specifications of BCF/VCF files, have a look at the [official specification documentation](http://samtools.github.io/hts-specs/VCFv4.3.pdf).

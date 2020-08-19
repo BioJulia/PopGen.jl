@@ -72,7 +72,7 @@ Calculate chi-squared test of HWE for each locus and returns observed and expect
 julia> hwe_test(gulfsharks())
 2213×4 DataFrame
 │ Row  │ locus        │ chisq     │ df    │ P        │
-│      │ Categorical… │ Float64   │ Int64 │ Float64? │
+│      │ String       │ Float64   │ Int64 │ Float64? │
 ├──────┼──────────────┼───────────┼───────┼──────────┤
 │ 1    │ contig_35208 │ 0.690979  │ 3     │ 0.875324 │
 │ 2    │ contig_23109 │ 1.71251   │ 1     │ 0.19066  │
@@ -97,7 +97,7 @@ julia> hwe_test(gulfsharks())
 julia> hwe_test(gulfsharks(), correction = "bh")
 2213×5 DataFrame
 │ Row  │ locus        │ chisq     │ df    │ P        │ P_bh     │
-│      │ Categorical… │ Float64   │ Int64 │ Float64? │ Float64? │
+│      │ String       │ Float64   │ Int64 │ Float64? │ Float64? │
 ├──────┼──────────────┼───────────┼───────┼──────────┼──────────┤
 │ 1    │ contig_35208 │ 0.690979  │ 3     │ 0.875324 │ 0.999911 │
 │ 2    │ contig_23109 │ 1.71251   │ 1     │ 0.19066  │ 0.999911 │
@@ -122,7 +122,7 @@ julia> hwe_test(gulfsharks(), correction = "bh")
 julia> hwe_test(gulfsharks(), by = "population")
 15491×5 DataFrame
 │ Row   │ locus        │ population     │ chisq       │ df    │ P        │
-│       │ Categorical… │ Categorical…   │ Float64     │ Int64 │ Float64? │
+│       │ String       │ String         │ Float64     │ Int64 │ Float64? │
 ├───────┼──────────────┼────────────────┼─────────────┼───────┼──────────┤
 │ 1     │ contig_35208 │ Cape Canaveral │ 1.01787     │ 1     │ 0.313025 │
 │ 2     │ contig_35208 │ Georgia        │ 0.725926    │ 1     │ 0.394207 │
@@ -163,7 +163,7 @@ Doing this results in a table that now only includes non-missing P-values of 0.0
 ```
 46×5 DataFrame
 │ Row │ locus │ population │ chisq   │ df    │ P           │
-│     │ Cat…  │ Cat…       │ Float64 │ Int64 │ Float64?    │
+│     │ Str…  │ String     │ Float64 │ Int64 │ Float64?    │
 ├─────┼───────┼────────────┼─────────┼───────┼─────────────┤
 │ 1   │ fca8  │ 2          │ 29.8624 │ 15    │ 0.0124275   │
 │ 2   │ fca8  │ 3          │ 39.72   │ 21    │ 0.00804172  │

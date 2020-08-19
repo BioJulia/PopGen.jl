@@ -58,10 +58,9 @@ PopData Object
   Marker: SNP
   Ploidy: 2
   Samples: 211
-  Loci: 2213
+  Loci: 2209
   Populations: 7
-  Longitude: present with 0 missing
-  Latitude: present with 0 missing
+  Coordinates: present
 
 # multiple samples
 julia> lots_fewer_sharks = remove(sharks, name = ["cc_001", "cc_002", "cc_003"])
@@ -69,10 +68,9 @@ PopData Object
   Marker: SNP
   Ploidy: 2
   Samples: 209
-  Loci: 2213
+  Loci: 2209
   Populations: 7
-  Longitude: present with 0 missing
-  Latitude: present with 0 missing
+  Coordinates: present
 ```
 
 </TabItem>
@@ -84,10 +82,9 @@ PopData Object
   Marker: SNP
   Ploidy: 2
   Samples: 212
-  Loci: 2212
+  Loci: 2208
   Populations: 7
-  Longitude: present with 0 missing
-  Latitude: present with 0 missing
+  Coordinates: present
 
 # multiple loci  
 julia> lots_fewer_loci = remove(sharks, locus = ["contig_475", "contig_2784", "contig_8065"])
@@ -95,10 +92,9 @@ PopData Object
   Marker: SNP
   Ploidy: 2
   Samples: 212
-  Loci: 2210
+  Loci: 2206
   Populations: 7
-  Longitude: present with 0 missing
-  Latitude: present with 0 missing
+  Coordinates: present
 ```
 
 </TabItem>
@@ -110,10 +106,9 @@ PopData Object
   Markers: SNP
   Ploidy: 2
   Samples: 182
-  Loci: 2213
+  Loci: 2209
   Populations: 6
-  Longitude: present with 0 missing
-  Latitude: present with 0 missing
+  Coordinates: present
 
 # multiple populations
 julia> lots_fewer_pops = remove(sharks, population = ["Florida Keys", "Mideast Gulf"])
@@ -121,10 +116,9 @@ PopData Object
   Markers: SNP
   Ploidy: 2
   Samples: 119
-  Loci: 2213
+  Loci: 2209
   Populations: 5
-  Longitude: present with 0 missing
-  Latitude: present with 0 missing
+  Coordinates: present
 ```
 
 </TabItem>
@@ -140,10 +134,9 @@ PopData Object
   Markers: SNP
   Ploidy: 2
   Samples: 190
-  Loci: 2212
+  Loci: 2208
   Populations: 6
-  Longitude: present with 0 missing
-  Latitude: present with 0 missing
+  Coordinates: present
 ```
 
 </TabItem>

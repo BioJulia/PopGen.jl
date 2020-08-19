@@ -11,6 +11,8 @@ permute_loci!(data::PopData)
 Edits `PopData` in place with loci permuted across populations within
 the `.loci` dataframe.
 
+----
+
 ### `permute_samples!`
 ```julia
 permute_samples!(data::PopData; meta::Bool = false)
@@ -20,6 +22,8 @@ the `.loci` dataframe. Since performance is important for many permutations,
 the default is to only edit the `.loci` table in place; use `meta = true`
 if you also require the `.meta` dataframe edited in place.
 
+----
+
 ### `permute_genotypes!`
 ```julia
 permute_genotypes!(data::PopData; by::String = "locus")
@@ -27,6 +31,8 @@ permute_genotypes!(data::PopData; by::String = "locus")
 Edits `PopData` in place with genotypes permuted across individuals within
 the `.loci` dataframe. Use `by = "population"` (or `"pop"`) to permute genotypes
 within populations.
+
+----
 
 ### `permute_alleles!`
 ```julia

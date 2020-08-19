@@ -3,6 +3,8 @@ id: delimited
 title: Delimited format
 sidebar_label: Delimited format
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Import a delimited file as `PopData`
 
@@ -20,7 +22,7 @@ delimited(infile::String; kwargs...)
 
 - `digits::Integer` : the number of digits used to denote an allele (default: `3`)
 - `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
-- `silent::Bool` : whether to print file information during import (default: `true`)
+- `silent::Bool` : whether to print file information during import (default: `false`)
 
 ### Example
 ```
@@ -42,14 +44,39 @@ First row is column names, and they occur in this order:
 7. etc...
 
 **Formatting example:**
+
+<Tabs
+  block={true}
+  defaultValue="csv"
+  values={[
+    { label: 'raw csv', value: 'csv', },
+    { label: 'table view', value: 'table', },
+  ]
+}>
+<TabItem value="csv">
+
 ```
-name,population,long,lat,Locus1,Locus2,Locus3   \n
-sierra_01,mountain,11.11,-22.22,001001,-9,001001   \n
-sierra_02,mountain,11.12,-22.21,001001,001001,001002   \n
-snbarb_01,coast,,,001001,001001,001002 \n
-snbarb_02,coast,11.14,-22.24,001001,001001,001001 \n
-snbarb_03,coast,11.15,,001002,001001,001001 \n
+name,population,longitude,latitude,Locus1,Locus2,Locus3
+sierra_01,mountain,11.11,-22.22,001001,-9,001001
+sierra_02,mountain,11.12,-22.21,001001,001001,001002
+snbarb_01,coast,,,001001,001001,001002
+snbarb_02,coast,11.14,-22.24,001001,001001,001001
+snbarb_03,coast,11.15,,001002,001001,001001
 ```
+
+</TabItem>
+<TabItem value="table">
+
+|name|population|longitude|latitude|Locus1|Locus2|Locus3|
+|:--: |:--: |:--: |:--: |:--: |:--: |:--: |
+|sierra_01|mountain|11.11|-22.22|001001|-9|001001|
+|sierra_02|mountain|11.12|-22.21|001001|001001|001002|
+|snbarb_01|coast|||001001|001001|001002|
+|snbarb_02|coast|11.14|-22.24|001001|001001|001001|
+|snbarb_03|coast|11.15||001002|001001|001001|
+
+</TabItem>
+</Tabs>
 
 ### Missing data
 #### Genotypes

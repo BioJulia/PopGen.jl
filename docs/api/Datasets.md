@@ -18,6 +18,8 @@ ncats = dataset("nancycats")
 gsharks = dataset("sharks")
 ```
 
+----
+
 ### `nancycats`
 ```julia
 nancycats()
@@ -30,6 +32,8 @@ individuals across 17 populations.
 ```
 ncats = nancycats()
 ```
+
+----
 
 ### `gulfsharks`
 ```julia

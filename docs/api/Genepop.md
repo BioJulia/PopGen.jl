@@ -47,6 +47,8 @@ Newcomb_04, 254230  564000  090120
 waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
 ```
 
+----
+
 ### `popdata2genepop`
 ```julia
 popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")

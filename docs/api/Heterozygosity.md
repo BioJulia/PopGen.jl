@@ -15,6 +15,8 @@ ishom(locus::Missing)
 ```
 A series of methods to test if a locus or loci are homozygous and return `true` if it is, `false` if it isn't, and `missing` if it's `missing`. The vector version simply broadcasts the function over the elements.
 
+----
+
 ### `ishet`
 ```julia
 ishet(locus::T) where T <: GenotypeArray
@@ -22,6 +24,8 @@ ishet(locus::Genotype)
 ishet(locus::Missing)
 ```
 A series of methods to test if a locus or loci are heterozygous and return `true` if it is, `false` if it isn't. The vector version simply broadcasts the function over the elements. Under the hood, this function is simply `!ishom`.
+
+----
 
 ### `gene_diversity_nei87`
 ```julia
@@ -41,17 +45,23 @@ Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press
 
 Use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 
+----
+
 ### `hetero_o`
 ```julia
 hetero_o(data::T) where T <: GenotypeArray
 ```
 Returns observed heterozygosity as a mean of the number of heterozygous genotypes, defined as genotypes returning `true` for `ishet()`. This is numerically feasible because `true` values are mathematically represented as `1`, whereas `false` are represented as `0`.
 
+----
+
 ### `hetero_e`
 ```julia
 hetero_e(allele_freqs::Vector{T}) where T <: GenotypeArray
 ```
 Returns the expected heterozygosity of an array of genotypes, calculated as 1 - sum of the squared allele frequencies.
+
+----
 
 ### `heterozygosity`
 ```julia
@@ -69,8 +79,10 @@ Calculate observed and expected heterozygosity in a `PopData` object. For loci, 
 heterozygosity(nancycats(), "population" )
 ```
 
+----
+
 ### `het_sample`
 ```julia
-    het_sample(data::PopData, individual::String)
+het_sample(data::PopData, individual::String)
 ```
 Calculate the observed heterozygosity for an individual in a `PopData` object. Returns an array of heterozygosity values.

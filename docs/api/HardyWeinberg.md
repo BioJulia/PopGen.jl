@@ -11,6 +11,8 @@ locus_chi_sq(locus::T) where T <: GenotypeArray
 Calculate the chi square statistic and p-value for a locus
 Returns a tuple with chi-square statistic, degrees of freedom, and p-value.
 
+----
+
 ### `hwe_test`
 ```julia
     hwe_test(data::PopData; by_pop::Bool = false; correction = "none")

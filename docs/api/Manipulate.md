@@ -6,11 +6,13 @@ sidebar_label: Manipulate.jl
 
 ### `locations`
 ```julia
-    locations(data::PopData)
+locations(data::PopData)
 ```
 View the longitude and latitude data in a `PopData` object. Returns a table derived from the PopData. Changes made to this table will not alter the source `PopData` object.
 
 Use `locations!` to add spatial data to a `PopData` object.
+
+----
 
 ### `locations!`
 ```julia
@@ -18,6 +20,7 @@ locations!(data::PopData; long::Vector{Float64}, lat::Vector{Float64})
 ```
 Replaces existing `PopData` location data (longitude `long`, latitude `lat`).
 Takes **decimal degrees** as a `Vector` of any `AbstractFloat`.
+
 #### Formatting requirements
 - Decimal Degrees format: `-11.431`
 - **Must** use negative sign `-` instead of cardinal directions
@@ -31,6 +34,8 @@ x = rand(237) ; y = rand(237)
 locations!(ncats, long = x, lat = y)
 ```
 
+----
+
 ### `locations!`
 ```julia
 locations!(data::PopData; long::Vector{String}, lat::Vector{String})
@@ -38,6 +43,7 @@ locations!(data::PopData; long::Vector{String}, lat::Vector{String})
 Replaces existing `PopData` location data (longitude `long`, latitude `lat`). Takes
 **decimal minutes** format as a `Vector` of `String`. Recommended to use `CSV.read`
 from `CSV.jl` to import your spatial coordinates from a text file.
+
 #### Formatting requirements
 - Decimal Minutes: `"-11 43.11"` (must use space and be a `String`)
 - **Must** use negative sign `-` or single-letter cardinal directions like "11 43.11W"
@@ -63,11 +69,15 @@ locations!(ncats, long = x, lat = y)
 ```
 
 
+----
+
 ### `loci`
 ```julia
 loci(data::PopData)
 ```
 Returns an array of strings of the loci names in a `PopData` object.
+
+----
 
 ### `get_genotypes`
 ```julia
@@ -84,6 +94,8 @@ get_genotype(cats, samples = "N115" , loci = ["fca8", "fca37"])
 get_genotype(cats, samples = ["N1", "N2"] , loci = ["fca8", "fca37"])
 ```
 
+----
+
 ### `get_sample_genotypes`
 ```julia
 get_sample_genotypes(data::PopData, sample::String)
@@ -96,6 +108,8 @@ cats = nancycats()
 get_sample_genotypes(cats, "N115")
 ```
 
+----
+
 ### `locus`
 ```julia
 locus(data::PopData, locus::Union{String, Symbol})
@@ -106,6 +120,8 @@ Convenience wrapper to return a vector of all the genotypes of a single locus
 ```julia
 locus(gulfsharks(), "contig_475")
 ```
+
+----
 
 ### `missing`
 ```julia
@@ -131,6 +147,8 @@ View unique population ID's and their counts in a `PopData`.
 
 - `listall = true` displays all samples and their `population` instead (default = `false`)
 
+----
+
 ### `populations!`
 ```julia
 populations!(data::PopData, rename::Dict)
@@ -138,6 +156,7 @@ populations!(data::PopData, rename::Vector{String})
 populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
 ```
 Multiple methods to rename or reassign population names in`PopData`.
+
 #### Rename using a Dictionary
 ```julia
 populations!(data::PopData, rename::Dict)
@@ -150,6 +169,7 @@ Rename existing population ID's of `PopData` using a `Dict` of
 potatopops = Dict("1" => "Idaho", "2" => "Russet")
 populations!(potatoes, potatopops)
 ```
+
 #### Rename using a Vector of Strings
 ```julia
 populations!(data::PopData, rename::Vector{String})
@@ -161,6 +181,7 @@ populations!(data::PopData, rename::Vector{String})
 potatopops = ["Idaho", "Russet"]
 populations!(potatoes, potatopops)
 ```
+
 #### Reassign using samples and new population assignments
 ```julia
 populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
@@ -173,6 +194,8 @@ population name.
 ```
 populations!(potatoes, ["potato_1", "potato_2"], ["north_russet", "south_russet"])
 ```
+
+----
 
 ### `exclude!`
 ```julia
@@ -200,6 +223,8 @@ exclude!(cats, name = "N100", population = ["1", "15"])
 exclude!(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
 exclude!(cats, names = "N102", loci = "fca8", population = "3")
 ```
+
+----
 
 ### `exclude`
 ```julia

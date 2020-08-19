@@ -22,11 +22,15 @@ and considering how few microsatellite markers are used in
 typical studies, the effect on in-memory size should be 
 negligible (as compared to SNPs).
 
+----
+
 ### `find_ploidy`
 ```julia
 find_ploidy(genotypes::T where T<:SubArray)
 ```
 Used internally in the `genepop` and `delimited` file parsers to scan the genotypes of a sample and return the ploidy of the first non-missing locus.
+
+----
 
 ### `phase`
 ```julia
@@ -46,6 +50,8 @@ map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
 [phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
 ```
 
+----
+
 ### `unphase`
 ```julia    
 unphase(geno::T; digits::Int = 3, ploidy::Int = 2, miss::Int = 0) where T <: Genotype
@@ -53,6 +59,7 @@ unphase(geno::missing; digits::Int = 3, ploidy::Int = 2, miss::Int = 0)
 ```
 Takes a `Genotype` (e.g. `(131, 94)`) and returns a string of concatenated
 alleles padded with *n* number of zeroes, where *n* is given by `digits = `.
+
 #### miss
 - `miss = 0`: `missing` values are returned as a string of `digits × ploidy` zeroes (default)
 - `miss = -9` : `missing` values are returned as `-9`

@@ -31,7 +31,7 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
  
 <Tabs
   block={true}
-  defaultValue="all"
+  defaultValue="a"
   values={[
     { label: 'All vs. All', value: 'a', },
     { label: 'Specific Samples', value: 's', },
@@ -40,55 +40,72 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
 <TabItem value="a">
 
 ```julia
-relatedness(data::PopData; method::Function, iterations::Int64, interval::Tuple(Float64, Float64))
-relatedness(data::PopData; method::Vector{Function}, iterations::Int64, interval::Tuple(Float64, Float64))
+relatedness(data::PopData; method::F, iterations::Int64, interval::Tuple(Float64, Float64))
 ```
-Return a dataframe of pairwise relatedness estimates for all individuals in a `PopData` object.
-To calculate means, median, standard error, and confidence intervals using bootstrapping,
+Return a dataframe of pairwise relatedness estimates for all individuals in a `PopData` object using 
+method `F` (see below). To calculate means, median, standard error, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%), however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`. **Note:** samples must be diploid.
+
+**Examples**
+```
+julia> cats = nancycats();
+
+julia> relatedness(cats, method = Ritland)
+27966×4 DataFrame
+│ Row   │ sample_1 │ sample_2 │ n_loci │ Ritland    │
+│       │ String   │ String   │ Int64  │ Float64?   │
+├───────┼──────────┼──────────┼────────┼────────────┤
+│ 1     │ N215     │ N216     │ 8      │ 0.258824   │
+│ 2     │ N215     │ N217     │ 8      │ 0.193238   │
+│ 3     │ N215     │ N218     │ 8      │ 0.127497   │
+⋮
+│ 27964 │ N281     │ N289     │ 8      │ 0.0892068  │
+│ 27965 │ N281     │ N290     │ 7      │ 0.104614   │
+│ 27966 │ N289     │ N290     │ 7      │ 0.0511663  │
+```
 
 </TabItem>
 <TabItem value="s">
 
 ```julia
-relatedness(data::PopData, sample_names::Vector{String}; method::Function, iterations::Int64, interval::Tuple(Float64, Float64))
-relatedness(data::PopData, sample_names::Vector{String}; method::Vector{Function}, iterations::Int64, interval::Tuple(Float64, Float64))
+relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64, interval::Tuple(Float64, Float64))
 ```
-Return a dataframe of pairwise relatedness estimates for all pairs of the supplied sample names in a `PopData` object.
-To calculate means, median, standard error, and confidence intervals using bootstrapping,
+Return a dataframe of pairwise relatedness estimates for all pairs of the supplied sample names in a `PopData` object using 
+method `F` (see below). To calculate means, median, standard error, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%),
 however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
 **Note:** samples must be diploid.
 
+**Examples**
+```
+julia> cats = nancycats();
+
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
+3×5 DataFrame
+│ Row │ sample_1 │ sample_2 │ n_loci │ Ritland    │ Wang      │
+│     │ String   │ String   │ Int64  │ Float64?   │ Float64?  │
+├─────┼──────────┼──────────┼────────┼────────────┼───────────┤
+│ 1   │ N7       │ N111     │ 9      │ -0.129432  │ -0.395806 │
+│ 2   │ N7       │ N115     │ 9      │ -0.0183925 │ 0.0024775 │
+│ 3   │ N111     │ N115     │ 9      │ 0.0240152  │ 0.183966  │
+
+
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975))
+3×13 DataFrame. Omitted printing of 7 columns
+│ Row │ sample_1 │ sample_2 │ n_loci │ Loiselle   │ Loiselle_mean │ Loiselle_median │
+│     │ String   │ String   │ Int64  │ Float64?   │ Float64?      │ Float64?        │
+├─────┼──────────┼──────────┼────────┼────────────┼───────────────┼─────────────────┤
+│ 1   │ N7       │ N111     │ 9      │ -0.101618  │ 0.0141364     │ 0.00703954      │
+│ 2   │ N7       │ N115     │ 9      │ -0.0428898 │ 0.0743497     │ 0.0798708       │
+│ 3   │ N111     │ N115     │ 9      │ 0.13681    │ 0.266043      │ 0.257748        │
+```
+
 </TabItem>
 </Tabs>
 
-**Methods**
-
-There are several estimators available and are listed below. `relatedness` takes the
-function names as arguments (**case sensitive**), therefore do not use quotes or colons
-in specifying the methods. Methods can be supplied as a vector. 
-
-:::tip autocompletion
-Since the methods correspond to function names, they will tab-autocomplete when 
-inputting them. For more information on a specific method, please see the respective docstring (e.g. `?
-Loiselle`).
-:::
-
-- `Blouin`
-- `LiHorvitz`
-- `Loiselle`
-- `Lynch`
-- `LynchLi`
-- `LynchRitland`
-- `Moran`
-- `QuellerGoodnight`
-- `Ritland`
-- `Wang`
-
-**Examples**
+### Methods
 
 <Tabs
   block={true}
@@ -122,16 +139,40 @@ julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = [Moran, Queller
 ```julia
 julia> cats = nancycats();
 
-julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = Ritland, iterations = 100)
+julia> cat_kin = relatendess(cats, method = [Ritland, Wang], iterations = 100)
 ```
 
 </TabItem>
 </Tabs>
 
+There are several estimators available and are listed below. `relatedness` takes the
+function names as arguments (**case sensitive**), therefore do not use quotes or colons
+in specifying the methods. Methods can be supplied as a vector. 
+
+:::tip autocompletion
+Since the methods correspond to function names, they will tab-autocomplete when 
+inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
+:::
+
+- [Blouin](analyses/relatedness.md#blouin)
+- [dyadML](analyses/relatedness.md#dyadic-maximum-likelihood)
+- [LiHorvitz](analyses/relatedness.md#li--horvitz)
+- [Loiselle](analyses/relatedness.md#loiselle)
+- [Lynch](analyses/relatedness.md#lynch)
+- [LynchLi](analyses/relatedness.md#lynch--li)
+- [LynchRitland](analyses/relatedness.md#lynch--ritland)
+- [Moran](analyses/relatedness.md#lynch--moran)
+- [QuellerGoodnight](analyses/relatedness.md#queller--goodnight)
+- [Ritland](analyses/relatedness.md#ritland)
+- [Wang](analyses/relatedness.md#wang)
+
 
 ## Relatedness Estimators
 ### Blouin
 The moments based estimator developed by [Blouin (year)](). Call `method = Blouin` to use this method. 
+
+### Dyadic Maximum Likelihood
+The moments based estimator developed by [PERSON (year)](). Call `method = dyadML` to use this method. 
 
 ### Li & Horvitz
 The moments based estimator developed by [Li & Horvitz (year)](). Call `method = LiHorvitz` to use this method. 
@@ -160,7 +201,6 @@ The moments based estimator developed by [Ritland (year)](). Call `method = Ritl
 
 ### Wang
 The moments based estimator developed by [Wang (year)](). Call `method = Wang` to use this method. 
-
 
 ---------------------
 ## Acknowledgements

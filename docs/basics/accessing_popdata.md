@@ -233,7 +233,7 @@ This will show you the entire `loci` table.
 julia> ncats.loci
 2133×4 DataFrame
 │ Row  │ name │ population │ locus │ genotype   │
-│      │ Cat… │ Cat…       │ Cat…  │ Tuple…?    │
+│      │ Str… │ String     │ Str…  │ Tuple…?    │
 ├──────┼──────┼────────────┼───────┼────────────┤
 │ 1    │ N215 │ 1          │ fca8  │ missing    │
 │ 2    │ N216 │ 1          │ fca8  │ missing    │
@@ -253,11 +253,9 @@ julia> ncats.loci
 
 ### locus names
 
-This will access the names of the loci as they appear in the data. Since everything but the genotypes in `.loci` are coded as Categorical, we need to use `levels()` from `CategoricalArrays.jl` or `unique()` from Base to pull out the unique loci. 
+This will access the names of the loci as they appear in the data. We need to use  `unique()` from Base to pull out the unique loci. 
 
 ```julia
-julia> levels(ncats.loci.locus)
-# or #
 julia> unique(ncats.loci.locus)
 9-element Array{String,1}:
  "fca8" 
@@ -273,11 +271,9 @@ julia> unique(ncats.loci.locus)
 
 ### locus population
 
-This will access the population of the individual for a genotype of a locus. These are also coded as Categorical, we need to use `levels()` from `CategoricalArrays.jl` or `unique()` from Base to pull out the unique populations. 
+This will access the population of the individual for a genotype of a locus. We need to use `unique()` from Base to pull out the unique populations. 
 
 ```julia
-julia> levels(ncats.loci.locus)
-# or #
 julia> unique(ncats.loci.locus)
 17-element Array{String,1}:
  "1" 
@@ -310,7 +306,7 @@ Because the genotype data is in "tidy" format, accessing genotypes in a meaningf
 julia> @where(ncats.loci, :locus .== "fca8")
 2133×4 DataFrame
 │ Row  │ name │ population │ locus │ genotype   │
-│      │ Cat… │ Cat…       │ Cat…  │ Tuple…?    │
+│      │ Str… │ Str…       │ Str…  │ Tuple…?    │
 ├──────┼──────┼────────────┼───────┼────────────┤
 │ 1    │ N215 │ 1          │ fca8  │ missing    │
 │ 2    │ N216 │ 1          │ fca8  │ missing    │
