@@ -45,6 +45,7 @@ step to convert the genotype column into the correct `GenoArray` type:
 julia> mydata = bcf("path/to/file.bcf", silent = true, rename_loci = true) ;
 
 julia> mydata.loci.genotype =  mydata.loci.genotype |> Array{Union{Missing, NTuple}}
+```
 """
 function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, allow_monomorphic::Bool = false)
     bases = (A = Int8(1), T = Int8(2), C = Int8(3), G = Int8(4), miss = Int8(0))
