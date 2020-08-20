@@ -2,7 +2,7 @@
 """
     simulate(data::PopData; n::Int = 100)
 
-Simulate `n` number of individuals (default: `100`) per population using per-population
+Simulate `n` number of individuals per population (default: `100`) using per-population
 allele frequencies derived from a `PopData` object. Returns a new `PopData` object.
 
 **Example**
