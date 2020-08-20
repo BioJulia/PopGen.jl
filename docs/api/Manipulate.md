@@ -123,22 +123,7 @@ locus(gulfsharks(), "contig_475")
 
 ----
 
-### `missing`
-```julia
-missing(data::PopData; by::String = "sample")
-```
-Get missing genotype information in a `PopData`. Specify a mode of operation to return a DataFrame corresponding with that missing information.
-
-**Modes**
-- `"sample"` - returns a count and list of missing loci per individual (default)
-- `"pop"` - returns a count of missing genotypes per population
-- `"locus"` - returns a count of missing genotypes per locus
-- `"full"` - returns a count of missing genotypes per locus per population
-
-**Example**
-```julia
-missing(gulfsharks(), by = "pop")
-```
+### `populations`
 
 ```julia
     populations(data::PopData; listall::Bool = false)

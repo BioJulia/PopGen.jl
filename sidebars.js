@@ -20,7 +20,8 @@ module.exports = {
       "basics/accessing",
       "basics/exclusion",
       "basics/populations",
-      "basics/viewsort"
+      "basics/viewdata",
+      "basics/dataexploration"
     ],
     "Analyses":[
       "analyses/hardyweinberg",
