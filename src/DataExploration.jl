@@ -1,6 +1,7 @@
 
 export pairwise_identical, missing
 
+#TODO relocate in docs
 """
     missing(data::PopData; by::String = "sample")
 Get missing genotype information in a `PopData`. Specify a mode of operation
@@ -77,7 +78,6 @@ function pairwise_identical(data::PopData, sample_names::Vector{String})
     idx = 0
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
-        print(Base.Threads.threadid())
         @inbounds geno_1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno_2 = popdata_idx[(sample_pairs[i][2],)].genotype
         len_1 = length(collect(skipmissing(geno_1)))
