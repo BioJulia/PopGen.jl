@@ -93,6 +93,7 @@ julia> loci_dataframe(nancycats())
     loci_matrix(data::PopData)
 Return a matrix of genotypes with dimensions `samples × loci`.
 Rows are samples and columns are loci. Will return an error if ploidy varies between samples. 
+
 **Example**
 ```
 julia> loci_matrix(nancycats())

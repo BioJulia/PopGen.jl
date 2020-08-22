@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 missing(data::PopData; by::String = "sample")
 ```
 
-Get missing genotype information in a `PopData`. Specify a mode of operation using the `by =` keyword to return a table corresponding with that missing information type.
+Get missing genotype information in a `PopData` object. Specify a mode of operation using the `by =` keyword to return a table corresponding with that missing information type.
 
 |     by     | alternative name | what it does                                                 |
 | :--------: | :--------------: | ------------------------------------------------------------ |
@@ -308,5 +308,5 @@ julia> summary(nancycats(), by = "locus")
 </Tabs>
 
 :::tip prime symbol
-The column names above use the unicode prime symbol `′` to better reflect the actual coefficient. To print that character, press `\prime<TAB>`, which reads "backslash, the word 'prime', and the TAB button".
+The column names above use the unicode prime symbol `′` to better reflect the actual coefficient ("FST prime" etc.). To print that character, press `\prime<TAB>`, which reads "backslash, the word 'prime', and the TAB button".
 :::

@@ -119,7 +119,7 @@ Calculates the moments based estimator of pairwise relatedness developed by Quel
     - Multiple loci are combined by independently summing the two numerator and two denominator terms before performing the final division and averaging the two components.
 - Assumes no inbreeding
 
-See equation 3 in Wang(2017) for variant of estimator used.
+See equation 3 in Wang (2017) for variant of estimator used.
 
 Queller, D. C., & Goodnight, K. F. (1989). Estimating relatedness using genetic markers. Evolution, 43(2), 258-275.
 

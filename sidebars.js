@@ -25,7 +25,8 @@ module.exports = {
     ],
     "Analyses":[
       "analyses/hardyweinberg",
-      "analyses/relatedness"
+      "analyses/relatedness",
+      "analyses/simulations"
     ],
     "API": [
       "api/api",
@@ -42,6 +43,7 @@ module.exports = {
       "api/permutations",
       "api/read",
       "api/relatednessmoments",
+      "api/simulations",
       "api/summaryinfo",
       "api/types",
       "api/utils",
