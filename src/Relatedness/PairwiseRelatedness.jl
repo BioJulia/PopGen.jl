@@ -23,17 +23,23 @@ end
 Perform `iterations` number of bootstrap resampling iterations of all genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
 of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `relatedness_boot_all`.
 """
-@inline function bootstrap_genos_all(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool) where T <: GenoArray where U <: NamedTuple where F
+@inline function bootstrap_genos_all(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool, n::Int) where T <: GenoArray where U <: NamedTuple where F
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
     n_loc = length(locus_names)
-    for iter in 1:iterations
-        # bootstrap the indices
-        boot_idx = rand(1:n_loc, n_loc)
-        # sample the source vectors with the resampled/bootstrapped indices
-        ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
-        # get index for genotype appearing missing in at least one individual in the pair
-        keep_idx = nonmissings(ind1_boot, ind2_boot)
-        relate_vec_boot[iter] = method(ind1_boot[keep_idx], ind2_boot[keep_idx], loc_boot[keep_idx], alleles, loc_n = n_per_loci[keep_idx], n_samples = n_loc, inbreeding = inbreeding)
+    prog_text = "name1" * "×" * "name2" * ":" * "$method"
+    # having a nested second progress bar doesn't seem to work
+    #p2 = Progress(iterations, dt = 0.75, color = :yellow, offset = 2)
+    @sync for iter in 1:iterations
+        Base.Threads.@spawn begin
+            # bootstrap the indices
+            boot_idx = rand(1:n_loc, n_loc)
+            # sample the source vectors with the resampled/bootstrapped indices
+            ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
+            # get index for genotype appearing missing in at least one individual in the pair
+            keep_idx = nonmissings(ind1_boot, ind2_boot)
+            relate_vec_boot[iter] = method(ind1_boot[keep_idx], ind2_boot[keep_idx], loc_boot[keep_idx], alleles, loc_n = n_per_loci[keep_idx], n_samples = n_loc, inbreeding = inbreeding)
+            #next!(p2)
+        end
     end
     return relate_vec_boot
 end
@@ -48,13 +54,15 @@ of the relatedness estimate given by method `method`. This is an internal functi
 @inline function bootstrap_genos_nonmissing(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool) where T <: GenoArray where U <: NamedTuple where F
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
     n_loc = length(locus_names)
-    for iter in 1:iterations
-        # bootstrap the indices
-        boot_idx = rand(1:n_loc, n_loc)
-        # sample the source vectors with the resampled/bootstrapped indices
-        ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
-        # faster/cheaper n counting
-        relate_vec_boot[iter] = method(ind1_boot, ind2_boot, loc_boot, alleles, loc_n = n_per_loci, n_samples = n_loc, inbreeding = inbreeding)
+    @sync for iter in 1:iterations
+        Base.Threads.@spawn begin
+            # bootstrap the indices
+            boot_idx = rand(1:n_loc, n_loc)
+            # sample the source vectors with the resampled/bootstrapped indices
+            ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
+            # faster/cheaper n counting
+            relate_vec_boot[iter] = method(ind1_boot, ind2_boot, loc_boot, alleles, loc_n = n_per_loci, n_samples = n_loc, inbreeding = inbreeding)
+        end
     end
     return relate_vec_boot
 end
@@ -75,9 +83,9 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
-    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    p = Progress(length(sample_pairs)*length(method), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
-    @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
+    @inbounds for i in 1:length(sample_pairs)
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
         # get index for genotype appearing missing in at least one individual in the pair
@@ -85,12 +93,16 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
         # generate nonmissing genotype data 
         gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
         @inbounds shared_loci[i] = length(keep_idx)
-        @inbounds for (j, mthd) in enumerate(method)
-            @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loci, n_samples = n_samples, inbreeding = inbreeding)
-            boot_out = bootstrap_genos_all(geno1, geno2, loci_names, n_per_loci, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
-            @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = bootstrap_summary(boot_out, interval)
+        @sync @inbounds for (j, mthd) in enumerate(method)
+            Base.Threads.@spawn begin
+                @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loci, n_samples = n_samples, inbreeding = inbreeding)
+                boot_out = bootstrap_genos_all(geno1, geno2, loci_names, n_per_loci, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding, n = j+1)
+                @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = bootstrap_summary(boot_out, interval)
+                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(length(sample_pairs))" * ")"
+                ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
+                #next!(p)
+            end
         end
-        next!(p)
     end
     method_colnames = [Symbol("$i") for i in method]
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
@@ -127,9 +139,9 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
-    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    p = Progress(length(sample_pairs) * length(method), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
-    @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
+    @inbounds for i in 1:length(sample_pairs)
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
         # get index for genotype appearing missing in at least one individual in the pair
@@ -137,12 +149,15 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
         # generate nonmissing genotype data 
         gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
         @inbounds shared_loci[i] = length(keep_idx)
-        @inbounds for (j, mthd) in enumerate(method)
-            @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
-            boot_out = bootstrap_genos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
-            @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = bootstrap_summary(boot_out, interval)
+        @inbounds @sync for (j, mthd) in enumerate(method)
+            Base.Threads.@spawn begin
+                @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
+                boot_out = bootstrap_genos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
+                @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = bootstrap_summary(boot_out, interval)
+                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(length(sample_pairs))" * ")"
+                ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
+            end
         end
-        next!(p)
     end
     method_colnames = [Symbol("$i") for i in method]
     boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
@@ -176,15 +191,22 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
-    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    p = Progress(length(sample_pairs)* length(method), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
-    @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
-        @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
-        @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
-        keep_idx = nonmissings(geno1, geno2)
-        @inbounds shared_loci[i] = length(keep_idx)
-        @inbounds [relate_vecs[j][i] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding) for (j,mth) in enumerate(method)]
-        next!(p)
+    @inbounds @sync for i in 1:length(sample_pairs)
+        Base.Threads.@spawn begin
+            @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
+            @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
+            keep_idx = nonmissings(geno1, geno2)
+            @inbounds shared_loci[i] = length(keep_idx)
+            @inbounds for (j, mthd) in enumerate(method)
+                #Base.Threads.@spawn begin
+                    @inbounds relate_vecs[j][i] = mthd(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding)
+                    pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(length(sample_pairs))" * ")"
+                    ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
+                #end
+            end
+        end
     end
     method_colnames = [Symbol("$i") for i in method]
     out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
