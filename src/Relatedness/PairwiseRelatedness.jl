@@ -200,11 +200,9 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
             keep_idx = nonmissings(geno1, geno2)
             @inbounds shared_loci[i] = length(keep_idx)
             @inbounds for (j, mthd) in enumerate(method)
-                #Base.Threads.@spawn begin
-                    @inbounds relate_vecs[j][i] = mthd(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding)
-                    pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(length(sample_pairs))" * ")"
-                    ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
-                #end
+                @inbounds relate_vecs[j][i] = mthd(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding)
+                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(length(sample_pairs))" * ")"
+                ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
             end
         end
     end

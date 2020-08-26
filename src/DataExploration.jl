@@ -77,17 +77,19 @@ function pairwise_identical(data::PopData, sample_names::Vector{String})
     popdata_idx = groupby(data.loci, :name)
     idx = 0
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
-    @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
-        @inbounds geno_1 = popdata_idx[(sample_pairs[i][1],)].genotype
-        @inbounds geno_2 = popdata_idx[(sample_pairs[i][2],)].genotype
-        len_1 = length(collect(skipmissing(geno_1)))
-        len_2 = length(collect(skipmissing(geno_2)))
-        shared_geno = minimum([len_1, len_2])
+    @inbounds @sync for i in 1:length(sample_pairs)
+        Base.Threads.@spawn begin
+            @inbounds geno_1 = popdata_idx[(sample_pairs[i][1],)].genotype
+            @inbounds geno_2 = popdata_idx[(sample_pairs[i][2],)].genotype
+            len_1 = nonmissing(geno_1)
+            len_2 = nonmissing(geno_2)
             shared_geno = minimum([len_1, len_2])
-            shared = sum(skipmissing(geno_1 .== geno_2))
-            @inbounds perc_ident_vec[i] = round(shared/shared_geno, digits = 2)
-            @inbounds n_vec[i] = shared_geno
-        next!(p)
+                shared_geno = minimum([len_1, len_2])
+                shared = sum(skipmissing(geno_1 .== geno_2))
+                @inbounds perc_ident_vec[i] = round(shared/shared_geno, digits = 2)
+                @inbounds n_vec[i] = shared_geno
+            next!(p)
+        end
     end
     DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :identical => perc_ident_vec, :n => n_vec)
 end

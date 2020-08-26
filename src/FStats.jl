@@ -108,8 +108,6 @@ end
 end
 
 
-
-
 function f_stat_p(data::PopData; nperm::Int = 1000)
     observed = FST_global(data)
     popnames = data.meta.population    
@@ -118,12 +116,14 @@ function f_stat_p(data::PopData; nperm::Int = 1000)
         :FST′ => Vector{Float64}(undef, nperm-1)
         )
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
-    Base.Threads.@threads for n in 1:nperm-1
-        tmp = copy(data.loci)
-        tmp_f = FST_global(permute_samples!(tmp, popnames))
-        perm_dict[:FST][n] = tmp_f[:FST]
-        perm_dict[:FST′][n] = tmp_f[:FST′]
-    next!(p)
+    @inbounds @sync for n in 1:nperm-1
+        Base.Threads.@spawn begin
+            tmp = copy(data.loci)
+            tmp_f = FST_global(permute_samples!(tmp, popnames))
+            perm_dict[:FST][n] = tmp_f[:FST]
+            perm_dict[:FST′][n] = tmp_f[:FST′]
+            next!(p)
+        end
     end
 
     @inbounds for (k,v) in perm_dict
