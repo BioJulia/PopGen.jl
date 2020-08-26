@@ -28,7 +28,17 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
 ::: 
 
 ## Calculate Relatedness
- 
+
+### Arguments
+- `data` : A PopData object
+- `sample_names` : A list of samples names to calculate relatedness for (optional)
+
+### Keyword Arguments
+- `method` : A method function or vector of method functions (see below)
+- `iterations` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
+- `interval` : A Tuple of (low, high) indicating the confidence intervals you would like for bootstrapping (default: `(0.275, 0.975)`, i.e. 95%)
+- `inbreeding` : true/false of whether to consider inbreeding in the calculations (default: `false`). Only used in `dyadML`
+
 <Tabs
   block={true}
   defaultValue="a"
@@ -106,6 +116,28 @@ julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], ite
 </Tabs>
 
 ### Methods
+There are several estimators available and are listed below. `relatedness` takes the
+function names as arguments (**case sensitive**), therefore do not use quotes or colons
+in specifying the methods. Methods can be supplied as a vector. 
+
+- [Blouin](analyses/relatedness.md#blouin)
+- [dyadML](analyses/relatedness.md#dyadic-maximum-likelihood)
+- [LiHorvitz](analyses/relatedness.md#li--horvitz)
+- [Loiselle](analyses/relatedness.md#loiselle)
+- [Lynch](analyses/relatedness.md#lynch)
+- [LynchLi](analyses/relatedness.md#lynch--li)
+- [LynchRitland](analyses/relatedness.md#lynch--ritland)
+- [Moran](analyses/relatedness.md#lynch--moran)
+- [QuellerGoodnight](analyses/relatedness.md#queller--goodnight)
+- [Ritland](analyses/relatedness.md#ritland)
+- [Wang](analyses/relatedness.md#wang)
+
+:::tip autocompletion
+Since the methods correspond to function names, they will tab-autocomplete when 
+inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
+:::
+
+#### Examples
 
 <Tabs
   block={true}
@@ -144,28 +176,6 @@ julia> cat_kin = relatendess(cats, method = [Ritland, Wang], iterations = 100)
 
 </TabItem>
 </Tabs>
-
-There are several estimators available and are listed below. `relatedness` takes the
-function names as arguments (**case sensitive**), therefore do not use quotes or colons
-in specifying the methods. Methods can be supplied as a vector. 
-
-:::tip autocompletion
-Since the methods correspond to function names, they will tab-autocomplete when 
-inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
-:::
-
-- [Blouin](analyses/relatedness.md#blouin)
-- [dyadML](analyses/relatedness.md#dyadic-maximum-likelihood)
-- [LiHorvitz](analyses/relatedness.md#li--horvitz)
-- [Loiselle](analyses/relatedness.md#loiselle)
-- [Lynch](analyses/relatedness.md#lynch)
-- [LynchLi](analyses/relatedness.md#lynch--li)
-- [LynchRitland](analyses/relatedness.md#lynch--ritland)
-- [Moran](analyses/relatedness.md#lynch--moran)
-- [QuellerGoodnight](analyses/relatedness.md#queller--goodnight)
-- [Ritland](analyses/relatedness.md#ritland)
-- [Wang](analyses/relatedness.md#wang)
-
 
 ## Relatedness Estimators
 ### Blouin

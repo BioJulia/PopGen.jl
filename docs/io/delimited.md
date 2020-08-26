@@ -29,7 +29,7 @@ delimited(infile::String; kwargs...)
 lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
 :::caution Windows users
-make sure to change your backslashes `\` to forward slashes `/` 
+Make sure to change the backslashes `\` in your file path to double-backslashes `\\` or forward slashes `/` 
 :::
 
 ### Format

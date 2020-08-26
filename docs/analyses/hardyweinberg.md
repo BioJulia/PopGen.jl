@@ -35,13 +35,15 @@ hwe_test(data::PopData, by::String = "locus", correction::String = "none")
 
 Calculate chi-squared test of HWE for each locus and returns observed and expected heterozygosity with chi-squared, degrees of freedom and p-values for each locus. Use `by = "population"` to perform this separately for each population (default: `"locus"`). Use `correction =` to specify a P-value correction method for multiple testing (recommended). For convenience, the correction method is appended to the name of the column, so you will always know how those P-values were adjusted.
 
-### arguments
+### Arguments
 
 - `data` : the input `PopData`
-- `by_pop =` : `false` (default) or `true` for hwe-by-population
-- `correction =`  : a string specifying a P-value adjustment type (default: "none")
 
-### `correction` methods
+### Keyword arguments 
+- `by` : `"locus"` (default) or `"population"`
+- `correction`  : a string specifying a P-value adjustment type (default: "none")
+
+#### `correction` methods
 
 - `"bonferroni"` : Bonferroni adjustment
 - `"holm"` : Holm adjustment
@@ -56,14 +58,14 @@ Calculate chi-squared test of HWE for each locus and returns observed and expect
 
 🤔 For more information on multiple testing adjustments, see [MultipleTesting.jl](https://juliangehring.github.io/MultipleTesting.jl/stable/)
 
-### example
+### Examples
 <Tabs
   block={true}
   defaultValue="hwe"
   values={[
     { label: 'HWE Chi-Sq', value: 'hwe', },
     { label: 'HWE with P adjustment', value: 'hwe_p', },
-    { label: 'HWE with by population', value: 'hwe_pop', },
+    { label: 'HWE by population', value: 'hwe_pop', },
   ]
 }>
 <TabItem value="hwe">

@@ -45,7 +45,7 @@ julia> mydata.loci.genotype =  mydata.loci.genotype |> Array{Union{Missing, NTup
 ```
 
 :::caution Windows users
-Make sure to change your backslashes `\` to forward slashes `/` 
+Make sure to change the backslashes `\` in your file path to double-backslashes `\\` or forward slashes `/` 
 :::
 
 ### Format

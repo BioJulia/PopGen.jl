@@ -32,7 +32,7 @@ By default, the file reader will assign numbers as population ID's (as Strings) 
 julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
 ```
 :::caution Windows users
-Make sure to change your backslashes `\` to forward slashes `/` 
+Make sure to change the backslashes `\` in your file path to double-backslashes `\\` or forward slashes `/` 
 :::
 
 ### Format
