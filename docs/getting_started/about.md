@@ -54,7 +54,7 @@ Julia's internals attempt to solve what's known as the "two language problem". T
 
 So, if we write everything in Julia, and you use everything in Julia, users can themselves diagnose these things if they so choose. We want the community to have the power to make sure that all the math and logic checks out. This means anyone can contribute to the overall health and accuracy of this package. Yes, that means that we might be getting more Issues opened up (*ugh*), but a bug found is a lot better than a bug overlooked!
 
-Like most Julia packages, PopGen.jl is written entirely in Julia, meaning the community using it need not learn another language if they wanted to contribute! Have you written a clever Julia function to calculate SAMOVA using `PopData`? Send us a pull request (please!)! Or [join the Slack group!](https://join.slack.com/t/popgenjl/shared_invite/zt-deam65n8-DuBs2z1oDtsbBuRplJW~Pg)
+Like most Julia packages, PopGen.jl is written entirely in Julia, meaning the community using it need not learn another language if they wanted to contribute! Have you written a clever Julia function to calculate SAMOVA using `PopData`? Send us a pull request (please!)! Or [join the Slack group!](https://join.slack.com/t/popgenjl/shared_invite/zt-deam65n8-DuBs2z1oDtsbBuRplJW~Pg) 
 
 #### Package manager
 

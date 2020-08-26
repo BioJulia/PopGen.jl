@@ -28,10 +28,10 @@ We include the familiar nancycats microsatellite data, as featured in [adegenet]
 ```julia
 julia> ncats = nancycats()
 PopData Object
-  Marker type: Microsatellite
+  Markers: Microsatellite
   Ploidy: 2
-  Number of individuals: 237
-  Number of loci: 9
+  Samples: 237
+  Loci: 9
   Populations: 17
   Coordinates: absent
 ```
@@ -45,11 +45,11 @@ We also include the SNP dataset used in [Dimens *et al.* 2019](https://link.spri
 ```julia
 julia> sharks = gulfsharks()
 PopData Object
-  Marker type: SNP
+  Markers: SNP
   Ploidy: 2
-  Number of individuals: 212
-  Number of loci: 2209
+  Samples: 212
+  Loci: 2209
   Populations: 7
-  Coordinates: present with 0 missing
+  Coordinates: present
 ```
 

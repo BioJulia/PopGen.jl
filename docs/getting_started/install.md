@@ -6,7 +6,7 @@ sidebar_label: Installation
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The package is currently unregistered while it's under active early development. However, installation is still simple!
+Installation is still simple!
 
 <Tabs
   block={true}
@@ -17,6 +17,7 @@ The package is currently unregistered while it's under active early development.
   ]
 }>
 <TabItem value="repl">
+
 Invoke the package manager with `]` in the REPL and use
 
 ```julia
@@ -27,6 +28,8 @@ add PopGen
 
 </TabItem>
 <TabItem value="jupyter">
+
+Slightly different than the REPL, you will need to invoke `using Pkg`.
 
 ```julia
 using Pkg
