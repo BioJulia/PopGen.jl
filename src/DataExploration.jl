@@ -1,7 +1,6 @@
 
 export pairwise_identical, missing
 
-#TODO relocate in docs
 """
     missing(data::PopData; by::String = "sample")
 Get missing genotype information in a `PopData`. Specify a mode of operation
@@ -47,7 +46,6 @@ missing(gulfsharks(), by = "pop")
     end
 end
 
-#TODO add to docs (Data Exploration page and API)
 
 """
     pairwise_identical(data::PopData)

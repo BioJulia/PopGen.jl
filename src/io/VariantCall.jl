@@ -31,12 +31,11 @@ Load a BCF file into memory as a PopData object. Population information needs to
 - `silent`: true/false of whether to print extra file information (default: `false`).
 Alleles are recoded according to the following schema:
 
-|Base| | Allele |
-|:---:|:---:|:---:|
-| A | => | 1 |
-| T | => | 2 |
-| C | => | 3 |
-| G | => | 4 |
+
+| **Base**   |  A   |  T   |  C   |  G   |
+| :--------  | :--: | :--: | :--: | :--: |
+| **Allele** |  1   |  2   |  3   |  4   |
+
 
 ### Mixed-ploidy data
 If importing mixed-ploidy data (such as poolseq), you will need to perform an additional
@@ -80,7 +79,7 @@ function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
         stacked_geno_df, 
         :name => PooledArray => :name, 
         :population => PooledArray => :population, 
-        :locus => (i -> PooledArray(i |> Array{String})) => :locus, 
+        :locus => (i -> PooledArray(i |> Vector{String})) => :locus, 
         :genotype
     )
     # replace missing genotypes as missing
@@ -119,12 +118,11 @@ Load a VCF file into memory as a PopData object. Population information needs to
 - `silent`: true/false of whether to print extra file information (default: `false`).
 Alleles are recoded according to the following schema:
 
-|Base| | Allele |
-|:---:|:---:|:---:|
-| A | => | 1 |
-| T | => | 2 |
-| C | => | 3 |
-| G | => | 4 |
+
+| **Base**   |  A   |  T   |  C   |  G   |
+| :--------  | :--: | :--: | :--: | :--: |
+| **Allele** |  1   |  2   |  3   |  4   |
+
 
 ### Mixed-ploidy data
 If importing mixed-ploidy data (such as poolseq), you will need to perform an additional
@@ -169,7 +167,7 @@ function vcf(infile::String; rename_snp::Bool = false, silent::Bool = false, all
         stacked_geno_df, 
         :name => PooledArray => :name, 
         :population => PooledArray => :population, 
-        :locus => (i -> PooledArray(i |> Array{String})) => :locus, 
+        :locus => (i -> PooledArray(i |> Vector{String})) => :locus, 
         :genotype
     )
     # replace missing genotypes as missing
