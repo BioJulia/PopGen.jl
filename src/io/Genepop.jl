@@ -9,7 +9,7 @@ Load a Genepop format file into memory as a PopData object.
 - `digits::Integer`: number of digits denoting each allele (default: `3`)
 - `popsep::String` : word that separates populations in `infile` (default: "POP")
 - `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
-- `silent::Bool`   : whether to print file information during import (default: `true`)
+- `silent::Bool`   : whether to print file information during import (default: `false`)
 - `allow_monomorphic::Bool` : whether to keep monomorphic loci in the dataset (default: `false`)
 
 
