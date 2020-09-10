@@ -35,6 +35,7 @@ Load a Structure format file into memory as a PopData object.
 - `missingval::String`  : the value used to identify missing values in the data (default: `"-9"`)
 - `silent::Bool`   : whether to print file information during import (default: `false`)
 - `allow_monomorphic::Bool` : whether to keep monomorphic loci in the dataset (default: `false`)
+- `faststructure::Bool`: whether the file is fastStructure format (default: `false`)
 
 ### File must follow this Structure format:
 - the file is `tab` or `space` delimited **but not both**
@@ -60,12 +61,32 @@ walnut_03	2	110	145	-9	0	92
 walnut_03	2	110	148	66	1	-9
 ```
 
+### fastStructure file format:
+- the file is `tab` or `space` delimited **but not both**
+- no first row of loci names
+- number of rows per sample = ploidy
+    - e.g. if diploid, that sample would have 2 rows
+- first data column is sample name
+- second data column is population ID
+- remaining columns are the genotype for that individual for that locus
+- usually, first 6 colums are empty (but not necessary)
+- **no** extra rows or columns.
+### fastStructure file example:
+```
+chestnut_01	1	-9	145	66	0	92
+chestnut_01	1	-9	-9	64	0	94
+chestnut_02	1	106	142	68	1	92
+chestnut_02	1	106	148	64	0	94
+chestnut_03	2	110	145	-9	0	92
+chestnut_03	2	110	148	66	1	-9
+```
+
 ## Example
 ```
 walnuts = structure("juglans_nigra.str", extracols = 0, extrarows = 0)
 ```
 """
-function structure(infile::String; silent::Bool = false, extracols::Int = 0, extrarows::Int = 0, allow_monomorphic::Bool = false, missingval::String = "-9")
+function structure(infile::String; silent::Bool = false, extracols::Int = 0, extrarows::Int = 0, allow_monomorphic::Bool = false, missingval::String = "-9", faststructure::Bool = false)
     # find the delimiter
     delimcheck = join(open(readlines, `head -n $(2+extrarows) $(infile)`))
 
@@ -79,9 +100,16 @@ function structure(infile::String; silent::Bool = false, extracols::Int = 0, ext
         error("Please format $infile to be either tab or space delimited")
     end
     
+    if faststructure == true
+        data_row = 1
+        first_row = split(strip(open(readline, infile)), delim)
+        n_loci = length(first_row)
+        locinames = ["marker_$i" for i in 1:n_loci-2]
+    else
+        data_row = 2 + extrarows
+        locinames = Symbol.(split(strip(open(readline, infile)), delim))
+    end
     # read in the file as a table
-    locinames = Symbol.(split(strip(open(readline, infile)), delim))
-    data_row = 2 + extrarows
     geno_parse = CSV.File(
         infile,
         delim = delim,
@@ -90,10 +118,21 @@ function structure(infile::String; silent::Bool = false, extracols::Int = 0, ext
         missingstrings = [missingval],
         #type = type,
         ignorerepeated = true
-    ) |> DataFrame
-    # ignore any extra columns
-    if !iszero(extracols)
-        geno_parse = geno_parse[!, Not(collect(3:2+n))]
+        ) |> DataFrame
+        # ignore any extra columns
+        if !iszero(extracols)
+            geno_parse = geno_parse[!, Not(collect(3:2+n))]
+        end
+        
+    # determine marker from max genotype value
+    maxval = map(i -> maximum(skipmissing(i)), eachcol(geno_parse[3:end])) |> maximum
+    markertype = maxval < 100 ? Int8 : Int16
+    if faststructure == true
+        if markertype == Int8
+            locinames = Symbol.(replace.(locinames, "marker" => "snp"))
+        else
+            locinames = Symbol.(replace.(locinames, "marker" => "msat"))
+        end
     end
     
     rename!(geno_parse, append!([:name, :population], locinames))
@@ -103,9 +142,6 @@ function structure(infile::String; silent::Bool = false, extracols::Int = 0, ext
     geno_parse.population = string.(geno_parse.population)
     by_sample = groupby(geno_parse, :name)
     
-    # determine marker from max genotype value
-    maxval = map(i -> maximum(skipmissing(i)), eachcol(geno_parse[3:end])) |> maximum
-    markertype = maxval < 100 ? Int8 : Int16
     
     # create new dataframe to add phased genotypes to
     loci_df = DataFrame(:locus => locinames)
