@@ -191,3 +191,67 @@ function structure(infile::String; silent::Bool = false, extracols::Int = 0, ext
     return pd_out
 end
 
+
+"""
+    popdata2structure(data::PopData; filename::String, faststructure::Bool, delim::String)
+Write a `PopData` object to a Stucture format file
+- `data`: the `PopData` object you wish to convert to a Genepop file
+### keyword arguments
+- `filename`: a `String` of the output filename
+- `delim` : a `String` of either `"tab"` or `"space"` indicating the delimiter (default: `"tab"`)
+- `faststructure`: true/false of whether the output should be formatted for fastStructure (default: `false`)
+
+```
+cats = nancycats();
+fewer_cats = omit(cats, name = samples(cats)[1:10]);
+popdata2structure(fewer_cats, filename = "filtered_nancycats.str", faststructure = true)
+```
+"""
+function popdata2structure(data::PopData; filename::String, faststructure::Bool = false, delim::String = "tab")
+    # index both dataframes
+    genos_gdf = groupby(data.loci, :name)
+    meta_gdf = groupby(data.meta, :name)
+    # get the sample names to iterate keys over
+    idx = collect(samples(data))
+    
+    outfile = open(filename, "w")
+    
+    # check delimiter
+    if delim == "tab"
+        dlm = "\t"
+    elseif delim == "space"
+        dlm = " "
+    else
+        throw(ArgumentError("Please choose from either \"tab\" (default) or \"space\" delimiters."))
+    end
+
+    faststructure == false && println(outfile, join([i * dlm for i in loci(data)]))
+    
+    # remap populations as integers
+    pops = unique(data.meta.population)
+    pop_mappings = Dict{String,Integer}()
+    [pop_mappings[j] = i for (i,j) in enumerate(pops)]
+
+    for sampl in idx
+        ploid = meta_gdf[(name = sampl,)].ploidy |> first
+        pop_id = meta_gdf[(name = sampl,)].population |> first
+    
+        # copy so as to not overwrite
+        genos = copy(genos_gdf[(name = sampl,)].genotype)
+    
+        # replace missing with -9's
+        miss_idx = findall(ismissing, genos)
+        for i in miss_idx
+            genos[i] = phase_structure(Int8, fill(-9, ploid)...)
+        end
+
+        # write the alleles to the file
+        for allele in 1:ploid
+            tmp_alleles = getindex.(genos, allele)
+            allele_row = join([string(i, dlm) for i in tmp_alleles[1:end-1]])
+            allele_row *= string(tmp_alleles[end])
+            println(outfile, sampl, dlm, pop_mappings[pop_id], dlm, allele_row)
+        end
+    end
+    close(outfile)
+end

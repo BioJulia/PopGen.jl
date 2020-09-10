@@ -59,9 +59,10 @@ to Genepop format, call up the docstring to `popdata2genepop` with `?popdata2gen
 
 | File Format | Extensions             | Docstring          |
 | :---------- | :--------------------- | :----------------- |
-| genepop     | '.gen', '.genepop'     | ?popdata2genepop   |
-| JLD2        | '.jld2'                | ?popdata2jld2      |
-| delimited   | '.csv', '.txt', '.tsv' | ?popdata2delimited |
+| genepop     | `.gen`, `.genepop`     | ?popdata2genepop   |
+| JLD2        | `.jld2`                | ?popdata2jld2      |
+| delimited   | `.csv`, `.txt`, `.tsv` | ?popdata2delimited |
+| structure   | `.str`, `.structure`   | ?popdata2structure |
 
 ### Example
 ```
@@ -76,6 +77,8 @@ function write_to(data::PopData; filename::String, kwargs...)
         popdata2genepop(data, filename = filename; kwargs...)
     elseif ext == "jld2"
         popdata2jdl2(data, filename = filename)
+    elseif ext in ["str", "structure"]
+        return popdata2structure(infile; kwargs...)
     elseif ext in ["csv", "txt", "tsv"]
         popdata2delimited(data, filename = filename; kwargs...)
     else
