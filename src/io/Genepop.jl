@@ -118,8 +118,8 @@ function genepop(
     sample_table = DataFrame(
         name = geno_parse.name,
         population = geno_parse.population,
-        latitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts)),
         longitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts))
+        latitude = Vector{Union{Missing,Float32}}(undef, sum(popcounts)),
     )
     # wide to long format
     geno_parse = DataFrames.stack(geno_parse, DataFrames.Not([:name, :population]))
