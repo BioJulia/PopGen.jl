@@ -315,7 +315,6 @@ function populations!(data::PopData, rename::Vector{String})
 end
 
 function populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
-    meta_pops = deepcopy(populations)
     meta_df = groupby(data.meta, :name)
     loci_df = groupby(data.loci, :name)
     for (sample, new_pop) in zip(samples, populations)
