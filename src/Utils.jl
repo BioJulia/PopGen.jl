@@ -1,6 +1,6 @@
 export quickstart, size, drop_monomorphic, drop_monomorphic!
 
-#TODO change location in API docs
+#TODO change location in API docs and rename allele_pool
 """
     alleles(locus::T; miss::Bool = false) where T<:GenoArray
 Return an array of all the non-missing alleles of a locus. Use
@@ -10,7 +10,7 @@ Return an array of all the non-missing alleles of a locus. Use
     if miss==true
         Base.Iterators.flatten(locus) |> collect
     else
-        @inbounds Base.Iterators.flatten(locus[.!ismissing.(locus)]) |> collect
+        reduce(vcat, collect.(skipmissing(locus)))
     end
 end
 
@@ -141,6 +141,7 @@ function loci_dataframe(data::PopData)
 end
 
 #TODO add to docs API
+#TODO make a SMatrix instead?
 """
     loci_matrix(data::PopData)
 Return a matrix of genotypes with dimensions `samples × loci`.
@@ -376,6 +377,14 @@ the number is `0` instead of returning `Inf`.
 """
 function reciprocal(num::T) where T <: Real
     !iszero(num) ? 1.0/float(num) : 0.0
+end
+
+"""
+    Base.sort(x::NTuple{N,T}) where N where T <: Signed 
+Sort the integers within a Tuple and return the sorted Tuple.
+"""
+function Base.sort(x::NTuple{N,T}) where N where T <: Signed 
+    Tuple(sort(SVector(x)))
 end
 
 #TODO add to API docs

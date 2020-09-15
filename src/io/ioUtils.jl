@@ -68,13 +68,10 @@ map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
     loc == "-9" || iszero(parse(Int, loc)) && return missing
     phased = map(i -> parse(type, join(i)), Iterators.partition(loc, digit))
     sort!(phased)
-    tupled = Tuple(phased)
-    return tupled
+    Tuple(phased)
 end
 
-@inline function phase(loc::Missing, type::DataType, digit::Int)
-    return missing
-end
+phase(loc::Missing, type::DataType, digit::Int) = missing
 
 @inline function phase(loc::T, type::DataType, digit::Int) where T<:Signed
     loc == -9 || iszero(loc) && return missing

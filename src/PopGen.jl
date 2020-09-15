@@ -36,7 +36,7 @@ module PopGen
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-using CSV, Distributions, DataFrames, PooledArrays
+using CSV, Distributions, DataFrames, PooledArrays, StaticArrays
 using FileIO, JLD2, Requires, ProgressMeter
 using MultipleTesting, Random, StatsBase
 #using Convex,ECOS
