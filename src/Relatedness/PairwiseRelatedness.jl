@@ -75,7 +75,12 @@ the `all` method, where resampling occurs over all loci. This is an internal fun
 """
 function relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    sample_pairs = pairwise_pairs(sample_names)
+    uniq_pops = unique(data.meta.population)
+    if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
+        sample_pairs = sim_pairs(sample_names)
+    else
+        sample_pairs = pairwise_pairs(sample_names)
+    end    
     n_samples = length(samples(data))
     allele_frequencies = allele_freq(data)
     n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
@@ -132,7 +137,12 @@ the `nonmissing` method, where resampling occurs over only shared non-missing lo
 """
 function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    sample_pairs = pairwise_pairs(sample_names)
+    uniq_pops = unique(data.meta.population)
+    if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
+        sample_pairs = sim_pairs(sample_names)
+    else
+        sample_pairs = pairwise_pairs(sample_names)
+    end
     n_samples = length(samples(data))
     n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
@@ -189,7 +199,12 @@ This is an internal function with arguments provided by `relatedness`.
 function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     n_samples = length(samples(data))
-    sample_pairs = pairwise_pairs(sample_names)
+    uniq_pops = unique(data.meta.population)
+    if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
+        sample_pairs = sim_pairs(sample_names)
+    else
+        sample_pairs = pairwise_pairs(sample_names)
+    end
     n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))

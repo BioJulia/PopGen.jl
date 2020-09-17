@@ -380,6 +380,25 @@ function reciprocal(num::T) where T <: Real
 end
 
 """
+    sim_pairs(data::Vector{String})
+Takes a Vector of sample names and returns a Tuple of sample pairs, grouped by simulation
+number. This is an internal function used for isolating sibship pairs from simulated shipship
+pairs (via `PopGenSims.jl`) to perform `relatedness` estimates only on those pairs.
+
+**Example**
+julia> a = ["sim1_off1", "sim1_off2", "sim2_off1", "sim2_off2"] ;
+
+julia> sim_pairs(a)
+("sim1_off1", "sim1_off2")
+("sim2_off1", "sim2_off2")
+"""
+function sim_pairs(data::Vector{String})
+    n = length(data)
+    isodd(n) && error("Expected an even number of samples, but got $n")
+    Tuple.(Base.Iterators.partition(sort(data), 2))
+end
+
+"""
     Base.sort(x::NTuple{N,T}) where N where T <: Signed 
 Sort the integers within a Tuple and return the sorted Tuple.
 """
