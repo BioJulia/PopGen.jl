@@ -262,6 +262,11 @@ For more information on a specific method, please see the respective docstring (
 - `Ritland`
 - `Wang`
 
+### Simulated siblingship comparison
+If validating the estimators using `PopGenSims.jl` to simulate sibship relationships, `relatedness`
+will recognize `PopData` generated in that manner (the `population` column) and only compare siblingship
+pairs. 
+
 ### Inbreeding
 Use the `inbreeding` keyword to specify whether to allow inbreeding (`true`) or not (`false`, default).
 This is only relevant for the `dyadicLikelihood` method.
