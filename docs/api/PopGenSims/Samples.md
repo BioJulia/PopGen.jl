@@ -1,33 +1,18 @@
 ---
-id: simulations
-title: Simulating Data
-sidebar_label: Simulating Data
+id: popgensims_samples
+title: Samples.jl
+sidebar_label: Samples.jl
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
-If you're looking to simulate breeding crosses, check out [GeneticCrosses.jl](https://github.com/pdimens/GeneticCrosses.jl). In the future, the simulation functionality of PopGen.jl may be moved into GeneticCrosses.jl.
-
-:::caution Help Wanted
-Being able to simulate samples in more ways would be awesome. Please reach out to use if you're interested in 
-expanding the kind of simulations PopGen.jl can perform. 
-:::
-
-## Simulate samples within populations
-```julia
-simulate(data::PopData; n::Int = 100)
-```
-If you want to generate simulated data of a certain number of individuals per popultion, you can do so with the `simulate()` function, which takes a `PopData` object and simulates `n` number of individuals per population using the allele frequencies of each population. This returns 
-new `PopData`. The simulated samples will have the naming convention `sim_#` where `#` is a number from 1:`n`. These simulations return samples with the same ploidy as the source `PopData`, but will **not** work on mixed-ploidy data. 
-
-In the example below, we simulate 100 individuals per
-population using the nancycats data, which has 17 populations, therefore the resulting `PopData` will have 1700 samples (100 samples x 17 populations)
-
+## `simulate`
+    simulate(data::PopData; n::Int = 100)
+Simulate `n` number of individuals (default: `100`) per population using per-population
+allele frequencies derived from a `PopData` object. Returns a new `PopData` object.
 #### Example
 ```julia
 cats = nancycats();
 
-julia> sims = simulate(x , n = 100)
+julia> sims = simulate(cats , n = 100)
 PopData Object
   Markers: Microsatellite
   Ploidy: 2
@@ -35,21 +20,7 @@ PopData Object
   Loci: 9
   Populations: 17
   Coordinates: absent
-```
 
-Here is a look inside the `PopData` to verify everything looks as expected.
-
-<Tabs
-  block={true}
-  defaultValue="m"
-  values={[
-    { label: 'meta', value: 'm', },
-    { label: 'loci', value: 'l', },
-  ]
-}>
-<TabItem value="m">
-
-```
 julia> sims.meta
   1700×5 DataFrame
   │ Row  │ name     │ population │ ploidy │ longitude │ latitude │
@@ -65,12 +36,7 @@ julia> sims.meta
   │ 1698 │ sim_1698 │ 17         │ 2      │ missing   │ missing  │
   │ 1699 │ sim_1699 │ 17         │ 2      │ missing   │ missing  │
   │ 1700 │ sim_1700 │ 17         │ 2      │ missing   │ missing  │  
-```
-
-</TabItem>
-<TabItem value="l">
-
-```
+  
 julia> sims.loci
   15300×4 DataFrame
   │ Row   │ name     │ population │ locus  │ genotype   │
@@ -86,6 +52,3 @@ julia> sims.loci
   │ 15299 │ sim_1700 │ 17         │ fca96  │ (113, 113) │
   │ 15300 │ sim_1700 │ 17         │ fca37  │ (208, 208) │
 ```
-
-</TabItem>
-</Tabs>

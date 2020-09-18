@@ -26,8 +26,12 @@ module.exports = {
     "Analyses":[
       "analyses/hardyweinberg",
       "analyses/relatedness",
-      "analyses/simulations"
     ],
+    "Simulations":[
+      "simulations/simulate_samples",
+      "simulations/breeding_crosses",
+      "simulations/sibship_simulations",
+    ],    
     "API": [
       "api/api",
       "api/allelefreq",
@@ -43,7 +47,14 @@ module.exports = {
       "api/permutations",
       "api/read",
       "api/relatednessmoments",
-      "api/simulations",
+      {
+      "PopGenSims":[
+        "api/PopGenSims/popgensims_cross",
+        "api/PopGenSims/popgensims_samples",
+        "api/PopGenSims/popgensims_sibship",
+        "api/PopGenSims/popgensims_utils",
+      ]
+      },
       "api/summaryinfo",
       "api/types",
       "api/utils",

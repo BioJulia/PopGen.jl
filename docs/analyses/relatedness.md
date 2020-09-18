@@ -29,16 +29,6 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
 
 ## Calculate Relatedness
 
-### Arguments
-- `data` : A PopData object
-- `sample_names` : A list of samples names to calculate relatedness for (optional)
-
-### Keyword Arguments
-- `method` : A method function or vector of method functions (see below)
-- `iterations` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
-- `interval` : A Tuple of (low, high) indicating the confidence intervals you would like for bootstrapping (default: `(0.275, 0.975)`, i.e. 95%)
-- `inbreeding` : true/false of whether to consider inbreeding in the calculations (default: `false`). Only used in `dyadML`
-
 <Tabs
   block={true}
   defaultValue="a"
@@ -56,6 +46,16 @@ Return a dataframe of pairwise relatedness estimates for all individuals in a `P
 method `F` (see below). To calculate means, median, standard error, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%), however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`. **Note:** samples must be diploid.
+
+### Arguments
+- `data` : A PopData object
+- `sample_names` : A list of samples names to calculate relatedness for (optional)
+
+### Keyword Arguments
+- `method` : A method function or vector of method functions (see below)
+- `iterations` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
+- `interval` : A Tuple of (low, high) indicating the confidence intervals you would like for bootstrapping (default: `(0.275, 0.975)`, i.e. 95%)
+- `inbreeding` : true/false of whether to consider inbreeding in the calculations (default: `false`). Only used in `dyadML`
 
 **Examples**
 ```
@@ -87,6 +87,16 @@ set `iterations = n` where `n` is an integer greater than `0` (the default) corr
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%),
 however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
 **Note:** samples must be diploid.
+
+### Arguments
+- `data` : A PopData object
+- `sample_names` : A list of samples names to calculate relatedness for (optional)
+
+### Keyword Arguments
+- `method` : A method function or vector of method functions (see below)
+- `iterations` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
+- `interval` : A Tuple of (low, high) indicating the confidence intervals you would like for bootstrapping (default: `(0.275, 0.975)`, i.e. 95%)
+- `inbreeding` : true/false of whether to consider inbreeding in the calculations (default: `false`). Only used in `dyadML`
 
 **Examples**
 ```
@@ -132,11 +142,6 @@ in specifying the methods. Methods can be supplied as a vector.
 - [Ritland](analyses/relatedness.md#ritland)
 - [Wang](analyses/relatedness.md#wang)
 
-:::tip autocompletion
-Since the methods correspond to function names, they will tab-autocomplete when 
-inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
-:::
-
 #### Examples
 
 <Tabs
@@ -176,6 +181,11 @@ julia> cat_kin = relatendess(cats, method = [Ritland, Wang], iterations = 100)
 
 </TabItem>
 </Tabs>
+
+:::tip autocompletion
+Since the methods correspond to function names, they will tab-autocomplete when 
+inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
+:::
 
 ## Relatedness Estimators
 ### Blouin
