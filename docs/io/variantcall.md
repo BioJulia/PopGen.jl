@@ -44,10 +44,6 @@ julia> mydata = bcf("path/to/file.bcf", silent = true, rename_loci = true) ;
 julia> mydata.loci.genotype =  mydata.loci.genotype |> Array{Union{Missing, NTuple}}
 ```
 
-:::caution Windows users
-Make sure to change the backslashes `\` in your file path to double-backslashes `\\` or forward slashes `/` 
-:::
-
 ### Format
 Variant Call Format files follow a format standard, and while there is some wiggle-room for optional values, PopGen.jl only requires the core/mandatory components of a BCF/VCF, meaning problems should hopefully not arise regardless of which variant caller you are using (although we use `Freebayes` ourselves). Please open an issue if they do, or reach out to us on the community Slack.
 

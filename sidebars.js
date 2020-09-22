@@ -13,6 +13,7 @@ module.exports = {
       "io/file_write",
       "io/delimited",
       "io/genepop",
+      "io/structure",
       "io/vcf",
     ],
     "Basics": [
@@ -55,6 +56,7 @@ module.exports = {
         "api/PopGenSims/popgensims_utils",
       ]
       },
+      "api/structure",
       "api/summaryinfo",
       "api/types",
       "api/utils",

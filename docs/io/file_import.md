@@ -4,16 +4,21 @@ title: Reading in data
 sidebar_label: Reading in data
 ---
 
-Currently, PopGen.jl provides four different file parsers with which to create `PopData`. Each of the file types have their own file importer denoted simply by the file type:
+Currently, PopGen.jl provides a handful of file readers with which to create `PopData`. Each of the file types have their own file reader denoted simply by the file type:
 
 | File type                     | Function to import it |
 | ----------------------------- | --------------------- |
 | Delimited                     | `delimited()`         |
 | Genepop                       | `genepop()`           |
+| Structure/fastStructure       | `structure()`         |
 | Variant Call Format           | `vcf()`               |
 | Variant Call Format (bzipped) | `bcf()`               |
 
 You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_from()`. This wrapper is also aliased with the more-explicit name `file_import()`. Feel free to use whichever you like best.
+
+:::caution Windows users
+Make sure to change the backslashes `\` in your file path to double-backslashes `\\` or forward slashes `/` 
+:::
 
 :::note monomorphic loci
 By default, the file reading methods drop monomorphic loci and inform you which were removed, so do not be alarmed if the number of loci in your `PopData` is different from the source data. You can disable this
@@ -43,7 +48,7 @@ Accepted extensions: `.csv`, `.tsv`, `.txt`
 - each line represents a row
 
 
-### [Genepop Files](genepop.md)
+### [Genepop files](genepop.md)
 
 Accepted extensions: `.gen`, `.genepop`
 
@@ -57,6 +62,14 @@ Accepted extensions: `.gen`, `.genepop`
 	- e.g. for genotype 001002 (3 digits per allele)
 	- allele 1 = 001
 	- allele 2 = 002
+
+
+### [Stucture files](structure.md)
+
+Accepted extensions: `.str`, `.structure`
+
+The formats vary between and within Structure and fastStructure files. See the [documentation page](structure.md)
+for the specific details. 
 
 
 ### [Variant Call Format](variantcall.md)
