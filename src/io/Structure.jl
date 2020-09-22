@@ -195,7 +195,7 @@ end
 """
     popdata2structure(data::PopData; filename::String, faststructure::Bool, delim::String)
 Write a `PopData` object to a Stucture format file
-- `data`: the `PopData` object you wish to convert to a Genepop file
+- `data`: the `PopData` object you wish to write to a Structure file
 ### keyword arguments
 - `filename`: a `String` of the output filename
 - `delim` : a `String` of either `"tab"` or `"space"` indicating the delimiter (default: `"tab"`)
