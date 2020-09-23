@@ -1,6 +1,5 @@
 export structure
 
-#TODO add to docs (API)
 """
 	phase_structure(datatype::DataType, args...)
 Takes a DataType (such as `Int8`) and a series of integers to return
@@ -22,7 +21,6 @@ function phase_structure(datatype::DataType, args...)
     return Tuple(datatype.(sort([args...])))
 end
 
-#TODO add to docs (own page + API)
 """
     structure(infile::String; kwargs...)
 Load a Structure format file into memory as a PopData object.
