@@ -81,16 +81,17 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
     else
         sample_pairs = pairwise_pairs(sample_names)
     end    
+    n_pairs = length(sample_pairs)
     n_samples = length(samples(data))
     allele_frequencies = allele_freq(data)
     n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
-    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
-    boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
-    shared_loci = Vector{Int}(undef, length(sample_pairs))
-    p = Progress(length(sample_pairs)*length(method), dt = 1, color = :blue)
+    boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, n_pairs), 1:length(method))
+    shared_loci = Vector{Int}(undef, n_pairs)
+    p = Progress(n_pairs*length(method), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
-    @inbounds for i in 1:length(sample_pairs)
+    @inbounds for i in 1:n_pairs
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
         # get index for genotype appearing missing in at least one individual in the pair
@@ -103,7 +104,7 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
                 @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loci, n_samples = n_samples, inbreeding = inbreeding)
                 boot_out = bootstrap_genos_all(geno1, geno2, loci_names, n_per_loci, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding, n = j+1)
                 @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = bootstrap_summary(boot_out, interval)
-                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(length(sample_pairs))" * ")"
+                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(n_pairs)" * ")"
                 ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
             end
         end
@@ -143,16 +144,17 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
     else
         sample_pairs = pairwise_pairs(sample_names)
     end
+    n_pairs = length(sample_pairs)
     n_samples = length(samples(data))
     n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
-    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
-    boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
-    shared_loci = Vector{Int}(undef, length(sample_pairs))
-    p = Progress(length(sample_pairs) * length(method), dt = 1, color = :blue)
+    boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, n_pairs), 1:length(method))
+    shared_loci = Vector{Int}(undef, n_pairs)
+    p = Progress(n_pairs * length(method), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
-    @inbounds for i in 1:length(sample_pairs)
+    @inbounds for i in 1:n_pairs
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
         # get index for genotype appearing missing in at least one individual in the pair
@@ -165,7 +167,7 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
                 @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
                 boot_out = bootstrap_genos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
                 @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = bootstrap_summary(boot_out, interval)
-                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(length(sample_pairs))" * ")"
+                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$n_pairs" * ")"
                 ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
             end
         end
@@ -205,13 +207,14 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
     else
         sample_pairs = pairwise_pairs(sample_names)
     end
+    n_pairs = length(sample_pairs)
     n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
-    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
-    shared_loci = Vector{Int}(undef, length(sample_pairs))
-    p = Progress(length(sample_pairs)* length(method), dt = 1, color = :blue)
+    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
+    shared_loci = Vector{Int}(undef, n_pairs)
+    p = Progress(n_pairs* length(method), dt = 1, color = :blue)
     popdata_idx = groupby(data.loci, :name)
-    @inbounds @sync for i in 1:length(sample_pairs)
+    @inbounds @sync for i in 1:n_pairs
         Base.Threads.@spawn begin
             @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
             @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
@@ -219,7 +222,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
             @inbounds shared_loci[i] = length(keep_idx)
             @inbounds for (j, mthd) in enumerate(method)
                 @inbounds relate_vecs[j][i] = mthd(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding)
-                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(length(sample_pairs))" * ")"
+                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * "/" * "$(n_pairs)" * ")"
                 ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
             end
         end
@@ -359,7 +362,7 @@ function relatedness(data::PopData, sample_names::Vector{String}; method::F, ite
         elseif resample == "nonmissing"
             relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
         else
-            throw(ArgumentError("Please choose from resample methods \"all\" or \"nonmissing\""))
+            throw(ArgumentError("Invalid resample method. Please choose from resample methods \"all\" or \"nonmissing\""))
         end
     else
         relatedness_no_boot(data, sample_names, method = method, inbreeding = inbreeding)
