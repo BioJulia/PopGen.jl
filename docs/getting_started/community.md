@@ -10,6 +10,17 @@ Have questions, want to talk population genetics, or have ideas?
 
  [![alt text](https://img.shields.io/badge/slack-join%20PopGen.jl-9d72b1?style=for-the-badge&logo=slack)](https://join.slack.com/t/popgenjl/shared_invite/zt-deam65n8-DuBs2z1oDtsbBuRplJW~Pg)
 
+:::note Community Standards
+The PopGen.jl community is committed to maintaining a welcoming, inclusive, civil, and constructive environment. We expect the following standards to be observed and upheld by all participants during all forms of communication.
+
+#### Be respectful and inclusive
+Do not attack anyone based on any aspect of personal identity, including but not limited to: gender, sexuality, politics, religion, ethnicity, race, age, or ability. Refrain from making prejudiced or sexual jokes and comments or using overtly sexual language or imagery. 
+
+If you believe one of these standards has been violated, you can either file an issue on an appropriate repository or confidentially contact Pavel in the Slack workspace. Although many mistakes are due to ignorance rather than malice, violation of these standards may result in the removal of an individual or individuals from the workspace. Please do your part in helping the community and the package grow.
+
+Adopted from the [Julia Community Standards](https://julialang.org/community/standards/).
+:::
+
 ## Contributing
 We absolutely welcome contributors to this package/project! See below for ways you can help PopGen.jl grow.
 
