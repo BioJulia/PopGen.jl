@@ -2,7 +2,7 @@ const remarkMath = require("remark-math");
 const rehypeKatex = require("rehype-katex");
 module.exports = {
   title: 'PopGen.jl',
-  tagline: 'Population Genetics in Julia',
+  tagline: 'A package to perform a suite of population genetics analyses, written in Julia',
   url: 'https://pdimens.github.io',
   baseUrl: '/PopGen.jl/',
   favicon: 'img/favicon.ico',
@@ -13,7 +13,7 @@ module.exports = {
       //defaultLanguage: 'julia',
       additionalLanguages: ['julia', 'r'],
       theme: require('prism-react-renderer/themes/github'),
-      darkTheme: require('prism-react-renderer/themes/palenight'),
+      darkTheme: require('prism-react-renderer/themes/dracula'),
     },
     algolia: {
       apiKey: 'f6d1b3005e55708c6b33b80157908b05',
@@ -53,9 +53,8 @@ module.exports = {
         },
         {
           href: 'https://github.com/pdimens/popgen.jl',
-          label: 'GitHub',
           position: 'right',
-          className: 'header-github-link',
+          className: 'header-github-link header-icon-link',
           'aria-label': 'GitHub repository',
         },
       ],
