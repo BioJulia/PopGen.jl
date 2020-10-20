@@ -2,7 +2,7 @@ const remarkMath = require("remark-math");
 const rehypeKatex = require("rehype-katex");
 module.exports = {
   title: 'PopGen.jl',
-  tagline: 'Population Genetics in Julia',
+  tagline: 'A package to perform a suite of population genetics analyses, written in Julia',
   url: 'https://pdimens.github.io',
   baseUrl: '/PopGen.jl/',
   favicon: 'img/favicon.ico',
