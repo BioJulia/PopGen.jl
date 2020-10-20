@@ -13,7 +13,7 @@ module.exports = {
       //defaultLanguage: 'julia',
       additionalLanguages: ['julia', 'r'],
       theme: require('prism-react-renderer/themes/github'),
-      darkTheme: require('prism-react-renderer/themes/palenight'),
+      darkTheme: require('prism-react-renderer/themes/dracula'),
     },
     algolia: {
       apiKey: 'f6d1b3005e55708c6b33b80157908b05',
