@@ -7,7 +7,7 @@ Population Genetics in Julia. We hope to merge this package into the `BioJulia` 
 ![build_status](https://img.shields.io/github/workflow/status/pdimens/PopGen.jl/CI_dev?label=Dev%20Build&logo=GitHub&style=for-the-badge)
 
 #### How to install:
-Invoke the package manager by pressing `]` on an empty line and `add` this repo
+Invoke the package manager by pressing `]` on an empty line and `add PopGen`
 
 ![install_instructions](misc/install_carbon.png)
 

@@ -1,7 +1,3 @@
-#=
-This file handles the import/export of delmited file formats
-=#
-
 export delimited, csv
 """
     delimited(infile::String; delim::Union{Char,String,Regex} = "auto", digits::Int64 = 3, silent::Bool = false)
@@ -15,6 +11,7 @@ in your file*
 - `digits` : number of digits denoting each allele (default: `3`)
 - `diploid`  : whether samples are diploid for parsing optimizations (default: `true`)
 - `silent`   : whether to print file information during import (default: `true`)
+- `allow_monomorphic::Bool` : whether to keep monomorphic loci in the dataset (default: `false`)
 
 ### File formatting:
 - The first row is column names (names don't matter)
@@ -55,7 +52,8 @@ function delimited(
     delim::Union{Char,String,Regex} = "auto",
     digits::Int = 3,
     diploid::Bool = true,
-    silent::Bool = false
+    silent::Bool = false,
+    allow_monomorphic::Bool = false
     )
 
     diploid ? type = nothing : type = String
@@ -71,23 +69,30 @@ function delimited(
     geno_type = determine_marker(file_parse, digits)
     geno_parse = DataFrames.stack(file_parse, DataFrames.Not(1:2))
     rename!(geno_parse, [:name, :population, :locus, :genotype])
-    categorical!(geno_parse, [:name, :population, :locus], compress = true)
-    transform!(geno_parse, :genotype => (i -> phase.(i, geno_type, digits)) => :genotype)
+    #categorical!(geno_parse, [:name, :population, :locus], compress = true)
+    select!(geno_parse,
+        :name => (i -> PooledArray(Array(i))) => :name,
+        :population => (i -> PooledArray(Array(i))) => :population,
+        :locus => (i -> PooledArray(Array(i))) => :locus, 
+        :genotype => (i -> phase.(i, geno_type, digits)) => :genotype
+    )
 
     if !silent
-        @info "\n$(abspath(infile))\n$(length(meta[!, 1])) samples across $(length(unique(meta[!,2]))) populations detected\n$(length(locinames)) loci detected"
+        @info "\n$(abspath(infile))\n$(length(meta[!, 1])) samples from $(length(unique(meta[!,2]))) populations detected\n$(length(locinames)) loci detected"
     end
-
-    # make sure levels are sorted by order of appearance
-    levels!(geno_parse.locus, unique(geno_parse.locus))
-    levels!(geno_parse.name, unique(geno_parse.name))
 
     ploidy = DataFrames.combine(
         groupby(dropmissing(geno_parse), :name),
         :genotype => find_ploidy => :ploidy
     ).ploidy
     DataFrames.insertcols!(meta, 3, :ploidy => ploidy)
-    PopData(meta, geno_parse)
+    
+    if allow_monomorphic 
+        pd_out = PopData(meta, geno_parse)
+    else
+        pd_out = drop_monomorphic!(PopData(meta, geno_parse))
+    end
+    return pd_out
 end
 
 const csv = delimited

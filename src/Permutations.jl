@@ -4,8 +4,10 @@ Edits `PopData` in place with loci permuted across populations within
 the `.loci` dataframe.
 """
 @inline function permute_loci!(data::PopData)
-    @inbounds for locus in groupby(data.loci, :locus)
-        shuffle!(locus.population)
+    @inbounds @sync for locus in groupby(data.loci, :locus)
+        Base.Threads.@spawn begin
+            shuffle!(locus.population)
+        end
     end
     data
 end
@@ -26,9 +28,10 @@ if you also require the `.meta` dataframe edited in place.
             @inbounds name.population .= pop!(meta_pops)
         end
     end
-
-    @inbounds for name in groupby(data.loci, :name)
-        @inbounds name.population .= pop!(pops)
+    @inbounds @sync for name in groupby(data.loci, :name)
+        Base.Threads.@spawn begin
+            @inbounds name.population .= pop!(pops) 
+        end
     end
     data
 end
@@ -36,8 +39,10 @@ end
 @inline function permute_samples!(data::AbstractDataFrame, popnames::Vector{String})
     pops = shuffle(popnames)
 
-    @inbounds for name in groupby(data, :name)
-        @inbounds name.population .= pop!(pops)
+    @inbounds @sync for name in groupby(data, :name)
+        Base.Threads.@spawn begin 
+            @inbounds name.population .= pop!(pops)
+        end
     end
     data
 end
@@ -58,8 +63,10 @@ within populations.
     else
         error("Please choose from either \"locus\" or \"population\" run methods.")
     end
-    @inbounds for grp in groupby(data.loci, groupings)
-        grp.genotype .= strict_shuffle!(grp.genotype)
+    @inbounds @sync for grp in groupby(data.loci, groupings)
+        Base.Threads.@spawn begin
+            grp.genotype .= strict_shuffle!(grp.genotype)
+        end
     end
     data
 end
@@ -89,10 +96,12 @@ it would be best to identify ploidy in advance and set it to a specific integer.
         ploidy = tmp[1]
     end
 
-    @inbounds for grp in groupby(data.loci, groupings)
-        alle = shuffle(alleles(grp.genotype))
-        new_genos = Tuple.(Base.Iterators.partition(alle, ploidy))
-        (@view grp.genotype[.!ismissing.(grp.genotype)]) .= new_genos
+    @inbounds @sync for grp in groupby(data.loci, groupings)
+        Base.Threads.@spawn begin
+            alle = shuffle(alleles(grp.genotype))
+            new_genos = Tuple.(Base.Iterators.partition(alle, ploidy))
+            (@view grp.genotype[.!ismissing.(grp.genotype)]) .= new_genos
+        end
     end
     data
 end

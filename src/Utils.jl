@@ -1,4 +1,6 @@
-#TODO change location in API docs
+export quickstart, size, drop_monomorphic, drop_monomorphic!
+
+#TODO change location in API docs and rename allele_pool
 """
     alleles(locus::T; miss::Bool = false) where T<:GenoArray
 Return an array of all the non-missing alleles of a locus. Use
@@ -8,10 +10,14 @@ Return an array of all the non-missing alleles of a locus. Use
     if miss==true
         Base.Iterators.flatten(locus) |> collect
     else
-        @inbounds Base.Iterators.flatten(locus[.!ismissing.(locus)]) |> collect
+        reduce(vcat, collect.(skipmissing(locus)))
     end
 end
 
+# TODO add to docs: Utils.jl API
+function Base.size(data::PopData)
+    return (samples = size(data.meta)[1], loci = length(loci(data)))
+end
 
 """
     unique_alleles(locus::T) where T<:GenoArray
@@ -63,6 +69,368 @@ end
 
 function Base.copy(data::PopData)
     PopData(copy.([data.meta,data.loci])...)
+end
+
+"""
+    drop_monomorphic(data::PopData)
+Return a `PopData` object omitting any monomorphic loci. Will inform you which
+loci were removed.
+"""
+function drop_monomorphic(data::PopData)
+    rm_loci = Vector{String}()
+    for (loc, loc_sdf) in pairs(groupby(data.loci, :locus))
+        length(unique(skipmissing(loc_sdf[:, :genotype]))) == 1 && push!(rm_loci, loc.locus)
+    end
+
+    if length(rm_loci) == 0
+        return data
+    elseif length(rm_loci) == 1
+        @info "Dropping monomorphic locus " * rm_loci[1]
+    else
+        @info "Dropping $(length(rm_loci)) monomorphic loci" * "\n $rm_loci"
+    end
+    exclude(data, locus = rm_loci)
+end
+
+
+"""
+    drop_monomorphic!(data::PopData)
+Edit a `PopData` object in place by omitting any monomorphic loci. Will inform you which
+loci were removed.
+"""
+function drop_monomorphic!(data::PopData)
+    rm_loci = Vector{String}()
+    for (loc, loc_sdf) in pairs(groupby(data.loci, :locus))
+        length(unique(skipmissing(loc_sdf[:, :genotype]))) == 1 && push!(rm_loci, loc.locus)
+    end
+    if length(rm_loci) == 0
+        return data
+    elseif length(rm_loci) == 1
+        @info "Dropping monomorphic locus " * rm_loci[1]
+    else
+        @info "Dropping $(length(rm_loci)) monomorphic loci" * "\n $rm_loci"
+    end
+    exclude!(data, locus = rm_loci)
+end
+
+##TODO add to docs API
+"""
+    loci_dataframe(data::PopData)
+Return a wide `DataFrame` of samples as columns, ommitting population information.
+
+**Example**
+```
+julia> loci_dataframe(nancycats())
+9×237 DataFrame. Omitted printing of 232 columns
+│ Row │ N215       │ N216       │ N217       │ N218       │ N219       │
+│     │ Tuple…?    │ Tuple…?    │ Tuple…?    │ Tuple…?    │ Tuple…?    │
+├─────┼────────────┼────────────┼────────────┼────────────┼────────────┤
+│ 1   │ missing    │ missing    │ (135, 143) │ (133, 135) │ (133, 135) │
+│ 2   │ (136, 146) │ (146, 146) │ (136, 146) │ (138, 138) │ (140, 146) │
+│ 3   │ (139, 139) │ (139, 145) │ (141, 141) │ (139, 141) │ (141, 145) │
+│ 4   │ (116, 120) │ (120, 126) │ (116, 116) │ (116, 126) │ (126, 126) │
+│ 5   │ (156, 156) │ (156, 156) │ (152, 156) │ (150, 150) │ (152, 152) │
+│ 6   │ (142, 148) │ (142, 148) │ (142, 142) │ (142, 148) │ (142, 148) │
+│ 7   │ (199, 199) │ (185, 199) │ (197, 197) │ (199, 199) │ (193, 199) │
+│ 8   │ (113, 113) │ (113, 113) │ (113, 113) │ (91, 105)  │ (113, 113) │
+│ 9   │ (208, 208) │ (208, 208) │ (210, 210) │ (208, 208) │ (208, 208) │
+```
+"""
+function loci_dataframe(data::PopData)
+    unstack(select(data.loci, Not(:population)), :name, :genotype)[:, Not(:locus)]
+end
+
+#TODO add to docs API
+#TODO make a SMatrix instead?
+"""
+    loci_matrix(data::PopData)
+Return a matrix of genotypes with dimensions `samples × loci`.
+Rows are samples and columns are loci. Will return an error if ploidy varies between samples. 
+
+**Example**
+```
+julia> loci_matrix(nancycats())
+237×9 Array{Union{Missing, Tuple{Int16,Int16}},2}:
+ missing     (136, 146)  (139, 139)  …  (199, 199)  (113, 113)  (208, 208)
+ missing     (146, 146)  (139, 145)     (185, 199)  (113, 113)  (208, 208)
+ (135, 143)  (136, 146)  (141, 141)     (197, 197)  (113, 113)  (210, 210)
+ (133, 135)  (138, 138)  (139, 141)     (199, 199)  (91, 105)   (208, 208)
+ (133, 135)  (140, 146)  (141, 145)     (193, 199)  (113, 113)  (208, 208)
+ (135, 143)  (136, 146)  (145, 149)  …  (193, 195)  (91, 113)   (208, 208)
+ (135, 135)  (136, 146)  (139, 145)     (199, 199)  (105, 113)  (208, 208)
+ (135, 143)  (136, 146)  (135, 149)     (193, 197)  (91, 91)    (208, 212)
+ (137, 143)  (136, 146)  (139, 139)     (197, 197)  (105, 113)  (208, 212)
+ (135, 135)  (132, 132)  (141, 145)     (197, 197)  (91, 105)   (208, 208)
+ (137, 141)  (130, 136)  (137, 145)  …  (193, 199)  (91, 91)    (182, 182)
+ (129, 133)  (130, 136)  (135, 145)     (193, 199)  (91, 113)   (182, 208)
+ ⋮                                   ⋱                          
+ (133, 135)  (136, 136)  (135, 139)  …  (199, 199)  (113, 113)  (182, 182)
+ (133, 141)  (136, 136)  (135, 139)     (197, 197)  (113, 113)  (182, 208)
+ (133, 141)  (130, 146)  (141, 141)     (191, 199)  missing     (208, 208)
+ (123, 133)  (138, 138)  (141, 145)     (191, 197)  missing     (208, 208)
+ (123, 133)  (138, 138)  (139, 139)     (197, 199)  missing     (208, 208)
+ (133, 141)  (136, 146)  (139, 139)  …  (197, 197)  missing     (208, 208)
+ (133, 141)  (130, 136)  (139, 145)     (191, 199)  missing     (208, 208)
+ (133, 141)  (136, 146)  (139, 145)     (199, 199)  missing     (208, 220)
+ (133, 143)  (130, 130)  (135, 145)     (197, 197)  missing     (208, 208)
+ (135, 141)  (136, 144)  (143, 143)     (191, 197)  (113, 117)  (208, 208)
+ (137, 143)  (130, 136)  (135, 145)  …  (193, 199)  (113, 117)  (208, 208)
+ (135, 141)  (130, 146)  (135, 139)     (197, 197)  missing     (208, 208)
+ ```
+"""
+function loci_matrix(data::PopData)
+    dims = size(data)
+    sort_df = issorted(data.loci, [:name, :locus]) ? sort(data.loci, [:name, :locus]) : data.loci
+    reshape(sort_df.genotype, (dims.samples, dims.loci)) |> collect
+end
+
+
+"""
+    multitest_missing(pvals::Vector{T}, method::String) where T <: Union{Missing, <:AbstractFloat}
+Modification to `MultipleTesting.adjust` to include `missing` values in the
+returned array. See MultipleTesting.jl docs for full more detailed information.
+
+**Example**
+```
+julia> multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")
+
+````
+
+### `correction` methods (case insensitive)
+- `"bonferroni"` : Bonferroni adjustment
+- `"holm"` : Holm adjustment
+- `"hochberg"` : Hochberg adjustment
+- `"bh"` : Benjamini-Hochberg adjustment
+- `"by"` : Benjamini-Yekutieli adjustment
+- `"bl"` : Benjamini-Liu adjustment
+- `"hommel"` : Hommel adjustment
+- `"sidak"` : Šidák adjustment
+- `"forwardstop"` or `"fs"` : Forward-Stop adjustment
+- `"bc"` : Barber-Candès adjustment
+"""
+@inline function multitest_missing(pvals::Vector{T}, method::String) where T <: Union{Missing, <:AbstractFloat}
+    # make a dict of all possible tests and their respective functions
+    d = Dict(
+        "bonferroni" => Bonferroni(),
+        "holm" => Holm(),
+        "hochberg" => Hochberg(),
+        "bh" => BenjaminiHochberg(),
+        "by" => BenjaminiYekutieli(),
+        "bl" => BenjaminiLiu(),
+        "hommel" => Hommel(),
+        "sidak" => Sidak(),
+        "forwardstop" => ForwardStop(),
+        "fs" => ForwardStop(),
+        "bc" => BarberCandes(),
+    )
+    p_copy = copy(pvals)
+    p_copy[.!ismissing.(p_copy)] .= adjust(p_copy[.!ismissing.(p_copy)] |> Vector{Float64}, d[lowercase(method)])
+    return p_copy
+end
+
+
+"""
+    nonmissing(vec::T) where T<:AbstractArray
+Convenience function to count the number of non-`missing` values
+in a vector.
+"""
+@inline function nonmissing(vec::T) where T<:AbstractArray
+    count(!ismissing, vec)
+end
+
+#TODO add to API docs
+"""
+    nonmissing(data::PopData, locus::String)
+Convenience function to count the number of non-`missing` samples
+at a locus.
+"""
+@inline function nonmissing(data::PopData, locus::String)
+    data.loci[data.loci.locus .== locus, :genotype] |> nonmissing
+end
+
+"""
+    nonmissings(vec1::AbstractVector, vec2::AbstractVector)
+Return a vector of indices where neither input vectors have a `missing` value, i.e. an
+intersection of the indices of their non-missing elements.
+"""
+@inline function nonmissings(vec1::T, vec2::T) where T <: AbstractVector
+    intersect(map(i -> findall(!ismissing, i), (vec1, vec2))...)
+end
+
+
+#TODO add to docs API
+"""
+    pairwise_pairs(smp_names::Vector{String})
+Given a vector of sample names, returns a vector of tuples of unique all x 
+all combinations of sample pairs, excluding self-comparisons.
+
+**Example**
+```
+julia> samps = ["red_1", "red_2", "blue_1", "blue_2"] ;
+
+julia> pairwise_pairs(samps)
+6-element Array{Tuple{String,String},1}:
+ ("red_1", "red_2")
+ ("red_1", "blue_1")
+ ("red_1", "blue_2")
+ ("red_2", "blue_1")
+ ("red_2", "blue_2")
+ ("blue_1", "blue_2")
+```
+"""
+@inline function pairwise_pairs(smp_names::AbstractVector{String})
+    [tuple(smp_names[i], smp_names[j]) for i in 1:length(smp_names)-1 for j in i+1:length(smp_names)]
+end
+
+#TODO add to docs API
+"""
+    phase(data::PopData)
+Return a `Vector` of length `ploidy` composed of allele matrices with dimensions `samples × loci`.
+Rows are samples and columns are loci. Will return an error if ploidy varies between samples. 
+
+**Example**
+```
+julia> mtx = phase(nancycats())
+2-element Array{Array{Union{Missing, Int16},2},1}:
+ [missing 136 … 113 208; missing 146 … 113 208; … ; 137 130 … 113 208; 135 130 … missing 208]
+ [missing 146 … 113 208; missing 146 … 113 208; … ; 143 136 … 117 208; 141 146 … missing 208]
+
+julia> mtx[1]
+237×9 Array{Union{Missing, Int16},2}:
+    missing  136  139  116         156  142  199  113         208
+    missing  146  139  120         156  142  185  113         208
+ 135         136  141  116         152  142  197  113         210
+ 133         138  139  116         150  142  199   91         208
+ 133         140  141  126         152  142  193  113         208
+ 135         136  145  120         150  148  193   91         208
+ 135         136  139  116         152  142  199  105         208
+ 135         136  135  120         154  142  193   91         208
+ 137         136  139  116         150  142  197  105         208
+ 135         132  141  120         150  148  197   91         208
+ 137         130  137  128         152  142  193   91         182
+ 129         130  135  126         144  140  193   91         182
+   ⋮                                      ⋮                   
+ 133         136  135     missing  146  142  199  113         182
+ 133         136  135     missing  150  142  197  113         182
+ 133         130  141     missing  148  142  191     missing  208
+ 123         138  141     missing  148  142  191     missing  208
+ 123         138  139     missing  150  142  197     missing  208
+ 133         136  139     missing  150  142  197     missing  208
+ 133         130  139     missing  152  142  191     missing  208
+ 133         136  139     missing  150  142  199     missing  208
+ 133         130  135     missing  148  142  197     missing  208
+ 135         136  143     missing  144  142  191  113         208
+ 137         130  135     missing  150  142  193  113         208
+ 135         130  135     missing  150  142  197     missing  208
+```
+"""
+function phase(data::PopData)
+    dims = size(data)
+    ploidy = unique(data.meta.ploidy)
+    ploidy = length(ploidy) != 1 ? error("Phasing will not work on mixed-ploidy samples") : ploidy[1]
+    sort_df = issorted(data.loci, [:name, :locus]) ? sort(data.loci, [:name, :locus]) : data.loci
+    matrices = map(j -> map(i -> ismissing(i) ? missing : i[j] , sort_df.genotype), 1:ploidy)
+    map(i -> collect(reshape(i, (dims.samples, dims.loci))), matrices)
+end
+
+
+"""
+    quickstart()
+Prints helpful text of how to get started using PopGen.
+"""
+function quickstart()
+    printstyled("\n        Quickstart for PopGen\n\n", bold = true)
+    println("Documentation: https://pdimens.github.io/PopGen.jl/")
+    println("Motivational(?) quote: ", motivational_quote())
+    println("\nA few things things you can do to get started:")
+
+    printstyled("\nLoad in data\n\n", color = :magenta)
+    println("- read_from(filename; kwargs...)")
+    println("- genepop(infile; kwargs...)  or similar file-specific importer")
+    println("- use available gulfsharks() or nancycats() datasets")
+
+    printstyled("\nExplore PopData\n\n", color = :blue)
+    println("- populations(PopData) to view population information")
+    println("- loci(PopData) to view locus names")
+    println("- samples(PopData) to view sample names")
+    println("- missing(PopData, by = ...) to view missing information")
+
+    printstyled("\nManipulate PopData\n\n", color = :light_red)
+    println("- populations!(PopData, ...) to rename populations")
+    println("- locations!(PopData, ...) to add geographical coordinates")
+    println("- exclude!(PopData, kwargs...) to selectively remove data")
+
+    printstyled("\nAnalyses\n\n", color = :green)
+    println("- richness(PopData) to calculate allelic richness")
+    println("- allele_avg(PopData) to calculate average # of alleles")
+    println("- summary(PopData) to calculate F-statistics, heterozygosity, etc.")
+    println("- hwe_test(PopData) to test for Hardy-Weinberg Equilibrium")
+
+    return
+end
+
+
+"""
+    reciprocal(num::T) where T <: Signed
+Returns the reciprocal (1/number) of a number. Will return `0` when
+the number is `0` instead of returning `Inf`.
+"""
+function reciprocal(num::T) where T <: Real
+    !iszero(num) ? 1.0/float(num) : 0.0
+end
+
+"""
+    sim_pairs(data::Vector{String})
+Takes a Vector of sample names and returns a Tuple of sample pairs, grouped by simulation
+number. This is an internal function used for isolating sibship pairs from simulated shipship
+pairs (via `PopGenSims.jl`) to perform `relatedness` estimates only on those pairs.
+
+**Example**
+julia> a = ["sim1_off1", "sim1_off2", "sim2_off1", "sim2_off2"] ;
+
+julia> sim_pairs(a)
+("sim1_off1", "sim1_off2")
+("sim2_off1", "sim2_off2")
+"""
+function sim_pairs(data::Vector{String})
+    n = length(data)
+    isodd(n) && error("Expected an even number of samples, but got $n")
+    Tuple.(Base.Iterators.partition(sort(data), 2))
+end
+
+"""
+    Base.sort(x::NTuple{N,T}) where N where T <: Signed 
+Sort the integers within a Tuple and return the sorted Tuple.
+"""
+function Base.sort(x::NTuple{N,T}) where N where T <: Signed 
+    Tuple(sort(SVector(x)))
+end
+
+#TODO add to API docs
+"""
+    strict_shuffle(x::T) where T <: AbstractArray
+Shuffle only the non-missing values of a Vector and return a copy of the vector,
+keeping the `missing` values at their original locations.
+Use `strict_shuffle!` to edit in-place instead of returning a copy.
+"""
+@inline function strict_shuffle(x::T) where T <: AbstractArray
+    # get indices of where original missing are
+    miss_idx = findall(i -> i === missing, x)
+    out_vec = shuffle(x[.!ismissing.(x)])
+
+    insert!.(Ref(out_vec), miss_idx, missing)
+    return out_vec
+end
+
+"""
+    strict_shuffle!(x::T)! where T <: AbstractArray
+Shuffle only the non-missing values of a Vector, keeping the
+`missing` values at their original locations. Use `strict_shuffle`
+to return a copy instead of editing in-place.
+"""
+function strict_shuffle!(x::T) where T <: AbstractArray
+    @inbounds shuffle!(@view x[.!ismissing.(x)])
+    return x
 end
 
 
@@ -120,139 +488,4 @@ function motivational_quote()
     "\"Always remember that you are unique – just like everybody else.\" Unknown"
     ]
     return quotes[rand(1:length(quotes))]
-end
-
-
-"""
-    multitest_missing(pvals::Vector{T}, correction::String) where T <: Union{Missing, <:AbstractFloat}
-Modification to `MultipleTesting.adjust` to include `missing` values in the
-returned array. Missing values are first removed from the array, the appropriate
-correction made, then missing values are re-added to the array at their original
-positions. See MultipleTesting.jl docs for full more detailed information.
-#### example
-`multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
-
-### `correction` methods (case insensitive)
-- `"bonferroni"` : Bonferroni adjustment
-- `"holm"` : Holm adjustment
-- `"hochberg"` : Hochberg adjustment
-- `"bh"` : Benjamini-Hochberg adjustment
-- `"by"` : Benjamini-Yekutieli adjustment
-- `"bl"` : Benjamini-Liu adjustment
-- `"hommel"` : Hommel adjustment
-- `"sidak"` : Šidák adjustment
-- `"forwardstop"` or `"fs"` : Forward-Stop adjustment
-- `"bc"` : Barber-Candès adjustment
-"""
-@inline function multitest_missing(pvals::Vector{T}, correction::String) where T <: Union{Missing, <:AbstractFloat}
-    # get indices of where original missing are
-    miss_idx = findall(i -> i === missing, pvals)
-
-    # make seperate array for non-missing P vals
-    p_no_miss = x[.!ismissing.(x)]
-
-    # make a dict of all possible tests and their respective functions
-    d = Dict(
-        "bonferroni" => Bonferroni(),
-        "holm" => Holm(),
-        "hochberg" => Hochberg(),
-        "bh" => BenjaminiHochberg(),
-        "by" => BenjaminiYekutieli(),
-        "bl" => BenjaminiLiu(),
-        "hommel" => Hommel(),
-        "sidak" => Sidak(),
-        "forwardstop" => ForwardStop(),
-        "fs" => ForwardStop(),
-        "bc" => BarberCandes(),
-    )
-
-    correct = adjust(p_no_miss, d[lowercase(correction)]) |> Vector{Union{Missing, Float64}}
-
-    # re-add missing to original positions
-    @inbounds for i in miss_idx
-        @inbounds insert!(correct, i, missing)
-    end
-    return correct
-end
-
-"""
-    nonmissing(vec::T) where T<:AbstractArray
-Convenience function to count the number of non-`missing` values
-in a vector.
-"""
-function nonmissing(vec::T) where T<:AbstractArray
-    count(!ismissing, vec)
-end
-
-
-"""
-    quickstart()
-Prints helpful text of how to get started using PopGen.
-"""
-function quickstart()
-    printstyled("\n        Quickstart for PopGen\n\n", bold = true)
-    println("Documentation: https://pdimens.github.io/PopGen.jl/")
-    println("Motivational(?) quote: ", motivational_quote())
-    println("\nA few things things you can do to get started:")
-
-    printstyled("\nLoad in data\n\n", color = :magenta)
-    println("- read_from(filename; kwargs...)")
-    println("- genepop(infile; kwargs...)  or similar file-specific importer")
-    println("- use available gulfsharks() or nancycats() datasets")
-
-    printstyled("\nExplore PopData\n\n", color = :blue)
-    println("- populations(PopData) to view population information")
-    println("- loci(PopData) to view locus names")
-    println("- samples(PopData) to view sample names")
-    println("- missing(PopData, by = ...) to view missing information")
-
-    printstyled("\nManipulate PopData\n\n", color = :light_red)
-    println("- populations!(PopData, ...) to rename populations")
-    println("- locations!(PopData, ...) to add geographical coordinates")
-    println("- exclude!(PopData, kwargs...) to selectively remove data")
-
-    printstyled("\nAnalyses\n\n", color = :green)
-    println("- richness(PopData) to calculate allelic richness")
-    println("- allele_avg(PopData) to calculate average # of alleles")
-    println("- summary(PopData) to calculate F-statistics, heterozygosity, etc.")
-    println("- hwe_test(PopData) to test for Hardy-Weinberg Equilibrium")
-
-    return
-end
-
-
-"""
-    reciprocal(num::T) where T <: Signed
-Returns the reciprocal (1/number) of a number. Will return `0` when
-the number is `0` instead of returning `Inf`.
-"""
-function reciprocal(num::T) where T <: Real
-    !iszero(num) ? 1.0/float(num) : 0.0
-end
-
-#TODO add to API docs
-"""
-    strict_shuffle(x::T) where T <: AbstractArray
-Shuffle only the non-missing values of a Vector and return a copy of the vector,
-keeping the `missing` values at their original locations.
-Use `strict_shuffle!` to edit in-place instead of returning a copy.
-"""
-@inline function strict_shuffle(x::T) where T <: AbstractArray
-    # get indices of where original missing are
-    miss_idx = findall(i -> i === missing, x)
-    out_vec = shuffle(x[.!ismissing.(x)])
-
-    insert!.(Ref(out_vec), miss_idx, missing)
-    return out_vec
-end
-
-"""
-    strict_shuffle!(x::T)! where T <: AbstractArray
-Shuffle only the non-missing values of a Vector, keeping the
-`missing` values at their original locations. Use `strict_shuffle`
-to return a copy instead of editing in-place.
-"""
-function strict_shuffle!(x::T) where T <: AbstractArray
-    @inbounds shuffle!(@view x[.!ismissing.(x)])
-    return x
 end

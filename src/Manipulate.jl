@@ -1,4 +1,4 @@
-export add_meta!, locations, locations!, loci, locus, get_genotypes, get_genotype, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
+export add_meta!, locations, locations!, loci, genotypes, get_genotypes, get_genotype, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
 
 """
     add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
@@ -166,7 +166,7 @@ end
 Returns an array of strings of the loci names in a `PopData` object.
 """
 function loci(data::PopData)
-    levels(data.loci.locus)
+    unique(data.loci.locus)
 end
 
 
@@ -185,16 +185,30 @@ end
 
 
 """
+    get_genotypes(data::PopData, sample::String)
+Return a vector of all the genotypes of a sample in a `PopData` object. To return a
+single genotype at a locus, see `get_genotype`.
+```
+cats = nancycats()
+get_genotypes(cats, "N115")
+```
+"""
+function get_genotypes(data::PopObj, sample::String)
+    data.loci[data.loci.name .== sample, :genotype]
+end
+
+#TODO raname kwarg to `name`
+"""
     get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
 Return a table of the genotype(s) of one or more `samples` for one or more
 specific `loci` (both as keywords) in a `PopData` object.
 ### Examples
 ```
 cats = nancycats();
-get_genotype(cats, sample = "N115" , locus = "fca8")
-get_genotypes(cats, sample = ["N1", "N2"] , locus = "fca8")
-get_genotype(cats, sample = "N115" , locus = ["fca8", "fca37"])
-get_genotype(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
+get_genotypes(cats, sample = "N115" , locus = "fca8")
+get_genotypes(cats, sample = ["N115", "N7"] , locus = "fca8")
+get_genotypes(cats, sample = "N115" , locus = ["fca8", "fca37"])
+get_genotypes(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
 ```
 """
 function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
@@ -209,30 +223,16 @@ end
 
 
 """
-    get_genotypes(data::PopData, sample::String)
-Return a vector of all the genotypes of a sample in a `PopData` object.
-```
-cats = nancycats()
-get_genotypes(cats, "N115")
-```
-"""
-function get_genotypes(data::PopObj, sample::String)
-    @view data.loci[data.loci.name .== sample, :genotype]
-end
-
-
-"""
-    locus(data::PopData, locus::Union{String, Symbol})
+    genotypes(data::PopData, locus::Union{String, Symbol})
 Convenience wrapper to return a vector of all the genotypes of a single locus
 
 ### Example
 ```
-locus(gulfsharks(), "contig_475")
+genotypes(gulfsharks(), "contig_475")
 ```
 """
-function locus(data::PopData, locus::String)
+function genotypes(data::PopData, locus::String)
     @view data.loci[data.loci.locus .== locus, :genotype]
-    #@where(data.loci, :locus .== locus)[! , :genotype]
 end
 
 
@@ -295,14 +295,14 @@ populations!(potatoes, ["potato_1", "potato_2"], ["north_russet", "south_russet"
 function populations!(data::PopData, rename::Dict)
     msg = ""
     @inbounds for key in keys(rename)
-        if key ∉ levels(data.loci.population)
+        if key ∉ unique(data.meta.population)
             msg *= "  Population \"$key\" not found in PopData\n"
         else
             replace!(data.meta.population, key => rename[key])
+            replace!(data.loci.population.pool, key => rename[key])
         end
     end
     msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
-    recode!(data.loci.population,rename...)
     return
 end
 
@@ -315,14 +315,14 @@ function populations!(data::PopData, rename::Vector{String})
 end
 
 function populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
-    meta_pops = deepcopy(populations)
     meta_df = groupby(data.meta, :name)
     loci_df = groupby(data.loci, :name)
     for (sample, new_pop) in zip(samples, populations)
-        meta_df[(name = sample,)].population .= new_pop
-        loci_df[(name = sample,)].population .= new_pop
+        meta_df[(name = sample,)].population = new_pop
+        loci_df[(name = sample,)].population = new_pop
     end
-    droplevels!(data.loci.population)
+    # drop old levels
+    data.loci.population = data.loci.population |> Array |> PooledArray
     return
 end
 
@@ -376,7 +376,7 @@ function exclude!(data::PopData; kwargs...)
             [notices *= "\n  population \"$i\" not found" for i in err]
         end
         # choose the cheaper method
-        all_pops = levels(tmp.loci.population)
+        all_pops = unique(tmp.meta.population)
         if length(filt_pop) < length(all_pops)/2
             filter!(:population => x -> x ∉ filt_pop, tmp.loci)
             filter!(:population => x -> x ∉ filt_pop, tmp.meta)
@@ -385,7 +385,7 @@ function exclude!(data::PopData; kwargs...)
             filter!(:population => x -> x in filt_pop, tmp.loci)
             filter!(:population => x -> x in filt_pop, tmp.meta)
         end
-        droplevels!(tmp.loci.population)
+        tmp.loci.population = tmp.loci.population |> Array |> PooledArray
     end
 
     # samples
@@ -411,7 +411,7 @@ function exclude!(data::PopData; kwargs...)
             filter!(:name => x -> x in keep, tmp.loci)
             filter!(:name => x -> x in keep, tmp.meta)
         end
-        droplevels!(tmp.loci.name)
+        tmp.loci.name = tmp.loci.name |> Array |> PooledArray
     end
 
     # loci
@@ -435,7 +435,7 @@ function exclude!(data::PopData; kwargs...)
             keep = all_loci[all_loci .∉ Ref(filt_loci)]
             filter!(:locus => x -> x in keep, tmp.loci)
         end
-        droplevels!(tmp.loci.locus)
+        tmp.loci.locus = tmp.loci.locus |> Array |> PooledArray
     end
 
     # print the notices, if any
