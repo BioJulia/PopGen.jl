@@ -53,9 +53,8 @@ module.exports = {
         },
         {
           href: 'https://github.com/pdimens/popgen.jl',
-          label: 'GitHub',
           position: 'right',
-          className: 'header-github-link',
+          className: 'header-github-link header-icon-link',
           'aria-label': 'GitHub repository',
         },
       ],
