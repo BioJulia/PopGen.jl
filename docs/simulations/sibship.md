@@ -42,12 +42,13 @@ strongly discouraged from manually editing the resulting `PopData` from `simulat
 :::
 
 ### Ploidy
-If your data is not diploid, then change this value to the appropriate ploidy. 
+By default, the ploidy of the simulated parents and offspring are inferred from the supplied `PopData`.
 
 :::note adjusting ploidy
-While the simulations default to diploid, if you wish to generate parents and offspring of a ploidy
-different than the source `PopData` you can change this value. For example, if your `PopData` is
-diploid, but you wish to generate triploid or octoploid parents and offspring, you can. 
+If you have mixed-ploidy data or wish to generate parents and offspring of a ploidy different than the source
+`PopData` you can specify the ploidy with which to simulate parents and offspring. For example, if your `PopData`
+is diploid, but you wish to generate triploid or octoploid parents and offspring, you would specify `ploidy = 3`
+ or `ploidy = 8` repectively.
 :::
 
 #### Odd ploidy

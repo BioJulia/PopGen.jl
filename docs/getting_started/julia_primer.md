@@ -13,7 +13,7 @@ There is nothing inherently special about this documentation relative to other d
 
 ## Using Julia
 
-Everyone has their own particular workflows, and if you're new to Julia, you might not have established one yet. Julia can be used rather comfortably using its built-in interpreter, but you can also use it via Atom (the officially supported [uber-juno](https://junolab.org/) add-on) for an RStudio-like experience. If you're already a fan of Jupyter notebooks (or [**nteract**](https://nteract.io/)), then all you need is to install the `IJulia` package in Julia and you have full Jupyter support for Julia! Other popular options are VScode (julia add-on), or Emacs. 
+Everyone has their own particular workflows, and if you're new to Julia, you might not have established one yet. Julia can be used rather comfortably using its built-in interpreter. For an RStudio-like experience, we recommend using the [VScode Julia extension](https://www.julia-vscode.org), but you can also use [Atom](https://junolab.org/) add-on). If you're already a fan of Jupyter notebooks (or [**nteract**](https://nteract.io/)), then all you need is to install the `IJulia` package in Julia and you have full Jupyter support for Julia! You can also use the new reactive notebooks provided by [Pluto.jl](https://github.com/fonsp/Pluto.jl).
 
 :::note Trivia
 If you didn't already know,  the name "Jupyter" is actually a concatenation of **Ju** (julia) **Pyt** (python) and **eR** (R). 🤯
