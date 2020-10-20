@@ -15,8 +15,7 @@ end
 
 As you can see, a `PopData` is made up of two DataFrames, one called `meta` for sample information (metadata), and the other called `loci` which includes genotype information. This structure allows for easy and convenient access to the fields using dot `.` accessors.. The `meta` and `loci` tables are both specific in their structure, so here is an illustration to help you visualize a `PopData` object:
 
-![PopData](/PopGen.jl/img/PopData.svg)
-
+![PopData](/img/PopData.svg)
 
 `PopData` and other custom types introduced in PopGen.jl fall under an AbstractType we call `PopObj`, which is short for "PopGen Object".
 

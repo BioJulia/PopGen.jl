@@ -15,7 +15,7 @@ Sometimes you want or need to know the relatedness of individuals in a sample. R
 
 The goal of calculating relatedness from molecular markers is to accurately estimate the proportion of the genome which is identical by descent between two individuals. With a pedigree this is "relatively" straightforward. However, for large, natural, populations pedigrees tend not to exist and some brilliant minds have developed various equations to estimate the relatedness from a set of molecular markers. Given two diploid individuals, there are 9 "identity by descent" models available between them ([Jacquard 1975](https://www.springer.com/gp/book/9783642884177), paywall), as shown below (from [Milligan 2003](https://www.genetics.org/content/163/3/1153.full)):
 
-![Jacquard IBD](/PopGen.jl/img/jacquard_identitiies.jpg)
+![Jacquard IBD](/img/jacquard_identitiies.jpg)
 
 Broadly speaking there are two different ways of estimating genetic relatedness using molecular markers: methods of moments, and likelihood estimators. Generally, moments estimators will be faster but aren't constrained to being between the theoretical minimum and maximum values of 0 and 1. The likelihood estimators use likelihood functions derived from the set of Jacquard Identity States (above) to determine the most likely inheritance pattern. One difference between the two classes is (generally) moments estimators require an assumption of no inbreeding, while that assumption isn't necessarily required for likelihood estimators (though it does simplify the math). It is increasingly common to use multiple estimators on pairs, simulated from your molecular markers, with known relationships to determine the most appropriate estimator to use with your data.
 
@@ -189,38 +189,38 @@ inputting them. For more information on a specific method, please see the respec
 
 ## Relatedness Estimators
 ### Blouin
-The moments based estimator developed by [Blouin (year)](). Call `method = Blouin` to use this method. 
+The moments based estimator developed by [Blouin (1996)](https://onlinelibrary.wiley.com/doi/10.1046/j.1365-294X.1996.00094.x). Call `method = Blouin` to use this method. 
 
 ### Dyadic Maximum Likelihood
-The moments based estimator developed by [PERSON (year)](). Call `method = dyadML` to use this method. 
+The moments based estimator developed by [Milligan (2003)](https://pubmed.ncbi.nlm.nih.gov/12663552/). Call `method = dyadML` to use this method. 
 
 ### Li & Horvitz
-The moments based estimator developed by [Li & Horvitz (year)](). Call `method = LiHorvitz` to use this method. 
+The moments based estimator developed by [Li & Horvitz (1953)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1716461/). Call `method = LiHorvitz` to use this method. 
 
 ### Loiselle
-The moments based estimator developed by [Loiselle (year)](). Call `method = Loiselle` to use this method. 
+The moments based estimator developed by [Loiselle (1995)](https://bsapubs.onlinelibrary.wiley.com/doi/abs/10.1002/j.1537-2197.1995.tb12679.x). Call `method = Loiselle` to use this method. 
 
 ### Lynch
-The moments based estimator developed by [Lynch (year)](). Call `method = Lynch` to use this method. 
+The moments based estimator developed by [Lynch (1988)](https://pubmed.ncbi.nlm.nih.gov/3193879/). Call `method = Lynch` to use this method. 
 
 ### Lynch / Li
-The moments based estimator developed by [Lynch/Li (year)](). Call `method = LynchLi` to use this method. 
+The moments based estimator developed by [Lynch/Li (1993)](https://pubmed.ncbi.nlm.nih.gov/8514326/). Call `method = LynchLi` to use this method. 
 
 ### Lynch & Ritland
-The moments based estimator developed by [Lynch & Ritland (year)](). Call `method = LynchRitland` to use this method. 
+The moments based estimator developed by [Lynch & Ritland (1999)](https://www.genetics.org/content/152/4/1753.short). Call `method = LynchRitland` to use this method. 
 
 ### Moran
-The moments based estimator developed by [Moran (year)](). Call `method = Moran` to use this method. 
+The moments based estimator developed by [Moran (1950)](https://www.jstor.org/stable/2332142?origin=crossref&seq=1#metadata_info_tab_contents). Call `method = Moran` to use this method. 
 
 ### Queller & Goodnight
 The moments based estimator developed by [Queller & Goodnight (1989)](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1989.tb04226.x). Call `method = QuellerGoodnight` to use this method. 
 
 
 ### Ritland
-The moments based estimator developed by [Ritland (year)](). Call `method = Ritland` to use this method. 
+The moments based estimator developed by [Ritland (1996)](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1996.tb02347.x). Call `method = Ritland` to use this method. 
 
 ### Wang
-The moments based estimator developed by [Wang (year)](). Call `method = Wang` to use this method. 
+The moments based estimator developed by [Wang (2002)](https://www.genetics.org/content/160/3/1203.short). Call `method = Wang` to use this method. 
 
 ---------------------
 ## Acknowledgements

@@ -1,6 +1,6 @@
 {
   "name": "pop-gen-jl",
-  "version": "0.0.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "start": "docusaurus start",
@@ -9,13 +9,13 @@
     "deploy": "docusaurus deploy"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.58",
-    "@docusaurus/preset-classic": "^2.0.0-alpha.58",
+    "@docusaurus/core": "^2.0.0-alpha.66",
+    "@docusaurus/preset-classic": "^2.0.0-alpha.66",
     "classnames": "^2.2.6",
     "clsx": "^1.1.1",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4",
-    "rehype-katex": "^3.0.0",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "rehype-katex": "^3.1.0",
     "remark-math": "^2.0.1"
   },
   "browserslist": {

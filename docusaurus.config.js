@@ -28,7 +28,7 @@ module.exports = {
         alt: 'PopGen.jl logo',
         src: 'img/logo_icon.png',
       },
-      links: [
+      items: [
         {
           to: 'docs/',
           activeBasePath: 'docs',
@@ -52,10 +52,10 @@ module.exports = {
           position: 'right',
         },
         {
-          href: 'https://github.com/pdimens/popgen.jl',
-          position: 'right',
-          className: 'header-github-link header-icon-link',
-          'aria-label': 'GitHub repository',
+        href: 'https://github.com/pdimens/popgen.jl',
+        position: 'right',
+        className: 'header-github-link',
+        'aria-label': 'GitHub repository',
         },
       ],
     },
@@ -70,7 +70,7 @@ module.exports = {
       {
         docs: {
           // It is recommended to set document id as docs home page (`docs/` path).
-          homePageId: 'getting_started/install',
+          //homePageId: 'docs/',
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl: 'https://github.com/pdimens/popgen.jl/edit/documentation/',

@@ -192,5 +192,5 @@ julia> ncats_hwe = hwe_test(nancycats() , by = "population", correction = "bonfe
 
 julia> ncats |> @vlplot(:rect, :locus, :population, color=:P_bonferroni)
 ```
-![hwe_test](/PopGen.jl/img/hwe_test.png)
+![hwe_test](/img/hwe_test.png)
 

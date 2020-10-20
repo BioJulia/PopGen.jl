@@ -33,6 +33,7 @@ Used internally in the `genepop` and `delimited` file parsers to scan the genoty
 ----
 
 ### `phase`
+
 ```julia
 phase(loc::Union{String, Int}, type::DataType, digit::Int)
 ```
@@ -43,25 +44,28 @@ file parsers. Use `type` to specify output type (`Int8` or
 characters used per allele in a locus.
 
 **Example**
+
 ```julia
 ph_locus = phase("128114", Int16, 3)
 map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
-# or #
+```
+```julia
 [phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
 ```
 
 ----
 
 ### `unphase`
+
 ```julia    
 unphase(geno::T; digits::Int = 3, ploidy::Int = 2, miss::Int = 0) where T <: Genotype
 unphase(geno::missing; digits::Int = 3, ploidy::Int = 2, miss::Int = 0) 
 ```
-Takes a `Genotype` (e.g. `(131, 94)`) and returns a string of concatenated
-alleles padded with *n* number of zeroes, where *n* is given by `digits = `.
+Takes a `Genotype` e.g. `(131, 94)` and returns a string of concatenated
+alleles padded with *n* number of zeroes, where *n* is given by `digits =` .
 
 #### miss
-- `miss = 0`: `missing` values are returned as a string of `digits × ploidy` zeroes (default)
+- `miss = 0`: `missing` values are returned as a string of `digits x ploidy` zeroes (default)
 - `miss = -9` : `missing` values are returned as `-9`
 The `ploidy` flag is only relevant for unphasing `missing` genotypes
 and not used otherwise.

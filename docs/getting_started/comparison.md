@@ -97,7 +97,7 @@ microbenchmark)
 </Tabs>
 
 
-![import plot](/PopGen.jl/img/speedplot.png)
+![import plot](/img/speedplot.png)
 
 Comparing averages, PopGen.jl clocks in at `910ms` versus adegenet's `6.745s` , so ~7.4x faster.
 
@@ -136,7 +136,7 @@ julia> Base.summarysize(sharks)
 </TabItem>
 </Tabs>
 
-![data structure plot](/PopGen.jl/img/objectplot.png)
+![data structure plot](/img/objectplot.png)
 
 The original file is `3.2mb` (the horizontal line), and our `PopData` object takes up ~`3.5mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
 
@@ -183,7 +183,7 @@ Unit: seconds
 </TabItem>
 </Tabs>
 
-![summary statistics plot](/PopGen.jl/img/sumstatplot.png)
+![summary statistics plot](/img/sumstatplot.png)
 
 Comparing averages, PopGen.jl clocks in at ~`171ms` versus hierfstat's `4.6s`, which is ~**27x** faster on these data. However, when testing on a data that was 401 samples x 5331 loci (not shown), PopGen.jl performed 36.6x faster. This gap seems to increase the larger the data is, but we have not tested the upper limits of this.
 
@@ -230,6 +230,6 @@ Unit: seconds
 </TabItem>
 </Tabs>
 
-![chi squared plot](/PopGen.jl/img/chisqplot.png)
+![chi squared plot](/img/chisqplot.png)
 
 Comparing averages, PopGen.jl clocks in at ~`176ms` versus adegenet's `6.3s`, so ~**35.8x** faster on these data(!)

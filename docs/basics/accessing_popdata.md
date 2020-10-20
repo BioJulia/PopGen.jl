@@ -379,4 +379,4 @@ julia> @where(x.loci, :population .== "9")
 </TabItem>
 </Tabs>
 
-Now that you're somewhat familiar with the parts of `PopData`, [have a look at the commands](view_and_sort.md) to view and manipulate `PopData` objects.
+Now that you're somewhat familiar with the parts of `PopData`, [have a look at the commands](view_data.md) to view and manipulate `PopData` objects.

@@ -1,5 +1,5 @@
 ---
-id: install
+slug: /
 title: Installation
 sidebar_label: Installation
 ---
@@ -24,7 +24,7 @@ Invoke the package manager with `]` in the REPL and use
 add PopGen
 ```
 
-![install](/PopGen.jl/img/install_repl.gif)
+![install](/img/install_repl.gif)
 
 </TabItem>
 <TabItem value="jupyter">
@@ -36,7 +36,7 @@ using Pkg
 Pkg.add("PopGen")
 ```
 
-![install](/PopGen.jl/img/install_jupyter.gif)
+![install](/img/install_jupyter.gif)
 
 </TabItem>
 </Tabs>

@@ -6,7 +6,7 @@ sidebar_label: Quick Start
 ## 1. Install PopGen
 Invoke the package manager with `]` and write `add PopGen`
 
-![install](/PopGen.jl/img/install_repl.gif)
+![install](/img/install_repl.gif)
 
 
 
