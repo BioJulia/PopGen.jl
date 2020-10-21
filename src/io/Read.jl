@@ -78,7 +78,7 @@ function write_to(data::PopData; filename::String, kwargs...)
     elseif ext == "jld2"
         popdata2jdl2(data, filename = filename)
     elseif ext in ["str", "structure"]
-        return popdata2structure(infile; kwargs...)
+        return popdata2structure(data; kwargs...)
     elseif ext in ["csv", "txt", "tsv"]
         popdata2delimited(data, filename = filename; kwargs...)
     else
