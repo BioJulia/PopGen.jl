@@ -100,7 +100,11 @@ Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
 @inline function hetero_e(data::T) where T <: GenoArray
-    1.0 - sum(@inbounds allele_freq_vec(data) .^ 2)
+    if all(ismissing.(data)) == true
+        return missing
+    else
+        1.0 - sum(@inbounds allele_freq_vec(data) .^ 2)
+    end
 end
 
 
