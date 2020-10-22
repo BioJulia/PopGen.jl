@@ -6,7 +6,8 @@ using PopGen
 using Test
 
 all_tests = [
-    "types.jl"
+    "types.jl",
+    "allelefreq.jl"
 ]
 
 println("Running tests:")

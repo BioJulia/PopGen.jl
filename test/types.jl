@@ -2,6 +2,7 @@ module  TestTypesDatasets
 
 using PopGen
 using DataFrames
+using PooledArrays
 using Test
 
 cats = nancycats();
