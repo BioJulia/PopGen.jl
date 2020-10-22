@@ -1,6 +1,7 @@
 module  TestTypesDatasets
 
 using PopGen
+using DataFrames
 using Test
 
 cats = nancycats();
@@ -64,8 +65,4 @@ end
 end
 
 
-
-
-
-end #module
-
+end  # module
