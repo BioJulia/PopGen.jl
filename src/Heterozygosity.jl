@@ -48,7 +48,6 @@ end
     return @inbounds ishet.(locus)
 end
 
-
 """
     gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)
 Calculate overall gene diversity with the adjustment/correction given by Nei:
@@ -78,6 +77,10 @@ end
 end
 
 @inline function gene_diversity_nei87(het_exp::Missing, het_obs::AbstractFloat, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+    return missing
+end
+
+@inline function gene_diversity_nei87(het_exp::Missing, het_obs::Missing, n::Union{Integer,AbstractFloat}; corr::Bool = true)
     return missing
 end
 
