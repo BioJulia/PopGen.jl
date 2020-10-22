@@ -18,7 +18,7 @@ sharks = gulfsharks();
     @test size(df_cats) == (17,2)
     @test eltype(df_cats.genos) == Dict{Int16,Float32}
     @test length(PopGen.allele_freq(cats, "fca8")) == 16
-    @test eltype(PopGen.allele_freq(cats, "fca8")) == Dict{Int16,Float32}
+    @test typeof(PopGen.allele_freq(cats, "fca8")) == Dict{Int16,Float32}
     
     @test length(PopGen.allele_freq(sharks)) == 2209
     @test eltype(PopGen.allele_freq(sharks)) == Dict{Int16,Float32}
@@ -30,7 +30,7 @@ sharks = gulfsharks();
     @test size(df_sharks) == (7,2)
     @test eltype(df_sharks.genos) == Dict{Int16,Float32}
     @test length(PopGen.allele_freq(sharks, "contig_2784")) == 2
-    @test eltype(PopGen.allele_freq(sharks, "contig_2784")) == Dict{Int16,Float32}
+    @test typeof(PopGen.allele_freq(sharks, "contig_2784")) == Dict{Int16,Float32}
 end
 
 @testset "other PopGen.allele_freqs" begin

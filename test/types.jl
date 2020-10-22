@@ -53,8 +53,8 @@ end
     @test typeof(sharks.meta.name) == Vector{String}
     @test typeof(sharks.meta.population) == Vector{String}
     @test typeof(sharks.meta.ploidy) == Vector{Int8}
-    @test typeof(sharks.meta.latitude) ==  Vector{Union{Missing, Float32}}
-    @test typeof(sharks.meta.longitude) == Vector{Union{Missing, Float32}}
+    @test typeof(sharks.meta.latitude) ==  Vector{Float64}
+    @test typeof(sharks.meta.longitude) == Vector{Float64}
     @test typeof(sharks.loci.name) <: PooledArray
     @test eltype(sharks.loci.name) == String
     @test typeof(sharks.loci.population) <: PooledArray
@@ -62,7 +62,7 @@ end
     @test typeof(sharks.loci.locus) <: PooledArray
     @test eltype(sharks.loci.locus) == String
     @test typeof(sharks.loci.genotype) <: GenoArray
-    @test eltype(sharks.loci.genotype) <: Genotype
+    @test eltype(sharks.loci.genotype) <: Union{Missing, Genotype}
 end
 
 
