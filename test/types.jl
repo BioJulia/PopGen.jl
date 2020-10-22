@@ -46,7 +46,7 @@ end
     @test typeof(cats.loci.locus) <: PooledArray
     @test eltype(cats.loci.locus) == String
     @test typeof(cats.loci.genotype) <: GenoArray
-    @test eltype(cats.loci.genotype) <: Genotype
+    @test eltype(cats.loci.genotype) <: Union{Missing, Genotype}
 end
 
 @testset "Gulfsharks column types" begin
