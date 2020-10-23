@@ -1,5 +1,6 @@
 export add_meta!, locations, locations!, loci, genotypes, get_genotypes, get_genotype, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
 
+#TODO add to docs (API and manipulate)
 """
     add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Metadata 
@@ -25,11 +26,14 @@ function add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = tru
         @info "Adding $Symbol(name) column to .meta and .loci dataframes"
         tmp = DataFrame(:name => popdata.meta.name, Symbol(name) => metadata)
         popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
-        categorical == true && categorical!(popdata.loci, Symbol(name), compress = true)
+        if categorical == true
+            popdata.loci[name] = PooledArray(popdata.loci[name])
+        end
     end
     return
 end
 
+#TODO add to docs (API and manipulate)
 """
     add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Takes a vector of
@@ -57,7 +61,9 @@ function add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name:
     if loci
         @info "Adding $Symbol(name) column to .meta and .loci dataframes"
         popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
-        categorical == true && categorical!(popdata.loci, Symbol(name), compress = true)
+        if categorical == true
+            popdata.loci[name] = PooledArray(popdata.loci[name])
+        end
     end
     return
 end
@@ -197,9 +203,9 @@ function get_genotypes(data::PopObj, sample::String)
     data.loci[data.loci.name .== sample, :genotype]
 end
 
-#TODO raname kwarg to `name`
+#TODO rename kwarg to `name`
 """
-    get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
+    get_genotypes(data::PopObj; sample::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
 Return a table of the genotype(s) of one or more `samples` for one or more
 specific `loci` (both as keywords) in a `PopData` object.
 ### Examples

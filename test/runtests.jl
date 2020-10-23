@@ -7,7 +7,8 @@ using Test
 
 all_tests = [
     "types.jl",
-    "allelefreq.jl"
+    "allelefreq.jl",
+    "manipulate.jl"
 ]
 
 println("Running tests:")
