@@ -1,5 +1,20 @@
 export quickstart, size, drop_monomorphic, drop_monomorphic!
 
+## experimental and not exported or documented!
+function adjacency_matrix(data::PopData)
+    data_loci = groupby(data.loci, :locus)
+    out_vec = Vector{Array{Int8,2}}(undef, length(data_loci))
+    for (j,i) in enumerate(data_loci)
+        uniq = unique(skipmissing(i.genotype))
+        adj_mat = fill(Int8(0), length(samples(data)), length(uniq))
+        for (j,k) in zip(i.genotype, eachrow(adj_mat))
+            k .= Ref(j) .=== uniq 
+        end
+        out_vec[j] = adj_mat
+    end
+    return out_vec
+end
+
 #TODO change location in API docs and rename allele_pool
 """
     alleles(locus::T; miss::Bool = false) where T<:GenoArray
