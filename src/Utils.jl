@@ -1,6 +1,7 @@
 export quickstart, size, drop_monomorphic, drop_monomorphic!
 
 #TODO change location in API docs and rename allele_pool
+#BUG fix miss=true because it cannot iterate over missing
 """
     alleles(locus::T; miss::Bool = false) where T<:GenoArray
 Return an array of all the non-missing alleles of a locus. Use
