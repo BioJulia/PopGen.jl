@@ -18,7 +18,7 @@ julia> sharks = gulfsharks() ;
 
 ### [Accessing Elements](accessing)
 
-### [Viewing and Sorting](viewsort)
+### [Viewing Data](viewdata)
 
 ### [Sample and Locus Exclusion/Removal](exclusion)
 
