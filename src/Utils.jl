@@ -1,19 +1,24 @@
 export quickstart, size, drop_monomorphic, drop_monomorphic!
 
 #TODO change location in API docs and rename allele_pool
-#BUG fix miss=true because it cannot iterate over missing
+#TODO replace alleles with universal Symbol type?
 """
     alleles(locus::T; miss::Bool = false) where T<:GenoArray
 Return an array of all the non-missing alleles of a locus. Use
 `miss = true` to include missing values.
 """
 @inline function alleles(locus::T; miss::Bool = false) where T<:GenoArray
-    if miss==true
-        Base.Iterators.flatten(locus) |> collect
-    else
-        reduce(vcat, collect.(skipmissing(locus)))
+    if all(ismissing.(locus))
+        return Vector{Union{Missing, eltype(locus).b.types[1]}}(undef, length(locus))
     end
+    alle_out = Base.Iterators.flatten(skipmissing(locus)) |> collect
+    alle_out = Vector{Union{Missing, eltype(alle_out)}}(alle_out)
+    if miss == true
+        append!(alle_out, locus[locus.=== missing])
+    end
+    return alle_out
 end
+
 
 # TODO add to docs: Utils.jl API
 function Base.size(data::PopData)
