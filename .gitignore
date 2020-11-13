@@ -1,6 +1,8 @@
 .DS_Store
 /Manifest.toml
+/README.md
 /dev/
+/.github/
 # Dependencies
 /node_modules
 
@@ -20,3 +22,5 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+jason_work/*

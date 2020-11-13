@@ -1,8 +1,73 @@
-#=
-These are commands that are for the general manipulation and viewing of the
-PopData type. The appear in alphabetical order.
-=#
-export locations, locations!, loci, locus, get_genotypes, get_genotypes, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
+export add_meta!, locations, locations!, loci, genotypes, get_genotypes, get_genotype, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
+
+#TODO add to docs (API and manipulate)
+"""
+    add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
+Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Metadata 
+must be in the same order as the samples in `PopData.meta`.
+
+#### Arguments
+- `popdata` : The `PopData` object to add information to
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+
+#### Keyword Arguments
+- `name` : String of the name of this new column
+- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
+"""
+function add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
+    length(metadata) != length(popdata.meta.name) && error("Provided metadata vector (n = $length(metadata)) and samples in PopData (n = $length(popdata.meta.name)) have different lengths")
+    @info "Adding $Symbol(name) column to .meta dataframe"
+    # add to meta
+    insertcols!(popdata.meta, Symbol(name) => metadata)
+
+    # add to loci
+    if loci
+        @info "Adding $Symbol(name) column to .meta and .loci dataframes"
+        tmp = DataFrame(:name => popdata.meta.name, Symbol(name) => metadata)
+        popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
+        if categorical == true
+            popdata.loci[name] = PooledArray(popdata.loci[name])
+        end
+    end
+    return
+end
+
+#TODO add to docs (API and manipulate)
+"""
+    add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
+Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Takes a vector of
+sample names if the metadata is not in the same order as samples appear in `PopData.meta`.
+
+#### Arguments
+- `popdata` : The `PopData` object to add information to
+- `sample` : A `Vector{String}` of sample names corresponding to the order of the `metadata` 
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+
+#### Keyword Arguments
+- `name` : String of the name of this new column
+- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
+"""
+function add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true) where T <: AbstractVector
+    length(samples) != length(popdata.meta.name) && error("Provided sample vector (n = $length(samples)) and samples in PopData (n = $length(popdata.meta.name)) have different lengths")
+    length(samples) != length(metadata) && error("Sample names (n = $length(samples)) and metadata vectors (n = $length(metadata)) have different lengths")
+    sort(samples) != sort(popdata.meta.name) && error("Sample names are not identical")
+    @info "Adding $Symbol(name) column to .meta dataframe"
+
+    tmp = DataFrame(:name => samples, Symbol(name) => metadata)
+    popdata.meta = outerjoin(popdata.meta, tmp, on = :name)
+
+    if loci
+        @info "Adding $Symbol(name) column to .meta and .loci dataframes"
+        popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
+        if categorical == true
+            popdata.loci[name] = PooledArray(popdata.loci[name])
+        end
+    end
+    return
+end
+
 
 """
     locations(data::PopData)
@@ -107,23 +172,52 @@ end
 Returns an array of strings of the loci names in a `PopData` object.
 """
 function loci(data::PopData)
-    levels(data.loci.locus)
+    unique(data.loci.locus)
 end
 
+
 """
-    get_genotypes(data::PopObj; samples::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
-Return the genotype(s) of one or more `samples` for one or more
+    get_genotype(data::PopObj; sample::String, locus::String)
+Return the genotype of one sample at one locus in a `PopData` object.
+### Example
+```
+cats = nancycats();
+get_genotype(cats, sample = "N115", locus = "fca8")
+```
+"""
+function get_genotype(data::PopData; sample::String, locus::String)
+    @views data.loci[(data.loci.name .== sample) .& (data.loci.locus .== locus), :genotype][1]
+end
+
+
+"""
+    get_genotypes(data::PopData, sample::String)
+Return a vector of all the genotypes of a sample in a `PopData` object. To return a
+single genotype at a locus, see `get_genotype`.
+```
+cats = nancycats()
+get_genotypes(cats, "N115")
+```
+"""
+function get_genotypes(data::PopObj, sample::String)
+    data.loci[data.loci.name .== sample, :genotype]
+end
+
+#TODO rename kwarg to `name`
+"""
+    get_genotypes(data::PopObj; sample::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
+Return a table of the genotype(s) of one or more `samples` for one or more
 specific `loci` (both as keywords) in a `PopData` object.
 ### Examples
 ```
 cats = nancycats();
-get_genotype(cats, sample = "N115" , locus = "fca8")
-get_genotypes(cats, sample = ["N1", "N2"] , locus = "fca8")
-get_genotype(cats, sample = "N115" , locus = ["fca8", "fca37"])
-get_genotype(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
+get_genotypes(cats, sample = "N115" , locus = "fca8")
+get_genotypes(cats, sample = ["N115", "N7"] , locus = "fca8")
+get_genotypes(cats, sample = "N115" , locus = ["fca8", "fca37"])
+get_genotypes(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
 ```
 """
-function get_genotypes(data::PopData, sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
+function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
     if typeof(sample) == String
         sample = [sample]
     end
@@ -135,30 +229,16 @@ end
 
 
 """
-    get_genotypes(data::PopData, sample::String)
-Return all the genotypes of a specific sample in a `PopData` object.
-```
-cats = nancycats()
-get_sample_genotypes(cats, "N115")
-```
-"""
-function get_genotypes(data::PopObj, sample::String)
-    @view data.loci[data.loci.name .== sample, :genotype]
-end
-
-
-"""
-    locus(data::PopData, locus::Union{String, Symbol})
+    genotypes(data::PopData, locus::Union{String, Symbol})
 Convenience wrapper to return a vector of all the genotypes of a single locus
 
 ### Example
 ```
-locus(gulfsharks(), "contig_475")
+genotypes(gulfsharks(), "contig_475")
 ```
 """
-function locus(data::PopData, locus::String)
+function genotypes(data::PopData, locus::String)
     @view data.loci[data.loci.locus .== locus, :genotype]
-    #@where(data.loci, :locus .== locus)[! , :genotype]
 end
 
 
@@ -221,14 +301,14 @@ populations!(potatoes, ["potato_1", "potato_2"], ["north_russet", "south_russet"
 function populations!(data::PopData, rename::Dict)
     msg = ""
     @inbounds for key in keys(rename)
-        if key ∉ levels(data.loci.population)
+        if key ∉ unique(data.meta.population)
             msg *= "  Population \"$key\" not found in PopData\n"
         else
             replace!(data.meta.population, key => rename[key])
+            replace!(data.loci.population.pool, key => rename[key])
         end
     end
     msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
-    recode!(data.loci.population,rename...)
     return
 end
 
@@ -241,14 +321,14 @@ function populations!(data::PopData, rename::Vector{String})
 end
 
 function populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
-    meta_pops = deepcopy(populations)
     meta_df = groupby(data.meta, :name)
     loci_df = groupby(data.loci, :name)
     for (sample, new_pop) in zip(samples, populations)
-        meta_df[(name = sample,)].population .= new_pop
-        loci_df[(name = sample,)].population .= new_pop
+        meta_df[(name = sample,)].population = new_pop
+        loci_df[(name = sample,)].population = new_pop
     end
-    droplevels!(data.loci.population)
+    # drop old levels
+    data.loci.population = data.loci.population |> Array |> PooledArray
     return
 end
 
@@ -302,7 +382,7 @@ function exclude!(data::PopData; kwargs...)
             [notices *= "\n  population \"$i\" not found" for i in err]
         end
         # choose the cheaper method
-        all_pops = levels(tmp.loci.population)
+        all_pops = unique(tmp.meta.population)
         if length(filt_pop) < length(all_pops)/2
             filter!(:population => x -> x ∉ filt_pop, tmp.loci)
             filter!(:population => x -> x ∉ filt_pop, tmp.meta)
@@ -311,7 +391,7 @@ function exclude!(data::PopData; kwargs...)
             filter!(:population => x -> x in filt_pop, tmp.loci)
             filter!(:population => x -> x in filt_pop, tmp.meta)
         end
-        droplevels!(tmp.loci.population)
+        tmp.loci.population = tmp.loci.population |> Array |> PooledArray
     end
 
     # samples
@@ -337,7 +417,7 @@ function exclude!(data::PopData; kwargs...)
             filter!(:name => x -> x in keep, tmp.loci)
             filter!(:name => x -> x in keep, tmp.meta)
         end
-        droplevels!(tmp.loci.name)
+        tmp.loci.name = tmp.loci.name |> Array |> PooledArray
     end
 
     # loci
@@ -361,7 +441,7 @@ function exclude!(data::PopData; kwargs...)
             keep = all_loci[all_loci .∉ Ref(filt_loci)]
             filter!(:locus => x -> x in keep, tmp.loci)
         end
-        droplevels!(tmp.loci.locus)
+        tmp.loci.locus = tmp.loci.locus |> Array |> PooledArray
     end
 
     # print the notices, if any

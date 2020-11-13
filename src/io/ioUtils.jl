@@ -7,9 +7,9 @@ of various file formats.
     determine_marker(geno_parse::T, digits::Int) where T<:AbstractDataFrame
 Return either `Int8` or `Int16` depending on largest allelic value in all genotypes
 in the first 10 samples of an input DataFrame (or all the samples if less than 10 samples).
-If the largest allele is 11 or greater, the marker will be considered a Microsatellite
+If the largest allele is 20 or greater, the marker will be considered a Microsatellite
 and coded in `PopData` as `Int16`, and the opposite is true for SNPs. There's no
-specific reason 10 was chosen other than it being a reasonable buffer for edge
+specific reason 100 was chosen other than it being a reasonable buffer for edge
 cases since SNP data <= 4, and haplotyped data could be a bit higher. Even if the
 microsatellite markers are coded incorrectly, there will be zero impact to performance,
 and considering how few microsatellite markers are used in typical studies, the
@@ -25,7 +25,7 @@ function determine_marker(geno_parse::T, digits::Int) where T<:AbstractDataFrame
         num_test_loc = total_col - 2
     end
     # remove everything else
-    test_df = @view geno_parse[!, 3:num_test_loc]
+    test_df = @view geno_parse[:, 3:num_test_loc]
 
     # isolate the largest allele value
     max_allele = map(eachcol(test_df)) do i
@@ -33,7 +33,7 @@ function determine_marker(geno_parse::T, digits::Int) where T<:AbstractDataFrame
         skipmissing |> Base.Iterators.flatten |> maximum
     end |> maximum
 
-    if max_allele <= 10
+    if max_allele <= 100
         return Int8
     else
         return Int16
@@ -68,13 +68,10 @@ map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
     loc == "-9" || iszero(parse(Int, loc)) && return missing
     phased = map(i -> parse(type, join(i)), Iterators.partition(loc, digit))
     sort!(phased)
-    tupled = Tuple(phased)
-    return tupled
+    Tuple(phased)
 end
 
-@inline function phase(loc::Missing, type::DataType, digit::Int)
-    return missing
-end
+phase(loc::Missing, type::DataType, digit::Int) = missing
 
 @inline function phase(loc::T, type::DataType, digit::Int) where T<:Signed
     loc == -9 || iszero(loc) && return missing

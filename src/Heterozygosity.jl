@@ -48,7 +48,6 @@ end
     return @inbounds ishet.(locus)
 end
 
-
 """
     gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)
 Calculate overall gene diversity with the adjustment/correction given by Nei:
@@ -81,6 +80,10 @@ end
     return missing
 end
 
+@inline function gene_diversity_nei87(het_exp::Missing, het_obs::Missing, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+    return missing
+end
+
 """
     hetero_o(data::T) where T <: GenoArray
 Returns observed heterozygosity as a mean of the number of heterozygous genotypes, defined
@@ -100,7 +103,11 @@ Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
 @inline function hetero_e(data::T) where T <: GenoArray
-    1.0 - sum(@inbounds @avx allele_freq_vec(data) .^ 2)
+    if all(ismissing.(data)) == true
+        return missing
+    else
+        1.0 - sum(@inbounds allele_freq_vec(data) .^ 2)
+    end
 end
 
 

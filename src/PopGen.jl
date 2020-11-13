@@ -36,20 +36,12 @@ module PopGen
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-using CSV, Distributions, DataFrames
-using FileIO, JLD2, LoopVectorization
+using CSV, Distributions, DataFrames, PooledArrays, StaticArrays
+using FileIO, JLD2, Requires, ProgressMeter
 using MultipleTesting, Random, StatsBase
-using GeneticVariation:
-      VCF,
-      BCF,
-      header
+#using Convex,ECOS
+# using LinearAlgebra
 
-#=
-using Convex,
-      ECOS,
-      LinearAlgebra,
-      ProgressMeter,
-=#
 
 #   o O       o O       o O       o O       o O
 # o | | O   o | | O   o | | O   o | | O   o | | O
@@ -64,23 +56,27 @@ include("io/ioUtils.jl")
 include("io/Delimited.jl")
 include("io/Genepop.jl")
 include("io/Read.jl")
-include("io/VariantCall.jl")
+include("io/Structure.jl")
+@init @require GeneticVariation="9bc6ac9d-e6b2-5f70-b0a8-242a01662520" begin
+    @require GZip="92fee26a-97fe-5a0c-ad85-20a5f3185b63" include("io/VariantCall.jl")
+end
 # example data
 include("io/Datasets.jl")
 # utility functions
 include("Utils.jl")
 include("Permutations.jl")
-# manipulation and exploration
-include("DataExploration.jl")
-include("Manipulate.jl")
 # allele frequency and heterozygosity functions
 include("AlleleFreq.jl")
 include("Heterozygosity.jl")
+# manipulation and exploration
+include("DataExploration.jl")
+include("Manipulate.jl")
 # summary information
 include("SummaryInfo.jl")
 #Analyses
 include("HardyWeinberg.jl")
-#include(PairwiseRelatedness.jl)  # not yet ready
+include("Relatedness/PairwiseRelatedness.jl")
+include("Relatedness/RelatednessMoments.jl")
 #include(PlotRecipes.jl)  # not yet ready
 
 end # module PopGen

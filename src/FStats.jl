@@ -31,10 +31,10 @@
     )
     =#
 
-    HT = mean(@inbounds @avx 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count))
-    DST = mean(@inbounds @avx HT .- n_df.HS)
-    DST′ = mean(@inbounds @avx n_df.count ./ (n_df.count .- 1) .* DST)
-    HT′ = mean(@inbounds @avx n_df.HS .+ DST′)
+    HT = mean(@inbounds 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count))
+    DST = mean(@inbounds HT .- n_df.HS)
+    DST′ = mean(@inbounds n_df.count ./ (n_df.count .- 1) .* DST)
+    HT′ = mean(@inbounds n_df.HS .+ DST′)
 
     return Dict{Symbol, Float64}(
         :FST => DST / HT,
@@ -96,18 +96,16 @@ end
         groupby(het_df, :locus)
     )
 
-    HT = mean(@inbounds @avx 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count))
-    DST = mean(@inbounds @avx HT .- n_df.HS)
-    DST′ = mean(@inbounds @avx n_df.count ./ (n_df.count .- 1) .* DST)
-    HT′ = mean(@inbounds @avx n_df.HS .+ DST′)
+    HT = mean(@inbounds 1.0 .- n_df.avg_freq + (n_df.HS / n_df.mn / n_df.count) - (n_df.Het_obs / 2.0 / n_df.mn / n_df.count))
+    DST = mean(@inbounds HT - n_df.HS)
+    DST′ = mean(@inbounds n_df.count / (n_df.count .- 1) * DST)
+    HT′ = mean(@inbounds n_df.HS .+ DST′)
 
     return Dict{Symbol, Float64}(
         :FST => DST / HT,
         :FST′ => DST′ / HT′
     )
 end
-
-
 
 
 function f_stat_p(data::PopData; nperm::Int = 1000)
@@ -117,12 +115,15 @@ function f_stat_p(data::PopData; nperm::Int = 1000)
         :FST => Vector{Float64}(undef, nperm-1),
         :FST′ => Vector{Float64}(undef, nperm-1)
         )
-        
-    @sync Base.Threads.@spawn for n in 1:nperm-1
-        tmp = copy(data.loci)
-        tmp_f = FST_global(permute_samples!(tmp, popnames))
-        perm_dict[:FST][n] = tmp_f[:FST]
-        perm_dict[:FST′][n] = tmp_f[:FST′]
+    p = Progress(length(sample_pairs), dt = 1, color = :blue)
+    @inbounds @sync for n in 1:nperm-1
+        Base.Threads.@spawn begin
+            tmp = copy(data.loci)
+            tmp_f = FST_global(permute_samples!(tmp, popnames))
+            perm_dict[:FST][n] = tmp_f[:FST]
+            perm_dict[:FST′][n] = tmp_f[:FST′]
+            next!(p)
+        end
     end
 
     @inbounds for (k,v) in perm_dict
