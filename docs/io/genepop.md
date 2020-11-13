@@ -29,7 +29,7 @@ By default, the file reader will assign numbers as population ID's (as Strings) 
 
 ### Example
 ```julia
-julia> b = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
+julia> wasp_data = genepop("/data/wasp_hive.gen", digits = 3, popsep = "POP")
 ```
 
 ### Format
