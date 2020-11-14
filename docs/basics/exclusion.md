@@ -62,7 +62,6 @@ PopData Object
   Populations: 7
   Coordinates: present
 
-# multiple samples
 julia> lots_fewer_sharks = remove(sharks, name = ["cc_001", "cc_002", "cc_003"])
 PopData Object
   Marker: SNP
@@ -86,7 +85,6 @@ PopData Object
   Populations: 7
   Coordinates: present
 
-# multiple loci  
 julia> lots_fewer_loci = remove(sharks, locus = ["contig_475", "contig_2784", "contig_8065"])
 PopData Object
   Marker: SNP
@@ -110,7 +108,6 @@ PopData Object
   Populations: 6
   Coordinates: present
 
-# multiple populations
 julia> lots_fewer_pops = remove(sharks, population = ["Florida Keys", "Mideast Gulf"])
 PopData Object
   Markers: SNP

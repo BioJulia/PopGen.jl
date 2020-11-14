@@ -131,7 +131,6 @@ function names as arguments (**case sensitive**), therefore do not use quotes or
 in specifying the methods. Methods can be supplied as a vector. 
 
 - [Blouin](analyses/relatedness.md#blouin)
-- [dyadML](analyses/relatedness.md#dyadic-maximum-likelihood)
 - [LiHorvitz](analyses/relatedness.md#li--horvitz)
 - [Loiselle](analyses/relatedness.md#loiselle)
 - [Lynch](analyses/relatedness.md#lynch)
@@ -140,7 +139,13 @@ in specifying the methods. Methods can be supplied as a vector.
 - [Moran](analyses/relatedness.md#lynch--moran)
 - [QuellerGoodnight](analyses/relatedness.md#queller--goodnight)
 - [Ritland](analyses/relatedness.md#ritland)
+##### In Progress (incomplete*)
+- [dyadML](analyses/relatedness.md#dyadic-maximum-likelihood)
 - [Wang](analyses/relatedness.md#wang)
+
+:::note *more relatedness
+Contact us or submit a pull request if you're interested in contributing to the relatedness methods. We're currently in the process of adding dryadML and Wang (2002) estimators and speeding up the existing methods. More help is always welcomed! :smile:
+:::
 
 #### Examples
 
@@ -191,9 +196,6 @@ inputting them. For more information on a specific method, please see the respec
 ### Blouin
 The moments based estimator developed by [Blouin (1996)](https://onlinelibrary.wiley.com/doi/10.1046/j.1365-294X.1996.00094.x). Call `method = Blouin` to use this method. 
 
-### Dyadic Maximum Likelihood
-The moments based estimator developed by [Milligan (2003)](https://pubmed.ncbi.nlm.nih.gov/12663552/). Call `method = dyadML` to use this method. 
-
 ### Li & Horvitz
 The moments based estimator developed by [Li & Horvitz (1953)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1716461/). Call `method = LiHorvitz` to use this method. 
 
@@ -219,8 +221,12 @@ The moments based estimator developed by [Queller & Goodnight (1989)](https://on
 ### Ritland
 The moments based estimator developed by [Ritland (1996)](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1996.tb02347.x). Call `method = Ritland` to use this method. 
 
-### Wang
-The moments based estimator developed by [Wang (2002)](https://www.genetics.org/content/160/3/1203.short). Call `method = Wang` to use this method. 
+### Incomplete
+#### Dyadic Maximum Likelihood
+The moments based estimator developed by [Milligan (2003)](https://pubmed.ncbi.nlm.nih.gov/12663552/).
+
+#### Wang
+The moments based estimator developed by [Wang (2002)](https://www.genetics.org/content/160/3/1203.short).
 
 ---------------------
 ## Acknowledgements

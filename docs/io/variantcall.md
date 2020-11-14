@@ -5,6 +5,7 @@ sidebar_label: Variant Call Format
 ---
 
 ## Import a BCF/VCF file as `PopData`
+
 ```julia
 vcf(infile::String; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
 bcf(infile::String; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
@@ -28,6 +29,7 @@ The packages required to import BCF/VCF files (`GeneticVariation.jl` and `GZip.j
 
 
 ### Example
+
 ```julia
 using GeneticVariation, GZip
 potato = vcf("/home/data/russet_potatoes.vcf.gz", allow_monomorphic = true)
@@ -36,16 +38,16 @@ cabbage = bcf("/home/data/nappa_cabbage.bcf", rename_loci = true, silent = true)
 
 ### Mixed-Ploidy data
 In the event your variant call file is for mixed-ploidy data (where ploidy is not the same across all samples, e.g. PoolSeq), you will need to perform an additional step after reading in your data as `PopData` to convert the `.loci.genotype` column into a `GenoArray`:
+
 ```julia
-# read in the file
 julia> mydata = bcf("path/to/file.bcf", silent = true, rename_loci = true) ;
 
-# convert the genotype column
 julia> mydata.loci.genotype =  mydata.loci.genotype |> Array{Union{Missing, NTuple}}
 ```
 
 ### Format
 Variant Call Format files follow a format standard, and while there is some wiggle-room for optional values, PopGen.jl only requires the core/mandatory components of a BCF/VCF, meaning problems should hopefully not arise regardless of which variant caller you are using (although we use `Freebayes` ourselves). Please open an issue if they do, or reach out to us on the community Slack.
+
 
 ### Allele encodings
 When converting to `PopData`, the nucleotides will be recoded according to this table:
