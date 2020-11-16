@@ -89,7 +89,13 @@ julia> rel_out.LynchLi
 </TabItem>
 <TabItem value="pl">
 
-And while it's totally optional, we can plot the distribution of values for some visual data exploration. For that we'll use Plots.jl and StatsPlots.jl.
+And while it's totally optional, we can plot the distribution of values for some visual data exploration. For that we'll use Plots.jl and StatsPlots.jl. 
+
+:::note plotting packages
+We could have used any plotting package, but Plots.jl was chosen for simplicity. Other great
+options are (and not limited to): Makie.jl, Gadfly.jl, VegaLite.jl, and PlotlyJS.jl.
+:::
+
 ```julia
 using Plots, StatsPlots
 
@@ -165,6 +171,17 @@ PopData Object
 </Tabs>
 
 Technically, we could merge all three results into a single `PopData`, but it will be easier to explain things if we don't. Feel free to take a peep into the simulated data:
+
+<Tabs
+  block={true}
+  defaultValue=""
+  values={[
+    { label: 'meta', value: 'meta', },
+    { label: 'loci', value: 'loci', },
+  ]
+}>
+<TabItem value="meta">
+
 ```
 julia> unrelated_sims.meta
 1000×5 DataFrame
@@ -198,6 +215,12 @@ julia> unrelated_sims.meta
  1000 │ sim500_un_off2  unrelated        2   missing   missing  
                                                 976 rows omitted
 
+```
+
+</TabItem>
+<TabItem value="loci">
+
+```
 julia> unrelated_sims.loci
 9000×4 DataFrame
   Row │ name            population  locus   genotype   
@@ -230,6 +253,9 @@ julia> unrelated_sims.loci
  9000 │ sim500_un_off2  unrelated   fca37   (208, 182)
                                       8976 rows omitted
 ```
+
+</TabItem>
+</Tabs>
 
 #### ii. get relatedness estimates for the simulated data
 Next, we want to get the relatedness estimate for each simulated pair of "known" sibship. We are only interested in the values for the simulated pairs and not samples across pairs. If you aren't sure why that is, think of it this way: we're trying to create a range of values where we can confidently say unknown things are full-sibs (or half-sib, etc.), so we want to know what range of values we get from a bunch of known fullsib pairs, not the unknown relationships of samples between pairs. 
@@ -331,7 +357,21 @@ julia> full_sims_rel = relatedness(fullsib_sims, method = LynchLi)
 </TabItem>
 </Tabs>
 
-Take a breath, we're almost there!
+And if we wanted to plot out what that looks like (optional):
+```julia
+using Plots, StatsPlots
+
+julia> density(rel_out.LynchLi.LynchLi, plot_title = "Nancycats relatedness", label = "real data", color = :grey, fill = (0, :grey))
+julia> density!(un_sims_rel.LynchLi, label = "unrelated")
+julia> density!(half_sims_rel.LynchLi, label = "halfsib", color = :blue)
+julia> density!(full_sims_rel.LynchLi, label = "fullsib", color = :black)
+julia> title!("relatedness estimates on simulated and real data")
+```
+
+![relatedness_histo](relatedness_img/nancycats_sims.png)
+
+
+Hopefully by now you are starting to contextualize why we're doing all of this. The distributions generated from our simulated data are giving us a better indication of what "unrelated", "halfsib", and "fullsib" estimates look like in our data.
 
 #### iii. sibship intervals
 What we just did is create null distributions for each sibship relationship, so now all that's left is to get a confidence interval from each.
