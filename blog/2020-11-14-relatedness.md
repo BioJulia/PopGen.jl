@@ -377,17 +377,31 @@ Hopefully by now you are starting to contextualize why we're doing all of this. 
 What we just did is create null distributions for each sibship relationship, so now all that's left is to get a confidence interval from each.
 
 ```julia
-jula> unrelated_ci = quantile(un_sims_rel.LynchLi, (0.025, 0.975))
-jula> halfsibs_ci = quantile(half_sims_rel.LynchLi, (0.025, 0.975))
-jula> fullsibs_ci = quantile(full_sims_rel.LynchLi, (0.025, 0.975))
+julia> unrelated_ci = quantile(un_sims_rel.LynchLi, (0.025, 0.975))
+(-0.3380513384854698, 0.33097433075726507)
+
+julia> halfsibs_ci = quantile(half_sims_rel.LynchLi, (0.025, 0.975))
+(-0.06652262584414452, 0.5556155725649398)
+
+julia> fullsibs_ci = quantile(full_sims_rel.LynchLi, (0.025, 0.975))
+(0.1989727186688347, 0.8219939374819633)
 ```
 
-### 4. Final data assessment
+So, given our data and the simulations we made, we can now make a reasonable assumption regarding the ranges for each sibship relationship:
+
+| Relationship | Low | High |
+| :------ | :---: | :---: |
+| unrelated | -0.338 | 0.331 |
+| half sibling | -0.066 | 0.555 |
+| full sibling | 0.199 | 0.82 |
+
+### 4. Finally, the data assessment
 Now that we have our relatedness estimates and the acceptable sibship ranges given our data, we can see where our data falls.
 _Now_, we can say that a particular sample pair is unrelated/halfsib/fullsib if:
 1. that pair's confidence interval does not include zero and 
 2. that pair's estimate falls within any of the three calculate ranges
 
+Unfortunately, the ranges overlap quite a bit, which makes interpretation difficult, so it may be suitable to use a different estimator. 
 
-### Final remarks
+### Closing remarks
 There is more that can be done for relatedness, like network analysis. However, this tutorial covers what we consider a reasonable way to assess kinship in population genetic studies. If removing kin is your ultimate goal, consider the effects doing that may have on the analyses you are looking to do. Additionally, consider which individual of a pair you would remove and why. If you were curious as to how many identical loci a pair of samples may share, you can check that using `pairwise_identical()`. Good luck!
