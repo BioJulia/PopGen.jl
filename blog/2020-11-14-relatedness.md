@@ -27,7 +27,7 @@ PopData Object
 ```
 
 ### Estimators
-Like `Coancestry` and the R packages that wrap it (i.e. `relate`, `related`), PopGen.jl provides a whole bunch of relatedness estimators that you can choose from for your data. Unfortunately, there is no right answer and you will need to use your discretion. Some people choose an estimator based on the heterozygosity of thhe data, others choose one based on more liberal or conservative values, and there are yet more criteria one can consider for choosing an estimator. To keep things simple, we're going to use `LynchLi`. Why? Because I'm the one writing this tutorial, and I said so :grin:. 
+Like `Coancestry` and the R packages that wrap it (i.e. `relate`, `related`), PopGen.jl provides a whole bunch of relatedness estimators that you can choose from for your data. Unfortunately, there is no right answer and you will need to use your discretion. Some people choose an estimator based on the heterozygosity of the data, others choose one based on more liberal or conservative values, and there are yet more criteria one can consider for choosing an estimator. To keep things simple, we're going to use `LynchLi`. Why? Because I'm the one writing this tutorial, and I said so :grin:. 
 
 
 ## The Steps
