@@ -253,15 +253,12 @@ View unique population ID's and their counts in a `PopData`.
         @info "no population data present in PopData"
         return
     elseif listall == true
-        return @view data.meta[!, [:name, :population]]
+        return @view data.meta[:, [:name, :population]]
     else
-        DataFrames.combine(
-            DataFrames.groupby(data.meta, :population),
-            nrow => :count
-        )
+        pops = countmap(data.meta.population)
+        return DataFrame(:population => collect(keys(pops)), :count => collect(values(pops)))
     end
 end
-
 """
 ```
 # Replace by matching
