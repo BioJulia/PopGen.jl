@@ -8,6 +8,10 @@ import TabItem from '@theme/TabItem';
 
 PopGen.jl is an attempt to create a unified ecosystem for population genetics analyses leveraging the speed, power, fun(?), and community of the Julia language. We hope to implement common analyses (heterozygosity, kinship, FST, Tajima's D, etc.) in *sane*, user friendly ways, with consistent and comfortable syntax. 
 
+:::note
+The package is still in its infancy, so expect breaking changes to be more common than not between versions. We _think_ the core components are probably not going to change much, but cannot guarantee it. The package follows standard semantic versioning (i.e. breaking.feature.bugfix), so if the first number changes, we'll announce what's broken.
+:::
+
 ## Goal
 
 To be a comprehensive package for population genetics analyses and visualization that's fast and user friendly. This project is developed with a particular mantra: *Sanity, Sensibility, Accessibility*.

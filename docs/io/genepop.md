@@ -115,6 +115,7 @@ fewer_cats = omit(cats, names = samples(cats)[1:10]);
 julia> popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
 
+----
 
 ## Acknowledgements
 

@@ -122,3 +122,8 @@ The genotypes of the `loci` are an array of type `Genotype`, which is [an alias]
 :::caution immutable genotypes
 We use the Tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using PopGen.jl, your data should already be filtered and screened. Hand-editing of genotype alleles is **strongly** discouraged, so we outlawed it.
 :::
+
+------
+
+## Acknowledgements
+A *lot* of what's possible in PopGen.jl is thanks to the tireless work of the contributors and maintainers of [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl). It's no small task to come up with and maintain a robust, performant, and sensible tabular data type, and they deserve so much credit for it. 
