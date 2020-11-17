@@ -361,7 +361,7 @@ And if we wanted to plot out what that looks like (optional):
 ```julia
 using Plots, StatsPlots
 
-julia> density(rel_out.LynchLi.LynchLi, plot_title = "Nancycats relatedness", label = "real data", color = :grey, fill = (0, :grey))
+julia> density(rel_out.LynchLi.LynchLi, label = "real data", color = :grey, fill = (0, :grey))
 julia> density!(un_sims_rel.LynchLi, label = "unrelated")
 julia> density!(half_sims_rel.LynchLi, label = "halfsib", color = :blue)
 julia> density!(full_sims_rel.LynchLi, label = "fullsib", color = :black)
@@ -389,7 +389,7 @@ julia> fullsibs_ci = quantile(full_sims_rel.LynchLi, (0.025, 0.975))
 
 So, given our data and the simulations we made, we can now make a reasonable assumption regarding the ranges for each sibship relationship:
 
-| Relationship | Low | High |
+| Relationship | Lower Bound | Upper Bound |
 | :------ | :---: | :---: |
 | unrelated | -0.338 | 0.331 |
 | half sibling | -0.066 | 0.555 |
