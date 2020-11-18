@@ -4,7 +4,11 @@ title: Provided datasets
 sidebar_label: Provided datasets
 ---
 
-PopGen.jl provides two datasets as examples, `nancycats` and `gulfsharks`. The datasets can be retrieved using the `dataset` function, or their names as commands without arguments (e.g. `gulfsharks()`). 
+PopGen.jl provides two datasets as examples, `nancycats` and `gulfsharks`. The datasets can be retrieved using the `dataset` function, or their names as macros  (e.g. `@gulfsharks`).
+
+:::caution
+As of v0.4.2 we are deprecating `nancycats()` and `gulfsharks()` in favor of their macros. You will still be able to use them, but you'll get a deprecation warning. We will remove `nancycats()` and `gulfsharks()` in the v0.5.0 release.
+:::
 
 :::info identitcal methods
 The methods are identical (one is a wrapper for the other), but the benefit of calling the datasets directly by name is that you get the luxury of tab auto-completion :grin:
@@ -23,10 +27,10 @@ cats = dataset("nancycats")
 ```
 ### nancycats
 
-We include the familiar nancycats microsatellite data, as featured in [adegenet](http://adegenet.r-forge.r-project.org), for easy importing into PopGen.jl as `PopData`. As an alternative to `datasets`, you can invoke the `nancycats()`  command without any arguments.
+We include the familiar nancycats microsatellite data, as featured in [adegenet](http://adegenet.r-forge.r-project.org), for easy importing into PopGen.jl as `PopData`. As an alternative to `datasets`, you can invoke the `@nancycats` macro.
 
 ```julia
-julia> ncats = nancycats()
+julia> cats = @nancycats
 PopData Object
   Markers: Microsatellite
   Ploidy: 2
@@ -40,10 +44,10 @@ The spatial coordinates provided for the dataset in `adegenet` are completely un
 
 ### gulfsharks
 
-We also include the SNP dataset used in [Dimens *et al.* 2019](https://link.springer.com/article/10.1007/s00227-019-3533-1) since it was already on hand. Like `nancycats`, we provide a convenient function to load these data into PopGen.jl as `PopData`. As an alternative to `datasets`, you can invoke the `gulfsharks()` command without any arguments. 
+We also include the SNP dataset used in [Dimens *et al.* 2019](https://link.springer.com/article/10.1007/s00227-019-3533-1) since it was already on hand. Like `nancycats`, we provide a convenient function to load these data into PopGen.jl as `PopData`. As an alternative to `datasets`, you can invoke the `@gulfsharks` macro. 
 
 ```julia
-julia> sharks = gulfsharks()
+julia> sharks = @gulfsharks
 PopData Object
   Markers: SNP
   Ploidy: 2
