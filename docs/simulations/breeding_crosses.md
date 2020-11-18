@@ -28,7 +28,7 @@ The cross function performs a simple parental cross from individuals `parent1` a
 
 #### Example
 ```julia
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> f1 = cross(cats, "N111", "N107", n = 100000)
 PopData Object

@@ -101,7 +101,7 @@ Write a `PopData` object to a Stucture format file
 - `faststructure`: true/false of whether the output should be formatted for fastStructure (default: `false`)
 
 ```
-cats = nancycats();
+cats = @nancycats;
 fewer_cats = omit(cats, name = samples(cats)[1:10]);
 popdata2structure(fewer_cats, filename = "filtered_nancycats.str", faststructure = true)
 ```

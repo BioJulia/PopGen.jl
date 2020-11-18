@@ -18,7 +18,7 @@ Get missing genotype information in a `PopData`. Specify a mode of operation to 
 
 **Example**
 ```julia
-missing(gulfsharks(), by = "pop")
+missing(@gulfsharks, by = "pop")
 ```
 
 -----
@@ -29,7 +29,7 @@ Return a table of the percent of identical genotypes at each locus between all p
 
 **Example**
 ```julia
-julia> cats = nancycats();
+julia> cats = @nancycats;
 julia> pairwise_identical(cats)
 27966×4 DataFrame
 │ Row   │ sample_1 │ sample_2 │ identical │ n     │
@@ -56,7 +56,7 @@ Return a table of the percent of identical genotypes at each locus between all p
 
 **Example**
 ```julia
-julia> cats = nancycats();
+julia> cats = @nancycats;
 julia> pairwise_identical(cats, samples(cats)[1:4])
 6×4 DataFrame
 │ Row │ sample_1 │ sample_2 │ identical │ n     │

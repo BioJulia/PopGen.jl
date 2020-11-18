@@ -13,7 +13,7 @@ To follow along like a tutorial, load the `gulfsharks` data in if you haven't al
 ```julia
 julia> using PopGen
 
-julia> sharks = gulfsharks() ;
+julia> sharks = @gulfsharks ;
 ```
 
 ### [Accessing Elements](accessing)

@@ -110,7 +110,7 @@ Writes a `PopData` object to a Genepop-formatted file.
 
 ### Example
 ```julia
-cats = nancycats();
+cats = @nancycats;
 fewer_cats = omit(cats, names = samples(cats)[1:10]);
 julia> popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```

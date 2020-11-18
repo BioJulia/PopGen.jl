@@ -71,7 +71,7 @@ Calculate chi-squared test of HWE for each locus and returns observed and expect
 <TabItem value="hwe">
 
 ```
-julia> hwe_test(gulfsharks())
+julia> hwe_test(@gulfsharks)
 2213×4 DataFrame
 │ Row  │ locus        │ chisq     │ df    │ P        │
 │      │ String       │ Float64   │ Int64 │ Float64? │
@@ -96,7 +96,7 @@ julia> hwe_test(gulfsharks())
 <TabItem value="hwe_p">
 
 ```
-julia> hwe_test(gulfsharks(), correction = "bh")
+julia> hwe_test(@gulfsharks, correction = "bh")
 2213×5 DataFrame
 │ Row  │ locus        │ chisq     │ df    │ P        │ P_bh     │
 │      │ String       │ Float64   │ Int64 │ Float64? │ Float64? │
@@ -121,7 +121,7 @@ julia> hwe_test(gulfsharks(), correction = "bh")
 <TabItem value="hwe_pop">
 
 ```
-julia> hwe_test(gulfsharks(), by = "population")
+julia> hwe_test(@gulfsharks, by = "population")
 15491×5 DataFrame
 │ Row   │ locus        │ population     │ chisq       │ df    │ P        │
 │       │ String       │ String         │ Float64     │ Int64 │ Float64? │
@@ -149,7 +149,7 @@ When doing this test by population, you may notice some loci have `missing` P-va
 ## Interpreting the results
 Since the results are in table form, you can easily process the table using `DataFramesMeta.jl` or `Query.jl` to find loci above or below the alpha threshold you want. As an example, let's perform an HWE-test on the `nancycats` data without any P-value adjustments:
 ```julia
-julia> ncats_hwe = hwe_test(nancycats() , by = "population") ;
+julia> ncats_hwe = hwe_test(@nancycats , by = "population") ;
 ```
 Now, we can use `DataFramesMeta.jl` to easily filter this table and leave only what we're interested in:
 ```julia
@@ -188,7 +188,7 @@ While not strictly necessary, it might sometimes make sense to generate of heatm
 ```julia
 using VegaLite
 
-julia> ncats_hwe = hwe_test(nancycats() , by = "population", correction = "bonferroni");
+julia> ncats_hwe = hwe_test(@nancycats , by = "population", correction = "bonferroni");
 
 julia> ncats |> @vlplot(:rect, :locus, :population, color=:P_bonferroni)
 ```

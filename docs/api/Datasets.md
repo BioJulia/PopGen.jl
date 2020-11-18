@@ -22,7 +22,7 @@ gsharks = dataset("sharks")
 
 ### `nancycats`
 ```julia
-nancycats()
+@nancycats
 ```
 Returns a `PopObj` of corresponding "nancycats" dataset as featured in
 the R package `adegenet`. This is microsatellite data of 9 loci in 237
@@ -30,14 +30,14 @@ individuals across 17 populations.
 
 **Example**
 ```
-ncats = nancycats()
+ncats = @nancycats
 ```
 
 ----
 
 ### `gulfsharks`
 ```julia
-gulfsharks()
+@gulfsharks
 ```
 Returns a `PopObj` corresponding the Blacknose shark dataset as used in
 Dimens et al. 2019. This is a mid-sized SNP dataset of 2213 SNPs in 212
@@ -45,5 +45,5 @@ individuals, across 7 populations.
 
 **Example**
 ```julia
-sharks = gulfsharks()
+sharks = @gulfsharks
 ```
