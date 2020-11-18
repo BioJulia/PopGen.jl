@@ -4,8 +4,8 @@ using PopGen
 using DataFrames
 using Test
 
-cats = nancycats();
-sharks = gulfsharks();
+cats = @nancycats;
+sharks = @gulfsharks;
 
 @testset "PopGen.allele_freq" begin
     @test length(PopGen.allele_freq(cats)) == 9

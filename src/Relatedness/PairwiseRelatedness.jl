@@ -254,7 +254,6 @@ in specifying the methods. Multiple methods can be supplied as a vector. All of 
 For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
 
 - `Blouin`
-- `dyadicLikelihood`
 - `LiHorvitz`
 - `Loiselle`
 - `Lynch`
@@ -263,7 +262,7 @@ For more information on a specific method, please see the respective docstring (
 - `Moran`
 - `QuellerGoodnight`
 - `Ritland`
-- `Wang`
+
 
 ### Simulated siblingship comparison
 If validating the estimators using `PopGenSims.jl` to simulate sibship relationships, `relatedness`
@@ -272,7 +271,7 @@ pairs.
 
 ### Inbreeding
 Use the `inbreeding` keyword to specify whether to allow inbreeding (`true`) or not (`false`, default).
-This is only relevant for the `dyadicLikelihood` method.
+This is only relevant for the `dyadicLikelihood` method (not yet released)
 
 ### Bootstrapping
 To calculate means, medians, standard errors, and confidence intervals using bootstrapping,

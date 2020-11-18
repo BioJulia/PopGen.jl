@@ -4,8 +4,8 @@ using PopGen
 using DataFrames
 using Test
 
-cats = nancycats();
-sharks = gulfsharks();
+cats = @nancycats;
+sharks = @gulfsharks;
 
 @testset "locations" begin
     x = rand(length(samples(cats))) ; y = rand(length(samples(cats)))

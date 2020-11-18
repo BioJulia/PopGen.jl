@@ -253,15 +253,12 @@ View unique population ID's and their counts in a `PopData`.
         @info "no population data present in PopData"
         return
     elseif listall == true
-        return @view data.meta[!, [:name, :population]]
+        return @view data.meta[:, [:name, :population]]
     else
-        DataFrames.combine(
-            DataFrames.groupby(data.meta, :population),
-            nrow => :count
-        )
+        pops = countmap(data.meta.population)
+        return DataFrame(:population => collect(keys(pops)), :count => collect(values(pops)))
     end
 end
-
 """
 ```
 # Replace by matching
@@ -324,8 +321,8 @@ function populations!(data::PopData, samples::Vector{String}, populations::Vecto
     meta_df = groupby(data.meta, :name)
     loci_df = groupby(data.loci, :name)
     for (sample, new_pop) in zip(samples, populations)
-        meta_df[(name = sample,)].population = new_pop
-        loci_df[(name = sample,)].population = new_pop
+        meta_df[(name = sample,)].population .= new_pop
+        loci_df[(name = sample,)].population .= new_pop
     end
     # drop old levels
     data.loci.population = data.loci.population |> Array |> PooledArray
