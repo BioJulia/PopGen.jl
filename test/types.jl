@@ -5,8 +5,8 @@ using DataFrames
 using PooledArrays
 using Test
 
-cats = nancycats();
-sharks = gulfsharks();
+cats = @nancycats;
+sharks = @gulfsharks;
 
 @testset "Dataset types" begin
     @test typeof(cats) == PopData
