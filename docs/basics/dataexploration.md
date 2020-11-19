@@ -34,6 +34,8 @@ Get missing genotype information in a `PopData` object. Specify a mode of operat
 <TabItem value="s">
 
 ```
+julia> sharks = @gulfsharks ;
+
 julia> missing(sharks)
 212×2 DataFrame
 │ Row │ name    │ missing │
@@ -59,6 +61,8 @@ julia> missing(sharks)
 <TabItem value="p">
 
 ```
+julia> sharks = @gulfsharks ;
+
 julia> missing(sharks, by = "pop")
 7×2 DataFrame
 │ Row │ population     │ missing │
@@ -77,6 +81,8 @@ julia> missing(sharks, by = "pop")
 <TabItem value="l">s
 
 ```
+julia> sharks = @gulfsharks ;
+
 julia> missing(sharks, by = "locus")
 2213×2 DataFrame
 │ Row  │ locus        │ missing │
@@ -102,7 +108,10 @@ julia> missing(sharks, by = "locus")
 <TabItem value="f">
 
 ```
+julia> sharks = @gulfsharks ;
+
 julia> missing(sharks, by = "full")
+
 15491×3 DataFrame
 │ Row   │ locus        │ population     │ missing │
 │       │ String       │ String         │ Int64   │

@@ -6,7 +6,7 @@ sidebar_label: Installation
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Installation is still simple!
+Installation is simple!
 
 <Tabs
   block={true}
