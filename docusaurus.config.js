@@ -41,6 +41,11 @@ module.exports = {
           position: 'right',
         },
         {
+        to: 'docs/latest',
+        label: 'What\'s New',
+        position: 'right',
+        },
+        {
           to: 'docs/getting_started/about',
           label: 'About',
           position: 'right',
@@ -82,7 +87,11 @@ module.exports = {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/pdimens/popgen.jl/edit/edit/documentation/website/blog/',
+            'https://github.com/pdimens/popgen.jl/edit/documentation/',
+          feedOptions: {
+            type: 'all',
+            copyright: `Copyright © ${new Date().getFullYear()} PopGen.jl`,
+          },
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
