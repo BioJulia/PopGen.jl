@@ -14,8 +14,8 @@ gsharks = dataset("sharks")
 ```
 """
 function dataset(name::String)
-    lowercase(name) in ["gulfsharks", "sharks"] && return gulfsharks()
-    lowercase(name) in ["nancycats", "cats"] && return nancycats()
+    lowercase(name) in ["gulfsharks", "sharks"] && return PopGen._gulfsharks()
+    lowercase(name) in ["nancycats", "cats"] && return PopGen._nancycats()
 end
 
 """
@@ -42,7 +42,7 @@ end
 
 macro nancycats()
     return esc(quote
-       _nancycats()
+       PopGen._nancycats()
     end)
 end
 
@@ -72,6 +72,6 @@ end
 
 macro gulfsharks()
     return esc(quote
-       _gulfsharks()
+       PopGen._gulfsharks()
     end)
 end
