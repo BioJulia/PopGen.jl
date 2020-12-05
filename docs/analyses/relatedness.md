@@ -63,16 +63,19 @@ julia> cats = nancycats();
 
 julia> relatedness(cats, method = Ritland)
 27966×4 DataFrame
-│ Row   │ sample_1 │ sample_2 │ n_loci │ Ritland    │
-│       │ String   │ String   │ Int64  │ Float64?   │
-├───────┼──────────┼──────────┼────────┼────────────┤
-│ 1     │ N215     │ N216     │ 8      │ 0.258824   │
-│ 2     │ N215     │ N217     │ 8      │ 0.193238   │
-│ 3     │ N215     │ N218     │ 8      │ 0.127497   │
-⋮
-│ 27964 │ N281     │ N289     │ 8      │ 0.0892068  │
-│ 27965 │ N281     │ N290     │ 7      │ 0.104614   │
-│ 27966 │ N289     │ N290     │ 7      │ 0.0511663  │
+    Row │ sample_1  sample_2  n_loci  Ritland
+        │ String    String    Int64   Float64?
+ ───────┼─────────────────────────────────────────
+      1 │ N215      N216           8   0.258824
+      2 │ N215      N217           8   0.193238
+      3 │ N215      N218           8   0.127497
+      4 │ N215      N219           8   0.0453471
+   ⋮   │    ⋮         ⋮        ⋮          ⋮
+  27963 │ N297      N290           7   0.189647
+  27964 │ N281      N289           8   0.0892068
+  27965 │ N281      N290           7   0.104614
+  27966 │ N289      N290           7   0.0511663
+                                27958 rows omitted
 ```
 
 </TabItem>
@@ -227,6 +230,29 @@ The moments based estimator developed by [Milligan (2003)](https://pubmed.ncbi.n
 
 #### Wang
 The moments based estimator developed by [Wang (2002)](https://www.genetics.org/content/160/3/1203.short).
+
+
+## Posthoc analyses
+There are several different kinds of things you can do with kinship information (e.g. network analysis), and one that's provided is lovingly
+called `relatedness_posthoc()`, which performs a permutation analysis to
+test if within-population relatedness is significantly greater than between-population relatedness for each population. We recommend that you
+correct for multiple testing using `MultipleTesting.jl`.
+
+```julia
+relatedness_posthoc(data::PopData, results::Union{DataFrame, NamedTuple}; iterations::Int)
+```
+### Arguments
+- `data` : A PopData object
+- `results` : the DataFrame or NamedTuple results from `relatedness()`
+
+### Keyword Arguments
+- `iterations` : number of iterations for the permutation tests (default: `20000`)
+
+:::tip not a great name
+We admit "relatedness_posthoc" is not a great name for this function. Please
+contact us with better ideas! :grin:
+:::
+
 
 ---------------------
 ## Acknowledgements
