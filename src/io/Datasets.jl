@@ -35,9 +35,14 @@ function nancycats()
     load(filename, "nancycats")
 end
 
+function _nancycats()
+    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
+    load(filename, "nancycats")
+end
+
 macro nancycats()
     return esc(quote
-       nancycats()
+       _nancycats()
     end)
 end
 
@@ -60,8 +65,13 @@ function gulfsharks()
     load(filename, "gulfsharks")
 end
 
+function _gulfsharks()
+    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
+    load(filename, "gulfsharks")
+end
+
 macro gulfsharks()
     return esc(quote
-       gulfsharks()
+       _gulfsharks()
     end)
 end

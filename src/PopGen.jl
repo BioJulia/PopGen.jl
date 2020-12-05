@@ -77,6 +77,7 @@ include("SummaryInfo.jl")
 include("HardyWeinberg.jl")
 include("Relatedness/PairwiseRelatedness.jl")
 include("Relatedness/RelatednessMoments.jl")
+include("Relatedness/RelatednessPostHocs.jl")
 #include(PlotRecipes.jl)  # not yet ready
 
 end # module PopGen
