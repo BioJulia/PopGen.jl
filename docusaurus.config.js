@@ -33,24 +33,24 @@ module.exports = {
           to: 'docs/',
           activeBasePath: 'docs',
           label: 'Docs',
-          position: 'right',
+          position: 'left',
         },
+        {
+          to: 'docs/getting_started/about',
+          label: 'About',
+          position: 'left',
+        },        
         {
           to: 'docs/getting_started/quickstart',
           label: 'Quickstart',
           position: 'right',
         },
+        {to: 'blog', label: 'Blog', position: 'left'},
         {
         to: 'docs/latest',
         label: 'What\'s New',
-        position: 'right',
+        position: 'left',
         },
-        {
-          to: 'docs/getting_started/about',
-          label: 'About',
-          position: 'right',
-        },        
-        {to: 'blog', label: 'Blog', position: 'right'},
         {
           to: 'docs/getting_started/community',
           label: 'Get Involved',
