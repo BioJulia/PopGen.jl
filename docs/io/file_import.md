@@ -6,13 +6,13 @@ sidebar_label: Reading in data
 
 Currently, PopGen.jl provides a handful of file readers with which to create `PopData`. Each of the file types have their own file reader denoted simply by the file type:
 
-| File type                     | Function to import it |
-| ----------------------------- | --------------------- |
-| Delimited                     | `delimited()`         |
-| Genepop                       | `genepop()`           |
-| Structure/fastStructure       | `structure()`         |
-| Variant Call Format           | `vcf()`               |
-| Variant Call Format (bzipped) | `bcf()`               |
+| File Format         | Extensions             | Docstring     |
+| :------------------ | :--------------------- | :------------ |
+| delimited           | `.csv`, `.txt`, `.tsv` | `?delimited`  |
+| genepop             | `.gen`, `.genepop`     | `?genepop`    |
+| structure           | `.str`, `.structure`   | `?structure`  |
+| variant call format (vcf) | `.vcf`, `.vcf.gz`| `?vcf`  |
+| variant call format (bcf) | `.bcf`, `.bcf.gz`| `?bcf`  |
 
 You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_from()`. This wrapper is also aliased with the more-explicit name `file_import()`. Feel free to use whichever you like best.
 
