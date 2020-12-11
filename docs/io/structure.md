@@ -14,7 +14,7 @@ More often than not, your Structure file was created by a conversion from anothe
 
 
 ```julia
-    structure(infile::String; kwargs...)
+structure(infile::String; kwargs...)
 ```
 
 ### Arguments
@@ -104,7 +104,7 @@ chestnuts = structure("castanea_dentata.str", faststructure = true)
 All file writing options can be performed using `write_to()`, which calls `popdata2structure` when writing to a Structure/fastStructure file.
 
 ```julia
-  popdata2structure(data::PopData; filename::String, faststructure::Bool, delim::String)
+popdata2structure(data::PopData; filename::String, faststructure::Bool, delim::String)
 ```
 Write a `PopData` object to a Stucture format file
 ### Arguments
