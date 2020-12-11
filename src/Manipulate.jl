@@ -205,7 +205,7 @@ end
 
 #TODO rename kwarg to `name`
 """
-    get_genotypes(data::PopObj; sample::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
+    get_genotypes(data::PopObj; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
 Return a table of the genotype(s) of one or more `samples` for one or more
 specific `loci` (both as keywords) in a `PopData` object.
 ### Examples

@@ -46,7 +46,6 @@ missing(gulfsharks(), by = "pop")
     end
 end
 
-#TODO update docs/API
 """
     pairwise_identical(data::PopData)
 Return a table of the percent of identical genotypes at each locus between all pairs of individuals.
@@ -78,7 +77,6 @@ function pairwise_identical(data::PopData)
     pairwise_identical(data, sample_names)
 end
 
-#TODO update docs/API
 """
     pairwise_identical(data::PopData, sample_names::Vector{String})
 Return a table of the percent of identical genotypes at each locus
@@ -144,8 +142,6 @@ function pairwise_identical(data::PopData, sample_names::Vector{String})
     DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :identical => perc_ident_vec, :n => n_vec)
 end
 
-#TODO add to docs/dataexploration
-#TODO add to docs/API
 """
     geno_freqtable(data::PopData; by::String = "global")
 Return a table of the observed `global` (default) or `population` genotype frequencies in a PopData object.
@@ -208,8 +204,7 @@ function geno_freqtable(data::PopData; by::String = "global")
     end
 end
 
-#TODO add to docs/dataexploration
-#TODO add to docs/API
+
 """
     allele_freqtable(data::PopData; by::String = "global")
 Return a table of the observed `global` (default) or `population` allele frequencies in a PopData object.

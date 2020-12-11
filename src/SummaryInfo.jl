@@ -23,7 +23,7 @@ allelic richness. Use `by = "population"` to calculate richness by
 locus by population.
 """
 function richness(data::PopData; by::String = "locus")
-    if by = "locus"
+    if by == "locus"
         DataFrames.combine(
             groupby(data.loci, :locus),
             :genotype => (geno -> length(unique_alleles(geno))) => :richness
