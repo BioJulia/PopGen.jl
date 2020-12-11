@@ -18,7 +18,7 @@ Let's keep things simple by loading in the nancycats data and calling it `ncats`
 
 
 ``` julia
-julia> ncats = nancycats()
+julia> ncats = @nancycats
 PopData Object
   Marker type: Microsatellite
   Ploidy: 2
@@ -197,7 +197,7 @@ julia> ncats.meta.longitude
 :::note actually seeing some location info 
 The nancycats data has some weird coordinate system for information, so those data were omitted. If you want a proof of concept for `.longitude` and `.latitude`, load in `gulfsharks` and try it out. We'll use `DataFrames.select` to isolate just the information we want. Later, you'll see that the `locations` command does this.
 ``` julia
-julia> sharks = gulfsharks() ;    # semicolon just supresses printing output
+julia> sharks = @gulfsharks ;    # semicolon just supresses printing output
 
 julia> select(sharks.meta, :name, :longitude, :latitude)
 212×3 DataFrame

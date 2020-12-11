@@ -29,7 +29,7 @@ Takes **decimal degrees** as a `Vector` of any `AbstractFloat`.
 
 **Example**
 ```
-ncats = nancycats() ;
+ncats = @nancycats ;
 x = rand(237) ; y = rand(237)
 locations!(ncats, long = x, lat = y)
 ```
@@ -63,7 +63,7 @@ and use these as inputs into `locations!`
 
 **Example**
 ```
-ncats = nancycats();
+ncats = @nancycats;
 x = fill("11 22.33W", 237) ; y = fill("-41 31.52", 237)
 locations!(ncats, long = x, lat = y)
 ```
@@ -87,7 +87,7 @@ Return the genotype(s) of one or more `samples` for one or more specific `loci` 
 
 **Example**
 ```julia
-cats = nancycats();
+cats = @nancycats;
 get_genotype(cats, samples = "N115" , loci = "fca8")
 get_genotypes(cats, samples = ["N1", "N2"] , loci = "fca8")
 get_genotype(cats, samples = "N115" , loci = ["fca8", "fca37"])
@@ -104,7 +104,7 @@ Return all the genotypes of a specific sample in a `PopData` object. This is an 
 
 **Example**
 ```julia
-cats = nancycats()
+cats = @nancycats
 get_sample_genotypes(cats, "N115")
 ```
 
@@ -118,7 +118,7 @@ Convenience wrapper to return a vector of all the genotypes of a single locus
 
 **Example**
 ```julia
-locus(gulfsharks(), "contig_475")
+locus(@gulfsharks, "contig_475")
 ```
 
 ----
@@ -203,7 +203,7 @@ The keywords can be used in any combination. Synonymous with `omit!` and `remove
 **Examples**
 
 ```julia
-cats = nancycats();
+cats = @nancycats;
 exclude!(cats, name = "N100", population = ["1", "15"])
 exclude!(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
 exclude!(cats, names = "N102", loci = "fca8", population = "3")
@@ -232,7 +232,7 @@ The keywords can be used in any combination. Synonymous with `omit` and `remove`
 **Examples**
 
 ```julia
-cats = nancycats();
+cats = @nancycats;
 exclude(cats, name = "N100", population = ["1", "15"])
 exclude(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
 exclude(cats, names = "N102", loci = "fca8", population = "3")

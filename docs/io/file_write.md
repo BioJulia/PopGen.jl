@@ -20,7 +20,7 @@ will infer the correct output file type from the output filename's extensions. C
 Additional keyword arguments `kwargs...` are specific to the intended file type, and are listed in the docstrings of the specific file writer with the format `?popdata2filetype` like shown above. For example, to find the appropriate keywords for a conversion to Genepop format, call up the docstring to `popdata2genepop` with `?popdata2genepop`.
 
 ```julia
-cats = nancycats();
+cats = @nancycats;
 fewer_cats = omit(cats, names = samples(cats)[1:10]);
 write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "horizontal")
 write_to(fewer_cats, filename = "filtered_nancycats.txt", digits = 4, format = "tidy", delim = ",")

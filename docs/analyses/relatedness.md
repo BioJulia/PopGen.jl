@@ -59,7 +59,7 @@ of bootstrap iterations you wish to perform for each pair. The default confidenc
 
 **Examples**
 ```
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> relatedness(cats, method = Ritland)
 27966×4 DataFrame
@@ -103,7 +103,7 @@ however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, h
 
 **Examples**
 ```
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
 3×5 DataFrame
@@ -164,7 +164,7 @@ Contact us or submit a pull request if you're interested in contributing to the 
 <TabItem value="s">
 
 ```julia
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = Ritland)
 ```
@@ -173,7 +173,7 @@ julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = Ritland)
 <TabItem value="m">
 
 ```julia
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = [Moran, QuellerGoodnight])
 ```
@@ -182,7 +182,7 @@ julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = [Moran, Queller
 <TabItem value="b">
 
 ```julia
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> cat_kin = relatendess(cats, method = [Ritland, Wang], iterations = 100)
 ```

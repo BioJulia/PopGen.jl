@@ -34,6 +34,6 @@ expected heterozygosity with chi-squared, degrees of freedom and p-values for ea
 
 **Example**
 ```julia
-hwe_test(gulfsharks(), correction = "bh")
-hwe_test(gulfsharks(), by_pop = true, correction = "bh")
+hwe_test(@gulfsharks, correction = "bh")
+hwe_test(@gulfsharks, by_pop = true, correction = "bh")
 ```

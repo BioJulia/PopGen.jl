@@ -76,7 +76,7 @@ Calculate observed and expected heterozygosity in a `PopData` object. For loci, 
 
 **Example**
 ```julia
-heterozygosity(nancycats(), "population" )
+heterozygosity(@nancycats, "population" )
 ```
 
 ----

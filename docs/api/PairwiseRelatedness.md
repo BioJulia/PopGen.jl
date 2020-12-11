@@ -109,7 +109,7 @@ There are two available resampling methods, `"all"` (default  & recommended) and
 
 #### Examples
 ```
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> relatedness(cats, method = Ritland)
 27966×4 DataFrame

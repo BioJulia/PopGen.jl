@@ -70,7 +70,7 @@ there's a 50% chance parent_1 will give 2 alleles for every locus for that simul
 
 **Example**
 ```
-julia> cats = nancycats() ;
+julia> cats = @nancycats ;
 
 julia> fullsib_sims = simulate_sibship(cats, n = 50, relationship= "fullsib")
 PopData Object

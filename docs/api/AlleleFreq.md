@@ -23,7 +23,7 @@ of that locus per population.
 
 **Example**
 ```julia
-cats = nancycats()
+cats = @nancycats
 allele_freq(cats, "fca8")
 allele_freq(cats, "fca8", population = true)
 ```
@@ -40,7 +40,7 @@ across populations.
 
 ***Example***
 ```
-cats = nancycats();
+cats = @nancycats;
 alleles_df = DataFrames.combine(
     groupby(cats.loci, [:locus, :population]),
     :genotype => allele_freq => :alleles
@@ -97,7 +97,7 @@ object. Use `population = true` to return a table of genotype frequencies
 of that locus per population.
 
 ```julia
-cats = nancycats()
+cats = @nancycats
 geno_freq(cats, "fca8")
 geno_freq(cats, "fca8", population = true)
 ```
@@ -122,7 +122,7 @@ Return a `Dict` of expected genotype frequencies of a single locus in a
 
 **Example**
 ```
-cats = nancycats()
+cats = @nancycats
 geno_freq_expeced(cats, "fca8")
 geno_freq_expected(cats, "fca8", population = true)
 ```

@@ -20,7 +20,7 @@ Returns a NamedTuple of the average number of alleles ('mean') and standard devi
 
 **Example**
 ```julia
-allele_avg(nancycats(), rounding = false)
+allele_avg(@nancycats, rounding = false)
 ```
 
 ----

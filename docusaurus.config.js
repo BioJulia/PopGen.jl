@@ -33,19 +33,24 @@ module.exports = {
           to: 'docs/',
           activeBasePath: 'docs',
           label: 'Docs',
-          position: 'right',
+          position: 'left',
         },
+        {
+          to: 'docs/getting_started/about',
+          label: 'About',
+          position: 'left',
+        },        
         {
           to: 'docs/getting_started/quickstart',
           label: 'Quickstart',
           position: 'right',
         },
+        {to: 'blog', label: 'Blog', position: 'left'},
         {
-          to: 'docs/getting_started/about',
-          label: 'About',
-          position: 'right',
-        },        
-        {to: 'blog', label: 'Blog', position: 'right'},
+        to: 'docs/latest',
+        label: 'What\'s New',
+        position: 'left',
+        },
         {
           to: 'docs/getting_started/community',
           label: 'Get Involved',
@@ -82,7 +87,11 @@ module.exports = {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/pdimens/popgen.jl/edit/edit/documentation/website/blog/',
+            'https://github.com/pdimens/popgen.jl/edit/documentation/',
+          feedOptions: {
+            type: 'all',
+            copyright: `Copyright © ${new Date().getFullYear()} PopGen.jl`,
+          },
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

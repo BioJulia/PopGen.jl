@@ -15,7 +15,7 @@ the two `PopData` objects do not have identical loci.
 
 **Example**
 ```
-julia> cats = nancycats()
+julia> cats = @nancycats
 PopData Object
   Markers: Microsatellite
   Ploidy: 2
@@ -58,7 +58,7 @@ objects do not have identical loci.
 
 **Example**
 ```
-julia> cats = nancycats()
+julia> cats = @nancycats
 PopData Object
   Markers: Microsatellite
   Ploidy: 2
@@ -100,7 +100,7 @@ an individual with a given `ploidy`. Returns a Vector of genotypes.
 
 **Example**
 ```
-julia> cats = nancycats() ;
+julia> cats = @nancycats ;
 julia> loc, alleles = allele_pool(cats) ;
 julia> simulate_parent(alleles, loc, ploidy = 2)
 9-element Array{Array{Int16,1},1}:

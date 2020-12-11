@@ -16,7 +16,7 @@ module.exports = {
       "io/structure",
       "io/vcf",
     ],
-    "Basics": [
+    "PopData Basics": [
       "basics/manipulate",
       "basics/accessing",
       "basics/exclusion",

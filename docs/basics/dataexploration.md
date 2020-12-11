@@ -34,6 +34,8 @@ Get missing genotype information in a `PopData` object. Specify a mode of operat
 <TabItem value="s">
 
 ```
+julia> sharks = @gulfsharks ;
+
 julia> missing(sharks)
 212×2 DataFrame
 │ Row │ name    │ missing │
@@ -59,6 +61,8 @@ julia> missing(sharks)
 <TabItem value="p">
 
 ```
+julia> sharks = @gulfsharks ;
+
 julia> missing(sharks, by = "pop")
 7×2 DataFrame
 │ Row │ population     │ missing │
@@ -77,6 +81,8 @@ julia> missing(sharks, by = "pop")
 <TabItem value="l">s
 
 ```
+julia> sharks = @gulfsharks ;
+
 julia> missing(sharks, by = "locus")
 2213×2 DataFrame
 │ Row  │ locus        │ missing │
@@ -102,7 +108,10 @@ julia> missing(sharks, by = "locus")
 <TabItem value="f">
 
 ```
+julia> sharks = @gulfsharks ;
+
 julia> missing(sharks, by = "full")
+
 15491×3 DataFrame
 │ Row   │ locus        │ population     │ missing │
 │       │ String       │ String         │ Int64   │
@@ -146,7 +155,7 @@ how many identical genotypes do two individuals have across all loci? To do this
 <TabItem value="a">
 
 ```julia
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> cats_pw = pairwise_identical(cats)
 27966×4 DataFrame
@@ -173,7 +182,7 @@ julia> cats_pw = pairwise_identical(cats)
 <TabItem value="s">
 
 ```julia
-julia> cats = nancycats(); some_cats = samples(cats)[1:4]
+julia> cats = @nancycats; some_cats = samples(cats)[1:4]
 
 julia> pairwise_identical(cats, some_cats)
 6×4 DataFrame
@@ -205,7 +214,7 @@ If you were curious about allelic richness (number of alleles per locus), then y
 <TabItem value="l">
 
 ```julia
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> richness(cats)
 9×2 DataFrame
@@ -254,10 +263,10 @@ julia> richness(cats, population = true)
 ## Average Number of Alleles
 Similar to richness, if you wanted to know the average number of alleles per locus, use `allele_avg()`. Use `rounding = false` if you don't want the answer rounded to 4 decimal places.
 ```julia
-julia> allele_avg(nancycats())
+julia> allele_avg(@nancycats)
 (mean = 12.0, stdev = 0.2668)
 
-julia> allele_avg(nancycats(), rounding = false)
+julia> allele_avg(@nancycats, rounding = false)
 (mean = 12.0, stdev = 0.2667968432263687)
 ```
 
@@ -275,7 +284,7 @@ Population genetics famously includes all manner of coefficients with which to s
 <TabItem value="g">
 
 ```julia
-julia> summary(nancycats())
+julia> summary(@nancycats)
 
 1×10 DataFrame
 │ Row │ Het_obs │ HS      │ HT      │ DST     │ HT′     │ DST′    │ FST     │ FST′    │ FIS     │ DEST    │
@@ -288,7 +297,7 @@ julia> summary(nancycats())
 <TabItem value="l">
 
 ```julia
-julia> summary(nancycats(), by = "locus")
+julia> summary(@nancycats, by = "locus")
 9×11 DataFrame
 │ Row │ locus  │ Het_obs │ HS      │ HT      │ DST     │ HT′     │ DST′    │ FST     │ FST′    │ FIS     │ DEST    │
 │     │ String │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │

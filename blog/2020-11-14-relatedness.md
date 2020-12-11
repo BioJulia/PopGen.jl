@@ -16,7 +16,7 @@ In a population genetics study, you often need to identify if there are kin in y
 ```julia
 using PopGen, PopGenSims, StatsBase
 
-julia> cats = nancycats()
+julia> cats = @nancycats
 PopData Object
   Markers: Microsatellite
   Ploidy: 2

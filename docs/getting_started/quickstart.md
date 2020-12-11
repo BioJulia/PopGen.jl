@@ -3,22 +3,51 @@ id: quickstart
 title: Quick Start
 sidebar_label: Quick Start
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## 1. Install PopGen
-Invoke the package manager with `]` and write `add PopGen`
+
+<Tabs
+  block={true}
+  defaultValue="repl"
+  values={[
+    { label: 'REPL/Juno', value: 'repl', },
+    { label: 'Jupyter/nteract', value: 'jupyter', },
+  ]
+}>
+<TabItem value="repl">
+
+Invoke the package manager with `]` in the REPL and use
+
+```julia
+add PopGen
+```
 
 ![install](/img/install_repl.gif)
 
+</TabItem>
+<TabItem value="jupyter">
+
+Invoke `using Pkg`
+
+```julia
+using Pkg
+Pkg.add("PopGen")
+```
+
+![install](/img/install_jupyter.gif)
+
+</TabItem>
+</Tabs>
 
 
 ## 2. Invoke the package
-
 Simply run:
 
 ```julia
 julia> using PopGen
 ```
-
-
 
 ## 3. Start playing around
 
@@ -38,7 +67,7 @@ Load in data
 
 - read_from(filename; kwargs...)
 - genepop(infile; kwargs...)  or similar file-specific importer
-- use available gulfsharks() or nancycats() datasets
+- use available @gulfsharks or @nancycats datasets
 
 Explore PopData
 

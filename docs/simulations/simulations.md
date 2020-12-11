@@ -22,7 +22,7 @@ population using the nancycats data, which has 17 populations, therefore the res
 
 #### Example
 ```julia
-cats = nancycats();
+cats = @nancycats;
 
 julia> sims = simulate(cats , n = 100)
 PopData Object

@@ -10,7 +10,7 @@ Simulate `n` number of individuals (default: `100`) per population using per-pop
 allele frequencies derived from a `PopData` object. Returns a new `PopData` object.
 #### Example
 ```julia
-cats = nancycats();
+cats = @nancycats;
 
 julia> sims = simulate(cats , n = 100)
 PopData Object

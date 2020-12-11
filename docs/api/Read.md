@@ -45,7 +45,7 @@ to Genepop format, call up the docstring to `popdata2genepop` with `?popdata2gen
 
 **Example**
 ```
-cats = nancycats();
+cats = @nancycats;
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
 write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
