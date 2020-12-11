@@ -253,6 +253,36 @@ We admit "relatedness_posthoc" is not a great name for this function. Please
 contact us with better ideas! :grin:
 :::
 
+**Example**
+```
+julia> cats = @nancycats ;
+
+julia> rel_out = relatedness(cats, method = [Ritland, Moran], iterations = 100);
+
+julia> relatedness_posthoc(cats, rel_out)
+17x3 DataFrame
+ Row │ population  Ritland_P  Moran_P
+     │ String      Float64    Float64
+─────┼────────────────────────────────
+   1 │ 1              5.0e-5   5.0e-5
+   2 │ 2              5.0e-5   5.0e-5
+   3 │ 3              5.0e-5   5.0e-5
+   4 │ 4              5.0e-5   5.0e-5
+   5 │ 5              5.0e-5   5.0e-5
+   6 │ 6              5.0e-5   5.0e-5
+   7 │ 7              5.0e-5   5.0e-5
+   8 │ 8              5.0e-5   5.0e-5
+   9 │ 9              5.0e-5   5.0e-5
+  10 │ 10             5.0e-5   5.0e-5
+  11 │ 11             5.0e-5   5.0e-5
+  12 │ 12             5.0e-5   5.0e-5
+  13 │ 13             5.0e-5   5.0e-5
+  14 │ 14             5.0e-5   5.0e-5
+  15 │ 15             5.0e-5   5.0e-5
+  16 │ 16             5.0e-5   5.0e-5
+  17 │ 17             5.0e-5   5.0e-5
+```
+
 ---------------------
 ## Acknowledgements
-The relatedness methods were dutifully written and verified against R analogues by Jason Selwyn. These anaylses can take a while, especially if performing bootstrapping; so we provide a progress bar via `ProgressMeter.jl` so you can move on and focus on other things. 
+The relatedness methods were dutifully written and verified against R analogues by Jason Selwyn. These anaylses can take a while, especially if performing bootstrapping; we provide a progress bar via `ProgressMeter.jl` so you can move on and focus on other things in the meantime. 
