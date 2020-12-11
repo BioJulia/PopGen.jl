@@ -10,7 +10,125 @@ import TabItem from '@theme/TabItem';
 ```julia
 allele_freqtable(data::PopData; by::String = "global")
 ```
-Return a table of the observed `global` (default) or `population` allele frequencies in a PopData object. Use this if you want to see what the allele frequencies are for every allele at every locus.
+Return a table of the observed `global` (default) or `population` allele frequencies in a PopData object. Use this if you want to see what the frequencies are for every allele at every locus.
+
+<Tabs
+  block={true}
+  defaultValue="g"
+  values={[
+    { label: 'global', value: 'g', },
+    { label: 'population', value: 'p', },
+  ]
+}>
+<TabItem value="g">
+
+```julia
+julia> cats = @nancycats ;
+
+julia> allele_freqtable(cats)
+108×4 DataFrame
+ Row │ locus   allele  count  frequency  
+     │ String  Int16?  Int64  Float64    
+─────┼───────────────────────────────────
+   1 │ fca8       135    105  0.241935
+   2 │ fca8       143     44  0.101382
+   3 │ fca8       133     33  0.0760369
+   4 │ fca8       137     83  0.191244
+  ⋮  │   ⋮       ⋮       ⋮        ⋮
+ 105 │ fca37      226      2  0.00421941
+ 106 │ fca37      216      7  0.0147679
+ 107 │ fca37      224      2  0.00421941
+ 108 │ fca37      204      6  0.0126582
+                         100 rows omitted
+```
+
+</TabItem>
+<TabItem value="p">
+
+```julia
+julia> cats = @nancycats ;
+
+julia> allele_freqtable(cats, by = "population")
+839×5 DataFrame
+ Row │ locus   population  allele  count  frequency 
+     │ String  String      Int16?  Int64  Float64   
+─────┼──────────────────────────────────────────────
+   1 │ fca8    1              135      9  0.5625
+   2 │ fca8    1              143      4  0.25
+   3 │ fca8    1              133      2  0.125
+   4 │ fca8    1              137      1  0.0625
+  ⋮  │   ⋮         ⋮         ⋮       ⋮        ⋮
+ 836 │ fca37   16             210      5  0.208333
+ 837 │ fca37   17             208     22  0.846154
+ 838 │ fca37   17             182      3  0.115385
+ 839 │ fca37   17             220      1  0.0384615
+                                    831 rows omitted
+```
+
+</TabItem>
+</Tabs>
+
+## Genotype frequency table
+```julia
+geno_freqtable(data::PopData; by::String = "global")
+```
+Return a table of the observed `global` (default) or `population` genotype frequencies in a PopData object. Use this if you want to see what the frequencies are for every genotype at every locus.
+
+<Tabs
+  block={true}
+  defaultValue="g"
+  values={[
+    { label: 'global', value: 'g', },
+    { label: 'population', value: 'p', },
+  ]
+}>
+<TabItem value="g">
+
+```julia
+julia> cats = @nancycats ;
+
+julia> geno_freqtable(cats)
+341×4 DataFrame
+ Row │ locus   genotype    count  frequency  
+     │ String  Tuple…      Int64  Float64    
+─────┼───────────────────────────────────────
+   1 │ fca8    (135, 143)     16  0.0737327
+   2 │ fca8    (133, 135)      9  0.0414747
+   3 │ fca8    (135, 135)     23  0.105991
+   4 │ fca8    (137, 143)      8  0.0368664
+  ⋮  │   ⋮         ⋮         ⋮        ⋮
+ 338 │ fca37   (206, 220)      1  0.00421941
+ 339 │ fca37   (208, 218)      1  0.00421941
+ 340 │ fca37   (184, 184)      3  0.0126582
+ 341 │ fca37   (208, 210)      3  0.0126582
+                             333 rows omitted
+```
+
+</TabItem>
+<TabItem value="p">
+
+```julia
+julia> cats = @nancycats ;
+
+julia> geno_freqtable(cats, by = "population")
+1094×5 DataFrame
+  Row │ locus   population  genotype    count  frequency         
+      │ String  String      Tuple…      Int64  Float64           
+──────┼──────────────────────────────────────────────────        
+    1 │ fca8    1           (135, 143)      3  0.375
+    2 │ fca8    1           (133, 135)      2  0.25
+    3 │ fca8    1           (135, 135)      2  0.25
+    4 │ fca8    1           (137, 143)      1  0.125
+  ⋮   │   ⋮         ⋮           ⋮         ⋮        ⋮
+ 1091 │ fca37   17          (208, 208)     10  0.769231
+ 1092 │ fca37   17          (182, 182)      1  0.0769231
+ 1093 │ fca37   17          (182, 208)      1  0.0769231
+ 1094 │ fca37   17          (208, 220)      1  0.0769231
+                                        1086 rows omitted 
+```
+
+</TabItem>
+</Tabs>
 
 ## Missing Data
 
@@ -163,51 +281,59 @@ how many identical genotypes do two individuals have across all loci? To do this
 ```julia
 julia> cats = @nancycats;
 
-julia> cats_pw = pairwise_identical(cats)
+julia> pairwise_identical(cats)
 27966×4 DataFrame
-│ Row   │ sample_1 │ sample_2 │ identical │ n     │
-│       │ String   │ String   │ Float64   │ Int64 │
-├───────┼──────────┼──────────┼───────────┼───────┤
-│ 1     │ N215     │ N216     │ 0.5       │ 8     │
-│ 2     │ N215     │ N217     │ 0.25      │ 8     │
-│ 3     │ N215     │ N218     │ 0.38      │ 8     │
-│ 4     │ N215     │ N219     │ 0.38      │ 8     │
-│ 5     │ N215     │ N220     │ 0.25      │ 8     │
-│ 6     │ N215     │ N221     │ 0.5       │ 8     │
-⋮
-│ 27960 │ N296     │ N290     │ 0.0       │ 7     │
-│ 27961 │ N297     │ N281     │ 0.14      │ 7     │
-│ 27962 │ N297     │ N289     │ 0.43      │ 7     │
-│ 27963 │ N297     │ N290     │ 0.29      │ 7     │
-│ 27964 │ N281     │ N289     │ 0.25      │ 8     │
-│ 27965 │ N281     │ N290     │ 0.43      │ 7     │
-│ 27966 │ N289     │ N290     │ 0.14      │ 7     │
+   Row │ sample_1  sample_2  identical  n     
+       │ String    String    Float64    Int64 
+───────┼──────────────────────────────────────
+     1 │ N215      N216           0.5       8
+     2 │ N215      N217           0.25      8
+     3 │ N215      N218           0.38      8
+     4 │ N215      N219           0.38      8
+   ⋮   │    ⋮         ⋮          ⋮        ⋮
+ 27963 │ N297      N290           0.29      7
+ 27964 │ N281      N289           0.25      8
+ 27965 │ N281      N290           0.43      7
+ 27966 │ N289      N290           0.14      7
+                            27958 rows omitted
 ```
 
 </TabItem>
 <TabItem value="s">
 
 ```julia
-julia> cats = @nancycats; some_cats = samples(cats)[1:4]
+julia> cats = @nancycats;
 
-julia> pairwise_identical(cats, some_cats)
-6×4 DataFrame
-│ Row │ sample_1 │ sample_2 │ identical │ n     │
-│     │ String   │ String   │ Float64   │ Int64 │
-├─────┼──────────┼──────────┼───────────┼───────┤
-│ 1   │ N215     │ N216     │ 0.5       │ 8     │
-│ 2   │ N215     │ N217     │ 0.25      │ 8     │
-│ 3   │ N215     │ N218     │ 0.38      │ 8     │
-│ 4   │ N216     │ N217     │ 0.12      │ 8     │
-│ 5   │ N216     │ N218     │ 0.25      │ 8     │
-│ 6   │ N217     │ N218     │ 0.0       │ 9     │
+julia> interesting_cats = samples(cats)[1:5]
+5-element Array{String,1}:
+ "N215"
+ "N216"
+ "N217"
+ "N218"
+ "N219"
+
+julia> pairwise_identical(cats, interesting_cats)
+10×4 DataFrame
+ Row │ sample_1  sample_2  identical  n     
+     │ String    String    Float64    Int64 
+─────┼──────────────────────────────────────
+   1 │ N215      N216           0.5       8 
+   2 │ N215      N217           0.25      8 
+   3 │ N215      N218           0.38      8 
+   4 │ N215      N219           0.38      8 
+   5 │ N216      N217           0.12      8 
+   6 │ N216      N218           0.25      8 
+   7 │ N216      N219           0.38      8 
+   8 │ N217      N218           0.0       9 
+   9 │ N217      N219           0.11      9 
+  10 │ N218      N219           0.33      9 
 ```
 
 </TabItem>
 </Tabs>
 
 ## Allelic Richness
-If you were curious about allelic richness (number of alleles per locus), then you can use `richness()` to find that out. Use `population = true` to return a table by locus by population.
+If you were curious about allelic richness (number of alleles per locus), then you can use `richness()` to find that out. Use `by = "population"` to return a table by locus by population.
 
 <Tabs
   block={true}
@@ -224,43 +350,39 @@ julia> cats = @nancycats;
 
 julia> richness(cats)
 9×2 DataFrame
-│ Row │ locus  │ richness │
-│     │ String │ Int64    │
-├─────┼────────┼──────────┤
-│ 1   │ fca8   │ 16       │
-│ 2   │ fca23  │ 11       │
-│ 3   │ fca43  │ 10       │
-│ 4   │ fca45  │ 9        │
-│ 5   │ fca77  │ 12       │
-│ 6   │ fca78  │ 8        │
-│ 7   │ fca90  │ 12       │
-│ 8   │ fca96  │ 12       │
-│ 9   │ fca37  │ 18       │
+ Row │ locus   richness 
+     │ String  Int64    
+─────┼──────────────────
+   1 │ fca8          16
+   2 │ fca23         11
+   3 │ fca43         10
+   4 │ fca45          9
+   5 │ fca77         12
+   6 │ fca78          8
+   7 │ fca90         12
+   8 │ fca96         12
+   9 │ fca37         18
 ```
 
 </TabItem>
 <TabItem value="p">
 
 ```julia
-julia> richness(cats, population = true)
+julia> richness(cats, by = "population")
 153×3 DataFrame
-│ Row │ locus  │ population │ richness │
-│     │ String │ String     │ Int64    │
-├─────┼────────┼────────────┼──────────┤
-│ 1   │ fca8   │ 1          │ 4        │
-│ 2   │ fca8   │ 2          │ 6        │
-│ 3   │ fca8   │ 3          │ 7        │
-│ 4   │ fca8   │ 4          │ 10       │
-│ 5   │ fca8   │ 5          │ 8        │
-│ 6   │ fca8   │ 6          │ 7        │
-⋮
-│ 147 │ fca37  │ 11         │ 7        │
-│ 148 │ fca37  │ 12         │ 7        │
-│ 149 │ fca37  │ 13         │ 5        │
-│ 150 │ fca37  │ 14         │ 3        │
-│ 151 │ fca37  │ 15         │ 4        │
-│ 152 │ fca37  │ 16         │ 3        │
-│ 153 │ fca37  │ 17         │ 3        │
+ Row │ locus   population  richness 
+     │ String  String      Int64    
+─────┼──────────────────────────────
+   1 │ fca8    1                  4
+   2 │ fca8    2                  6
+   3 │ fca8    3                  7
+   4 │ fca8    4                 10
+  ⋮  │   ⋮         ⋮          ⋮
+ 150 │ fca37   14                 3
+ 151 │ fca37   15                 4
+ 152 │ fca37   16                 3
+ 153 │ fca37   17                 3
+                    145 rows omitted
 ```
 
 </TabItem>

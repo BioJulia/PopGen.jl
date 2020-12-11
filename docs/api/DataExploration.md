@@ -121,6 +121,7 @@ Return a table of the percent of identical genotypes at each locus between all p
 **Example**
 ```julia
 julia> cats = @nancycats;
+
 julia> pairwise_identical(cats)
 27966×4 DataFrame
    Row │ sample_1  sample_2  identical  n     
@@ -144,6 +145,8 @@ between all pairs of provided `sample_names`.
 
 **Example**
 ```julia
+julia> cats = @nancycats;
+
 julia> interesting_cats = samples(cats)[1:5]
 5-element Array{String,1}:
  "N215"
