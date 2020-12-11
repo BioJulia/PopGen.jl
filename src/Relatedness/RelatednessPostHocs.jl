@@ -39,7 +39,7 @@ function sig_within(data::PopData, results::DataFrame, population::String, itera
         @sync @inbounds for j in 1:n_iter
             Base.Threads.@spawn begin
                 iter_count += 1
-                idx_within = sample(1:n_tot, n_within, replace = false)
+                idx_within = sample(Xoroshiro128Star(), 1:n_tot, n_within, replace = false)
                 idx_among = n_range[Not(idx_within)]
                 
                 mu_within = mean(results[:, est][idx_within])
