@@ -32,7 +32,7 @@ of the relatedness estimate given by method `method`. This is an internal functi
     @sync for iter in 1:iterations
         Base.Threads.@spawn begin
             # bootstrap the indices
-            boot_idx = rand(1:n_loc, n_loc)
+            boot_idx = rand(Xoroshiro128Star(), 1:n_loc, n_loc)
             # sample the source vectors with the resampled/bootstrapped indices
             ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
             # get index for genotype appearing missing in at least one individual in the pair
@@ -56,7 +56,7 @@ of the relatedness estimate given by method `method`. This is an internal functi
     @sync for iter in 1:iterations
         Base.Threads.@spawn begin
             # bootstrap the indices
-            boot_idx = rand(1:n_loc, n_loc)
+            boot_idx = rand(Xoroshiro128Star(), 1:n_loc, n_loc)
             # sample the source vectors with the resampled/bootstrapped indices
             ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
             # faster/cheaper n counting

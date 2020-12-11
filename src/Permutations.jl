@@ -6,7 +6,7 @@ the `.loci` dataframe.
 @inline function permute_loci!(data::PopData)
     @inbounds @sync for locus in groupby(data.loci, :locus)
         Base.Threads.@spawn begin
-            shuffle!(locus.population)
+            shuffle!(Xoroshiro128Star(), locus.population)
         end
     end
     data
@@ -20,7 +20,7 @@ the default is to only edit the `.loci` table in place; use `meta = true`
 if you also require the `.meta` dataframe edited in place.
 """
 @inline function permute_samples!(data::PopData; meta::Bool = false)
-    pops = shuffle(data.meta.population)
+    pops = shuffle(Xoroshiro128Star(), data.meta.population)
 
     if meta == true
         meta_pops = deepcopy(pops)
@@ -38,7 +38,7 @@ end
 
 
 @inline function permute_samples!(data::AbstractDataFrame, popnames::Vector{String})
-    pops = shuffle(popnames)
+    pops = shuffle(Xoroshiro128Star(), popnames)
 
     @inbounds @sync for name in groupby(data, :name)
         Base.Threads.@spawn begin 
@@ -99,7 +99,7 @@ it would be best to identify ploidy in advance and set it to a specific integer.
 
     @inbounds @sync for grp in groupby(data.loci, groupings)
         Base.Threads.@spawn begin
-            alle = shuffle(alleles(grp.genotype))
+            alle = shuffle(Xoroshiro128Star(), alleles(grp.genotype))
             new_genos = Tuple.(Base.Iterators.partition(alle, ploidy))
             (@view grp.genotype[.!ismissing.(grp.genotype)]) .= new_genos
         end
