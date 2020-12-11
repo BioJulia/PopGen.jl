@@ -253,7 +253,6 @@ We admit "relatedness_posthoc" is not a great name for this function. Please
 contact us with better ideas! :grin:
 :::
 
-
 ---------------------
 ## Acknowledgements
 The relatedness methods were dutifully written and verified against R analogues by Jason Selwyn. These anaylses can take a while, especially if performing bootstrapping; so we provide a progress bar via `ProgressMeter.jl` so you can move on and focus on other things. 
