@@ -6,6 +6,12 @@ sidebar_label: Data exploration
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+## Allele frequency table
+```julia
+allele_freqtable(data::PopData; by::String = "global")
+```
+Return a table of the observed `global` (default) or `population` allele frequencies in a PopData object. Use this if you want to see what the allele frequencies are for every allele at every locus.
+
 ## Missing Data
 
 ```julia
