@@ -17,27 +17,30 @@ end
 
 
 """
-    richness(data::PopData; population::Bool = false)
+    richness(data::PopData; by::String = "locus")
 Calculates various allelic richness and returns a table of per-locus
-allelic richness. Use `population = true` to calculate richness by
+allelic richness. Use `by = "population"` to calculate richness by
 locus by population.
 """
-function richness(data::PopData; population::Bool = false)
-    if !population
+function richness(data::PopData; by::String = "locus")
+    if by = "locus"
         DataFrames.combine(
             groupby(data.loci, :locus),
             :genotype => (geno -> length(unique_alleles(geno))) => :richness
         )
-    else
+    elseif by == "population"
         DataFrames.combine(
             groupby(data.loci, [:locus, :population]),
             :genotype => (geno -> length(unique_alleles(geno))) => :richness
         )
+    else
+        throw(ArgumentError("Please use by = \"locus\" (default) or \"population\""))
     end
 end
 
 
 #TODO add citations to docstring
+#BUG fix combine syntax
 """
     summary(data::PopData; by::String = "global")
 Provides summary statistics for a `PopData` object. Use `by = "locus"` for
