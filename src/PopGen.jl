@@ -9,7 +9,7 @@ Motivational(?) quote: $(motivational_quote())
 ## Load in data
 - `read_from(filename; kwargs...)`
 - `genepop(infile; kwargs...)`  or similar file-specific importer
-- use available `gulfsharks()` or `nancycats()` datasets
+- use available `@gulfsharks` or `@nancycats` datasets
 
 ## Explore PopData
 - `populations(PopData)` to view population information

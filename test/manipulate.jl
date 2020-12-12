@@ -61,11 +61,11 @@ end
 end
 
 @testset "exclusion" begin
-    tmp = exclude(nancycats(), name = "N100", population = ["1", "15"])
+    tmp = exclude(@nancycats, name = "N100", population = ["1", "15"])
     @test length(samples(tmp)) == 215
     @test size(populations(tmp)) == (15,2)
 
-    tmp = exclude(nancycats(), names = "N102", loci = "fca8", population = "3")
+    tmp = exclude(@nancycats, names = "N102", loci = "fca8", population = "3")
     @test length(loci(tmp)) == 8
     @test size(populations(tmp)) == (16,2)
     @test length(samples(tmp)) == 225

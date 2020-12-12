@@ -2,7 +2,7 @@
 #Then read in all functions within PairwiseRelatedness.jl
 
 verbose = true
-data = nancycats()
+data = @nancycats
 
 alleles = Dict()
 for loc in loci(data)

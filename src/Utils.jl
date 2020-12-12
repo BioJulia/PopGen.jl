@@ -141,7 +141,7 @@ Return a wide `DataFrame` of samples as columns, ommitting population informatio
 
 **Example**
 ```
-julia> loci_dataframe(nancycats())
+julia> loci_dataframe(@nancycats)
 9×237 DataFrame. Omitted printing of 232 columns
 │ Row │ N215       │ N216       │ N217       │ N218       │ N219       │
 │     │ Tuple…?    │ Tuple…?    │ Tuple…?    │ Tuple…?    │ Tuple…?    │
@@ -170,7 +170,7 @@ Rows are samples and columns are loci. Will return an error if ploidy varies bet
 
 **Example**
 ```
-julia> loci_matrix(nancycats())
+julia> loci_matrix(@nancycats)
 237×9 Array{Union{Missing, Tuple{Int16,Int16}},2}:
  missing     (136, 146)  (139, 139)  …  (199, 199)  (113, 113)  (208, 208)
  missing     (146, 146)  (139, 145)     (185, 199)  (113, 113)  (208, 208)
@@ -311,7 +311,7 @@ Rows are samples and columns are loci. Will return an error if ploidy varies bet
 
 **Example**
 ```
-julia> mtx = phase(nancycats())
+julia> mtx = phase(@nancycats)
 2-element Array{Array{Union{Missing, Int16},2},1}:
  [missing 136 … 113 208; missing 146 … 113 208; … ; 137 130 … 113 208; 135 130 … missing 208]
  [missing 146 … 113 208; missing 146 … 113 208; … ; 143 136 … 117 208; 141 146 … missing 208]
@@ -368,7 +368,7 @@ function quickstart()
     printstyled("\nLoad in data\n\n", color = :magenta)
     println("- read_from(filename; kwargs...)")
     println("- genepop(infile; kwargs...)  or similar file-specific importer")
-    println("- use available gulfsharks() or nancycats() datasets")
+    println("- use available @gulfsharks or @nancycats datasets")
 
     printstyled("\nExplore PopData\n\n", color = :blue)
     println("- populations(PopData) to view population information")

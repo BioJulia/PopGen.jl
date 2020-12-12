@@ -121,7 +121,7 @@ calculated as the average over heterozygosity per locus per population.
 - `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
 - `"population"` or `"pop"` : heterozygosity per population
 ## Example
-heterozygosity(nancycats(), "population" )
+heterozygosity(@nancycats, "population" )
 """
 function heterozygosity(data::PopData, by::String = "locus")
     if by ∈ ["locus", "loci"]

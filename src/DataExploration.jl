@@ -14,7 +14,7 @@ to return a DataFrame corresponding with that missing information.
 
 ### Example:
 ```
-missing(gulfsharks(), by = "pop")
+missing(@gulfsharks, by = "pop")
 ```
 """
 
