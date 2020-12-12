@@ -19,6 +19,7 @@ module.exports = {
     "PopData Basics": [
       "basics/manipulate",
       "basics/accessing",
+      "basics/add_info",
       "basics/exclusion",
       "basics/populations",
       "basics/viewdata",
