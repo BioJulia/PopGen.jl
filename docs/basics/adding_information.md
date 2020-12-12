@@ -10,9 +10,10 @@ PopData's standard/default format includes information on:
 - sample name
 - sample population name
 - sample ploidy
-- same genotypes
+- sample geographical coordinates
+- sample genotypes
 
-But, sometimes you might want to add more information to the data structure. That's where the convenience function `add_meta!` come in.
+But, sometimes you might want to add more information to the data structure. That's where the convenience function `add_meta!` comes in.
 
 ## `add_meta!`
 This function has two methods, one for when the additional information you're adding is in the order with which your samples appear in `PopData.meta`, and another for when they don't. 
@@ -64,3 +65,7 @@ in `PopData.meta`.
 
 </TabItem>
 </Tabs>
+
+:::note futureproofing
+As of yet, there are no features within PopGen.jl that require the use of `add_meta!`, but it is a great convenience function to have in our toolset for increasingly complicated things.
+:::
