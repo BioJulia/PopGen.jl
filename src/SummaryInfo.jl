@@ -40,7 +40,6 @@ end
 
 
 #TODO add citations to docstring
-#BUG fix combine syntax
 """
     summary(data::PopData; by::String = "global")
 Provides summary statistics for a `PopData` object. Use `by = "locus"` for
@@ -103,14 +102,12 @@ function Base.summary(data::PopData; by::String = "global")
     )
     # collapse down to retrieve averages and counts
     n_df = DataFrames.combine(
-        [:het_obs, :het_exp, :n, :alleles] => (o,e,n,alleles) -> (
-            count = sum(.!iszero.(n)),
-            mn = sum(.!iszero.(n)) ./ sum(reciprocal.(n)),
-            HS = mean(skipmissing(gene_diversity_nei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n))))),
-            Het_obs = mean(skipmissing(o)),
-            avg_freq = sum(values(avg_allele_freq(alleles)).^2)
-            ),
-        groupby(het_df, :locus)
+        groupby(het_df, :locus),
+        :n => (n -> sum(.!iszero.(n)))=> :count,
+        :n => (n -> sum(.!iszero.(n)) ./ sum(reciprocal.(n))) => :mn,
+        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n)))))) => :HS,
+        :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
+        :alleles => (alleles ->  sum(values(avg_allele_freq(alleles)).^2))=> :avg_freq
     )
 
     Ht = 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)
