@@ -511,7 +511,7 @@ function motivational_quote()
     return quotes[rand(1:length(quotes))]
 end
 
-
+#TODO add to docs API
 """
     generate_meta(data::DataFrame)
 Given a genotype DataFrame formatted like `PopData.loci`, generates a corresponding
