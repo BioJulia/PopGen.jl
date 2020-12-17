@@ -40,8 +40,6 @@ using CSV, Distributions, DataFrames, PooledArrays, StaticArrays
 using FileIO, JLD2, Requires, ProgressMeter
 using MultipleTesting, Random, StatsBase
 using RandomNumbers.Xorshifts
-#using Convex,ECOS
-# using LinearAlgebra
 
 
 #   o O       o O       o O       o O       o O
