@@ -550,7 +550,6 @@ function generate_meta(data::DataFrame)
     nms = map(z -> z.name, keys(grp))
     pops = map(z -> first(z.population), grp)
     ploids = map(z -> find_ploidy(z.genotype), grp)
-    return ploids
     DataFrame(
         :name => nms,
         :population => pops,
