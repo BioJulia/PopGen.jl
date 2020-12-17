@@ -1,8 +1,9 @@
 
-export pairwise_identical, missing
+export pairwise_identical, missing_data, geno_freqtable, allele_freqtable
 
+#TODO update docs (API/dataexploration) and tests
 """
-    missing(data::PopData; by::String = "sample")
+    missing_data(data::PopData; by::String = "sample")
 Get missing genotype information in a `PopData`. Specify a mode of operation
 to return a DataFrame corresponding with that missing information.
 
@@ -14,11 +15,10 @@ to return a DataFrame corresponding with that missing information.
 
 ### Example:
 ```
-missing(@gulfsharks, by = "pop")
+missing_data(@gulfsharks, by = "pop")
 ```
 """
-
-@inline function Base.missing(data::PopData; by::String = "sample")
+@inline function missing_data(data::PopData; by::String = "sample")
     if by ∈ ["sample", "individual"]
         DataFrames.combine(
             DataFrames.groupby(data.loci, :name),
@@ -42,7 +42,7 @@ missing(@gulfsharks, by = "pop")
         )
     else
         @error "Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"
-        missing(data)
+        missing_data(data)
     end
 end
 
