@@ -1,6 +1,7 @@
 module  TestIO
 
 using PopGen
+using GeneticVariation, GZip
 using Test
 
 cats_gen = normpath(joinpath(@__DIR__,"..","data/source", "nancycats.gen"))
@@ -14,11 +15,11 @@ oyster_vcf = normpath(joinpath(@__DIR__,"..","data/source", "filtered_oyster.vcf
     @test typeof(genepop(sharks_gen, silent = true)) == PopData
 end
 
-#=
+
 @testset "VCF io" begin
     @test typeof(read_from(oyster_vcf, silent = true)) == PopData
     @test typeof(vcf(oyster_vcf, silent = true)) == PopData    
 end
-=#
+
 end # module
 
