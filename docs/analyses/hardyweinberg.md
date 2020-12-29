@@ -190,7 +190,7 @@ using VegaLite
 
 julia> ncats_hwe = hwe_test(@nancycats , by = "population", correction = "bonferroni");
 
-julia> ncats |> @vlplot(:rect, :locus, :population, color=:P_bonferroni)
+julia> ncats_hwe |> @vlplot(:rect, :locus, :population, color=:P_bonferroni)
 ```
 ![hwe_test](/img/hwe_test.png)
 

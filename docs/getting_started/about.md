@@ -60,6 +60,6 @@ So, if we write everything in Julia, and you use everything in Julia, users can 
 
 Like most Julia packages, PopGen.jl is written entirely in Julia, meaning the community using it need not learn another language if they wanted to contribute! Have you written a clever Julia function to calculate SAMOVA using `PopData`? Send us a pull request (please!)! Or [join the Slack group!](https://join.slack.com/t/popgenjl/shared_invite/zt-deam65n8-DuBs2z1oDtsbBuRplJW~Pg) 
 
-#### Package manager
+### Package manager
 
 It's just such a delight to use. [Installing PopGen.jl](/getting_started/install.md) should be simple, consistent, and effortless thanks to the brilliant built-in package manager in Julia. 
