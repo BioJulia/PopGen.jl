@@ -131,16 +131,10 @@ function genepop(
         :locus => (i -> PooledArray(Array(i))) => :locus, 
         :genotype
     )
-    #categorical!(geno_parse, [:name, :population, :locus], compress = true)
-    geno_parse.genotype = map(i -> phase.(i, geno_type, digits), geno_parse.genotype)
-    
-    ploidy = DataFrames.combine(
-        groupby(dropmissing(geno_parse), :name),
-        :genotype => find_ploidy => :ploidy
-    ).ploidy
 
-    # Add the ploidy info to the meta df
-    insertcols!(sample_table, 3, :ploidy => ploidy)
+    geno_parse.genotype = map(i -> phase.(i, geno_type, digits), geno_parse.genotype)
+    sample_table = generate_meta(geno_parse)
+
     if allow_monomorphic 
         pd_out = PopData(sample_table, geno_parse)
     else
@@ -165,7 +159,7 @@ Writes a `PopData` object to a Genepop-formatted file.
     - `-9` : As a single value `-9`
 
 ```julia
-cats = nancycats();
+cats = @nancycats;
 fewer_cats = omit(cats, name = samples(cats)[1:10]);
 genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```

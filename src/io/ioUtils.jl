@@ -46,7 +46,7 @@ Used internally in the `genepop` and `delimited` file parsers to scan the genoty
 of a sample and return the ploidy of the first non-missing locus.
 """
 @inline function find_ploidy(genotypes::T) where T<:GenoArray
-    return Int8(length(genotypes[1]))
+    return Int8(length(first(skipmissing(genotypes))))
 end
 
 

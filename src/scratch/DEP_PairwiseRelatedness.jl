@@ -32,7 +32,7 @@ Milligan 2003.
 """
 function pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
     #= Example
-    cats = nancycats()
+    cats = @nancycats
     cat1=get_genotype(cats, sample = "N100", locus = "fca23")
     cat2=get_genotype(cats, sample = "N111", locus = "fca23")
     allele = allele_freq(cats.loci.fca23)
@@ -541,18 +541,18 @@ const kinship = pairwise_relatedness
 # - `"dyadml"` : Milligan 2002 Dyadic Maximum Likelihood relatedness estimator
 
 #=
-cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
-cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
+cat_rel_noInbreeding = pairwise_relatedness(@nancycats, method = "dyadml", inbreeding = false, verbose = false)
+cat_rel_Inbreeding = pairwise_relatedness(@nancycats, method = "dyadml", inbreeding = true, verbose = false)
 
 
-cat_rel_qg = pairwise_relatedness(nancycats(), method = "qg", verbose = false)
+cat_rel_qg = pairwise_relatedness(@nancycats, method = "qg", verbose = false)
 =#
 
 #=
 Testing area
-cat_rel_noInbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = false, verbose = false)
+cat_rel_noInbreeding = pairwise_relatedness(@nancycats, method = "dyadml", inbreeding = false, verbose = false)
 
-cat_rel_Inbreeding = pairwise_relatedness(nancycats(), method = "dyadml", inbreeding = true, verbose = false)
+cat_rel_Inbreeding = pairwise_relatedness(@nancycats, method = "dyadml", inbreeding = true, verbose = false)
 
 count(cat_rel_noInbreeding[i,4] == :Optimal for i in 1:27966)
 count(cat_rel_Inbreeding[i,4] == :Optimal for i in 1:27966)
