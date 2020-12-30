@@ -101,10 +101,10 @@ chestnuts = structure("castanea_dentata.str", faststructure = true)
 
 
 ## Writing to a Structure file
-All file writing options can be performed using `write_to()`, which calls `popdata2structure` when writing to a Structure/fastStructure file.
+All file writing options can be performed using `write_to()`, which calls `structure` when writing to a Structure/fastStructure file.
 
 ```julia
-popdata2structure(data::PopData; filename::String, faststructure::Bool, delim::String)
+structure(data::PopData; filename::String, faststructure::Bool, delim::String)
 ```
 Write a `PopData` object to a Stucture format file
 ### Arguments
@@ -119,5 +119,5 @@ Write a `PopData` object to a Stucture format file
 ```
 cats = @nancycats;
 fewer_cats = omit(cats, name = samples(cats)[1:10]);
-popdata2structure(fewer_cats, filename = "filtered_nancycats.str", faststructure = true)
+structure(fewer_cats, filename = "filtered_nancycats.str", faststructure = true)
 ```

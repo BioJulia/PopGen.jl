@@ -87,9 +87,9 @@ You can also use the command `csv()` synonymously with `delimited()`.
 :::
 
 ## Writing to a delimited file
-All file writing options can be performed using `write_to()`, which calls `popdata2delimited` when writing to a delimited file.
+All file writing options can be performed using `write_to()`, which calls `delimited` when writing to a delimited file.
 ```julia
-popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
+delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
 ```
 Write PopData to a text-delimited file. 
 ### Keyword Arguments
@@ -107,7 +107,7 @@ Write PopData to a text-delimited file.
 ```julia
 cats = @nancycats;
 fewer_cats = omit(cats, names = samples(cats)[1:10]);
-popdata2delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
+delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
 ```
 
 ## Acknowledgements

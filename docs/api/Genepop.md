@@ -49,9 +49,9 @@ waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
 
 ----
 
-### `popdata2genepop`
+### `genepop`
 ```julia
-popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
+genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
 ```
 Writes a `PopData` object to a Genepop-formatted file
 - `data`: the `PopData` object you wish to convert to a Genepop file
@@ -68,5 +68,5 @@ Writes a `PopData` object to a Genepop-formatted file
 ```julia
 cats = @nancycats;
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
-julia> popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
+julia> genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
