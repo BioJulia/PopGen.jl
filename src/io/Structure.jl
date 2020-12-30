@@ -150,7 +150,7 @@ function structure(infile::String; silent::Bool = false, extracols::Int = 0, ext
         )
     end
 
-    # hacky way of tranposing the dataframe
+    # hacky way of transposing the dataframe
     loci_df = loci_df[!, Not(:locus)] |> Matrix |> permutedims |> DataFrame
     rename!(loci_df, locinames)
 
@@ -205,7 +205,7 @@ fewer_cats = omit(cats, name = samples(cats)[1:10]);
 structure(fewer_cats, filename = "filtered_nancycats.str", faststructure = true)
 ```
 """
-function popdata2structure(data::PopData; filename::String, faststructure::Bool = false, delim::String = "tab")
+function structure(data::PopData; filename::String, faststructure::Bool = false, delim::String = "tab")
     # index both dataframes
     genos_gdf = groupby(data.loci, :name)
     meta_gdf = groupby(data.meta, :name)
