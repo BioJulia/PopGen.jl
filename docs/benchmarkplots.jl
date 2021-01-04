@@ -3,8 +3,8 @@ using VegaLite, DataFrames
 function comparison_plot(x::Vector{String},y::Vector{Float64}, yaxis::String, main::String)
     corners = 10
     @vlplot(
-        height=290,
-        width=500,
+        height=300,
+        width=650,
         title={
           text=main,
           fontSize=20,
@@ -59,8 +59,8 @@ f_size = [3.498172, 5.331536]
 DataFrame(:names => obj, :size => f_size) |>
     @vlplot() +
     @vlplot(
-        height=290,
-        width=500,
+        height=300,
+        width=650,
         title={
           text="Data structure size relative to source file",
           fontSize=22,
