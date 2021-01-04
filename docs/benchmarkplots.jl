@@ -1,23 +1,23 @@
-using VegaLite
+using VegaLite, DataFrames
 
 function comparison_plot(x::Vector{String},y::Vector{Float64}, yaxis::String, main::String)
-    corners = 25
+    corners = 10
     @vlplot(
-        height=500,
-        width=450,
+        height=290,
+        width=500,
         title={
           text=main,
-          fontSize=22,
+          fontSize=20,
           fontWeight="normal"
         },
         mark={
             :bar,
-            cornerRadiusTopLeft=corners,
+            cornerRadiusTopLeft=0,
             cornerRadiusTopRight=corners,
-            cornerRadiusBottomLeft=corners,
+            cornerRadiusBottomLeft=0,
             cornerRadiusBottomRight=corners
         },
-        y={y,
+        x={y,
             axis={
                 title=yaxis,
                 titleFontSize = 17,
@@ -27,7 +27,7 @@ function comparison_plot(x::Vector{String},y::Vector{Float64}, yaxis::String, ma
                 domain = false
             }
         },
-        x={x,
+        y={x,
             axis={
                 title="",
                 labelAngle= 0,
@@ -50,30 +50,30 @@ pop_hierf = ["PopGen.jl", "hierfstat"]
 
 #### Load in Data ####
 import_speed = [.910, 6.745]
-comparison_plot(pop_adeg, import_speed, "Seconds", "Importing a genepop file") |> save("static/img/speedplot.png")
+comparison_plot(pop_adeg, import_speed, "Seconds", "Importing a genepop file (less is better)") |> save("static/img/speedplot.png")
 
 #### Filesize (mb) ####
-obj = ["PopData (PopGen.jl)", "genind (adegenet)"]
+obj = ["PopData\n(PopGen.jl)", "genind\n(adegenet)"]
 f_size = [3.498172, 5.331536]
 # I know, it's kind of obnoxiously long, but this is the syntax for getting that line on there.
 DataFrame(:names => obj, :size => f_size) |>
     @vlplot() +
     @vlplot(
-        height=500,
-        width=450,
+        height=290,
+        width=500,
         title={
-          text="Data structure size",
+          text="Data structure size relative to source file",
           fontSize=22,
           fontWeight="normal"
         },
         mark={
             :bar,
-            cornerRadiusTopLeft=25,
-            cornerRadiusTopRight=25,
-            cornerRadiusBottomLeft=25,
-            cornerRadiusBottomRight=25
+            cornerRadiusTopLeft=0,
+            cornerRadiusTopRight=15,
+            cornerRadiusBottomLeft=0,
+            cornerRadiusBottomRight=15
         },
-        y={"size:q",
+        x={"size:q",
             axis={
                 title="megabytes",
                 titleFontSize = 17,
@@ -83,7 +83,7 @@ DataFrame(:names => obj, :size => f_size) |>
                 domain = false
             }
         },
-        x={"names:n",
+        y={"names:n",
             axis={
                 title="",
                 labelAngle= 0,
@@ -99,15 +99,15 @@ DataFrame(:names => obj, :size => f_size) |>
             legend=false
         }
     ) +
-    @vlplot(:rule, y={datum=3.2})  |> save("static/img/objectplot.png")
+    @vlplot(:rule, x={datum=3.2})  |> save("static/img/objectplot.png")
 
 #### f-stat summary ####
 sumstat = [0.171, 4.6]
-comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics") |> save("static/img/sumstatplot.png")
+comparison_plot(pop_hierf, sumstat, "Seconds", "Summary Statistics (less is better)") |> save("static/img/sumstatplot.png")
 
 #### Χ² test ####
 chitest = [0.176, 6.2659]
-comparison_plot(pop_adeg, chitest, "Seconds", "Hardy-Weinberg Equilibrium Χ² test") |> save("static/img/chisqplot.png")
+comparison_plot(pop_adeg, chitest, "Seconds", "Hardy-Weinberg Equilibrium Χ² test (less is better)") |> save("static/img/chisqplot.png")
 
 
 #### Makie version
