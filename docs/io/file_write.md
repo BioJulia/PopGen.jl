@@ -12,12 +12,12 @@ will infer the correct output file type from the output filename's extensions. C
 
 | File Format | Extensions             | Docstring            |
 | :---------- | :--------------------- | :------------------- |
-| genepop     | `.gen`, `.genepop`     | `?popdata2genepop`   |
-| JLD2        | `.jld2`                | `?popdata2jld2`      |
-| delimited   | `.csv`, `.txt`, `.tsv` | `?popdata2delimited` |
-| Structure/fastStructure   | `.str`, `.structure` | `?popdata2structure` |
+| genepop     | `.gen`, `.genepop`     | `?genepop`   |
+| JLD2        | `.jld2`                | `?jld2`      |
+| delimited   | `.csv`, `.txt`, `.tsv` | `?delimited` |
+| Structure/fastStructure   | `.str`, `.structure` | `?structure` |
 
-Additional keyword arguments `kwargs...` are specific to the intended file type, and are listed in the docstrings of the specific file writer with the format `?popdata2filetype` like shown above. For example, to find the appropriate keywords for a conversion to Genepop format, call up the docstring to `popdata2genepop` with `?popdata2genepop`.
+Additional keyword arguments `kwargs...` are specific to the intended file type, and are listed in the docstrings of the specific file writer with the format `?filetype` like shown above. For example, to find the appropriate keywords for a conversion to Genepop format, call up the docstring to `genepop` with `?genepop`.
 
 ```julia
 cats = @nancycats;

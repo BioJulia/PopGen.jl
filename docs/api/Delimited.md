@@ -57,9 +57,9 @@ lizardsCA = delimited("CA_lizards.csv", digits = 3);
 
 ----
 
-### `popdata2delimtied`
+### `delimtied`
 ```julia
-popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
+delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
 ```
 Write PopData to a text-delimited file. 
 #### Keyword Arguments
@@ -72,5 +72,5 @@ Write PopData to a text-delimited file.
 ```julia
 cats = @nancycats;
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
-popdata2delimited(fewer_cats, filename = "filtered_nancycats.csv", digits = 3, format = "wide", delim = " ")
+delimited(fewer_cats, filename = "filtered_nancycats.csv", digits = 3, format = "wide", delim = " ")
 ```

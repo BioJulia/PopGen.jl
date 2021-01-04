@@ -89,9 +89,9 @@ walnuts = structure("juglans_nigra.str", extracols = 0, extrarows = 0)
 ```
 ----
 
-### `popdata2structure`
+### `structure`
 ```julia
-popdata2structure(data::PopData; filename::String, faststructure::Bool, delim::String)
+structure(data::PopData; filename::String, faststructure::Bool, delim::String)
 ```
 Write a `PopData` object to a Stucture format file
 - `data`: the `PopData` object you wish to convert to a Structure file
@@ -103,5 +103,5 @@ Write a `PopData` object to a Stucture format file
 ```
 cats = @nancycats;
 fewer_cats = omit(cats, name = samples(cats)[1:10]);
-popdata2structure(fewer_cats, filename = "filtered_nancycats.str", faststructure = true)
+structure(fewer_cats, filename = "filtered_nancycats.str", faststructure = true)
 ```

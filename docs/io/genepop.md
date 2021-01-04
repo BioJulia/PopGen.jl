@@ -89,9 +89,9 @@ Newcomb_04,	254230	564000	090120
 </Tabs>
 
 ## Writing to a Genepop file
-All file writing options can be performed using `write_to()`, which calls `popdata2genpop` when writing to a Genepop file.
+All file writing options can be performed using `write_to()`, which calls `genpop` when writing to a Genepop file.
 ```julia
-popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
+genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
 ```
 Writes a `PopData` object to a Genepop-formatted file.
 ### Arguments
@@ -112,7 +112,7 @@ Writes a `PopData` object to a Genepop-formatted file.
 ```julia
 cats = @nancycats;
 fewer_cats = omit(cats, names = samples(cats)[1:10]);
-julia> popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
+julia> genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
 
 ----
