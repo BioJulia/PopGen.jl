@@ -40,10 +40,10 @@ end
 @inline function permute_samples!(data::AbstractDataFrame, popnames::Vector{String})
     pops = shuffle(Xoroshiro128Star(), popnames)
 
-    @inbounds @sync for name in groupby(data, :name)
-        Base.Threads.@spawn begin 
+    @inbounds #=@sync=# for name in groupby(data, :name)
+        #Base.Threads.@spawn begin 
             @inbounds name.population .= pop!(pops)
-        end
+        #end
     end
     data
 end
