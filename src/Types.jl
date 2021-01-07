@@ -90,4 +90,5 @@ function Base.show(io::IO, data::PopData)
     else
         print(io, "  Coordinates:") ; printstyled(io, " absent\n", color = :yellow)
     end
+    # add extracols section
 end
