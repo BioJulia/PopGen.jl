@@ -22,7 +22,7 @@ object.
     #d = Dict{eltype(first(skipmissing(locus))),Float32}()
     all(ismissing.(locus)) == true && return Dict{eltype(first(skipmissing(locus))),Float64}()
     flat_alleles = alleles(locus)
-    proportionmap(flat_alleles[flat_alleles .!== missing])
+    proportionmap(flat_alleles |> skipmissing |> collect)
     #=  # deprecated in favor of proportionmap
     len = length(flat_alleles)
     @inbounds @simd for allele in flat_alleles
@@ -215,7 +215,7 @@ Return a `Dict` of genotype frequencies of a single locus in a
 @inline function geno_freq(locus::T) where T<:GenoArray
     # conditional testing if all genos are missing
     all(ismissing.(locus)) && return missing
-    proportionmap(locus[locus .!== missing])
+    proportionmap(locus |> skipmissing |> collect)
     #= deprecated in favor of proportionmap
     d = Dict{Tuple, Float32}()
     @inbounds for genotype in skipmissing(locus)

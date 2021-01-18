@@ -9,28 +9,28 @@ sharks = @gulfsharks;
 
 @testset "PopGen.allele_freq" begin
     @test length(PopGen.allele_freq(cats)) == 9
-    @test eltype(PopGen.allele_freq(cats)) == Dict{Int16,Float32}
-    @test typeof(PopGen.allele_freq(cats.loci.genotype)) == Dict{Int16,Float32}
+    @test eltype(PopGen.allele_freq(cats)) == Dict{Int16,Float64}
+    @test typeof(PopGen.allele_freq(cats.loci.genotype)) == Dict{Int16,Float64}
     df_cats = DataFrames.combine(
         groupby(cats.loci, :population),
         :genotype => PopGen.allele_freq => :genos
     )
     @test size(df_cats) == (17,2)
-    @test eltype(df_cats.genos) == Dict{Int16,Float32}
+    @test eltype(df_cats.genos) == Dict{Int16,Float64}
     @test length(PopGen.allele_freq(cats, "fca8")) == 16
-    @test typeof(PopGen.allele_freq(cats, "fca8")) == Dict{Int16,Float32}
+    @test typeof(PopGen.allele_freq(cats, "fca8")) == Dict{Int16,Float64}
     
     @test length(PopGen.allele_freq(sharks)) == 2209
-    @test eltype(PopGen.allele_freq(sharks)) == Dict{Int16,Float32}
-    @test typeof(PopGen.allele_freq(sharks.loci.genotype)) == Dict{Int16,Float32}
+    @test eltype(PopGen.allele_freq(sharks)) == Dict{Int8,Float64}
+    @test typeof(PopGen.allele_freq(sharks.loci.genotype)) == Dict{Int16,Float64}
     df_sharks = DataFrames.combine(
         groupby(sharks.loci, :population),
         :genotype => PopGen.allele_freq => :genos
     )
     @test size(df_sharks) == (7,2)
-    @test eltype(df_sharks.genos) == Dict{Int16,Float32}
+    @test eltype(df_sharks.genos) == Dict{Int8,Float64}
     @test length(PopGen.allele_freq(sharks, "contig_2784")) == 2
-    @test typeof(PopGen.allele_freq(sharks, "contig_2784")) == Dict{Int16,Float32}
+    @test typeof(PopGen.allele_freq(sharks, "contig_2784")) == Dict{Int16,Float64}
 end
 
 @testset "other PopGen.allele_freqs" begin
