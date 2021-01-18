@@ -107,7 +107,7 @@ allele_freq(cats, "fca8")
 allele_freq(cats, "fca8", population = true)
 ```
 """
-function allele_freq(data::PopData, locus::String, population::Bool=false)
+function allele_freq(data::PopData, locus::String; population::Bool=false)
     if !population
         data.loci[data.loci.locus .== locus, :genotype] |> allele_freq
     else
