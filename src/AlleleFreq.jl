@@ -22,7 +22,7 @@ object.
     #d = Dict{eltype(first(skipmissing(locus))),Float32}()
     all(ismissing.(locus)) == true && return Dict{eltype(first(skipmissing(locus))),Float64}()
     flat_alleles = alleles(locus)
-    proportionmap(flat_alleles)
+    proportionmap(flat_alleles[flat_alleles .!== missing])
     #=  # deprecated in favor of proportionmap
     len = length(flat_alleles)
     @inbounds @simd for allele in flat_alleles
