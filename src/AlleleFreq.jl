@@ -20,7 +20,7 @@ object.
 """
 @inline function allele_freq(locus::GenoArray)
     #d = Dict{eltype(first(skipmissing(locus))),Float32}()
-    all(ismissing.(locus)) == true && return Dict{eltype(first(skipmissing(locus))),Float64}()
+    all(ismissing.(locus)) == true && return Dict{eltype(eltype(locus) |> nonmissingtype) ,Float64}()
     flat_alleles = alleles(locus)
     proportionmap(flat_alleles |> skipmissing |> collect)
     #=  # deprecated in favor of proportionmap
@@ -86,12 +86,11 @@ DataFrames.combine(
 )
 ```
 """
-function avg_allele_freq(allele_dicts::AbstractVector{T}) where T<:Dict{Signed,Float32}
-   sum_dict = Dict{Int16, Tuple{Float32, Int}}()
+function avg_allele_freq(allele_dicts::AbstractVector{Dict{T, Float64}}) where T<:Signed   
+    sum_dict = Dict{Int16, Tuple{Float32, Int}}()
    # remove any dicts with no entries (i.e. from a group without that locus)
    allele_dicts = allele_dicts[length.(allele_dicts) .> 0]
    # create a list of all the alleles
-   #TODO replace with union?
    all_alleles = keys.(allele_dicts) |> Base.Iterators.flatten |> collect |> unique
    # populate the sum dict with allele frequency and n for each allele
    @inbounds for allele in all_alleles
@@ -99,6 +98,7 @@ function avg_allele_freq(allele_dicts::AbstractVector{T}) where T<:Dict{Signed,F
            @inbounds sum_dict[allele] = get!(sum_dict, allele, (0., 0)) .+ (get!(allele_dict, allele, 0.), 1)
        end
    end
+   return sum_dict
    avg_dict = Dict{Int16, Float32}()
    # collapse the sum dict into a dict of averages
    @inbounds for (key, value) in sum_dict
