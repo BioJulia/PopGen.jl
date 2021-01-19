@@ -75,9 +75,9 @@ function Base.show(io::IO, data::PopData)
     else
         print(io, "  Ploidy:") ; printstyled(io, " absent\n", color = :yellow)
     end
-    print(io, "  Samples: ") ; printstyled(io, length(data.meta.name), "\n", bold = true)
+    print(io, "  Samples: ") ; printstyled(io, length(data.loci.name.pool), "\n", bold = true)
     print(io, "  Loci: ") ; printstyled(io, length(unique(data.loci.locus)), "\n", bold = true)
-    print(io, "  Populations: ") ; printstyled(io, length(unique(data.meta.population)), "\n", bold = true)
+    print(io, "  Populations: ") ; printstyled(io, length(data.loci.population |> unique), "\n", bold = true)
 
     if "longitude" ∈ names(data.meta)
         if ismissing.(data.meta.longitude) |> all == true
@@ -90,4 +90,5 @@ function Base.show(io::IO, data::PopData)
     else
         print(io, "  Coordinates:") ; printstyled(io, " absent\n", color = :yellow)
     end
+    # add extracols section
 end

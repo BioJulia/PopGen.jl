@@ -29,7 +29,7 @@ Return an array of all the non-missing alleles of a locus. Use
     alle_out = Base.Iterators.flatten(skipmissing(locus)) |> collect
     alle_out = Vector{Union{Missing, eltype(alle_out)}}(alle_out)
     if miss == true
-        append!(alle_out, locus[locus.=== missing])
+        append!(alle_out, locus[locus .=== missing])
     end
     return alle_out
 end
