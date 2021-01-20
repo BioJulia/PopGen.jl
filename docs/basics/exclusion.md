@@ -24,9 +24,9 @@ keyword is singular or plural (like `locus` vs `loci`).
 ## Exclude samples, loci, or entire populations
 
 ```julia
-exclude(data::PopObj, kwargs...)
-omit(data::PopObj, kwargs...)
-remove(data::PopObj, kwargs...)
+exclude(data::PopData, kwargs...)
+omit(data::PopData, kwargs...)
+remove(data::PopData, kwargs...)
 ```
 Returns a new `PopData` object without the sample or samples provided. Input can be a
 single sample, or an array of samples. This command will inform you if your criteria
