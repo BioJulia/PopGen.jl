@@ -1,6 +1,6 @@
 #TODO add to API docs
 """
-allele_freq(data::PopData)
+    allele_freq(data::PopData)
 Return a NamedTuple of `Dicts` of allele frequencies of all
 loci in a `PopData` object. These are global allele frequencies.
 """
@@ -15,14 +15,12 @@ end
 
 """
     allele_freq(locus::GenoArray)
-Return a `Dict` of allele frequencies of a GenoArray (typically a single locus) in a `PopData`
-object.
+Return a `Dict` of allele frequencies of a GenoArray (typically a single locus) in 
+a `PopData` object.
 """
 @inline function allele_freq(locus::GenoArray)
-    #d = Dict{eltype(first(skipmissing(locus))),Float32}()
-    all(ismissing.(locus)) == true && return Dict{eltype(eltype(locus) |> nonmissingtype) ,Float64}()
-    flat_alleles = alleles(locus)
-    proportionmap(flat_alleles |> skipmissing |> collect)
+    all(ismissing.(locus)) == true && return Dict{eltype(nonmissingtype(eltype(locus))), Float64}()
+    proportionmap(alleles(locus))
     #=  # deprecated in favor of proportionmap
     len = length(flat_alleles)
     @inbounds @simd for allele in flat_alleles
@@ -87,7 +85,7 @@ DataFrames.combine(
 ```
 """
 function avg_allele_freq(allele_dicts::AbstractVector{Dict{T, Float64}}) where T<:Signed   
-    sum_dict = Dict{Int16, Tuple{Float32, Int}}()
+   sum_dict = Dict{Int16, Tuple{Float32, Int}}()
    # remove any dicts with no entries (i.e. from a group without that locus)
    allele_dicts = allele_dicts[length.(allele_dicts) .> 0]
    # create a list of all the alleles
