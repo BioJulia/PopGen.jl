@@ -15,19 +15,30 @@ function adjacency_matrix(data::PopData)
     return out_vec
 end
 
-#TODO change location in API docs and rename allele_pool
+#TODO change location in API docs and rename allele_pool?
 #TODO replace alleles with universal Symbol type?
 """
-    alleles(locus::T; miss::Bool = false) where T<:GenoArray
-Return an array of all the non-missing alleles of a locus. Use
-`miss = true` to include missing values.
+    alleles(locus::T) where T<:GenoArray
+Return an array of all the non-missing alleles of a locus.
 """
-@inline function alleles(locus::T; miss::Bool = false) where T<:GenoArray
+@inline function alleles(locus::T) where T<:GenoArray
     if all(ismissing.(locus))
         return Vector{Union{Missing, eltype(locus).b.types[1]}}(undef, length(locus))
     end
     alle_out = Base.Iterators.flatten(skipmissing(locus)) |> collect
-    alle_out = Vector{Union{Missing, eltype(alle_out)}}(alle_out)
+end
+
+"""
+    alleles(locus::T, miss::Bool = false) where T<:GenoArray
+Return an array of all the non-missing alleles of a locus. Use the second positional
+argument as `true` to include missing values.
+"""
+@inline function alleles(locus::T, miss::Bool) where T<:GenoArray
+    int_type = eltype(locus).b.types[1]
+    if all(ismissing.(locus))
+        return Vector{Union{Missing, int_type}}(undef, length(locus))
+    end
+    alle_out = Vector{Union{Missing, int_type}}(Base.Iterators.flatten(skipmissing(locus)) |> collect)
     if miss == true
         append!(alle_out, locus[locus .=== missing])
     end
