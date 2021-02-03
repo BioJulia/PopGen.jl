@@ -22,7 +22,7 @@ end
 
 @testset "summary F/D/etc. stats" begin
     smry_glob = summary(cats)
-    smry_pop = summary(cats, by = "population")
+    smry_loc = summary(cats, by = "locus")
     @test typeof(smry_glob) == DataFrame
     @test typeof(smry_pop) == DataFrame
     @test size(smry_glob) == (1, 10)
