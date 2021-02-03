@@ -24,9 +24,9 @@ end
     smry_glob = summary(cats)
     smry_loc = summary(cats, by = "locus")
     @test typeof(smry_glob) == DataFrame
-    @test typeof(smry_pop) == DataFrame
+    @test typeof(smry_loc) == DataFrame
     @test size(smry_glob) == (1, 10)
-    @test size(smry_pop) ==(9, 11)
+    @test size(smry_loc) ==(9, 11)
 end
 
 end # module
