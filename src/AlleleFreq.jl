@@ -270,7 +270,7 @@ function geno_freq_expected(locus::T) where T<:GenoArray
     genos = reverse.(Base.Iterators.product(alle, alle) |> collect |> vec)
 
     # reform genotype frequencies into a Dict
-    expected = Dict{Tuple, Float64}()
+    expected = Dict{nonmissingtype(eltype(locus)), Float64}()
     for (geno, freq) in zip(genos, expected_genotype_freq)
         expected[geno] = get!(expected, geno, 0.0) + freq
     end

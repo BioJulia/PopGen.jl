@@ -52,30 +52,29 @@ end
 
 @testset "geno freqs" begin
     @test length(PopGen.geno_freq(cats.loci.genotype)) == 295
-    @test typeof(PopGen.geno_count_observed(cats.loci.genotype)) == Dict{Tuple,Float32}
+    @test typeof(PopGen.geno_freq(cats.loci.genotype)) <: Dict{<:Tuple,Float64}
     @test length(PopGen.geno_freq(cats, "fca8")) == 51
-    @test typeof(PopGen.geno_freq(cats, "fca8")) == Dict{Tuple,Float32}
+    @test typeof(PopGen.geno_freq(cats, "fca8")) <: Dict{<:Tuple,Float64}
     @test typeof(PopGen.geno_freq(cats, "fca8", population = true)) == DataFrame
     @test size(PopGen.geno_freq(cats, "fca8", population = true)) == (17,2)
 
     @test length(PopGen.geno_freq_expected(cats.loci.genotype)) == 6241
-    @test typeof(PopGen.geno_freq_expected(cats.loci.genotype)) == Dict{Tuple,Float64}
+    @test typeof(PopGen.geno_freq_expected(cats.loci.genotype)) <: Dict{<:Tuple,Float64}
     @test length(PopGen.geno_freq_expected(cats, "fca8")) == 256
-    @test typeof(PopGen.geno_freq_expected(cats, "fca8")) == Dict{Tuple,Float64}
+    @test typeof(PopGen.geno_freq_expected(cats, "fca8")) <: Dict{<:Tuple,Float64}
     @test typeof(PopGen.geno_freq_expected(cats, "fca8", population = true)) == DataFrame
     @test size(PopGen.geno_freq_expected(cats, "fca8", population = true)) == (17,2)
 
     @test length(PopGen.geno_freq(sharks.loci.genotype)) == 12
-    @test typeof(PopGen.geno_count_observed(sharks.loci.genotype)) == Dict{Tuple,Float32}
     @test length(PopGen.geno_freq(sharks, "contig_2784")) == 2
-    @test typeof(PopGen.geno_freq(sharks, "contig_2784")) == Dict{Tuple,Float32}
+    @test typeof(PopGen.geno_freq(sharks, "contig_2784")) <: Dict{<:Tuple,Float64}
     @test typeof(PopGen.geno_freq(sharks, "contig_2784", population = true)) == DataFrame
     @test size(PopGen.geno_freq(sharks, "contig_2784", population = true)) == (7,2)
 
     @test length(PopGen.geno_freq_expected(sharks.loci.genotype)) == 25
-    @test typeof(PopGen.geno_freq_expected(sharks.loci.genotype)) == Dict{Tuple,Float64}
+    @test typeof(PopGen.geno_freq_expected(sharks.loci.genotype)) <: Dict{<:Tuple,Float64}
     @test length(PopGen.geno_freq_expected(sharks, "contig_2784")) == 4
-    @test typeof(PopGen.geno_freq_expected(sharks, "contig_2784")) == Dict{Tuple,Float64}
+    @test typeof(PopGen.geno_freq_expected(sharks, "contig_2784")) <: Dict{<:Tuple,Float64}
     @test typeof(PopGen.geno_freq_expected(sharks, "contig_2784", population = true)) == DataFrame
     @test size(PopGen.geno_freq_expected(sharks, "contig_2784", population = true)) == (7,2)
 end
