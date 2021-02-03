@@ -162,7 +162,8 @@ Return a `Dict` of genotype counts of a single locus in a
 @inline function geno_count_observed(locus::T) where T<:GenoArray
     # conditional testing if all genos are missing
     all(ismissing.(locus)) && return missing
-    countmap(locus[locus .!== missing])
+    countmap(skipmissing(locus))
+
     #= # deprecated in favor of countmap
     d = Dict{Tuple, Float32}()
     @inbounds for genotype in skipmissing(locus)
@@ -195,7 +196,7 @@ function geno_count_expected(locus::T) where T<:GenoArray
 
     # reform genotype frequencies with same all-by-all approach
     genos = reverse.(Base.Iterators.product(alle, alle) |> collect |> vec)
-    expected = Dict{Tuple, Float64}()
+    expected = Dict{nonmissingtype(eltype(locus)), Float64}()
     for (geno, freq) in zip(genos, expected_genotype_freq)
         expected[geno] = get!(expected, geno, 0.0) + freq
     end
