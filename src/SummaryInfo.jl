@@ -107,15 +107,15 @@ function Base.summary(data::PopData; by::String = "global")
         :n => (n -> sum(.!iszero.(n)) ./ sum(reciprocal.(n))) => :mn,
         [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n)))))) => :HS,
         :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
-        :alleles => (alleles ->  sum(values(avg_allele_freq(alleles)).^2))=> :avg_freq
-    )
+        :alleles => (alleles ->  sum(values(avg_allele_freq(alleles, 2))))=> :avg_freq
+        )
 
     Ht = 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)
     DST = Ht .- n_df.HS
     DST′ = n_df.count ./ (n_df.count .- 1) .* DST
     HT′ = n_df.HS .+ DST′
 
-    if lowercase(by) != "global"
+    if lowercase(by) == "locus"
         FIS =  1.0 .- (n_df.Het_obs ./ n_df.HS)
         FST = DST ./ Ht
         DEST = DST′ ./ (1 .- n_df.HS)
@@ -136,7 +136,7 @@ function Base.summary(data::PopData; by::String = "global")
             :FIS => round.(FIS, digits = 4),
             :DEST => round.(DEST, digits = 4)
         )
-    else
+    elseif lowercase(by) == "global"
         Het_obs = mean(n_df.Het_obs)
         HS = mean(n_df.HS)
         Ht = mean(Ht)
@@ -156,6 +156,8 @@ function Base.summary(data::PopData; by::String = "global")
         :FIS => round(1 - (Het_obs / HS), digits = 4),
         :DEST => round(DST′ / (1 - HS), digits = 4)
         )
+    else
+        throw(ArgumentError("Use by = \"global\" or \"locus\""))
     end
 end
 
