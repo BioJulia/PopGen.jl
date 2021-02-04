@@ -8,7 +8,6 @@ sidebar_label: VariantCall.jl
     openvcf(::String)
 Open VCF file (`.vcf/.gz`, or `.bcf/.gz`) and return an `IO` stream in reading mode `"r"`.
 Adapted from OpenMendel/VCFTools.jl
-https://github.com/OpenMendel/VCFTools.jl/blob/master/src/gtstats.jl#L169
 
 
 ----
@@ -24,12 +23,9 @@ Load a BCF file into memory as a PopData object. Population information needs to
 - `silent`: true/false of whether to print extra file information (default: `false`).
 Alleles are recoded according to the following schema:
 
-|Base| | Allele |
-|:---:|:---:|:---:|
-| A | => | 1 |
-| T | => | 2 |
-| C | => | 3 |
-| G | => | 4 |
+|    Base    |  A   |  T   |  C   |  G   |
+| :--------  | :--: | :--: | :--: | :--: |
+| **Allele** |  1   |  2   |  3   |  4   |
 
 #### Mixed-ploidy data
 If importing mixed-ploidy data (such as poolseq), you will need to perform an additional
@@ -51,12 +47,10 @@ Load a VCF file into memory as a PopData object. Population information needs to
 - `silent`: true/false of whether to print extra file information (default: `false`).
 Alleles are recoded according to the following schema:
 
-|Base| | Allele |
-|:---:|:---:|:---:|
-| A | => | 1 |
-| T | => | 2 |
-| C | => | 3 |
-| G | => | 4 |
+|    Base    |  A   |  T   |  C   |  G   |
+| :--------  | :--: | :--: | :--: | :--: |
+| **Allele** |  1   |  2   |  3   |  4   |
+
 #### Mixed-ploidy data
 If importing mixed-ploidy data (such as poolseq), you will need to perform an additional
 step to convert the genotype column into the correct `GenoArray` type:
