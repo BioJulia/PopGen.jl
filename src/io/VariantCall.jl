@@ -4,7 +4,7 @@ export bcf, vcf
 
 """
     openvcf(::String)
-Open VCF file (`.vcf` or `.bcf`) and return an `IO` stream in reading mode `"r"`.
+Open VCF file (`.vcf/.gz`, or `.bcf/.gz`) and return an `IO` stream in reading mode `"r"`.
 """
 function openvcf(infile::String)
     if endswith(infile, ".vcf") || endswith(infile, ".bcf")
