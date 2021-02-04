@@ -1,5 +1,4 @@
 using .GeneticVariation
-using .GZip
 
 export bcf, vcf
 
