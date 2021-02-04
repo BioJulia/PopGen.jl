@@ -5,7 +5,6 @@ export bcf, vcf
 """
     openvcf(::String)
 Open VCF file (`.vcf` or `.bcf`) and return an `IO` stream in reading mode `"r"`.
-Adapted from OpenMendel/VCFTools.jl
 """
 function openvcf(infile::String)
     if endswith(infile, ".vcf") || endswith(infile, ".bcf")
