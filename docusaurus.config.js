@@ -9,6 +9,7 @@ module.exports = {
   organizationName: 'pdimens', // Usually your GitHub org/user name.
   projectName: 'PopGen.jl', // Usually your repo name.
   themeConfig: {
+    hideableSidebar: true,
     prism: {
       //defaultLanguage: 'julia',
       additionalLanguages: ['julia', 'r'],
