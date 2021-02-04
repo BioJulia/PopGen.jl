@@ -1,7 +1,9 @@
 using .GeneticVariation
+using .GZip
 
 export bcf, vcf
 
+#=
 """
     openvcf(::String)
 Open VCF file (`.vcf` or `.bcf`) and return an `IO` stream in reading mode `"r"`.
@@ -13,7 +15,24 @@ function openvcf(infile::String)
         throw(ArgumentError("The filename must end with .vcf or .bcf"))
     end
 end
+=#
 
+"""
+    openvcf(::String)
+Open VCF file (`.vcf/.gz`, or `.bcf/.gz`) and return an `IO` stream in reading mode `"r"`.
+"""
+function openvcf(infile::String)
+    if endswith(infile, ".vcf") || endswith(infile, ".bcf")
+        return open(infile, "r")
+    elseif endswith(infile, ".vcf.gz") || endswith(infile, ".bcf.gz")
+        @require GZip="92fee26a-97fe-5a0c-ad85-20a5f3185b63" begin
+            return GZip.open(infile, "r")
+        end
+        throw(ArgumentError("Please load in GZip.jl with \`using GZip\`"))
+    else
+        throw(ArgumentError("The filename must end with .vcf/.bcf or .vcf.gz/.bcf.gz"))
+    end
+end
 
 """
     bcf(infile::String; ; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
