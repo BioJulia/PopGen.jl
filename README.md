@@ -1,6 +1,6 @@
 ![logo](misc/logo.png)
 
-Population Genetics in Julia. We hope to merge this package into the `BioJulia` or `EcoJulia` ecosystem.
+Population Genetics in Julia.
 
 [![alt text](https://img.shields.io/badge/docs-stable-informational?style=for-the-badge&logo=Read%20The%20Docs&logoColor=white)](https://pdimens.github.io/PopGen.jl/) 
 [![alt text](https://img.shields.io/badge/slack-join%20PopGen.jl-9d72b1?style=for-the-badge&logo=slack)](https://join.slack.com/t/popgenjl/shared_invite/zt-deam65n8-DuBs2z1oDtsbBuRplJW~Pg)

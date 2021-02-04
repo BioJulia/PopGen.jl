@@ -1,21 +1,18 @@
 using .GeneticVariation
-using .GZip
 
 export bcf, vcf
 
 """
     openvcf(::String)
 Open VCF file (`.vcf/.gz`, or `.bcf/.gz`) and return an `IO` stream in reading mode `"r"`.
-Adapted from OpenMendel/VCFTools.jl
-https://github.com/OpenMendel/VCFTools.jl/blob/master/src/gtstats.jl#L169
 """
 function openvcf(infile::String)
     if endswith(infile, ".vcf") || endswith(infile, ".bcf")
         return open(infile, "r")
-    elseif endswith(infile, ".vcf.gz") || endswith(infile, ".bcf.gz")
-        return GZip.open(infile, "r")
+    elseif endswith(infile, ".gz")
+        throw(ArgumentError("Please load in GZip.jl with \`using GZip\`"))
     else
-        throw(ArgumentError("The filename must end with .vcf/.bcf or .vcf.gz/.bcf.gz"))
+        throw(ArgumentError("The filename must end with .vcf or .bcf"))
     end
 end
 
