@@ -56,9 +56,8 @@ include("io/Delimited.jl")
 include("io/Genepop.jl")
 include("io/Read.jl")
 include("io/Structure.jl")
-@init @require GeneticVariation="9bc6ac9d-e6b2-5f70-b0a8-242a01662520" begin
-    @require GZip="92fee26a-97fe-5a0c-ad85-20a5f3185b63" include("io/VariantCall.jl")
-end
+@require GeneticVariation="9bc6ac9d-e6b2-5f70-b0a8-242a01662520" include("io/VariantCall.jl")
+@require GZip="92fee26a-97fe-5a0c-ad85-20a5f3185b63" include("io/VariantCallGz.jl")
 # example data
 include("io/Datasets.jl")
 # utility functions
