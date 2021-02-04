@@ -4,6 +4,15 @@ title: What's New
 sidebar_label: What's New
 ---
 
+## v0.4.3
+This release fixes and simplifies the under-the-hood `allele_freq`, `geno_freq`, and `geno_count_xxx` functions. The are faster now, and they infer types, making the output have expected type behavior. 
+
+### Changes
+- You no longer need to import both `GeneticVariations.jl` and `GZip.jl` to have the `vcf` and `bcf` functions work. The reason is that if your file isn't gzipped, then why load in an unnecessary library? Therefore, if your file is gzipped, then you'll need to load in `GZip.jl` too, otherwise you just need `GeneticVariation.jl`. :cool:
+- `avg_allele_freq` now has a different method, where the second positional argument is `power`, which will raise the calculated frequencies to the given value (default = `1`). This simplifies having to do things like square the values of the resulting `Dict`.
+
+-----
+
 ## v0.4.0
 This release adds a slew of relatedness estimators, which can be bootstrapped and are performed in parallel. Paired with release of `PopGenSims.jl v0.0.2`.
 

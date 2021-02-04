@@ -13,7 +13,9 @@ bcf(infile::String; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
 PopGen.jl provides the commands `vcf` and `bcf` to import a variant call format files into `PopData`. The reader also accepts files that are gzipped. 
 
 :::note Lazy Loading
-The packages required to import BCF/VCF files (`GeneticVariation.jl` and `GZip.jl`) are lazy-loaded, therefore you must invoke `using GeneticVariation, GZip` to get this import functionality (see example below). 
+The packages required to import BCF/VCF files (`GeneticVariation.jl` and `GZip.jl`) are lazy-loaded. If you have not-gzipped variant call files, then
+you'll need to call `using GeneticVariation` before `bcf` and `vcf` become available to use. If your files are compressed, then you'll need to call
+`usig GZip` too. 
 :::
 
 
@@ -31,9 +33,11 @@ The packages required to import BCF/VCF files (`GeneticVariation.jl` and `GZip.j
 ### Example
 
 ```julia
-using GeneticVariation, GZip
-potato = vcf("/home/data/russet_potatoes.vcf.gz", allow_monomorphic = true)
+using GeneticVariation
 cabbage = bcf("/home/data/nappa_cabbage.bcf", rename_loci = true, silent = true)
+
+using GZip
+potato = vcf("/home/data/russet_potatoes.vcf.gz", allow_monomorphic = true)
 ```
 
 ### Mixed-Ploidy data
@@ -78,4 +82,4 @@ but they **will not** provide:
 This means you will need to add that information separately afterwards. Location data (which is *optional*) can be added to the `PopData` with the `locations!` command. Population names (*mandatory*) can be added using `populations!()`
 
 ## Acknowledgements
-The majority of the BCF/VCF reader is thanks to the tremendous efforts of Ben J. Ward and the BioJulia contributors involved in [GeneticVariation.jl](https://github.com/BioJulia/GeneticVariation.jl), which we use to parse your files into `PopData` format. If you love the file importer, then give those folks your thanks. If something is wrong and/or you hate the importer, blame us first (and please [open up an issue](https://github.com/pdimens/PopGen.jl/issues) 😅). 
+The majority of the BCF/VCF reader is thanks to the tremendous efforts of Ben J. Ward and the BioJulia contributors involved in [GeneticVariation.jl](https://github.com/BioJulia/GeneticVariation.jl), which we use to parse your files into `PopData` format. If you love the file importer, then give those folks your thanks. If something is wrong and/or you hate the importer, blame us first (and please [open up an issue](https://github.com/pdimens/PopGen.jl/issues) 😅).

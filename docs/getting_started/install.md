@@ -61,4 +61,11 @@ If you compiled Julia from source, your PopGen.jl installation may fail due to i
 - if Julia was compiled from source: install `julia-arpack` from the AUR and make sure to delete `~/.julia/packages/Arpack` if it exists. That *should* fix things, but sometimes it still acts up.
 :::
 
-The magic of Docusaurus (the engine these docs are built on) lets you "install" this documentation as a progressive web app if you're using a Chromium-based browser (e.g. Chrome, Chromium, Brave, Vivaldi, Edge). Doing so gives you quick-access to these docs as easy as double-clicking an application. Here's what that looks like using the Edge browser on Windows.
+## "Installing" the docs
+The magic of Docusaurus (the engine these docs are built on) lets you "install" this documentation as a progressive web app (fancy web shortcut) if you're using a Chromium-based browser (e.g. Chrome, Chromium, Brave, Vivaldi, Edge). Doing so gives you quick-access to these docs as easy as double-clicking an application. Here's what that looks like using the Edge browser on Windows:
+
+![edge_pwa](/img/pwa_screenshot.png)
+
+which then shows up in your Start menu like a plain-regular application!
+
+![pwa_app](/img/pwa_icon.png)
