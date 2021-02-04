@@ -42,8 +42,8 @@ each locus. Use `by = "population"` to perform this separately for each populati
 adjustment method for multiple testing.
 
 #### example
-`hwe_test(gulfsharks(), correction = "bh")` \n
-`hwe_test(gulfsharks(), by = "population", correction = "bh")` \n
+`hwe_test(@gulfsharks, correction = "bh")` \n
+`hwe_test(@gulfsharks, by = "population", correction = "bh")` \n
 
 
 ### `correction` methods (case insensitive)

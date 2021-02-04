@@ -63,23 +63,32 @@ function Base.show(io::IO, data::PopData)
         marker = "SNP"
     end
     print(io,"  Markers: "); printstyled(io, marker, "\n", bold = true)
-    ploidy = unique(data.meta.ploidy) |> sort
-    if length(ploidy) == 1
-        print(io, "  Ploidy: ") ; printstyled(io, ploidy |> join, "\n", bold = true)
+    if "ploidy" ∈ names(data.meta)
+        ploidy = unique(data.meta.ploidy) |> sort
+        if length(ploidy) == 1
+            print(io, "  Ploidy: ") ; printstyled(io, ploidy |> join, "\n", bold = true)
+        else
+            print(io, "  Ploidy (varies): ")
+            printstyled(io, ploidy[1], bold = true); [printstyled(io, ", $i", bold = true) for i in ploidy[2:end]]
+            print(io, "\n")
+        end
     else
-        print(io, "  Ploidy (varies): ")
-        printstyled(io, ploidy[1], bold = true); [printstyled(io, ", $i", bold = true) for i in ploidy[2:end]]
-        print(io, "\n")
+        print(io, "  Ploidy:") ; printstyled(io, " absent\n", color = :yellow)
     end
-    print(io, "  Samples: ") ; printstyled(io, length(data.meta.name), "\n", bold = true)
+    print(io, "  Samples: ") ; printstyled(io, length(data.loci.name.pool), "\n", bold = true)
     print(io, "  Loci: ") ; printstyled(io, length(unique(data.loci.locus)), "\n", bold = true)
-    print(io, "  Populations: ") ; printstyled(io, length(unique(data.meta.population)), "\n", bold = true)
+    print(io, "  Populations: ") ; printstyled(io, length(data.loci.population |> unique), "\n", bold = true)
 
-    if ismissing.(data.meta.longitude) |> all == true
-        print(io, "  Coordinates:") ; printstyled(io, " absent\n", color = :yellow)
-    elseif ismissing.(data.meta.longitude) |> all == false
-        println(io, "  Coordinates: present")
+    if "longitude" ∈ names(data.meta)
+        if ismissing.(data.meta.longitude) |> all == true
+            print(io, "  Coordinates:") ; printstyled(io, " absent\n", color = :yellow)
+        elseif ismissing.(data.meta.longitude) |> all == false
+            println(io, "  Coordinates: present")
+        else
+            println(io, "  Coordinates: present (", count(i -> i === missing, data.meta.longitude), " missing)")
+        end
     else
-        println(io, "  Coordinates: present (", count(i -> i === missing, data.meta.longitude), " missing)")
+        print(io, "  Coordinates:") ; printstyled(io, " absent\n", color = :yellow)
     end
+    # add extracols section
 end

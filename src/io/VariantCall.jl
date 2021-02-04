@@ -54,7 +54,7 @@ function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
     nsamples = length(sample_ID)
     loci_names = fill("marker", nmarkers)
     geno_df = DataFrame(:name => sample_ID, :population =>  "missing")
-    if !silent
+    if silent == false
         @info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
     end
         for record in stream
@@ -91,12 +91,14 @@ function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
         end
     end
     sort!(stacked_geno_df, [:name, :locus])
+    #meta_df = generate_meta(stacked_geno_df)
     # ploidy finding
     meta_df = DataFrames.combine(DataFrames.groupby(stacked_geno_df, :name),
         :genotype => (i -> Int8(length(first(skipmissing(i))))) => :ploidy    
     )
     insertcols!(meta_df, 2, :population => "missing")
     insertcols!(meta_df, 4, :longitude => Vector{Union{Missing, Float32}}(undef, nsamples), :latitude => Vector{Union{Missing, Float32}}(undef, nsamples))
+    
     if allow_monomorphic 
         pd_out = PopData(meta_df, stacked_geno_df)
     else
@@ -142,7 +144,7 @@ function vcf(infile::String; rename_snp::Bool = false, silent::Bool = false, all
     nsamples = length(sample_ID)
     loci_names = fill("marker", nmarkers)
     geno_df = DataFrame(:name => sample_ID, :population =>  "missing")
-    if !silent
+    if silent == false
         @info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
     end
     for record in stream
@@ -180,11 +182,13 @@ function vcf(infile::String; rename_snp::Bool = false, silent::Bool = false, all
     end
     sort!(stacked_geno_df, [:name, :locus])
     # ploidy finding
+    #meta_df = generate_meta(stacked_geno_df)
     meta_df = DataFrames.combine(DataFrames.groupby(stacked_geno_df, :name),
         :genotype => (i -> Int8(length(first(skipmissing(i))))) => :ploidy    
     )
     insertcols!(meta_df, 2, :population => "missing")
     insertcols!(meta_df, 4, :longitude => Vector{Union{Missing, Float32}}(undef, nsamples), :latitude => Vector{Union{Missing, Float32}}(undef, nsamples))
+    
     if allow_monomorphic 
         pd_out = PopData(meta_df, stacked_geno_df)
     else

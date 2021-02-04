@@ -8,7 +8,10 @@ using Test
 all_tests = [
     "types.jl",
     "allelefreq.jl",
-    "manipulate.jl"
+    "io.jl",
+    "manipulate.jl",
+    "dataexploration.jl",
+    "summaryinfo.jl"
 ]
 
 println("Running tests:")
@@ -30,5 +33,5 @@ for a_test in all_tests
 end
 
 if anyerrors
-    throw("Tests failed")
+    throw("Tests failed :(")
 end

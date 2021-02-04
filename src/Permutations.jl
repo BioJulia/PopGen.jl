@@ -6,7 +6,7 @@ the `.loci` dataframe.
 @inline function permute_loci!(data::PopData)
     @inbounds @sync for locus in groupby(data.loci, :locus)
         Base.Threads.@spawn begin
-            shuffle!(locus.population)
+            shuffle!(Xoroshiro128Star(), locus.population)
         end
     end
     data
@@ -20,10 +20,10 @@ the default is to only edit the `.loci` table in place; use `meta = true`
 if you also require the `.meta` dataframe edited in place.
 """
 @inline function permute_samples!(data::PopData; meta::Bool = false)
-    pops = shuffle(data.meta.population)
+    pops = shuffle(Xoroshiro128Star(), data.meta.population)
 
     if meta == true
-        meta_pops = deepcopy(pops)
+        meta_pops = copy(pops)
         @inbounds for name in groupby(data.meta, :name)
             @inbounds name.population .= pop!(meta_pops)
         end
@@ -38,12 +38,12 @@ end
 
 
 @inline function permute_samples!(data::AbstractDataFrame, popnames::Vector{String})
-    pops = shuffle(popnames)
+    pops = shuffle(Xoroshiro128Star(), popnames)
 
-    @inbounds @sync for name in groupby(data, :name)
-        Base.Threads.@spawn begin 
+    @inbounds #=@sync=# for name in groupby(data, :name)
+        #Base.Threads.@spawn begin 
             @inbounds name.population .= pop!(pops)
-        end
+        #end
     end
     data
 end
@@ -52,18 +52,12 @@ end
 """
     permute_genotypes!(data::PopData; by::String = "locus")
 Edits `PopData` in place with genotypes permuted across individuals within
-the `.loci` dataframe. Use `by = "population"` (or `"pop"`) to permute genotypes
+the `.loci` dataframe. Use `by = "population"` to permute genotypes
 within populations.
 """
 @inline function permute_genotypes!(data::PopData; by::String = "locus")
-    #establish mode of operation
-    if by in ["locus", "loci"]
-        groupings = :locus
-    elseif by in ["population", "pop"]
-        groupings = [:locus, :population]
-    else
-        error("Please choose from either \"locus\" or \"population\" run methods.")
-    end
+    # establish mode of operation
+    groupings = by == "locus" ? :locus : [:locus, :population]
     @inbounds @sync for grp in groupby(data.loci, groupings)
         Base.Threads.@spawn begin
             grp.genotype .= strict_shuffle!(grp.genotype)
@@ -76,30 +70,24 @@ end
 """
     permute_alleles!(data::PopData; ploidy::Union{Nothing, Int} = nothing, by::String = "locus")
 Edits `PopData` in place with alleles permuted and reconstructed into genotypes
-for each locus within the `.loci` dataframe. Use `by = "population"` (or `"pop"`)
+for each locus within the `.loci` dataframe. Use `by = "population"`
 to permute alleles within populations. If `ploidy` is not provided (default `ploidy = nothing`),
 then ploidy will be identified from the PopData. If performance is important,
 it would be best to identify ploidy in advance and set it to a specific integer.
 """
 @inline function permute_alleles!(data::PopData; ploidy::Union{Nothing, Int} = nothing, by::String = "locus")
-    #establish mode of operation
-    if by in ["locus", "loci"]
-        groupings = :locus
-    elseif by in ["population", "pop"]
-        groupings = [:locus, :population]
-    else
-        error("Please choose from either \"locus\" or \"population\" run methods.")
-    end
-
     if ploidy == nothing
         tmp = unique(data.meta.ploidy)
         length(tmp) > 1 && error("This permutation method is not appropriate for mixed-ploidy data")
-        ploidy = tmp[1]
+        ploidy = first(tmp)
     end
+
+    # establish mode of operation
+    groupings = by == "locus" ? :locus : [:locus, :population]
 
     @inbounds @sync for grp in groupby(data.loci, groupings)
         Base.Threads.@spawn begin
-            alle = shuffle(alleles(grp.genotype))
+            alle = shuffle(Xoroshiro128Star(), alleles(grp.genotype))
             new_genos = Tuple.(Base.Iterators.partition(alle, ploidy))
             (@view grp.genotype[.!ismissing.(grp.genotype)]) .= new_genos
         end

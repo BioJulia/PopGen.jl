@@ -17,22 +17,24 @@ end
 
 
 """
-    richness(data::PopData; population::Bool = false)
+    richness(data::PopData; by::String = "locus")
 Calculates various allelic richness and returns a table of per-locus
-allelic richness. Use `population = true` to calculate richness by
+allelic richness. Use `by = "population"` to calculate richness by
 locus by population.
 """
-function richness(data::PopData; population::Bool = false)
-    if !population
+function richness(data::PopData; by::String = "locus")
+    if by == "locus"
         DataFrames.combine(
             groupby(data.loci, :locus),
             :genotype => (geno -> length(unique_alleles(geno))) => :richness
         )
-    else
+    elseif by == "population"
         DataFrames.combine(
             groupby(data.loci, [:locus, :population]),
             :genotype => (geno -> length(unique_alleles(geno))) => :richness
         )
+    else
+        throw(ArgumentError("Please use by = \"locus\" (default) or \"population\""))
     end
 end
 
@@ -100,22 +102,20 @@ function Base.summary(data::PopData; by::String = "global")
     )
     # collapse down to retrieve averages and counts
     n_df = DataFrames.combine(
-        [:het_obs, :het_exp, :n, :alleles] => (o,e,n,alleles) -> (
-            count = sum(.!iszero.(n)),
-            mn = sum(.!iszero.(n)) ./ sum(reciprocal.(n)),
-            HS = mean(skipmissing(gene_diversity_nei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n))))),
-            Het_obs = mean(skipmissing(o)),
-            avg_freq = sum(values(avg_allele_freq(alleles)).^2)
-            ),
-        groupby(het_df, :locus)
-    )
+        groupby(het_df, :locus),
+        :n => (n -> sum(.!iszero.(n)))=> :count,
+        :n => (n -> sum(.!iszero.(n)) ./ sum(reciprocal.(n))) => :mn,
+        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n)))))) => :HS,
+        :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
+        :alleles => (alleles ->  sum(values(avg_allele_freq(alleles, 2))))=> :avg_freq
+        )
 
     Ht = 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)
     DST = Ht .- n_df.HS
     DST′ = n_df.count ./ (n_df.count .- 1) .* DST
     HT′ = n_df.HS .+ DST′
 
-    if lowercase(by) != "global"
+    if lowercase(by) == "locus"
         FIS =  1.0 .- (n_df.Het_obs ./ n_df.HS)
         FST = DST ./ Ht
         DEST = DST′ ./ (1 .- n_df.HS)
@@ -136,7 +136,7 @@ function Base.summary(data::PopData; by::String = "global")
             :FIS => round.(FIS, digits = 4),
             :DEST => round.(DEST, digits = 4)
         )
-    else
+    elseif lowercase(by) == "global"
         Het_obs = mean(n_df.Het_obs)
         HS = mean(n_df.HS)
         Ht = mean(Ht)
@@ -155,6 +155,73 @@ function Base.summary(data::PopData; by::String = "global")
         :FST′ => round(DST′ / HT′, digits = 4),
         :FIS => round(1 - (Het_obs / HS), digits = 4),
         :DEST => round(DST′ / (1 - HS), digits = 4)
+        )
+    else
+        throw(ArgumentError("Use by = \"global\" or \"locus\""))
+    end
+end
+
+function _summary(data::PopData; by::String = "global")
+    # observed/expected het per locus per pop
+    het_df = DataFrames.combine(
+        groupby(data.loci, [:locus, :population]),
+        :genotype => nonmissing => :n,
+        :genotype => hetero_o => :het_obs,
+        :genotype => (i -> hetero_e(i)) => :het_exp,
+        :genotype => allele_freq => :alleles
+    )
+    # collapse down to retrieve averages and counts
+    n_df = DataFrames.combine(
+        groupby(het_df, :locus),
+        :n => (n -> sum(.!iszero.(n)))=> :count,
+        :n => (n -> sum(.!iszero.(n)) ./ sum(reciprocal.(n))) => :mn,
+        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n)))))) => :HS,
+        :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
+        :alleles => (alleles ->  sum(values(avg_allele_freq(alleles)).^2))=> :avg_freq
+    )
+
+    Ht = 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)
+    DST = Ht .- n_df.HS
+    DST′ = n_df.count ./ (n_df.count .- 1) .* DST
+    HT′ = n_df.HS .+ DST′
+
+    if lowercase(by) != "global"
+        FIS =  1.0 .- (n_df.Het_obs ./ n_df.HS)
+        FST = DST ./ Ht
+        DEST = DST′ ./ (1 .- n_df.HS)
+        FST′ = DST′ ./ HT′
+        DataFrame(
+            :locus => n_df.locus,
+            :Het_obs => n_df.Het_obs,
+            :HS => n_df.HS,
+            :HT => Ht,
+            :DST => DST,
+            :HT′ => HT′,
+            :DST′ =>DST′,
+            :FST => FST,
+            :FST′ => FST′,
+            :FIS => FIS,
+            :DEST => DEST
+        )
+    else
+        Het_obs = mean(n_df.Het_obs)
+        HS = mean(n_df.HS)
+        Ht = mean(Ht)
+        DST = mean(DST)
+        DST′ = mean(DST′)
+        HT′ = mean(HT′)
+
+        DataFrame(
+        :Het_obs => Het_obs,
+        :HS => HS,
+        :HT => Ht,
+        :DST => DST,
+        :HT′ => HT′,
+        :DST′ => DST′,
+        :FST => DST / Ht,
+        :FST′ => DST′ / HT′,
+        :FIS => 1 - (Het_obs / HS),
+        :DEST => DST′ / (1 - HS)
         )
     end
 end

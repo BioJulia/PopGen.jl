@@ -98,7 +98,7 @@ end
 const csv = delimited
 
 """
-    popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
+    delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
 Write PopData to a text-delimited file.
 ### Keyword Arguments
 - `filename`: a `String` of the output filename
@@ -113,12 +113,12 @@ Write PopData to a text-delimited file.
 
 ### Example
 ```julia
-cats = nancycats();
+cats = @nancycats;
 fewer_cats = omit(cats, name = samples(cats)[1:10]);
-popdata2delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
+delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
 ```
 """
-function popdata2delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
+function delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
     # create empty String column
     unphased_df = insertcols!(copy(data.loci), :string_geno => fill("", length(data.loci.name)))
     # grouping to facilitate pulling out ploidy values for coding missing genotypes

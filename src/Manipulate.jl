@@ -1,6 +1,6 @@
 export add_meta!, locations, locations!, loci, genotypes, get_genotypes, get_genotype, populations, population, populations!, population!, exclude, remove, omit, exclude!, remove!, omit!, samples
 
-#TODO add to docs (API and manipulate)
+
 """
     add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Metadata 
@@ -33,7 +33,7 @@ function add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = tru
     return
 end
 
-#TODO add to docs (API and manipulate)
+
 """
     add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Takes a vector of
@@ -93,7 +93,7 @@ Takes **decimal degrees** as a `Vector` of any `AbstractFloat`.
 - Missing data should be coded as `missing` values of type `Missing` (can be accomplished with `replace!()`)
 ### Example
 ```
-ncats = nancycats() ;
+ncats = @nancycats ;
 x = rand(237) ; y = rand(237)
 locations!(ncats, long = x, lat = y)
 ```
@@ -139,7 +139,7 @@ and use these as inputs into `locations!`
 
 ### Example
 ```
-ncats = nancycats();
+ncats = @nancycats;
 x = fill("11 22.33W", 237) ; y = fill("-41 31.52", 237)
 locations!(ncats, long = x, lat = y)
 ```
@@ -181,7 +181,7 @@ end
 Return the genotype of one sample at one locus in a `PopData` object.
 ### Example
 ```
-cats = nancycats();
+cats = @nancycats;
 get_genotype(cats, sample = "N115", locus = "fca8")
 ```
 """
@@ -195,7 +195,7 @@ end
 Return a vector of all the genotypes of a sample in a `PopData` object. To return a
 single genotype at a locus, see `get_genotype`.
 ```
-cats = nancycats()
+cats = @nancycats
 get_genotypes(cats, "N115")
 ```
 """
@@ -203,28 +203,27 @@ function get_genotypes(data::PopObj, sample::String)
     data.loci[data.loci.name .== sample, :genotype]
 end
 
-#TODO rename kwarg to `name`
 """
-    get_genotypes(data::PopObj; sample::Union{String, Vector{String}}, loci::Union{String, Vector{String}})
+    get_genotypes(data::PopObj; name::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
 Return a table of the genotype(s) of one or more `samples` for one or more
 specific `loci` (both as keywords) in a `PopData` object.
 ### Examples
 ```
-cats = nancycats();
-get_genotypes(cats, sample = "N115" , locus = "fca8")
-get_genotypes(cats, sample = ["N115", "N7"] , locus = "fca8")
-get_genotypes(cats, sample = "N115" , locus = ["fca8", "fca37"])
-get_genotypes(cats, sample = ["N1", "N2"] , locus = ["fca8", "fca37"])
+cats = @nancycats;
+get_genotypes(cats, name = "N115" , locus = "fca8")
+get_genotypes(cats, name = ["N115", "N7"] , locus = "fca8")
+get_genotypes(cats, name = "N115" , locus = ["fca8", "fca37"])
+get_genotypes(cats, name = ["N1", "N2"] , locus = ["fca8", "fca37"])
 ```
 """
-function get_genotypes(data::PopData; sample::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
-    if typeof(sample) == String
-        sample = [sample]
+function get_genotypes(data::PopData; name::Union{String, Vector{String}}, locus::Union{String, Vector{String}})
+    if typeof(name) == String
+        name = [name]
     end
     if typeof(locus) == String
         locus = [locus]
     end
-    @view data.loci[(data.loci.name .∈ Ref(sample)) .& (data.loci.locus .∈ Ref(locus)), :] 
+    @view data.loci[(data.loci.name .∈ Ref(name)) .& (data.loci.locus .∈ Ref(locus)), :] 
 end
 
 
@@ -234,7 +233,7 @@ Convenience wrapper to return a vector of all the genotypes of a single locus
 
 ### Example
 ```
-genotypes(gulfsharks(), "contig_475")
+genotypes(@gulfsharks, "contig_475")
 ```
 """
 function genotypes(data::PopData, locus::String)
@@ -354,7 +353,7 @@ The keywords `names`, `sample`, and `samples` also work.
 
 **Examples**
 ```
-cats = nancycats();
+cats = @nancycats;
 exclude!(cats, name = "N100", population = ["1", "15"])
 exclude!(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
 exclude!(cats, names = "N102", loci = "fca8", population = "3")
@@ -472,7 +471,7 @@ The keywords `names`, `sample`, and `samples` also work.
 
 **Examples**
 ```
-cats = nancycats();
+cats = @nancycats;
 exclude(cats, name = "N100", population = ["1", "15"])
 exclude(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
 exclude(cats, names = "N102", loci = "fca8", population = "3")

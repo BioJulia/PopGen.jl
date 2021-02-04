@@ -131,16 +131,10 @@ function genepop(
         :locus => (i -> PooledArray(Array(i))) => :locus, 
         :genotype
     )
-    #categorical!(geno_parse, [:name, :population, :locus], compress = true)
-    geno_parse.genotype = map(i -> phase.(i, geno_type, digits), geno_parse.genotype)
-    
-    ploidy = DataFrames.combine(
-        groupby(dropmissing(geno_parse), :name),
-        :genotype => find_ploidy => :ploidy
-    ).ploidy
 
-    # Add the ploidy info to the meta df
-    insertcols!(sample_table, 3, :ploidy => ploidy)
+    geno_parse.genotype = map(i -> phase.(i, geno_type, digits), geno_parse.genotype)
+    sample_table = generate_meta(geno_parse)
+
     if allow_monomorphic 
         pd_out = PopData(sample_table, geno_parse)
     else
@@ -150,7 +144,7 @@ function genepop(
 end
 
 """
-    popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
+    genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
 Writes a `PopData` object to a Genepop-formatted file.
 - `data`: the `PopData` object you wish to convert to a Genepop file
 ### keyword arguments
@@ -165,12 +159,12 @@ Writes a `PopData` object to a Genepop-formatted file.
     - `-9` : As a single value `-9`
 
 ```julia
-cats = nancycats();
+cats = @nancycats;
 fewer_cats = omit(cats, name = samples(cats)[1:10]);
-popdata2genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
+genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
 """
-function popdata2genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
+function genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
     open(filename, "w") do outfile
         println(outfile, "genepop generated from PopData by PopGen.jl")
         if format in ["h", "horizontal"]

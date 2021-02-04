@@ -1,3 +1,5 @@
+export relatedness_posthoc
+
 function sig_within(data::PopData, results::DataFrame, population::String, iterations::Int = 20000)
     # add extra columns of population names
     pop_names = select(data.meta, :name => :sample_1 ,:population => :pop_1)
@@ -37,7 +39,7 @@ function sig_within(data::PopData, results::DataFrame, population::String, itera
         @sync @inbounds for j in 1:n_iter
             Base.Threads.@spawn begin
                 iter_count += 1
-                idx_within = sample(1:n_tot, n_within, replace = false)
+                idx_within = sample(Xoroshiro128Star(), 1:n_tot, n_within, replace = false)
                 idx_among = n_range[Not(idx_within)]
                 
                 mu_within = mean(results[:, est][idx_within])
@@ -54,6 +56,47 @@ function sig_within(data::PopData, results::DataFrame, population::String, itera
     #(sum(differ .<= bootstrapped) + 1) / (iterations)
 end
 
+
+"""
+    relatedness_posthoc(::PopData, results::DataFrame; iterations::Int)
+
+Performs a posthoc analysis using the resulting DataFrame or NamedTuple
+from relatedness(). This analysis uses permutations to test if a population has
+significantly higher within-population relatedess than between-population relatedness.
+The `results` object must have been generated from the provided `PopData`. Use `iterations = `
+to specify the number of iterations for the permutation tests (default = `20000`). **Recommended**
+that you use `MultipleTesting.jl` to correct resulting P-values.
+
+**Example**
+```
+julia> cats = @nancycats ;
+
+julia> rel_out = relatedness(cats, method = [Ritland, Moran], iterations = 100);
+
+julia> relatedness_posthoc(cats, rel_out)
+17x3 DataFrame
+ Row │ population  Ritland_P  Moran_P
+     │ String      Float64    Float64
+─────┼────────────────────────────────
+   1 │ 1              5.0e-5   5.0e-5
+   2 │ 2              5.0e-5   5.0e-5
+   3 │ 3              5.0e-5   5.0e-5
+   4 │ 4              5.0e-5   5.0e-5
+   5 │ 5              5.0e-5   5.0e-5
+   6 │ 6              5.0e-5   5.0e-5
+   7 │ 7              5.0e-5   5.0e-5
+   8 │ 8              5.0e-5   5.0e-5
+   9 │ 9              5.0e-5   5.0e-5
+  10 │ 10             5.0e-5   5.0e-5
+  11 │ 11             5.0e-5   5.0e-5
+  12 │ 12             5.0e-5   5.0e-5
+  13 │ 13             5.0e-5   5.0e-5
+  14 │ 14             5.0e-5   5.0e-5
+  15 │ 15             5.0e-5   5.0e-5
+  16 │ 16             5.0e-5   5.0e-5
+  17 │ 17             5.0e-5   5.0e-5
+```
+"""
 function relatedness_posthoc(data::PopData, results::DataFrame; iterations::Int = 20000)
     all_pops = unique(data.meta.population)
     estimators = Symbol.(names(results)[names(results) .∉ Ref(["sample_1", "sample_2", "n_loci"])] .* "_P")
@@ -67,7 +110,7 @@ end
 
 function relatedness_posthoc(data::PopData, results::NamedTuple; iterations::Int = 20000)
     estimators = keys(results)
-    coeffs = [getindex(results[i], estimators[i]) for i in 1:length(estimators)]
+    coeffs = [results[i][:, estimators[i]] for i in 1:length(estimators)]
     df = select(results[1], "sample_1", "sample_2", "n_loci")
     [df[:, estimators[i]] = coeffs[i] for i in 1:length(estimators)]
     relatedness_posthoc(data, df, iterations = iterations)

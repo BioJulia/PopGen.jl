@@ -32,7 +32,7 @@ of the relatedness estimate given by method `method`. This is an internal functi
     @sync for iter in 1:iterations
         Base.Threads.@spawn begin
             # bootstrap the indices
-            boot_idx = rand(1:n_loc, n_loc)
+            boot_idx = rand(Xoroshiro128Star(), 1:n_loc, n_loc)
             # sample the source vectors with the resampled/bootstrapped indices
             ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
             # get index for genotype appearing missing in at least one individual in the pair
@@ -56,7 +56,7 @@ of the relatedness estimate given by method `method`. This is an internal functi
     @sync for iter in 1:iterations
         Base.Threads.@spawn begin
             # bootstrap the indices
-            boot_idx = rand(1:n_loc, n_loc)
+            boot_idx = rand(Xoroshiro128Star(), 1:n_loc, n_loc)
             # sample the source vectors with the resampled/bootstrapped indices
             ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
             # faster/cheaper n counting
@@ -240,7 +240,7 @@ end
 
 ```
 # to compare specific samples
-relatedness(::PopData, samples; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
+relatedness(::PopData, samples::Vector{String}; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
 ```
 Return a dataframe of pairwise relatedness estimates for all or select pairs of `samples` in a `PopData` object using 
 method(s) `F` where `F` is one or several of the methods listed below. If no bootstrapping is required, then the only 
@@ -294,51 +294,55 @@ There are two available resampling methods, `"all"` (default  & recommended) and
 
 **Examples**
 ```
-julia> cats = nancycats();
+julia> cats = @nancycats;
 
 julia> relatedness(cats, method = Ritland)
 27966×4 DataFrame
-│ Row   │ sample_1 │ sample_2 │ n_loci │ Ritland    │
-│       │ String   │ String   │ Int64  │ Float64?   │
-├───────┼──────────┼──────────┼────────┼────────────┤
-│ 1     │ N215     │ N216     │ 8      │ 0.258824   │
-│ 2     │ N215     │ N217     │ 8      │ 0.193238   │
-│ 3     │ N215     │ N218     │ 8      │ 0.127497   │
-⋮
-│ 27964 │ N281     │ N289     │ 8      │ 0.0892068  │
-│ 27965 │ N281     │ N290     │ 7      │ 0.104614   │
-│ 27966 │ N289     │ N290     │ 7      │ 0.0511663  │
+   Row │ sample_1  sample_2  n_loci  Ritland     
+       │ String    String    Int64   Float64?    
+───────┼─────────────────────────────────────────
+     1 │ N215      N216           8   0.258824
+     2 │ N215      N217           8   0.193238
+     3 │ N215      N218           8   0.127497
+     4 │ N215      N219           8   0.0453471
+   ⋮   │    ⋮         ⋮        ⋮          ⋮
+ 27963 │ N297      N290           7   0.189647
+ 27964 │ N281      N289           8   0.0892068
+ 27965 │ N281      N290           7   0.104614
+ 27966 │ N289      N290           7   0.0511663
+                               27958 rows omitted
 
-julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
+julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Loiselle])
 3×5 DataFrame
-│ Row │ sample_1 │ sample_2 │ n_loci │ Ritland    │ Wang      │
-│     │ String   │ String   │ Int64  │ Float64?   │ Float64?  │
-├─────┼──────────┼──────────┼────────┼────────────┼───────────┤
-│ 1   │ N7       │ N111     │ 9      │ -0.129432  │ -0.395806 │
-│ 2   │ N7       │ N115     │ 9      │ -0.0183925 │ 0.0024775 │
-│ 3   │ N111     │ N115     │ 9      │ 0.0240152  │ 0.183966  │
+ Row │ sample_1  sample_2  n_loci  Ritland     Loiselle   
+     │ String    String    Int64   Float64?    Float64?   
+─────┼────────────────────────────────────────────────────
+   1 │ N7        N111           9  -0.129432   -0.101618
+   2 │ N7        N115           9  -0.0183925  -0.0428898
+   3 │ N111      N115           9   0.0240152   0.13681
 
 julia> rel_out = relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975));
 
 julia> rel_out.Loiselle
-3×8 DataFrame. Omitted printing of 2 columns
-│ Row │ sample_1 │ sample_2 │ n_loci │ Loiselle   │ Loiselle_mean │ Loiselle_median │
-│     │ String   │ String   │ Int64  │ Float64?   │ Float64?      │ Float64?        │
-├─────┼──────────┼──────────┼────────┼────────────┼───────────────┼─────────────────┤
-│ 1   │ N7       │ N111     │ 9      │ -0.101618  │ 0.0258023     │ 0.0305877       │
-│ 2   │ N7       │ N115     │ 9      │ -0.0428898 │ 0.0592551     │ 0.0634846       │
-│ 3   │ N111     │ N115     │ 9      │ 0.13681    │ 0.258741      │ 0.255247        │
+3×8 DataFrame
+ Row │ sample_1  sample_2  n_loci  Loiselle    Loiselle_mean  Loiselle_median  Loiselle_SE  Loiselle_CI_95
+     │ String    String    Int64   Float64?    Float64?       Float64?         Float64?     Tuple…?
+─────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │ N7        N111           9  -0.101618       0.0164593        0.0168983    0.0511942  (-0.0670707, 0.104008)
+   2 │ N7        N115           9  -0.0428898      0.0771664        0.0880589    0.0982462  (-0.0428068, 0.183625)
+   3 │ N111      N115           9   0.13681        0.255124         0.24991      0.267319   (0.103864, 0.421979)
 
 # merge results into one big dataframe
 
 julia> merge_relatedness(rel_out)
-3×13 DataFrame. Omitted printing of 7 columns
-│ Row │ sample_1 │ sample_2 │ n_loci │ Loiselle   │ Loiselle_mean │ Loiselle_median │
-│     │ String   │ String   │ Int64  │ Float64?   │ Float64?      │ Float64?        │
-├─────┼──────────┼──────────┼────────┼────────────┼───────────────┼─────────────────┤
-│ 1   │ N7       │ N111     │ 9      │ -0.101618  │ 0.0141364     │ 0.00703954      │
-│ 2   │ N7       │ N115     │ 9      │ -0.0428898 │ 0.0743497     │ 0.0798708       │
-│ 3   │ N111     │ N115     │ 9      │ 0.13681    │ 0.266043      │ 0.257748        │
+3×13 DataFrame
+ Row │ sample_1  sample_2  n_loci  Loiselle    Loiselle_mean  Loiselle_ ⋯ 
+     │ String    String    Int64   Float64?    Float64?       Float64?  ⋯
+─────┼───────────────────────────────────────────────────────────────────
+   1 │ N7        N111           9  -0.101618       0.0164593        0.0 ⋯
+   2 │ N7        N115           9  -0.0428898      0.0771664        0.0  
+   3 │ N111      N115           9   0.13681        0.255124         0.2  
+                                                        8 columns omitted
 ```
 """
 function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F

@@ -14,8 +14,8 @@ gsharks = dataset("sharks")
 ```
 """
 function dataset(name::String)
-    lowercase(name) in ["gulfsharks", "sharks"] && return gulfsharks()
-    lowercase(name) in ["nancycats", "cats"] && return nancycats()
+    lowercase(name) in ["gulfsharks", "sharks"] && return PopGen._gulfsharks()
+    lowercase(name) in ["nancycats", "cats"] && return PopGen._nancycats()
 end
 
 """
@@ -35,9 +35,14 @@ function nancycats()
     load(filename, "nancycats")
 end
 
+function _nancycats()
+    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
+    load(filename, "nancycats")
+end
+
 macro nancycats()
     return esc(quote
-       nancycats()
+       PopGen._nancycats()
     end)
 end
 
@@ -60,8 +65,13 @@ function gulfsharks()
     load(filename, "gulfsharks")
 end
 
+function _gulfsharks()
+    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
+    load(filename, "gulfsharks")
+end
+
 macro gulfsharks()
     return esc(quote
-       gulfsharks()
+       PopGen._gulfsharks()
     end)
 end

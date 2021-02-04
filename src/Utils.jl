@@ -15,21 +15,32 @@ function adjacency_matrix(data::PopData)
     return out_vec
 end
 
-#TODO change location in API docs and rename allele_pool
+#TODO change location in API docs and rename allele_pool?
 #TODO replace alleles with universal Symbol type?
 """
-    alleles(locus::T; miss::Bool = false) where T<:GenoArray
-Return an array of all the non-missing alleles of a locus. Use
-`miss = true` to include missing values.
+    alleles(locus::T) where T<:GenoArray
+Return an array of all the non-missing alleles of a locus.
 """
-@inline function alleles(locus::T; miss::Bool = false) where T<:GenoArray
+@inline function alleles(locus::T) where T<:GenoArray
     if all(ismissing.(locus))
         return Vector{Union{Missing, eltype(locus).b.types[1]}}(undef, length(locus))
     end
     alle_out = Base.Iterators.flatten(skipmissing(locus)) |> collect
-    alle_out = Vector{Union{Missing, eltype(alle_out)}}(alle_out)
+end
+
+"""
+    alleles(locus::T, miss::Bool = false) where T<:GenoArray
+Return an array of all the non-missing alleles of a locus. Use the second positional
+argument as `true` to include missing values.
+"""
+@inline function alleles(locus::T, miss::Bool) where T<:GenoArray
+    int_type = eltype(locus).b.types[1]
+    if all(ismissing.(locus))
+        return Vector{Union{Missing, int_type}}(undef, length(locus))
+    end
+    alle_out = Vector{Union{Missing, int_type}}(Base.Iterators.flatten(skipmissing(locus)) |> collect)
     if miss == true
-        append!(alle_out, locus[locus.=== missing])
+        append!(alle_out, locus[locus .=== missing])
     end
     return alle_out
 end
@@ -141,7 +152,7 @@ Return a wide `DataFrame` of samples as columns, ommitting population informatio
 
 **Example**
 ```
-julia> loci_dataframe(nancycats())
+julia> loci_dataframe(@nancycats)
 9×237 DataFrame. Omitted printing of 232 columns
 │ Row │ N215       │ N216       │ N217       │ N218       │ N219       │
 │     │ Tuple…?    │ Tuple…?    │ Tuple…?    │ Tuple…?    │ Tuple…?    │
@@ -170,7 +181,7 @@ Rows are samples and columns are loci. Will return an error if ploidy varies bet
 
 **Example**
 ```
-julia> loci_matrix(nancycats())
+julia> loci_matrix(@nancycats)
 237×9 Array{Union{Missing, Tuple{Int16,Int16}},2}:
  missing     (136, 146)  (139, 139)  …  (199, 199)  (113, 113)  (208, 208)
  missing     (146, 146)  (139, 145)     (185, 199)  (113, 113)  (208, 208)
@@ -311,7 +322,7 @@ Rows are samples and columns are loci. Will return an error if ploidy varies bet
 
 **Example**
 ```
-julia> mtx = phase(nancycats())
+julia> mtx = phase(@nancycats)
 2-element Array{Array{Union{Missing, Int16},2},1}:
  [missing 136 … 113 208; missing 146 … 113 208; … ; 137 130 … 113 208; 135 130 … missing 208]
  [missing 146 … 113 208; missing 146 … 113 208; … ; 143 136 … 117 208; 141 146 … missing 208]
@@ -368,7 +379,7 @@ function quickstart()
     printstyled("\nLoad in data\n\n", color = :magenta)
     println("- read_from(filename; kwargs...)")
     println("- genepop(infile; kwargs...)  or similar file-specific importer")
-    println("- use available gulfsharks() or nancycats() datasets")
+    println("- use available @gulfsharks or @nancycats datasets")
 
     printstyled("\nExplore PopData\n\n", color = :blue)
     println("- populations(PopData) to view population information")
@@ -437,7 +448,7 @@ Use `strict_shuffle!` to edit in-place instead of returning a copy.
 @inline function strict_shuffle(x::T) where T <: AbstractArray
     # get indices of where original missing are
     miss_idx = findall(i -> i === missing, x)
-    out_vec = shuffle(x[.!ismissing.(x)])
+    out_vec = shuffle(Xoroshiro128Star(), x[.!ismissing.(x)])
 
     insert!.(Ref(out_vec), miss_idx, missing)
     return out_vec
@@ -450,7 +461,7 @@ Shuffle only the non-missing values of a Vector, keeping the
 to return a copy instead of editing in-place.
 """
 function strict_shuffle!(x::T) where T <: AbstractArray
-    @inbounds shuffle!(@view x[.!ismissing.(x)])
+    @inbounds shuffle!(Xoroshiro128Star(), @view x[.!ismissing.(x)])
     return x
 end
 
@@ -509,4 +520,52 @@ function motivational_quote()
     "\"Always remember that you are unique – just like everybody else.\" Unknown"
     ]
     return quotes[rand(1:length(quotes))]
+end
+
+#TODO add to docs API
+"""
+    generate_meta(data::DataFrame)
+Given a genotype DataFrame formatted like `PopData.loci`, generates a corresponding
+`meta` DataFrame. In other words, it creates the `.meta` part of `PopData` from the `.loci` part.
+
+**Example**:
+```
+julia> cats = @nancycats ;
+
+julia> cats_nometa = cats.loci ;
+
+julia> cats_meta = generate_meta(cats_nometa)
+237×5 DataFrame
+ Row │ name    population  ploidy  longitude  latitude 
+     │ String  String      Int8    Float32?   Float32? 
+─────┼─────────────────────────────────────────────────
+   1 │ N215    1                2   missing   missing  
+   2 │ N216    1                2   missing   missing  
+   3 │ N217    1                2   missing   missing  
+   4 │ N218    1                2   missing   missing  
+   5 │ N219    1                2   missing   missing  
+   6 │ N220    1                2   missing   missing  
+   7 │ N221    1                2   missing   missing  
+  ⋮  │   ⋮         ⋮         ⋮         ⋮         ⋮
+ 232 │ N295    17               2   missing   missing  
+ 233 │ N296    17               2   missing   missing  
+ 234 │ N297    17               2   missing   missing  
+ 235 │ N281    17               2   missing   missing  
+ 236 │ N289    17               2   missing   missing  
+ 237 │ N290    17               2   missing   missing  
+                                       224 rows omitted
+```
+"""
+function generate_meta(data::DataFrame)
+    grp = groupby(data, :name)
+    nms = map(z -> z.name, keys(grp))
+    pops = map(z -> first(z.population), grp)
+    ploids = map(z -> find_ploidy(z.genotype), grp)
+    DataFrame(
+        :name => nms,
+        :population => pops,
+        :ploidy => ploids,
+        :longitude => Vector{Union{Missing, Float32}}(undef, (length(nms))),
+        :latitude => Vector{Union{Missing, Float32}}(undef, (length(nms)))
+    )
 end
