@@ -16,11 +16,11 @@ julia> using PopGen
 julia> sharks = @gulfsharks ;
 ```
 
-### [Accessing Elements](accessing)
-
-### [Viewing Data](viewdata)
-
-### [Sample and Locus Exclusion/Removal](exclusion)
-
-### [Location and Population Information](populations)
+## Topics
+#### [Accessing Elements](accessing)
+#### [Adding Information](add_info)
+#### [Data Exclusion](exclusion)
+#### [Location and Population Data](populations)
+#### [Viewing Data](viewdata)
+#### [Data Exploration](dataexploration)
 
