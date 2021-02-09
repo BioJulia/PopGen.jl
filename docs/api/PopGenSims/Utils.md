@@ -102,7 +102,7 @@ an individual with a given `ploidy`. Returns a Vector of genotypes.
 ```
 julia> cats = @nancycats ;
 julia> loc, alleles = allele_pool(cats) ;
-julia> simulate_parent(alleles, loc, ploidy = 2)
+julia> simulate_sample(alleles, loc, ploidy = 2)
 9-element Array{Array{Int16,1},1}:
  [139, 129]
  [146, 146]
