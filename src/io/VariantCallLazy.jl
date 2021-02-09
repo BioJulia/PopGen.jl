@@ -4,15 +4,13 @@ export bcf, vcf
 
 """
     openvcf(::String)
-Open VCF file (`.vcf/.gz`, or `.bcf/.gz`) and return an `IO` stream in reading mode `"r"`.
+Open VCF file (`.vcf(.gz)`, or `.bcf(.gz)`) and return an `IO` stream in reading mode `"r"`.
 """
 function openvcf(infile::String)
-    if endswith(infile, ".vcf") || endswith(infile, ".bcf")
-        return open(infile, "r")
-    elseif endswith(infile, ".gz")
+    if endswith(infile, ".gz")
         throw(ArgumentError("Please load in GZip.jl with \`using GZip\`"))
     else
-        throw(ArgumentError("The filename must end with .vcf or .bcf"))
+        return open(infile, "r")
     end
 end
 
