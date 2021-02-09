@@ -39,7 +39,7 @@ Files must follow standard Genepop formatting:
 - First line is a comment (and skipped)
 - Loci are listed after first line as one-per-line without commas or in single comma-separated row
 - A line with a particular and consistent keyword must delimit populations
-- **Must** be the same word each time and not a unique population name
+  - **must** be the same word each time and not a unique population name
 - File is **tab** delimited or **space** delimited, but not both
 
 <Tabs
@@ -99,11 +99,11 @@ Writes a `PopData` object to a Genepop-formatted file.
 ### Keyword arguments
 - `filename`: a `String` of the output filename
 - `digits` : an `Integer` indicating how many digits to format each allele
-  -  e.g. `(1, 2)` => `001002` for `digits = 3`
+  -  e.g. `digits = 3` will turn `(1, 2)` into `001002` 
 - `format` : a `String` indicating whether loci should be formatted 
   - vertically (`"v"` or `"vertical"`)
   - hortizontally (`"h"`, or `"horizontal"`)
-  - Genepop Isolation-By-Distance (`"ibd"`) where each sample is a population with long/lat data prepended
+  - isolation-by-distance (`"ibd"`) where each sample is a population with coordinate data prepended
 - `miss` : an `Integer` for how you would like missing values written 
   - `0` : As a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 
   - `-9` : As a single value `-9`
