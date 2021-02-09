@@ -62,7 +62,6 @@ module.exports = {
       "api/types",
       "api/utils",
       "api/variantcall",
-      "api/variantcallgz"
     ]
   }
 }
