@@ -13,9 +13,9 @@ bcf(infile::String; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
 PopGen.jl provides the commands `vcf` and `bcf` to import a variant call format files into `PopData`. The reader also accepts files that are gzipped. 
 
 :::note Lazy Loading
-The packages required to import BCF/VCF files (`GeneticVariation.jl` and `GZip.jl`) are lazy-loaded. If you have not-gzipped variant call files, then
+The packages required to import BCF/VCF files (`GeneticVariation.jl` and `GZip.jl`) are lazy-loaded and not included as dependencies within PopGen.jl, so you will need to install them manually with (`]add GeneticVariation GZip`). If you have not-gzipped variant call files, then
 you'll need to call `using GeneticVariation` before `bcf` and `vcf` become available to use. If your files are compressed, then you'll need to call
-`usig GZip` too. 
+`using GZip` too.
 :::
 
 
