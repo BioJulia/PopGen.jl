@@ -411,6 +411,23 @@ function reciprocal(num::T) where T <: Real
     !iszero(num) ? 1.0/float(num) : 0.0
 end
 
+#TODO add to API/utils.jl
+"""
+    safemean(::AbstractVector{T}) where T<:Real
+A wrapper for StatsBase.mean to calculate a mean after skipping `Inf`, `-Inf`, and `NaN` values.
+"""
+function safemean(x::AbstractVector{T}) where T<:Real
+    y = x
+    if any(isinf.(x))
+        y =  x[.!isinf.(x)]
+    end
+    if any(isnan.(x))
+        y = y[.!isnan.(y)]
+    end
+    mean(y)
+end
+
+
 """
     sim_pairs(data::Vector{String})
 Takes a Vector of sample names and returns a Tuple of sample pairs, grouped by simulation

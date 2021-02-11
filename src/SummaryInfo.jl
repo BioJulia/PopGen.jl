@@ -138,11 +138,11 @@ function Base.summary(data::PopData; by::String = "global")
         )
     elseif lowercase(by) == "global"
         Het_obs = mean(n_df.Het_obs)
-        HS = mean(n_df.HS)
-        Ht = mean(Ht)
-        DST = mean(DST)
-        DST′ = mean(DST′)
-        HT′ = mean(HT′)
+        HS = safemean(n_df.HS)
+        Ht = safemean(Ht)
+        DST = safemean(DST)
+        DST′ = safemean(DST′)
+        HT′ = safemean(HT′)
 
         DataFrame(
         :Het_obs => round.(Het_obs, digits = 4),
