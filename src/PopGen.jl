@@ -78,6 +78,8 @@ include("Manipulate.jl")
 include("SummaryInfo.jl")
 #Analyses
 include("HardyWeinberg.jl")
+#TODO uncomment when ready
+#include("FStats.jl")
 include("Relatedness/PairwiseRelatedness.jl")
 include("Relatedness/RelatednessMoments.jl")
 include("Relatedness/RelatednessPostHocs.jl")
