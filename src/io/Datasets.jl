@@ -29,21 +29,16 @@ Example:
 ncats = @nancycats
 ```
 """
-function nancycats()
-    @warn "This method is deprecated, please use @nancycats instead"  * "\nnancycats() will be removed in the next release"
-    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
-    load(filename, "nancycats")
-end
-
-function _nancycats()
-    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
-    load(filename, "nancycats")
-end
-
 macro nancycats()
     return esc(quote
        PopGen._nancycats()
     end)
+end
+
+
+function _nancycats()
+    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
+    load(filename, "nancycats")
 end
 
 
@@ -59,19 +54,13 @@ Example:
 sharks = @gulfsharks
 ```
 """
-function gulfsharks()
-    @warn "This method is deprecated, please use @gulfsharks instead" * "\ngulfsharks() will be removed in the next release"
-    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
-    load(filename, "gulfsharks")
+macro gulfsharks()
+    return esc(quote
+       PopGen._gulfsharks()
+    end)
 end
 
 function _gulfsharks()
     filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
     load(filename, "gulfsharks")
-end
-
-macro gulfsharks()
-    return esc(quote
-       PopGen._gulfsharks()
-    end)
 end
