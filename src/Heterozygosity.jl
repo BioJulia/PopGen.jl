@@ -11,7 +11,7 @@ it is, `false` if it isn't, and `missing` if it's `missing`. The vector version
 simply broadcasts the function over the elements.
 """
 @inline function ishom(locus::Genotype)
-    # if allele 1 equels all others, return true
+    # if allele 1 equals all others, return true
     return all(@inbounds locus[1] .== locus)
 end
 
@@ -64,11 +64,7 @@ Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
 use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 """
 @inline function gene_diversity_nei87(het_exp::T, het_obs::T, n::Union{Integer,T}; corr::Bool = true) where T<: AbstractFloat
-    if corr == true
-        corr_val = n/(n-1.0)
-    else
-        corr_val = 1.0
-    end
+    corr_val = corr ? n/(n-1.0) : 1.0
     return @fastmath (het_exp - (het_obs/n/2.0)) * corr_val
 end
 
