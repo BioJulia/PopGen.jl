@@ -132,9 +132,10 @@ end
 
 
 #TODO add to docs (API)
+#TODO swtich order of args do it's data, allele?
 """
     allele_freq(allele::Int, genos::GenoArray)
-Return the frequency of a specific `allele` from a vector of `genotypes`
+Return the frequency of a specific `allele` from a vector of `genotypes`.
 
 ### Example
 ```
