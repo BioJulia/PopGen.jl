@@ -35,7 +35,6 @@ function FST_global(data::AbstractDataFrame)
         :n => count_nonzeros => :count,
         :n => (n -> count_nonzeros(n) / reciprocal_sum(n)) => :mn,
         [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e, o, count_nonzeros(n) / reciprocal_sum(n))))) => :HS,
-        #[:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e, o, count_nonzeros(n) / sum(reciprocal.(n)))))) => :HS,
         :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
         :alleles => (alleles ->  sum(values(avg_allele_freq(alleles, 2))))=> :avg_freq
         )
