@@ -6,7 +6,7 @@ Returns a NamedTuple of the average number of alleles ('mean') and
 standard deviation (`stdev`) of a `PopData`. Use `rounding = false` to
 not round results. Default (`true`) rounds to 4 digits.
 """
-function allele_avg(data::PopData; rounding::Bool = true, population = false)
+function allele_avg(data::PopData; rounding::Bool = true)
     tmp = richness(data)
     if rounding
         (mean = round(mean(tmp.richness), digits = 4), stdev = round(variation(tmp.richness), digits = 4))
