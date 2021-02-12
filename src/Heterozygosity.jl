@@ -63,11 +63,11 @@ Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
 (Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press).
 use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 """
-@inline function gene_diversity_nei87(het_exp::AbstractFloat, het_obs::AbstractFloat, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+@inline function gene_diversity_nei87(het_exp::T, het_obs::T, n::Union{Integer,T}; corr::Bool = true) where T<: AbstractFloat
     if corr == true
-        corr_val = n/(n-1)
+        corr_val = n/(n-1.0)
     else
-        corr_val = 1
+        corr_val = 1.0
     end
     return @fastmath (het_exp - (het_obs/n/2.0)) * corr_val
 end

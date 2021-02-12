@@ -23,7 +23,8 @@ Return an array of all the non-missing alleles of a locus.
 """
 @inline function alleles(locus::T) where T<:GenoArray
     if all(ismissing.(locus))
-        return Vector{Union{Missing, eltype(locus).b.types[1]}}(undef, length(locus))
+        int_type = eltype(typeof(locus)) |> nonmissingtype |> eltype
+        return Vector{Union{Missing, int_type}}(undef, length(locus))
     end
     alle_out = Base.Iterators.flatten(skipmissing(locus)) |> collect
 end
@@ -34,7 +35,7 @@ Return an array of all the non-missing alleles of a locus. Use the second positi
 argument as `true` to include missing values.
 """
 @inline function alleles(locus::T, miss::Bool) where T<:GenoArray
-    int_type = eltype(locus).b.types[1]
+    int_type = eltype(typeof(locus)) |> nonmissingtype |> eltype
     if all(ismissing.(locus))
         return Vector{Union{Missing, int_type}}(undef, length(locus))
     end
@@ -88,7 +89,7 @@ function convert_coord(coordinate::String)
     if length(split_coord) == 3
         split_coord[3] /=3600.0
     end
-    conv = sum(abs.(split_coord))
+    conv = mapreduce(abs, +, split_coord)
     # N + E are positive | S + W are negative
     if split_coord[1] < 0 || occursin(r"[SW]", uppercase(coordinate))
         # negative
@@ -102,6 +103,16 @@ end
 function Base.copy(data::PopData)
     PopData(copy.([data.meta,data.loci])...)
 end
+
+#TODO add to docs/API
+"""
+    count_nonzeros(x::AbstractVector{T}) where T<:Real
+Return the number of non-zero values in a vector
+"""
+function count_nonzeros(x::AbstractVector{T}) where T<:Real
+    mapreduce(!iszero, +, x)
+end
+
 
 """
     drop_monomorphic(data::PopData)
@@ -267,8 +278,9 @@ Convenience function to count the number of non-`missing` values
 in a vector.
 """
 @inline function nonmissing(vec::T) where T<:AbstractArray
-    count(!ismissing, vec)
+    mapreduce(!ismissing, +, vec)
 end
+
 
 #TODO add to API docs
 """
@@ -409,6 +421,16 @@ the number is `0` instead of returning `Inf`.
 """
 function reciprocal(num::T) where T <: Real
     !iszero(num) ? 1.0/float(num) : 0.0
+end
+
+
+"""
+    reciprocal_sum(x::AbstractVector{T}) where T<:Real
+Return the sum of the reciprocal values of `x`, skipping the `Inf` values
+resulting from divide-by-zero errors.
+"""
+function reciprocal_sum(x::AbstractVector{T}) where T<:Real
+    mapreduce(reciprocal, +, x)
 end
 
 #TODO add to API/utils.jl
