@@ -29,6 +29,16 @@ Return an array of all the non-missing alleles of a locus.
     alle_out = Base.Iterators.flatten(skipmissing(locus)) |> collect
 end
 
+
+"""
+    allele_count(locus::T) where T<:GenoArray
+Return the number of unique alleles present at a locus.
+"""
+@inline function allele_count(locus::T) where T<:GenoArray
+    Base.Iterators.flatten(skipmissing(locus)) |> collect |> unique |> length
+end
+
+
 """
     alleles(locus::T, miss::Bool = false) where T<:GenoArray
 Return an array of all the non-missing alleles of a locus. Use the second positional
