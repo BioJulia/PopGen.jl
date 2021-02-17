@@ -24,6 +24,9 @@ end
     return @inbounds ishom.(locus)
 end
 
+@inline function ishom(locus::T) where T<:Base.SkipMissing
+    return @inbounds ishom.(locus)
+end
 
 """
 ```
@@ -45,6 +48,10 @@ end
 end
 
 @inline function ishet(locus::T) where T<:GenoArray
+    return @inbounds ishet.(locus)
+end
+
+@inline function ishet(locus::T) where T<:Base.SkipMissing
     return @inbounds ishet.(locus)
 end
 
