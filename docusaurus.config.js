@@ -6,10 +6,15 @@ module.exports = {
   url: 'https://pdimens.github.io',
   baseUrl: '/PopGen.jl/',
   favicon: 'img/favicon.ico',
-  organizationName: 'pdimens', // Usually your GitHub org/user name.
+  organizationName: 'BioJulia', // Usually your GitHub org/user name.
   projectName: 'PopGen.jl', // Usually your repo name.
   themeConfig: {
     hideableSidebar: true,
+    announcementBar: {
+      id: 'supportus',
+      content:
+        '🔵 Like PopGen.jl? Give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/BioJulia/PopGen.jl">GitHub!</a>! 🟣',
+    },
     prism: {
       //defaultLanguage: 'julia',
       additionalLanguages: ['julia', 'r'],
