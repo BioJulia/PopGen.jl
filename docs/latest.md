@@ -4,6 +4,9 @@ title: What's New
 sidebar_label: What's New
 ---
 
+## v0.4.5
+This release builds off of `0.4.3` and does a better job with the VCF loading logic. Along with that, `vcf` and `bcf` exist in the namespace before loading in `GeneticVariation.jl`, meaning you can always view the docstrings. These stripped-down methods in the namespace will give helpful errors to remind you to load in `GeneticVariation.jl` and/or `GZip.jl`.
+
 ## v0.4.3
 This release fixes and simplifies the under-the-hood `allele_freq`, `geno_freq`, and `geno_count_xxx` functions. The are faster now, and they infer types, making the output have expected type behavior. 
 
