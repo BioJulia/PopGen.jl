@@ -8,25 +8,36 @@ ishom(locus::Missing)
 ```
 A series of methods to test if a locus or loci are homozygous and return `true` if
 it is, `false` if it isn't, and `missing` if it's `missing`. The vector version
-simply broadcasts the function over the elements.
+simply maps the function over the elements.
 """
 @inline function ishom(locus::Genotype)
     # if allele 1 equals all others, return true
     return all(@inbounds locus[1] .== locus)
 end
 
-@inline function ishom(locus::Missing)
-    # if the locus is Missing, return missing. no muss no fuss
-    return missing
-end
+ishom(locus::Missing) = missing
 
 @inline function ishom(locus::T) where T<:GenoArray
-    return @inbounds ishom.(locus)
+    return @inbounds map(ishom, locus)
 end
 
 @inline function ishom(locus::T) where T<:Base.SkipMissing
-    return @inbounds ishom.(locus)
+    return @inbounds map(ishom, locus)
 end
+
+
+"""
+    ishom(locus::Genotype, allele::Signed)
+    ishom(loci::GenoArray, allele::Signed)
+Returns `true` if the `locus`/`loci` is/are homozygous for the specified `allele`.
+"""
+function ishom(geno::T, allele::U) where T<:Genotype where U<:Signed
+    ∈(allele, geno) & ishom(geno) ? true : false
+end
+
+ishom(geno::T, allele::U) where T<:GenoArray where U<:Signed = map(i -> ishom(i, allele), geno)
+
+ishom(geno::Missing, allele::U) where U<:Signed = missing
 
 """
 ```
@@ -42,18 +53,32 @@ elements. Under the hood, this function is simply `!ishom`.
     return !ishom(locus)
 end
 
-@inline function ishet(locus::Missing)
-    # if the locus is Missing, return missing. no muss no fuss
-    return missing
-end
+ishet(locus::Missing) = missing
+
 
 @inline function ishet(locus::T) where T<:GenoArray
-    return @inbounds ishet.(locus)
+    return @inbounds map(ishet, locus)
 end
 
+
+"""
+    ishet(locus::Genotype, allele::Signed)
+    ishet(loci::GenoArray, allele::Signed)
+Returns `true` if the `locus`/`loci` is/are heterozygous for the specified `allele`. 
+"""
 @inline function ishet(locus::T) where T<:Base.SkipMissing
-    return @inbounds ishet.(locus)
+    return @inbounds map(ishet, locus)
 end
+
+function ishet(geno::T, allele::U) where T<:Genotype where U<:Signed
+    ∈(allele, geno) & !ishom(geno) ? true : false
+end
+
+ishet(geno::T, allele::U) where T<:GenoArray where U<:Signed = map(i -> ishet(i, allele), geno)
+
+ishet(geno::Missing, allele::U) where U<:Signed = missing
+
+
 
 """
     gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)
