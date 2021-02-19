@@ -131,11 +131,7 @@ Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
 @inline function hetero_e(data::T) where T <: GenoArray
-    if all(ismissing.(data)) == true
-        return missing
-    else
-        1.0 - sum(@inbounds allele_freq_vec(data) .^ 2)
-    end
+    all(ismissing.(data)) == true ? missing : 1.0 - mapreduce(i -> i^2, + , allele_freq_vec(data))
 end
 
 
@@ -187,6 +183,8 @@ end
 
 const het = heterozygosity
 
+
+#NOTE this is not intended to be performant. It's a convenience function. 
 """
     het_sample(data::PopData, individual::String)
 Calculate the observed heterozygosity for an individual in a `PopData` object.
