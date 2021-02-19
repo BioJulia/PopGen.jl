@@ -84,6 +84,7 @@ ishet(geno::Missing, allele::U) where U<:Signed = missing
 
 """
     counthet(geno::T, allele::Int) where T<:GenoArray
+    counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Signed
 Given a `GenoArray`, count the number of times `allele` appears in the
 heterozygous state.
 """
@@ -93,9 +94,9 @@ end
 
 
 function counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Signed
-    map(allele) do _allele
-        mapreduce(i -> ishet(i, _allele), +, skipmissing(geno))
-    end
+    tmp = skipmissing(geno)
+    isempty(tmp) && return fill(0, length(allele))
+    map(_allele -> mapreduce(i -> ishet(i, _allele), +, tmp), allele)
 end
 
 
@@ -105,17 +106,13 @@ Given a `GenoArray`, count the number of times `allele` appears in the
 homozygous state.
 """
 function counthom(geno::T, allele::U) where T<:GenoArray where U <: Signed
-    tmp = skipmissing(geno)
-    isempty(tmp) && return fill(0, length(allele))
     mapreduce(i -> ishom(i, allele), +, skipmissing(geno))
 end
 
-function counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Signed
+function counthom(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Signed
     tmp = skipmissing(geno)
     isempty(tmp) && return fill(0, length(allele))
-    map(allele) do _allele
-        mapreduce(i -> ishom(i, _allele), +, tmp)
-    end
+    map(_allele -> mapreduce(i -> ishom(i, _allele), +, tmp), allele)
 end
 
 """
