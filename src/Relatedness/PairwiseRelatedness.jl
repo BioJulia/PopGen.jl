@@ -26,9 +26,6 @@ of the relatedness estimate given by method `method`. This is an internal functi
 @inline function bootstrap_genos_all(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool, n::Int) where T <: GenoArray where U <: NamedTuple where F
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
     n_loc = length(locus_names)
-    prog_text = "name1" * "×" * "name2" * ":" * "$method"
-    # having a nested second progress bar doesn't seem to work
-    #p2 = Progress(iterations, dt = 0.75, color = :yellow, offset = 2)
     @sync for iter in 1:iterations
         Base.Threads.@spawn begin
             # bootstrap the indices
