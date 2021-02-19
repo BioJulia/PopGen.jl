@@ -1,23 +1,3 @@
-"""
-    counthet(geno::T, allele::Int) where T<:GenoArray
-Given a `GenoArray`, count the number of times `allele` appears in the
-heterozygous state.
-"""
-function counthet(geno::T, allele::Int) where T<:GenoArray
-    reduce(+, (allele .∈ skipmissing(geno)) .& (ishet(skipmissing(geno))))
-end
-
-
-"""
-    counthom(geno::T, allele::Int) where T<:GenoArray
-Given a `GenoArray`, count the number of times `allele` appears in the
-homozygous state.
-"""
-function counthom(geno::T, allele::Int) where T<:GenoArray
-    reduce(+, (allele .∈ skipmissing(geno)) .& (ishom(skipmissing(geno))))
-end
-
-
 function _pairwise_wc(data::PopData)
     loc_names = loci(data)
     n_loci = length(loc_names)
@@ -63,11 +43,42 @@ function _pairwise_wc(data::PopData)
     _freqs = map(values, allele_counts.freqs) |> Base.Iterators.flatten |> collect
 
     # # heterozygotes per allele per locus per population
-    _alleles_perloc = map(keys, allele_counts.freqs)
-    for i in groupby(tmp_data.loci, [:locus, :population])
-        ishet(i.genotype)
-    end
-    #return groupby(tmp_data.loci, [:locus, :population])
+    #TODO remove sorting (it's there for testing)
+    # sorted list of alleles in each locus
+    _alleles_perloc = map(j -> sort(collect(keys(j))), allele_counts.freqs)
+    
+    genos_vec = [i.genotype for i in per_locpop]
+
+    # create matrix of heterozygote occurrences per allele per pop
+    het_mtx = reduce(vcat,
+        # map across the vector of alleles for each locus
+        # vcat will concatenate the returned matrices into a single matrix
+        map(_alleles_perloc) do _alleles
+            reduce(hcat,
+                # each element in x is locus × population, so use a comprehension to
+                # do counthet() as many times as there are populations, popfirst!'ing
+                # the first element of x until it's ultimately empty
+                # then concatenate it into a matrix
+                [counthet(popfirst!(genos_vec), _alleles) for pop_n in 1: n_pops]
+            )
+        end
+    )
 end
 
+x = [i.genotype for i in zz] ;
+ns = length.(_alleles_perloc)
 
+
+tst = reduce(vcat,
+        # map across the vector of alleles for each locus
+        # vcat will concatenate the returned matrices into a single matrix
+        map(_alleles_perloc) do _alleles
+            reduce(hcat,
+                # each element in x is locus × population, so use a comprehension to
+                # do counthet() as many times as there are populations, popfirst!'ing
+                # the first element of x until it's ultimately empty
+                # then concatenate it into a matrix
+                [counthet(popfirst!(x), _alleles) for pop_n in 1:pops]
+            )
+        end
+    )
