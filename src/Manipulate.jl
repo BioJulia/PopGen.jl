@@ -255,7 +255,7 @@ View unique population ID's and their counts in a `PopData`.
         return @view data.meta[:, [:name, :population]]
     else
         pops = countmap(data.meta.population)
-        return DataFrame(:population => collect(keys(pops)), :count => collect(values(pops)))
+        return DataFrame(:population => collect(keys(pops)), :count => collect(values(pops))) |> sort
     end
 end
 """
