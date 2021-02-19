@@ -92,6 +92,13 @@ function counthet(geno::T, allele::U) where T<:GenoArray where U<:Signed
 end
 
 
+function counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Signed
+    map(allele) do _allele
+        mapreduce(i -> ishet(i, _allele), +, skipmissing(geno))
+    end
+end
+
+
 """
     counthom(geno::T, allele::Int) where T<:GenoArray
 Given a `GenoArray`, count the number of times `allele` appears in the
@@ -101,6 +108,11 @@ function counthom(geno::T, allele::U) where T<:GenoArray where U <: Signed
     mapreduce(i -> ishom(i, allele), +, skipmissing(geno))
 end
 
+function counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Signed
+    map(allele) do _allele
+        mapreduce(i -> ishom(i, _allele), +, skipmissing(geno))
+    end
+end
 
 """
     gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)
