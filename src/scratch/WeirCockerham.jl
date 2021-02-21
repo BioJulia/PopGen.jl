@@ -35,18 +35,39 @@ function _pairwise_wc(data::PopData)
     )
     # allele freqs per locus per population
     alle_freqs = DataFrames.combine(per_locpop, :genotype => allele_freq => :freqs)
+    # expand out the n matrix to be same dimensions as unique_alleles x pop
     n_expanded = reduce(hcat, repeat.(eachrow(n_per_locpop), 1, allele_counts.allele_count)) |> permutedims
-    corr_n_per_loc = (n_total .- (sum.(eachrow(n_per_locpop .^2)) ./ n_total)) ./ (n_pop_per_loc .- 1) 
+    # expand n_total matrix to be same dimensions as unique_alleles x pop
     n_tot_expanded = reduce(vcat, repeat.(eachrow(n_total), allele_counts.allele_count))
+    # calculate corrected n per locus
+    corr_n_per_loc = (n_total .- (sum.(eachrow(n_per_locpop .^2)) ./ n_total)) ./ (n_pop_per_loc .- 1) 
+    # expand corr_n matrix to be same dimensions as unique_alleles x pop
     corr_n_per_loc_exp = reduce(vcat, repeat.(eachrow(corr_n_per_loc), allele_counts.allele_count))
+    #TODO remove sorting (it's there for testing)
+    # sorted list of alleles in each locus
+    _alleles_perloc = map(j -> sort(collect(keys(j))), allele_counts.freqs)
+    # extremely convoluted, creates a big matrix of allele freqs per locus per population
+    # TODO are there too many reshapes going on?
+    afreq_tmp = permutedims(reshape(alle_freqs.freqs, n_pops, :))
+    allele_freq_pop = reshape(
+        reduce(vcat,
+            map(zip(eachrow(afreq_tmp), _alleles_perloc)) do (_freqs_p, _alle)
+                reduce(hcat,
+                    map(_freqs_p) do _freqs
+                        [get(_freqs, i, 0.) for i in _alle]
+                    end
+                )
+            end
+            ),
+        n_pops, :
+    )'
+
     _alleles = map(keys, allele_counts.freqs) |> Base.Iterators.flatten |> collect
     _freqs = map(values, allele_counts.freqs) |> Base.Iterators.flatten |> collect
 
     # # heterozygotes per allele per locus per population
-    #TODO remove sorting (it's there for testing)
-    # sorted list of alleles in each locus
-    _alleles_perloc = map(j -> sort(collect(keys(j))), allele_counts.freqs)
     
+    # gets emptied from the popfirst! calls below(!)
     genos_vec = [i.genotype for i in per_locpop]
 
     # create matrix of heterozygote occurrences per allele per pop
@@ -63,22 +84,5 @@ function _pairwise_wc(data::PopData)
             )
         end
     )
+    return allele_freq_pop
 end
-
-x = [i.genotype for i in zz] ;
-ns = length.(_alleles_perloc)
-
-
-tst = reduce(vcat,
-        # map across the vector of alleles for each locus
-        # vcat will concatenate the returned matrices into a single matrix
-        map(_alleles_perloc) do _alleles
-            reduce(hcat,
-                # each element in x is locus × population, so use a comprehension to
-                # do counthet() as many times as there are populations, popfirst!'ing
-                # the first element of x until it's ultimately empty
-                # then concatenate it into a matrix
-                [counthet(popfirst!(x), _alleles) for pop_n in 1:pops]
-            )
-        end
-    )
