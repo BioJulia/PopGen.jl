@@ -48,6 +48,7 @@ function _pairwise_wc(data::PopData)
     _alleles_perloc = map(j -> sort(collect(keys(j))), allele_counts.freqs)
     # extremely convoluted, creates a big matrix of allele freqs per locus per population
     # TODO are there too many reshapes going on?
+    #TODO move into its own function? This seems like it could be a recurring thing
     afreq_tmp = permutedims(reshape(alle_freqs.freqs, n_pops, :))
     allele_freq_pop = reshape(
         reduce(vcat,
@@ -59,8 +60,8 @@ function _pairwise_wc(data::PopData)
                 )
             end
             ),
-        n_pops, :
-    )'
+       :, n_pops
+    )
 
     _alleles = map(keys, allele_counts.freqs) |> Base.Iterators.flatten |> collect
     _freqs = map(values, allele_counts.freqs) |> Base.Iterators.flatten |> collect
@@ -84,5 +85,6 @@ function _pairwise_wc(data::PopData)
             )
         end
     )
-    return allele_freq_pop
+    μ_het =  (2 * n_expanded .* allele_freq_pop - het_mtx) / 2
+    ssg = map(sum, eachrow(n_expanded .* allele_freq_pop - μ_het))
 end
