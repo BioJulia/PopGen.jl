@@ -84,7 +84,7 @@ DataFrames.combine(
 )
 ```
 """
-function avg_allele_freq(allele_dicts::AbstractVector{Dict{T, Float64}}, power::Int = 1) where T<:Signed   
+function avg_allele_freq(allele_dicts::AbstractVector{Dict{T, Float64}}, power::Int = 1) where T<:Integer   
    sum_dict = Dict{Int16, Tuple{Float32, Int}}()
    # remove any dicts with no entries (i.e. from a group without that locus)
    allele_dicts = allele_dicts[length.(allele_dicts) .> 0]

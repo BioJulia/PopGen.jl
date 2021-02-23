@@ -35,16 +35,16 @@ end
 
 """
     Genotype::DataType
-For convenience purposes, an alias for `NTuple{N, <:Signed} where N`, which is
+For convenience purposes, an alias for `NTuple{N, <:Integer} where N`, which is
 the type describing individual genotypes in PopData.
 """
-const Genotype = NTuple{N, <:Signed} where N
+const Genotype = NTuple{N, <:Integer} where N
 
 
 """
     GenoArray::DataType
 For convenience purposes, an alias for an `AbstractVector` of elements `Missing`
-and `Genotype`, which itself is of type `NTuple{N, <:Signed} where N`.
+and `Genotype`, which itself is of type `NTuple{N, <:Integer} where N`.
 The definition as an `AbstractVector` adds flexibility for `SubArray`
 cases.
 """

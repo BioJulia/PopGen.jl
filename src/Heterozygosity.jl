@@ -33,13 +33,13 @@ end
     ishom(loci::GenoArray, allele::Signed)
 Returns `true` if the `locus`/`loci` is/are homozygous for the specified `allele`.
 """
-function ishom(geno::T, allele::U) where T<:Genotype where U<:Signed
+function ishom(geno::T, allele::U) where T<:Genotype where U<:Integer
     ∈(allele, geno) & ishom(geno) ? true : false
 end
 
-ishom(geno::T, allele::U) where T<:GenoArray where U<:Signed = map(i -> ishom(i, allele), geno)
+ishom(geno::T, allele::U) where T<:GenoArray where U<:Integer = map(i -> ishom(i, allele), geno)
 
-ishom(geno::Missing, allele::U) where U<:Signed = missing
+ishom(geno::Missing, allele::U) where U<:Integer = missing
 
 """
 ```
@@ -73,27 +73,27 @@ end
     ishet(loci::GenoArray, allele::Signed)
 Returns `true` if the `locus`/`loci` is/are heterozygous for the specified `allele`. 
 """
-function ishet(geno::T, allele::U) where T<:Genotype where U<:Signed
+function ishet(geno::T, allele::U) where T<:Genotype where U<:Integer
     ∈(allele, geno) & !ishom(geno) ? true : false
 end
 
-ishet(geno::T, allele::U) where T<:GenoArray where U<:Signed = map(i -> ishet(i, allele), geno)
+ishet(geno::T, allele::U) where T<:GenoArray where U<:Integer = map(i -> ishet(i, allele), geno)
 
-ishet(geno::Missing, allele::U) where U<:Signed = missing
+ishet(geno::Missing, allele::U) where U<:Integer = missing
 
 
 """
     counthet(geno::T, allele::Int) where T<:GenoArray
-    counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Signed
+    counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
 Given a `GenoArray`, count the number of times `allele` appears in the
 heterozygous state.
 """
-function counthet(geno::T, allele::U) where T<:GenoArray where U<:Signed
+function counthet(geno::T, allele::U) where T<:GenoArray where U<:Integer
     mapreduce(i -> ishet(i, allele), +, skipmissing(geno))
 end
 
 
-function counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Signed
+function counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
     tmp = skipmissing(geno)
     isempty(tmp) && return fill(0, length(allele))
     map(_allele -> mapreduce(i -> ishet(i, _allele), +, tmp), allele)
@@ -109,7 +109,7 @@ function counthom(geno::T, allele::U) where T<:GenoArray where U <: Signed
     mapreduce(i -> ishom(i, allele), +, skipmissing(geno))
 end
 
-function counthom(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Signed
+function counthom(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
     tmp = skipmissing(geno)
     isempty(tmp) && return fill(0, length(allele))
     map(_allele -> mapreduce(i -> ishom(i, _allele), +, tmp), allele)
