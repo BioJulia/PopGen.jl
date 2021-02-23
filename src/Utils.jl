@@ -336,6 +336,27 @@ julia> pairwise_pairs(samps)
     [tuple(smp_names[i], smp_names[j]) for i in 1:length(smp_names)-1 for j in i+1:length(smp_names)]
 end
 
+
+"""
+    partitionarray(array::AbstractArray, sizes::Tuple)
+Like Base.Iterators.Partition, except you can apply arbitrary sizes to
+partition the array by. The `sizes` must add up to the total row length
+of the matrix.
+
+***Example***
+````
+julia> partitionmatrix(rand(20,5), (10,3,4,3)) .|> size
+((10, 5), (3, 5), (4, 5), (3, 5))
+
+"""
+# solution brilliantly provided by @mcabbott
+partitionarray(array::AbstractArray, sizes::Tuple{}) = ()
+
+@views function partitionarray(array::AbstractArray, sizes::Tuple)
+    axes(array,1) == 1:sum(sizes) || error("Sizes provided do not sum to length of the first dimension") 
+    (array[1:first(sizes),:], partitionarray(array[first(sizes)+1:end,:], Base.tail(sizes))...)
+end
+
 #TODO add to docs API
 """
     phase(data::PopData)
