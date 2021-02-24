@@ -338,24 +338,26 @@ end
 
 
 """
-    partitionarray(array::AbstractArray, sizes::AbstractVector{<:Integer})
+    partitionarray(array::AbstractArray, steps::AbstractVector{<:Integer})
 Like Base.Iterators.Partition, except you can apply arbitrary sizes to
-partition the array by. The `sizes` must add up to the total row length
-of the matrix.
+partition the array by. The `steps` must add up to the total row length
+of the array.
 
 ***Example***
 ````
 julia> partitionmatrix(rand(20,5), [10,3,4,3]) .|> size
 ((10, 5), (3, 5), (4, 5), (3, 5))
-
+```
 """
-# solution brilliantly provided by @stevengj on Discourse (https://discourse.julialang.org/t/is-there-a-simple-intuitive-way-to-partition-a-matrix-by-arbitrary-strides-like-i/55863)
-@views function partitionarray(array::AbstractArray, rowlens::AbstractVector{<:Integer})
-    sum(rowlens) <= size(M,1) || throw(error("Sizes provided do not sum to length of the first dimension") )
-    let s = cumsum([first(axes(M,1)); rowlens])
-        return (M[s[i]:s[i+1]-1,:] for i = 1:length(s)-1)
-    end
+# solution brilliantly provided by @stevengj and @mcabbott on Slack and Discourse (https://discourse.julialang.org/t/is-there-a-simple-intuitive-way-to-partition-a-matrix-by-arbitrary-strides-like-i/55863)
+function partitionarray(array::AbstractArray, steps::AbstractVector{<:Integer})
+    v = axes(array,1)
+    v == 1:sum(steps) || error("Steps provided do not sum to length of the first dimension")
+    i = firstindex(v)
+    tmp = (view(v, i:(i+=s)-1) for s in steps)
+    [view(array,r,:) for r in tmp]
 end
+
 
 #TODO add to docs API
 """
