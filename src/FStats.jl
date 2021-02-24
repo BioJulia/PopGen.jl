@@ -12,7 +12,7 @@ function Base.show(io::IO, data::PairwiseFST)
         io,
         data.results,
         show_row_number=false,
-        rowlabel = :population,
+        rowlabel = Symbol(" "),
         eltypes = false,
         row_names = names(data.results),
         title = "Pairwise FST: " * data.method
@@ -48,7 +48,7 @@ function FST_global(data::AbstractDataFrame)
 end
 
 
-function _pairwise_nei(data::PopData)
+function _pairwise_Nei(data::PopData)
     idx_pdata = groupby(data.loci, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = length(idx_pdata)
@@ -61,16 +61,30 @@ function _pairwise_nei(data::PopData)
     return PairwiseFST(DataFrame(results, Symbol.(pops)), "Nei 1987")
 end
 
+function _pairwise_WeirCockerham(data::PopData)
+    idx_pdata = groupby(data.loci, :population)
+    pops = getindex.(keys(idx_pdata), :population)
+    npops = length(idx_pdata)
+    results = zeros(npops, npops)
+    for i in 2:npops
+        for j in 1:(i-1)
+            results[i,j] = FST_global(DataFrame(idx_pdata[[j,i]]))
+        end
+    end
+    return PairwiseFST(DataFrame(results, Symbol.(pops)), "Weir-Cockerham")
+end
 
 #TODO add methods and complete docstring
 """
     pairwise_fst(data::PopData; method::String)
 Calculate pairwise FST between populations in a `PopData` object.
 #### Methods:
-- `"Nei87"`: The method described in ________
+- `"Nei87"`: Nei (1987) method
+- `"WC84"` : Weir-Cockerham (1984) method (default)
 """
-function pairwise_fst(data::PopData; method::String = "Nei87")
-    lowercase(method) == "nei87" && return _pairwise_nei(data)
+function pairwise_fst(data::PopData; method::String = "WC")
+    occursin("nei", lowercase(method)) && return _pairwise_Nei(data)
+    occursin("wc", lowercase(method)) && return _pairwise_WeirCockerham(data)
 end
 
 
