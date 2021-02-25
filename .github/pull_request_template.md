@@ -1,11 +1,11 @@
 # A clear and descriptive title (No issue numbers please)
 
-> _This template is rather extensive. Fill out all that you can, if are a new contributor or you're unsure about any section, leave it unchanged and a reviewer will help you_ :smile:. _This template is simply a tool to help everyone remember the BioJulia guidelines, if you feel anything in this template is not relevant, simply delete it._
+> _This template is extensive, so fill out all that you can. If are a new contributor or unsure about any section, leave it empty and a reviewer will help you_ :smile:. If anything in this template isn't relevant, just delete or ignore it._
 
 ## Types of changes
 
 This PR implements the following changes:
-_(Please tick any or all of the following that are applicable)_
+_(tick any that apply)_
 
 * [ ] :sparkles: New feature (A non-breaking change which adds functionality).
 * [ ] :bug: Bug fix (A non-breaking change, which fixes an issue).
