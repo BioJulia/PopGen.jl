@@ -1,8 +1,6 @@
 """
-# Quickstart for PopGen
+# Population genetics analyses in Julia
 Documentation: https://pdimens.github.io/PopGen.jl/
-
-Motivational(?) quote: $(motivational_quote())
 
 \nA few things things you can do to get started:
 
@@ -24,7 +22,7 @@ Motivational(?) quote: $(motivational_quote())
 
 ## Analyses
 - `richness(PopData)` to calculate allelic richness
-- `allele_avg(PopData)` to calculate average # of alleles
+- `relatedness(PopData, method = ...)` to get pairwise relatedness of individuals
 - `summary(PopData)` to calculate F-statistics, heterozygosity, etc.
 - `hwe_test(PopData)` to test for Hardy-Weinberg Equilibrium
 """

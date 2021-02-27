@@ -411,41 +411,6 @@ function phase(data::PopData)
 end
 
 
-"""
-    quickstart()
-Prints helpful text of how to get started using PopGen.
-"""
-function quickstart()
-    printstyled("\n        Quickstart for PopGen\n\n", bold = true)
-    println("Documentation: https://pdimens.github.io/PopGen.jl/")
-    println("Motivational(?) quote: ", motivational_quote())
-    println("\nA few things things you can do to get started:")
-
-    printstyled("\nLoad in data\n\n", color = :magenta)
-    println("- read_from(filename; kwargs...)")
-    println("- genepop(infile; kwargs...)  or similar file-specific importer")
-    println("- use available @gulfsharks or @nancycats datasets")
-
-    printstyled("\nExplore PopData\n\n", color = :blue)
-    println("- populations(PopData) to view population information")
-    println("- loci(PopData) to view locus names")
-    println("- samples(PopData) to view sample names")
-    println("- missing(PopData, by = ...) to view missing information")
-
-    printstyled("\nManipulate PopData\n\n", color = :light_red)
-    println("- populations!(PopData, ...) to rename populations")
-    println("- locations!(PopData, ...) to add geographical coordinates")
-    println("- exclude!(PopData, kwargs...) to selectively remove data")
-
-    printstyled("\nAnalyses\n\n", color = :green)
-    println("- richness(PopData) to calculate allelic richness")
-    println("- allele_avg(PopData) to calculate average # of alleles")
-    println("- summary(PopData) to calculate F-statistics, heterozygosity, etc.")
-    println("- hwe_test(PopData) to test for Hardy-Weinberg Equilibrium")
-
-    return
-end
-
 
 """
     reciprocal(num::T) where T <: Signed
@@ -537,62 +502,6 @@ function strict_shuffle!(x::T) where T <: AbstractArray
     return x
 end
 
-
-"""
-    motivational_quote()
-Randomly returns one of ~50 _somewhat_ motivational quotes.
-"""
-function motivational_quote()
-# quotes retrieved on 06/11/2020 from https://www.coburgbanks.co.uk/blog/friday-funnies/50-funny-motivational-quotes/
-    quotes =  [
-    "\"The elevator to success is out of order. You’ll have to use the stairs, one step at a time.\" Joe Girard",
-    "\"People often say that motivation doesn’t last. Well, neither does bathing – that’s why we recommend it daily.\" Zig Ziglar",
-    "\"I always wanted to be somebody, but now I realise I should have been more specific.\" Lily Tomlin",
-    "\"I am so clever that sometimes I don’t understand a single word of what I am saying.\" Oscar Wilde",
-    "\"People say nothing is impossible, but I do nothing every day.\" Winnie the Pooh",
-    "\"Life is like a sewer… what you get out of it depends on what you put into it.\" Tom Lehrer",
-    "\"You can’t have everything. Where would you put it?\" Steven Wright",
-    "\"Work until your bank account looks like a phone number.\" Unknown ",
-    "\"Change is not a four letter word… but often your reaction to it is!\" Jeffrey Gitomer",
-    "\"If you think you are too small to make a difference, try sleeping with a mosquito.\" Dalai Lama",
-    "\"Bad decisions make good stories.\" Ellis Vidler",
-    "\"I’ll probably never fully become what I wanted to be when I grew up, but that’s probably because I wanted to be a ninja princess.\" Cassandra Duffy",
-    "\"When life gives you lemons, squirt someone in the eye.\" Cathy Guisewite",
-    "\"A clear conscience is a sure sign of a bad memory.\" Mark Twain",
-    "\"Well-behaved women seldom make history.\" Laurel Thatcher Ulrich",
-    "\"I didn’t fail the test. I just found 100 ways to do it wrong.\" Benjamin Franklin",
-    "\"I used to think I was indecisive, but now I’m not so sure.\" Unknown",
-    "\"Don’t worry about the world coming to an end today. It’s already tomorrow in Australia.\" Charles Schulz",
-    "\"Think like a proton. Always positive.\" Unknown",
-    "\"Be happy – it drives people crazy.\" Unknown",
-    "\"Optimist: someone who figures that taking a step backward after taking a step forward is not a disaster, it’s more like a cha-cha.\" Robert Brault",
-    "\"The question isn’t who is going to let me, it’s who is going to stop me.\" Ayn Rand.",
-    "\"You’re only given a little spark of madness. You mustn’t lose it.\" Robin Williams",
-    "\"I am an early bird and a night owl… so I am wise and I have worms\" Michael Scott",
-    "\"If you let your head get too big, it’ll break your neck.\" Elvis Presley",
-    "\"The road to success is dotted with many tempting parking spaces.\" Will Rogers",
-    "\"Live each day like it’s your second to the last. That way you can fall asleep at night.\" Jason Love",
-    "\"Even a stopped clock is right twice every day. After some years, it can boast of a long series of successes.\" Marie Von Ebner-Eschenbach",
-    "\"Honest criticism is hard to take, particularly from a relative, a friend, an acquaintance, or a stranger.\" Franklin P. Jones",
-    "\"Opportunity is missed by most people because it is dressed in overalls and looks like work.\" Thomas Eddison",
-    "\"A diamond is merely a lump of coal that did well under pressure.\" Unknown",
-    "\"Nothing is impossible, the word itself says “I’m possible!\" Audrey Hepburn",
-    "\"Friendship is like peeing on yourself: everyone can see it, but only you get the warm feeling that it brings.\" Robert Bloch",
-    "\"Women who seek to be equal with men lack ambition.\" Marilyn Monroe",
-    "\"By working faithfully eight hours a day you may eventually get to be boss and work twelve hours a day.\" Robert Frost",
-    "\"The trouble with having an open mind, of course, is that people will insist on coming along and trying to put things in it.\" Terry Pratchett",
-    "\"Age is of no importance unless you’re a cheese.\" Billie Burke",
-    "\"When tempted to fight fire with fire, remember that the Fire Department usually uses water.\" Unknown",
-    "\"Trying is the first step toward failure.\" Homer Simpson",
-    "\"Happiness is just sadness that hasn’t happened yet.\" Unknown",
-    "\"The best things in life are actually really expensive.\" Unknown",
-    "\"A few harmless flakes working together can unleash an avalanche of destruction.\" Justin Sewell",
-    "\"It could be that your purpose in life is to serve as a warning to others.\"  Ashleigh Brilliant",
-    "\"If the world didn’t suck we’d all fly into space.\" Unknown",
-    "\"Always remember that you are unique – just like everybody else.\" Unknown"
-    ]
-    return quotes[rand(1:length(quotes))]
-end
 
 #TODO add to docs API
 """
