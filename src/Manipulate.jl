@@ -359,93 +359,40 @@ exclude!(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
 exclude!(cats, names = "N102", loci = "fca8", population = "3")
 ```
 """
-function exclude!(data::PopData; kwargs...)
-    filter_by = Dict(kwargs...)
-    tmp = data
-    filter_params = keys(filter_by) |> collect
-    notices = ""
-    # populations
-    # check for keywords
-    filt_pop = get.(Ref(filter_by), [:population, :populations], nothing)
-    filt_pop = filt_pop[filt_pop .!== nothing]
-    if length(filt_pop) != 0
-        filt_pop = filt_pop[begin]
-        if typeof(filt_pop) == String
-            filt_pop = [filt_pop]
-        end
-        err = filt_pop[filt_pop .∉ Ref(unique(tmp.meta.population))]
-        if length(err) > 0
-            [notices *= "\n  population \"$i\" not found" for i in err]
-        end
-        # choose the cheaper method
-        all_pops = unique(tmp.meta.population)
-        if length(filt_pop) < length(all_pops)/2
-            filter!(:population => x -> x ∉ filt_pop, tmp.loci)
-            filter!(:population => x -> x ∉ filt_pop, tmp.meta)
-        else
-            keep = all_pops[all_pops .∉ Ref(filt_pop)]
-            filter!(:population => x -> x in filt_pop, tmp.loci)
-            filter!(:population => x -> x in filt_pop, tmp.meta)
-        end
-        tmp.loci.population = tmp.loci.population |> Array |> PooledArray
+function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing, name::Any = nothing)
+    #filter_by = filter(kv -> !isnothing(kv.second), Dict(kwargs...))
+    filter_by = Dict()
+    if !isnothing(population)
+        filter_by[:population] = typeof(population) <: AbstractArray ? population : [population]
+    end
+    if !isnothing(locus)
+        filter_by[:locus] = typeof(locus) <: AbstractArray ? locus : [locus]
+    end
+    if !isnothing(name)
+        filter_by[:name] = typeof(name) <: AbstractArray ? name : [name]
     end
 
-    # samples
-    # check for keywords
-    filt_name = get.(Ref(filter_by), [:name, :names, :sample, :samples], nothing)
-    filt_name = filt_name[filt_name .!== nothing]
-    if length(filt_name) != 0
-        filt_name = filt_name[begin]
-        if typeof(filt_name) == String
-            filt_name = [filt_name]
+    filter_keys = Symbol.(keys(filter_by))
+    meta_keys = filter_keys[filter_keys .!= :locus]
+    #return filter_keys
+    if length(filter_keys) == 1
+        filter!(filter_keys[1] => x -> x ∉ filter_by[filter_keys[1]] , data.loci)
+        if !isempty(meta_keys)
+            filter!(meta_keys[1] => x -> x ∉ filter_by[meta_keys[1]] , data.meta)
         end
-        err = filt_name[filt_name .∉ Ref(tmp.meta.name)]
-        if length(err) > 0
-            [notices *= "\n  sample \"$i\" not found" for i in err]
+    elseif length(filter_keys) == 2
+        filter!([filter_keys[1], filter_keys[2]] => (x,y) -> x ∉ filter_by[filter_keys[1]] && y ∉ filter_by[filter_keys[2]] , data.loci)
+        if !isempty(meta_keys)
+            [filter!(i => x -> x ∉ filter_by[i] , data.meta) for i in meta_keys]
         end
-        # choose the cheaper method
-        all_samples = tmp.meta.name
-        if length(filt_name) < length(all_samples)/2
-            filter!(:name => x -> x ∉ filt_name, tmp.loci)
-            filter!(:name => x -> x ∉ filt_name, tmp.meta)
-        else
-            keep = all_samples[all_samples .∉ Ref(filt_name)]
-            filter!(:name => x -> x in keep, tmp.loci)
-            filter!(:name => x -> x in keep, tmp.meta)
+    elseif length(filter_keys) == 3
+        filter!([filter_keys[1], filter_keys[2], filter_keys[3]] => (x,y,z) -> x ∉ filter_by[filter_keys[1]] && y ∉ filter_by[filter_keys[2]] && z ∉ filter_by[filter_keys[3]] , data.loci)
+        if !isempty(meta_keys)
+            [filter!(i => x -> x ∉ filter_by[i] , data.meta) for i in meta_keys]
         end
-        tmp.loci.name = tmp.loci.name |> Array |> PooledArray
+    else
+        throw(ArgumentError("Please specify at least one filter parameter of population, locus, or name"))   
     end
-
-    # loci
-    # check for keywords
-    filt_loci = get.(Ref(filter_by), [:locus, :loci], nothing)
-    filt_loci = filt_loci[filt_loci .!= nothing]
-    if length(filt_loci) != 0
-        filt_loci = filt_loci[begin]
-        if typeof(filt_loci) == String
-            filt_loci = [filt_loci]
-        end
-        err = filt_loci[filt_loci .∉ Ref(loci(tmp))]
-        if length(err) > 0
-            [notices *= "\n  locus \"$i\" not found" for i in err]
-        end
-        # choose the cheaper method
-        all_loci = loci(tmp)
-        if length(filt_loci) < length(all_loci)/2
-            filter!(:locus => x -> x ∉ filt_loci, tmp.loci)
-        else
-            keep = all_loci[all_loci .∉ Ref(filt_loci)]
-            filter!(:locus => x -> x in keep, tmp.loci)
-        end
-        tmp.loci.locus = tmp.loci.locus |> Array |> PooledArray
-    end
-
-    # print the notices, if any
-    if notices != ""
-        printstyled("Notices:", bold = true, color = :blue)
-        print(notices, "\n\n")
-    end
-    return tmp
 end
 
 const omit! = exclude!
@@ -459,15 +406,12 @@ The keywords can be used in any combination. Synonymous with `omit` and `remove`
 ### Keyword Arguments
 #### `locus`
 A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
-The keyword `loci` also works.
 
 #### `population`
 A `String` or `Vector{String}` of populations you want to remove from the `PopData`.
-The keyword `populations` also works.
 
 #### `name`
 A `String` or `Vector{String}` of samples you want to remove from the `PopData`.
-The keywords `names`, `sample`, and `samples` also work.
 
 **Examples**
 ```
@@ -477,9 +421,9 @@ exclude(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
 exclude(cats, names = "N102", loci = "fca8", population = "3")
 ```
 """
-function exclude(data::PopData; kwargs...)
+function exclude(data::PopData; population::Any = nothing, locus::Any = nothing, name::Any = nothing)
     tmp = copy(data)
-    exclude!(tmp; kwargs...)
+    exclude!(tmp; population = population, locus = locus, name = name)
     return tmp
 end
 
