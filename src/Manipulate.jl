@@ -361,8 +361,7 @@ exclude!(cats, names = "N102", loci = :fca8, population = "3")
 ```
 """
 function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing, name::Any = nothing)
-    #filter_by = filter(kv -> !isnothing(kv.second), Dict(kwargs...))
-    filter_by = Dict()
+    filter_by = Dict{Symbol,Vector{String}}()
     notices = ""
     if !isnothing(population)
         filter_by[:population] = typeof(population) <: AbstractArray ? string.(population) : [string(population)]
