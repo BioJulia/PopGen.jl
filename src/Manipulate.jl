@@ -356,13 +356,14 @@ The keywords `names`, `sample`, and `samples` also work.
 ```
 cats = @nancycats;
 exclude!(cats, name = "N100", population = 1:5)
-exclude!(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
-exclude!(cats, names = "N102", loci = :fca8, population = "3")
+exclude!(cats, name = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
+exclude!(cats, name = "N102", locus = :fca8, population = "3")
 ```
 """
 function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing, name::Any = nothing)
     filter_by = Dict{Symbol,Vector{String}}()
     notices = ""
+
     if !isnothing(population)
         filter_by[:population] = typeof(population) <: AbstractArray ? string.(population) : [string(population)]
         err = filter_by[:population][filter_by[:population] .∉ Ref(unique(data.meta.population))]
@@ -393,7 +394,7 @@ function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing
 
     filter_keys = Symbol.(keys(filter_by))
     meta_keys = filter_keys[filter_keys .!= :locus]
-    #return filter_keys
+
     if length(filter_keys) == 1
         filter!(filter_keys[1] => x -> x ∉ filter_by[filter_keys[1]] , data.loci)
         if !isempty(meta_keys)
@@ -412,7 +413,8 @@ function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing
     else
         throw(ArgumentError("Please specify at least one filter parameter of population, locus, or name"))   
     end
-    [data.loci[!, i] = PooledArray(Array(data.loci[!, i])) for i in filter_keys]
+    # make sure to update all the PooledArray pools
+    [data.loci[!, i] = PooledArray(Array(data.loci[!, i])) for i in [:population, :locus, :name]]
     return
 end
 
@@ -439,8 +441,8 @@ A `String` or `Vector{String}` of samples you want to remove from the `PopData`.
 ```
 cats = @nancycats;
 exclude(cats, name = "N100", population = 1:5)
-exclude(cats, samples = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
-exclude(cats, names = "N102", loci = :fca8, population = "3")
+exclude(cats, name = ["N100", "N102", "N211"], locus = ["fca8", "fca23"])
+exclude(cats, name = "N102", locus = :fca8, population = "3")
 ```
 """
 function exclude(data::PopData; population::Any = nothing, locus::Any = nothing, name::Any = nothing)
@@ -451,6 +453,103 @@ end
 
 const omit = exclude
 const remove = exclude
+
+"""
+    keep(data::PopData, kwargs...)
+Edit a `PopData` object in-place by keeping only the occurrences of the specified keyword.
+Unlike `exclude!()`. only one keyword can be used at a time. All values are 
+converted to `String` for filtering, so `Symbol` and numbers will also work.
+
+### Keyword Arguments
+#### `locus`
+A `String` or `Vector{String}` of loci you want to keep in the `PopData`.
+
+#### `population`
+A `String` or `Vector{String}` of populations you want to keep in the `PopData`.
+
+#### `name`
+A `String` or `Vector{String}` of samples you want to keep in the `PopData`.
+
+**Examples**
+```
+cats = @nancycats;
+keep(cats, population = 1:5)
+keep(cats, name = ["N100", "N102", "N211"])
+keep(cats, locus = [:fca8, "fca37"])
+"""
+function keep!(data::PopData; population::Any = nothing, locus::Any = nothing, name::Any = nothing)
+    filter_by = Dict{Symbol,Vector{String}}()
+    notices = ""
+
+    if !isnothing(population)
+        filter_by[:population] = typeof(population) <: AbstractArray ? string.(population) : [string(population)]
+        err = filter_by[:population][filter_by[:population] .∉ Ref(unique(data.meta.population))]
+        if length(err) > 0
+            [notices *= "\n  population \"$i\"" for i in err]
+        end
+    end
+    if !isnothing(locus)
+        filter_by[:locus] = typeof(locus) <: AbstractArray ? string.(locus) : [string(locus)]
+        err = filter_by[:locus][filter_by[:locus] .∉ Ref(loci(data))]
+        if length(err) > 0
+            [notices *= "\n  locus \"$i\"" for i in err]
+        end
+    end
+    if !isnothing(name)
+        filter_by[:name] = typeof(name) <: AbstractArray ? string.(name) : [string(name)]
+        err = filter_by[:name][filter_by[:name] .∉ Ref(data.meta.name)]
+        if length(err) > 0
+            [notices *= "\n  sample \"$i\"" for i in err]
+        end
+    end
+    length(filter_by) > 1 && throw(ArgumentError("Please specify only one of \`population\`, \`locus\`, or \`name\` keyword arguments"))
+    
+    # print the notices, if any
+    if notices != ""
+        error("Criteria not found in PopData:" * notices)
+    end
+
+    filter_keys = Symbol.(keys(filter_by))
+    meta_keys = filter_keys[filter_keys .!= :locus]
+
+    filter!(filter_keys[1] => x -> x ∈ filter_by[filter_keys[1]] , data.loci)
+    if !isempty(meta_keys)
+        filter!(meta_keys[1] => x -> x ∈ filter_by[meta_keys[1]] , data.meta)
+    end
+    [data.loci[!, i] = PooledArray(Array(data.loci[!, i])) for i in [:population, :locus, :name]]
+    return
+end
+
+
+"""
+    keep(data::PopData, kwargs...)
+Returns a new `PopData` object keeping only the occurrences of the specified keyword.
+Unlike `exclude()`. only one keyword can be used at a time. All values are 
+converted to `String` for filtering, so `Symbol` and numbers will also work.
+
+### Keyword Arguments
+#### `locus`
+A `String` or `Vector{String}` of loci you want to keep in the `PopData`.
+
+#### `population`
+A `String` or `Vector{String}` of populations you want to keep in the `PopData`.
+
+#### `name`
+A `String` or `Vector{String}` of samples you want to keep in the `PopData`.
+
+**Examples**
+```
+cats = @nancycats;
+keep(cats, population = 1:5)
+keep(cats, name = ["N100", "N102", "N211"])
+keep(cats, locus = [:fca8, "fca37"])
+```
+"""
+function keep(data::PopData; population::Any = nothing, locus::Any = nothing, name::Any = nothing)
+    tmp = copy(data)
+    keep!(tmp; population = population, locus = locus, name = name)
+    return tmp
+end
 
 """
     samples(data::PopData)
