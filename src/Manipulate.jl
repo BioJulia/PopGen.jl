@@ -362,34 +362,39 @@ exclude!(cats, name = "N102", locus = :fca8, population = "3")
 """
 function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing, name::Any = nothing)
     filter_by = Dict{Symbol,Vector{String}}()
-    notices = ""
 
     if !isnothing(population)
         filter_by[:population] = typeof(population) <: AbstractArray ? string.(population) : [string(population)]
         err = filter_by[:population][filter_by[:population] .∉ Ref(unique(data.meta.population))]
         if length(err) > 0
-            [notices *= "\n  population \"$i\" not found" for i in err]
+            printstyled("Populations not found: ", bold = true)
+            print(err[1])
+            if length(err) > 1
+                [print(", \"$i\"") for i in err[2:end]] ; print("\n")
+            end
         end
     end
     if !isnothing(locus)
         filter_by[:locus] = typeof(locus) <: AbstractArray ? string.(locus) : [string(locus)]
         err = filter_by[:locus][filter_by[:locus] .∉ Ref(loci(data))]
         if length(err) > 0
-            [notices *= "\n  locus \"$i\" not found" for i in err]
+            printstyled("Loci not found: ", bold = true)
+            print(err[1])
+            if length(err) > 1
+                [print(", \"$i\"") for i in err[2:end]] ; print("\n")
+            end
         end
     end
     if !isnothing(name)
         filter_by[:name] = typeof(name) <: AbstractArray ? string.(name) : [string(name)]
         err = filter_by[:name][filter_by[:name] .∉ Ref(data.meta.name)]
         if length(err) > 0
-            [notices *= "\n  sample \"$i\" not found" for i in err]
+            printstyled("Samples not found: ", bold = true)
+            print(err[1])
+            if length(err) > 1
+                [print(", \"$i\"") for i in err[2:end]] ; print("\n")
+            end
         end
-    end
-
-    # print the notices, if any
-    if notices != ""
-        printstyled("Notices:", bold = true, color = :blue)
-        print(notices, "\n\n")
     end
 
     filter_keys = Symbol.(keys(filter_by))
@@ -478,35 +483,45 @@ keep(cats, name = ["N100", "N102", "N211"])
 keep(cats, locus = [:fca8, "fca37"])
 """
 function keep!(data::PopData; population::Any = nothing, locus::Any = nothing, name::Any = nothing)
+    count(!isnothing, [population, locus, name]) > 1 && throw(ArgumentError("Please specify only one of \`population\`, \`locus\`, or \`name\` keyword arguments"))
+
     filter_by = Dict{Symbol,Vector{String}}()
-    notices = ""
 
     if !isnothing(population)
         filter_by[:population] = typeof(population) <: AbstractArray ? string.(population) : [string(population)]
         err = filter_by[:population][filter_by[:population] .∉ Ref(unique(data.meta.population))]
         if length(err) > 0
-            [notices *= "\n  population \"$i\"" for i in err]
+            notice = "Criteria not found in PopData\nPopulations: "
+            notice *= "\"" * err[1] * "\""
+            if length(err) > 1
+                [notice *= ", \"$i\"" for i in err[2:end]]
+            end
+            throw(ArgumentError(notice))
         end
     end
     if !isnothing(locus)
         filter_by[:locus] = typeof(locus) <: AbstractArray ? string.(locus) : [string(locus)]
         err = filter_by[:locus][filter_by[:locus] .∉ Ref(loci(data))]
         if length(err) > 0
-            [notices *= "\n  locus \"$i\"" for i in err]
+            notice = "Criteria not found in PopData\nLoci: "
+            notice *= "\"" * err[1] * "\""
+            if length(err) > 1
+                [notice *= ", \"$i\"" for i in err[2:end]]
+            end
+            throw(ArgumentError(notice))
         end
     end
     if !isnothing(name)
         filter_by[:name] = typeof(name) <: AbstractArray ? string.(name) : [string(name)]
         err = filter_by[:name][filter_by[:name] .∉ Ref(data.meta.name)]
         if length(err) > 0
-            [notices *= "\n  sample \"$i\"" for i in err]
+            notice = "Criteria not found in PopData\nSamples: "
+            notice *= "\"" * err[1] * "\""
+            if length(err) > 1
+                [notice *= ", \"$i\"" for i in err[2:end]]
+            end
+            throw(ArgumentError(notice))
         end
-    end
-    length(filter_by) > 1 && throw(ArgumentError("Please specify only one of \`population\`, \`locus\`, or \`name\` keyword arguments"))
-    
-    # print the notices, if any
-    if notices != ""
-        error("Criteria not found in PopData:" * notices)
     end
 
     filter_keys = Symbol.(keys(filter_by))
