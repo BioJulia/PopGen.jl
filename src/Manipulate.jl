@@ -368,7 +368,7 @@ function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing
         err = filter_by[:population][filter_by[:population] .∉ Ref(unique(data.meta.population))]
         if length(err) > 0
             printstyled("Populations not found: ", bold = true)
-            print(err[1])
+            print("\"" * err[1] * "\"")
             if length(err) > 1
                 [print(", \"$i\"") for i in err[2:end]] ; print("\n")
             end
@@ -379,7 +379,7 @@ function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing
         err = filter_by[:locus][filter_by[:locus] .∉ Ref(loci(data))]
         if length(err) > 0
             printstyled("Loci not found: ", bold = true)
-            print(err[1])
+            print("\"" * err[1] * "\"")
             if length(err) > 1
                 [print(", \"$i\"") for i in err[2:end]] ; print("\n")
             end
@@ -390,7 +390,7 @@ function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing
         err = filter_by[:name][filter_by[:name] .∉ Ref(data.meta.name)]
         if length(err) > 0
             printstyled("Samples not found: ", bold = true)
-            print(err[1])
+            print("\"" * err[1] * "\"")
             if length(err) > 1
                 [print(", \"$i\"") for i in err[2:end]] ; print("\n")
             end
