@@ -257,11 +257,7 @@ function allele_freqtable(data::PopData; by::String = "global")
             ungroup = false
         )
         counts = DataFrames.combine(
-            counts,
-            :locus, :allele, :n
-        )
-        counts = DataFrames.combine(
-            groupby(counts, [:locus, :allele]),
+            groupby(DataFrame(counts), [:locus, :allele]),
             nrow => :count,
             [:n, :allele] => ((n,al) -> length(al)/first(n)) => :frequency
         )
@@ -275,15 +271,10 @@ function allele_freqtable(data::PopData; by::String = "global")
             ungroup = false
         )
         counts = DataFrames.combine(
-            counts,
-            :locus, :population, :allele, :n
-        )
-        counts = DataFrames.combine(
-            groupby(counts, [:locus, :population, :allele]),
+            groupby(DataFrame(counts), [:locus, :population, :allele]),
             nrow => :count,
             [:n, :allele] => ((n,al) -> length(al)/first(n)) => :frequency
         )
-        #return counts
     else
         throw(ArgumentError("Please use by = \"global\" (default) or \"population\""))
     end

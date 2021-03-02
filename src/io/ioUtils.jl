@@ -73,7 +73,7 @@ end
 
 phase(loc::Missing, type::DataType, digit::Int) = missing
 
-@inline function phase(loc::T, type::DataType, digit::Int) where T<:Signed
+@inline function phase(loc::T, type::DataType, digit::Int) where T<:Integer
     loc == -9 || iszero(loc) && return missing
     units = 10^digit
     allele1 = loc ÷ units |> type

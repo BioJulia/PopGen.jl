@@ -38,9 +38,9 @@ end
 end
 
 @testset "populations" begin
-    @test size(populations(cats)) == (17,2)
-    @test typeof(populations(cats).population) == Vector{String}
-    @test typeof(populations(cats).count) == Vector{Int}
+    @test length(populations(cats)) == 17
+    @test typeof(populations(cats, counts = true).population) == Vector{String}
+    @test typeof(populations(cats, counts = true).count) == Vector{Int}
 
     rn_dict = Dict("1" => "one", "2" => "two")
     populations!(cats, rn_dict)
@@ -63,11 +63,11 @@ end
 @testset "exclusion" begin
     tmp = exclude(@nancycats, name = "N100", population = ["1", "15"])
     @test length(samples(tmp)) == 215
-    @test size(populations(tmp)) == (15,2)
+    @test length(populations(tmp)) == 15
 
-    tmp = exclude(@nancycats, names = "N102", loci = "fca8", population = "3")
+    tmp = exclude(@nancycats, name = "N102", locus= "fca8", population = "3")
     @test length(loci(tmp)) == 8
-    @test size(populations(tmp)) == (16,2)
+    @test length(populations(tmp)) == 16
     @test length(samples(tmp)) == 225
 end
 

@@ -64,12 +64,15 @@ function delimited(
     locinames = names(file_parse)[5:end]
 
     meta = select(file_parse, 1:4)
+    # force strings for this field
+    meta.population = string.(meta.population)
+
     rename!(meta, [:name, :population, :longitude, :latitude])
     select!(file_parse, Not(3:4))
     geno_type = determine_marker(file_parse, digits)
     geno_parse = DataFrames.stack(file_parse, DataFrames.Not(1:2))
     rename!(geno_parse, [:name, :population, :locus, :genotype])
-    #categorical!(geno_parse, [:name, :population, :locus], compress = true)
+
     select!(geno_parse,
         :name => (i -> PooledArray(Array(i))) => :name,
         :population => (i -> PooledArray(Array(i))) => :population,
@@ -86,12 +89,9 @@ function delimited(
         :genotype => find_ploidy => :ploidy
     ).ploidy
     DataFrames.insertcols!(meta, 3, :ploidy => ploidy)
-    
-    if allow_monomorphic 
-        pd_out = PopData(meta, geno_parse)
-    else
-        pd_out = drop_monomorphic!(PopData(meta, geno_parse))
-    end
+
+    pd_out = PopData(meta, geno_parse)
+    !allow_monomorphic && drop_monomorphic!(pd_out)
     return pd_out
 end
 

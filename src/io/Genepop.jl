@@ -135,11 +135,8 @@ function genepop(
     geno_parse.genotype = map(i -> phase.(i, geno_type, digits), geno_parse.genotype)
     sample_table = generate_meta(geno_parse)
 
-    if allow_monomorphic 
-        pd_out = PopData(sample_table, geno_parse)
-    else
-        pd_out = drop_monomorphic!(PopData(sample_table, geno_parse))
-    end
+    pd_out = PopData(sample_table, geno_parse)
+    !allow_monomorphic && drop_monomorphic!(pd_out)
     return pd_out
 end
 

@@ -23,10 +23,21 @@ Return an array of all the non-missing alleles of a locus.
 """
 @inline function alleles(locus::T) where T<:GenoArray
     if all(ismissing.(locus))
-        return Vector{Union{Missing, eltype(locus).b.types[1]}}(undef, length(locus))
+        int_type = eltype(typeof(locus)) |> nonmissingtype |> eltype
+        return Vector{Union{Missing, int_type}}(undef, length(locus))
     end
     alle_out = Base.Iterators.flatten(skipmissing(locus)) |> collect
 end
+
+
+"""
+    allele_count(locus::T) where T<:GenoArray
+Return the number of unique alleles present at a locus.
+"""
+@inline function allele_count(locus::T) where T<:GenoArray
+    Base.Iterators.flatten(skipmissing(locus)) |> collect |> unique |> length
+end
+
 
 """
     alleles(locus::T, miss::Bool = false) where T<:GenoArray
@@ -34,7 +45,7 @@ Return an array of all the non-missing alleles of a locus. Use the second positi
 argument as `true` to include missing values.
 """
 @inline function alleles(locus::T, miss::Bool) where T<:GenoArray
-    int_type = eltype(locus).b.types[1]
+    int_type = eltype(typeof(locus)) |> nonmissingtype |> eltype
     if all(ismissing.(locus))
         return Vector{Union{Missing, int_type}}(undef, length(locus))
     end
@@ -88,7 +99,7 @@ function convert_coord(coordinate::String)
     if length(split_coord) == 3
         split_coord[3] /=3600.0
     end
-    conv = sum(abs.(split_coord))
+    conv = mapreduce(abs, +, split_coord)
     # N + E are positive | S + W are negative
     if split_coord[1] < 0 || occursin(r"[SW]", uppercase(coordinate))
         # negative
@@ -102,6 +113,16 @@ end
 function Base.copy(data::PopData)
     PopData(copy.([data.meta,data.loci])...)
 end
+
+#TODO add to docs/API
+"""
+    count_nonzeros(x::AbstractVector{T}) where T<:Real
+Return the number of non-zero values in a vector
+"""
+function count_nonzeros(x::AbstractVector{T}) where T<:Real
+    mapreduce(!iszero, +, x)
+end
+
 
 """
     drop_monomorphic(data::PopData)
@@ -267,8 +288,9 @@ Convenience function to count the number of non-`missing` values
 in a vector.
 """
 @inline function nonmissing(vec::T) where T<:AbstractArray
-    count(!ismissing, vec)
+    mapreduce(!ismissing, +, vec)
 end
+
 
 #TODO add to API docs
 """
@@ -292,9 +314,9 @@ end
 
 #TODO add to docs API
 """
-    pairwise_pairs(smp_names::Vector{String})
-Given a vector of sample names, returns a vector of tuples of unique all x 
-all combinations of sample pairs, excluding self-comparisons.
+    pairwise_pairs(smp_names::Vector{T}) where T
+Given a vector of some iterable, returns a vector of tuples of unique all x 
+all combinations of pairs, excluding self-comparisons.
 
 **Example**
 ```
@@ -310,9 +332,32 @@ julia> pairwise_pairs(samps)
  ("blue_1", "blue_2")
 ```
 """
-@inline function pairwise_pairs(smp_names::AbstractVector{String})
+@inline function pairwise_pairs(smp_names::AbstractVector{T}) where T
     [tuple(smp_names[i], smp_names[j]) for i in 1:length(smp_names)-1 for j in i+1:length(smp_names)]
 end
+
+
+"""
+    partitionarray(array::AbstractArray, steps::AbstractVector{<:Integer})
+Like Base.Iterators.Partition, except you can apply arbitrary sizes to
+partition the array by. The `steps` must add up to the total row length
+of the array.
+
+***Example***
+````
+julia> partitionmatrix(rand(20,5), [10,3,4,3]) .|> size
+((10, 5), (3, 5), (4, 5), (3, 5))
+```
+"""
+# solution brilliantly provided by @stevengj and @mcabbott on Slack and Discourse (https://discourse.julialang.org/t/is-there-a-simple-intuitive-way-to-partition-a-matrix-by-arbitrary-strides-like-i/55863)
+function partitionarray(array::AbstractArray, steps::AbstractVector{<:Integer})
+    v = axes(array,1)
+    v == 1:sum(steps) || error("Steps provided do not sum to length of the first dimension")
+    i = firstindex(v)
+    tmp = (view(v, i:(i+=s)-1) for s in steps)
+    [view(array,r,:) for r in tmp]
+end
+
 
 #TODO add to docs API
 """
@@ -410,6 +455,33 @@ the number is `0` instead of returning `Inf`.
 function reciprocal(num::T) where T <: Real
     !iszero(num) ? 1.0/float(num) : 0.0
 end
+
+
+"""
+    reciprocal_sum(x::AbstractVector{T}) where T<:Real
+Return the sum of the reciprocal values of `x`, skipping the `Inf` values
+resulting from divide-by-zero errors.
+"""
+function reciprocal_sum(x::AbstractVector{T}) where T<:Real
+    mapreduce(reciprocal, +, x)
+end
+
+#TODO add to API/utils.jl
+"""
+    safemean(::AbstractVector{T}) where T<:Real
+A wrapper for StatsBase.mean to calculate a mean after skipping `Inf`, `-Inf`, and `NaN` values.
+"""
+function safemean(x::AbstractVector{T}) where T<:Real
+    y = x
+    if any(isinf.(x))
+        y =  x[.!isinf.(x)]
+    end
+    if any(isnan.(x))
+        y = y[.!isnan.(y)]
+    end
+    mean(y)
+end
+
 
 """
     sim_pairs(data::Vector{String})

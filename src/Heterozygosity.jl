@@ -1,5 +1,7 @@
 export ishom, ishet, heterozygosity, het
 
+
+#TODO how to treat haploids?
 """
 ```
 ishom(locus::T) where T <: GenoArray
@@ -8,22 +10,36 @@ ishom(locus::Missing)
 ```
 A series of methods to test if a locus or loci are homozygous and return `true` if
 it is, `false` if it isn't, and `missing` if it's `missing`. The vector version
-simply broadcasts the function over the elements.
+simply maps the function over the elements.
 """
 @inline function ishom(locus::Genotype)
-    # if allele 1 equels all others, return true
-    return all(@inbounds locus[1] .== locus)
+    # if the first equals all others, return true
+    return all(@inbounds first(locus) .== locus)
 end
 
-@inline function ishom(locus::Missing)
-    # if the locus is Missing, return missing. no muss no fuss
-    return missing
-end
+ishom(locus::Missing) = missing
 
 @inline function ishom(locus::T) where T<:GenoArray
-    return @inbounds ishom.(locus)
+    return @inbounds map(ishom, locus)
 end
 
+@inline function ishom(locus::T) where T<:Base.SkipMissing
+    return @inbounds map(ishom, locus)
+end
+
+
+"""
+    ishom(locus::Genotype, allele::Signed)
+    ishom(loci::GenoArray, allele::Signed)
+Returns `true` if the `locus`/`loci` is/are homozygous for the specified `allele`.
+"""
+function ishom(geno::T, allele::U) where T<:Genotype where U<:Integer
+    ∈(allele, geno) & ishom(geno) ? true : false
+end
+
+ishom(geno::T, allele::U) where T<:GenoArray where U<:Integer = map(i -> ishom(i, allele), geno)
+
+ishom(geno::Missing, allele::U) where U<:Integer = missing
 
 """
 ```
@@ -39,13 +55,64 @@ elements. Under the hood, this function is simply `!ishom`.
     return !ishom(locus)
 end
 
-@inline function ishet(locus::Missing)
-    # if the locus is Missing, return missing. no muss no fuss
-    return missing
-end
+ishet(locus::Missing) = missing
+
 
 @inline function ishet(locus::T) where T<:GenoArray
-    return @inbounds ishet.(locus)
+    return @inbounds map(ishet, locus)
+end
+
+
+@inline function ishet(locus::T) where T<:Base.SkipMissing
+    return @inbounds map(ishet, locus)
+end
+
+
+"""
+    ishet(locus::Genotype, allele::Signed)
+    ishet(loci::GenoArray, allele::Signed)
+Returns `true` if the `locus`/`loci` is/are heterozygous for the specified `allele`. 
+"""
+function ishet(geno::T, allele::U) where T<:Genotype where U<:Integer
+    ∈(allele, geno) & !ishom(geno) ? true : false
+end
+
+ishet(geno::T, allele::U) where T<:GenoArray where U<:Integer = map(i -> ishet(i, allele), geno)
+
+ishet(geno::Missing, allele::U) where U<:Integer = missing
+
+
+"""
+    counthet(geno::T, allele::Int) where T<:GenoArray
+    counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
+Given a `GenoArray`, count the number of times `allele` appears in the
+heterozygous state.
+"""
+function counthet(geno::T, allele::U) where T<:GenoArray where U<:Integer
+    mapreduce(i -> ishet(i, allele), +, skipmissing(geno))
+end
+
+
+function counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
+    tmp = skipmissing(geno)
+    isempty(tmp) && return fill(0, length(allele))
+    map(_allele -> mapreduce(i -> ishet(i, _allele), +, tmp), allele)
+end
+
+
+"""
+    counthom(geno::T, allele::Int) where T<:GenoArray
+Given a `GenoArray`, count the number of times `allele` appears in the
+homozygous state.
+"""
+function counthom(geno::T, allele::U) where T<:GenoArray where U <: Signed
+    mapreduce(i -> ishom(i, allele), +, skipmissing(geno))
+end
+
+function counthom(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
+    tmp = skipmissing(geno)
+    isempty(tmp) && return fill(0, length(allele))
+    map(_allele -> mapreduce(i -> ishom(i, _allele), +, tmp), allele)
 end
 
 """
@@ -63,12 +130,8 @@ Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
 (Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press).
 use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 """
-@inline function gene_diversity_nei87(het_exp::AbstractFloat, het_obs::AbstractFloat, n::Union{Integer,AbstractFloat}; corr::Bool = true)
-    if corr == true
-        corr_val = n/(n-1)
-    else
-        corr_val = 1
-    end
+@inline function gene_diversity_nei87(het_exp::T, het_obs::T, n::Union{Integer,T}; corr::Bool = true) where T<: AbstractFloat
+    corr_val = corr ? n/(n-1.0) : 1.0
     return @fastmath (het_exp - (het_obs/n/2.0)) * corr_val
 end
 
@@ -103,11 +166,7 @@ Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
 @inline function hetero_e(data::T) where T <: GenoArray
-    if all(ismissing.(data)) == true
-        return missing
-    else
-        1.0 - sum(@inbounds allele_freq_vec(data) .^ 2)
-    end
+    all(ismissing.(data)) == true ? missing : 1.0 - mapreduce(i -> i^2, + , allele_freq_vec(data))
 end
 
 
@@ -159,6 +218,8 @@ end
 
 const het = heterozygosity
 
+
+#NOTE this is not intended to be performant. It's a convenience function. 
 """
     het_sample(data::PopData, individual::String)
 Calculate the observed heterozygosity for an individual in a `PopData` object.

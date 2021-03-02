@@ -37,7 +37,7 @@ module PopGen
 #   O o       O o       O o       O o       O o
 
 using CSV, Distributions, DataFrames, PooledArrays, StaticArrays
-using FileIO, JLD2, Requires, ProgressMeter
+using Requires, ProgressMeter
 using MultipleTesting, Random, StatsBase
 using RandomNumbers.Xorshifts
 
@@ -78,6 +78,8 @@ include("Manipulate.jl")
 include("SummaryInfo.jl")
 #Analyses
 include("HardyWeinberg.jl")
+#TODO uncomment when ready
+#include("FStats.jl")
 include("Relatedness/PairwiseRelatedness.jl")
 include("Relatedness/RelatednessMoments.jl")
 include("Relatedness/RelatednessPostHocs.jl")

@@ -181,11 +181,9 @@ function structure(infile::String; silent::Bool = false, extracols::Int = 0, ext
     loci_df.population = PooledArray(loci_df.population)
     loci_df.locus = PooledArray(loci_df.locus)
 
-    if allow_monomorphic 
-        pd_out = PopData(meta_df, loci_df)
-    else
-        pd_out = drop_monomorphic!(PopData(meta_df, loci_df))
-    end
+    pd_out = PopData(meta_df, loci_df)
+    !allow_monomorphic && drop_monomorphic!(pd_out) 
+
     return pd_out
 end
 
