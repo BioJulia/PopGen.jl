@@ -68,7 +68,11 @@ function _pairwise_WeirCockerham(data::PopData)
     results = zeros(npops, npops)
     for i in 2:npops
         for j in 1:(i-1)
+<<<<<<< HEAD
             results[i,j] = weircockerham1984(DataFrame(idx_pdata[[j,i]]))
+=======
+            results[i,j] = _pairwise_WC(DataFrame(idx_pdata[[j,i]]))
+>>>>>>> 0cbbeb84a843b040e67b1016d0af3c8c19f6b6f4
         end
     end
     return PairwiseFST(DataFrame(results, Symbol.(pops)), "Weir-Cockerham")

@@ -314,9 +314,9 @@ end
 
 #TODO add to docs API
 """
-    pairwise_pairs(smp_names::Vector{String})
-Given a vector of sample names, returns a vector of tuples of unique all x 
-all combinations of sample pairs, excluding self-comparisons.
+    pairwise_pairs(smp_names::Vector{T}) where T
+Given a vector of some iterable, returns a vector of tuples of unique all x 
+all combinations of pairs, excluding self-comparisons.
 
 **Example**
 ```
@@ -332,7 +332,7 @@ julia> pairwise_pairs(samps)
  ("blue_1", "blue_2")
 ```
 """
-@inline function pairwise_pairs(smp_names::AbstractVector{String})
+@inline function pairwise_pairs(smp_names::AbstractVector{T}) where T
     [tuple(smp_names[i], smp_names[j]) for i in 1:length(smp_names)-1 for j in i+1:length(smp_names)]
 end
 
