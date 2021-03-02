@@ -54,8 +54,8 @@ const file_import = read_from
     write_to(data::PopData; filename::String, kwargs...)
 Writes `PopData` to a specified file type inferred from the extension of `filename = ` (case insensitive). Additional keyword
 arguments `kwargs...` are specific to the intended file type, and are listed in the docstrings of the specific
-file writer with the format `?popdata2filetype`. For example, to find the appropriate keywords for a conversion
-to Genepop format, call up the docstring to `popdata2genepop` with `?popdata2genepop`.
+file writer with the format `?filetype`. For example, to find the appropriate keywords for a conversion
+to Genepop format, call up the `?genepop` docstring.
 
 | File Format | Extensions             | Docstring          |
 | :---------- | :--------------------- | :----------------- |
