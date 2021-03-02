@@ -136,7 +136,7 @@ function genepop(
     sample_table = generate_meta(geno_parse)
 
     pd_out = PopData(sample_table, geno_parse)
-    allow_monomorphic && drop_monomorphic!(pd_out)
+    !allow_monomorphic && drop_monomorphic!(pd_out)
     return pd_out
 end
 

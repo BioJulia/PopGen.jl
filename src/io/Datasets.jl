@@ -4,7 +4,7 @@ export dataset, @nancycats, @gulfsharks
 """
     dataset(::String)
 Load an example dataset from either `"gulfsharks"` (SNP) or `"nancycats"` (microsatellite). Can also use `"sharks"` and `"cats"`
-as shorthands. Use `?nancycats` and `?gulfsharks` to learn more about
+as shorthands. Use `?@nancycats` and `?@gulfsharks` to learn more about
 these datasets.
 
 ### Example
@@ -14,8 +14,14 @@ gsharks = dataset("sharks")
 ```
 """
 function dataset(name::String)
-    lowercase(name) in ["gulfsharks", "sharks"] && return PopGen._gulfsharks()
-    lowercase(name) in ["nancycats", "cats"] && return PopGen._nancycats()
+    if lowercase(name) in ["nancycats", "cats"] 
+        filename = normpath(joinpath(@__DIR__,"../..","data", "nancycats.gen"))
+    elseif lowercase(name) in ["gulfsharks", "sharks"]
+        filename = normpath(joinpath(@__DIR__,"../..","data", "gulfsharks.csv"))
+    else
+        throw(ArgumentError("Please choose either the \"nancycats\" or \"gulfsharks\" datasets"))
+    end
+    read_from(filename, silent = true)
 end
 
 """
@@ -31,14 +37,8 @@ ncats = @nancycats
 """
 macro nancycats()
     return esc(quote
-       PopGen._nancycats()
+       dataset("nancycats")
     end)
-end
-
-
-function _nancycats()
-    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
-    load(filename, "nancycats")
 end
 
 
@@ -56,11 +56,6 @@ sharks = @gulfsharks
 """
 macro gulfsharks()
     return esc(quote
-       PopGen._gulfsharks()
+       dataset("gulfsharks")
     end)
-end
-
-function _gulfsharks()
-    filename = normpath(joinpath(@__DIR__,"../..","data", "datasets.jld2"))
-    load(filename, "gulfsharks")
 end

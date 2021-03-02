@@ -59,10 +59,9 @@ to Genepop format, call up the docstring to `popdata2genepop` with `?popdata2gen
 
 | File Format | Extensions             | Docstring          |
 | :---------- | :--------------------- | :----------------- |
-| genepop     | `.gen`, `.genepop`     | ?popdata2genepop   |
-| JLD2        | `.jld2`                | ?popdata2jld2      |
-| delimited   | `.csv`, `.txt`, `.tsv` | ?popdata2delimited |
-| structure   | `.str`, `.structure`   | ?popdata2structure |
+| genepop     | `.gen`, `.genepop`     | ?genepop   |
+| delimited   | `.csv`, `.txt`, `.tsv` | ?delimited |
+| structure   | `.str`, `.structure`   | ?structure |
 
 ### Example
 ```
@@ -74,23 +73,12 @@ write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "
 function write_to(data::PopData; filename::String, kwargs...)
     ext = split(filename, ".")[end] |> lowercase
     if ext in ["gen", "genepop"]
-        popdata2genepop(data, filename = filename; kwargs...)
-    elseif ext == "jld2"
-        popdata2jdl2(data, filename = filename)
+        genepop(data, filename = filename; kwargs...)
     elseif ext in ["str", "structure"]
-        return popdata2structure(data; kwargs...)
+        return structure(data; kwargs...)
     elseif ext in ["csv", "txt", "tsv"]
-        popdata2delimited(data, filename = filename; kwargs...)
+        delimited(data, filename = filename; kwargs...)
     else
         @error "File type not recognized by filename extension. Please see the docstring"
     end
-end
-
-
-"""
-    popdata2jdl2(data::PopData; filename::String)
-Write PopData to a `JLD2` file.
-"""
-function popdata2jdl2(data::PopData; filename::String)
-    JLD2.@save filename data
 end

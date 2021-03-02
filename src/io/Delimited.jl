@@ -87,11 +87,13 @@ function delimited(
     ).ploidy
     DataFrames.insertcols!(meta, 3, :ploidy => ploidy)
     
-    if allow_monomorphic 
-        pd_out = PopData(meta, geno_parse)
-    else
-        pd_out = drop_monomorphic!(PopData(meta, geno_parse))
+    # make sure the populations are strings, just in case
+    if eltype(meta.population) != String 
+       meta.population = string.(meta.population) 
     end
+    
+    pd_out = PopData(meta, geno_parse)
+    !allow_monomorphic && drop_monomorphic!(pd_out)
     return pd_out
 end
 
