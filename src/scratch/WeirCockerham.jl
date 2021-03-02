@@ -2,6 +2,7 @@ function _wc_helper(x::AbstractArray{Float64,2})
     view(x,:,1) ./ sum(x, dims = 2)
 end
 
+#= dont think we need the full version
 function _wc_full(data::PopData)
     loc_names = loci(data)
     n_loci = length(loc_names)
@@ -114,8 +115,9 @@ function _wc_full(data::PopData)
     return fst_total, fis_total
 
 end
+=#
 
-function _pairwise_WC(data::AbstractDataFrame)
+function weircockerham1984(data::AbstractDataFrame)
     loc_names = unique(data.locus)
     n_loci = length(loc_names)
     n_pops = length(unique(data.population))
@@ -149,7 +151,7 @@ function _pairwise_WC(data::AbstractDataFrame)
     allele_counts = DataFrames.combine(
         per_loc, 
         :genotype => allele_count => :allele_count,  # allele counts
-        :genotype => (i -> allele_freq(i)) => :freqs,          # global allele freqs
+        :genotype => allele_freq => :freqs,          # global allele freqs
     )
     # allele freqs per locus per population
     alle_freqs = DataFrames.combine(per_locpop, :genotype => allele_freq => :freqs)
@@ -213,5 +215,6 @@ function _pairwise_WC(data::AbstractDataFrame)
     σ_a = 0.5 ./ corr_n_per_loc_exp .* (MSP - MSI)
     σ = hcat(σ_a, σ_b, σ_w)
     σ_total = sum(σ, dims = 1)
-    fst_total = @views σ_total[1] / sum(σ_total)
+    σ_total
+    fst_total = σ_total[1] / sum(σ_total)
 end
