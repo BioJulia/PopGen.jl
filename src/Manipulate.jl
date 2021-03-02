@@ -242,22 +242,28 @@ end
 
 
 """
-    populations(data::PopData; listall::Bool = false)
-View unique population ID's and their counts in a `PopData`.
+    populations(data::PopData; counts::Bool = false)
+View unique population ID's and/or their counts in `PopData`.
 
-- `listall = true` displays all samples and their `population` instead (default = `false`)
+- `counts` returns a dataframe of samples per `population` instead (default = `false`)
 """
-@inline function populations(data::PopData; listall::Bool = false)
+@inline function populations(data::PopData; counts::Bool = false)
     if all(ismissing.(data.meta.population)) == true
         @info "no population data present in PopData"
         return
-    elseif listall == true
-        return @view data.meta[:, [:name, :population]]
+    end
+    
+    uniq_pops = unique(data.meta.population)
+    
+    if counts == false
+        return uniq_pops
     else
         pops = countmap(data.meta.population)
-        return DataFrame(:population => collect(keys(pops)), :count => collect(values(pops))) |> sort
+        return DataFrame(:population => uniq_pops, :count => [pops[i] for i in uniq_pops])
     end
 end
+
+
 """
 ```
 # Replace by matching
