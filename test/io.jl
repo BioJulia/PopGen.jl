@@ -4,9 +4,9 @@ using PopGen
 using GeneticVariation, GZip
 using Test
 
-cats_gen = normpath(joinpath(@__DIR__,"..","data/source", "nancycats.gen"))
-sharks_gen = normpath(joinpath(@__DIR__,"..","data/source", "gulfsharks.gen"))
-oyster_vcf = normpath(joinpath(@__DIR__,"..","data/source", "filtered_oyster.vcf"))
+cats_gen = normpath(joinpath(@__DIR__,"..","data/", "nancycats.gen"))
+sharks_gen = normpath(joinpath(@__DIR__,"..","data/", "gulfsharks.csv"))
+oyster_vcf = normpath(joinpath(@__DIR__,"..","data/", "filtered_oyster.vcf"))
 
 @testset "Genepop io" begin
     @test typeof(read_from(cats_gen, silent = true)) == PopData
