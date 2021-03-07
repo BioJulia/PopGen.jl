@@ -57,7 +57,6 @@ argument as `true` to include missing values.
 end
 
 
-# TODO add to docs: Utils.jl API
 function Base.size(data::PopData)
     return (samples = size(data.meta)[1], loci = length(loci(data)))
 end
@@ -114,7 +113,6 @@ function Base.copy(data::PopData)
     PopData(copy.([data.meta,data.loci])...)
 end
 
-#TODO add to docs/API
 """
     count_nonzeros(x::AbstractVector{T}) where T<:Real
 Return the number of non-zero values in a vector
@@ -166,7 +164,6 @@ function drop_monomorphic!(data::PopData)
     exclude!(data, locus = rm_loci)
 end
 
-##TODO add to docs API
 """
     loci_dataframe(data::PopData)
 Return a wide `DataFrame` of samples as columns, ommitting population information.
@@ -193,7 +190,6 @@ function loci_dataframe(data::PopData)
     unstack(select(data.loci, Not(:population)), :name, :genotype)[:, Not(:locus)]
 end
 
-#TODO add to docs API
 #TODO make a SMatrix instead?
 """
     loci_matrix(data::PopData)
@@ -247,7 +243,7 @@ returned array. See MultipleTesting.jl docs for full more detailed information.
 ```
 julia> multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")
 
-````
+```
 
 ### `correction` methods (case insensitive)
 - `"bonferroni"` : Bonferroni adjustment
@@ -292,7 +288,6 @@ in a vector.
 end
 
 
-#TODO add to API docs
 """
     nonmissing(data::PopData, locus::String)
 Convenience function to count the number of non-`missing` samples
@@ -312,7 +307,6 @@ intersection of the indices of their non-missing elements.
 end
 
 
-#TODO add to docs API
 """
     pairwise_pairs(smp_names::Vector{T}) where T
 Given a vector of some iterable, returns a vector of tuples of unique all x 
@@ -343,8 +337,8 @@ Like Base.Iterators.Partition, except you can apply arbitrary sizes to
 partition the array by. The `steps` must add up to the total row length
 of the array.
 
-***Example***
-````
+**Example**
+```
 julia> partitionmatrix(rand(20,5), [10,3,4,3]) .|> size
 ((10, 5), (3, 5), (4, 5), (3, 5))
 ```
@@ -359,7 +353,6 @@ function partitionarray(array::AbstractArray, steps::AbstractVector{<:Integer})
 end
 
 
-#TODO add to docs API
 """
     phase(data::PopData)
 Return a `Vector` of length `ploidy` composed of allele matrices with dimensions `samples × loci`.
@@ -431,7 +424,7 @@ function reciprocal_sum(x::AbstractVector{T}) where T<:Real
     mapreduce(reciprocal, +, x)
 end
 
-#TODO add to API/utils.jl
+
 """
     safemean(::AbstractVector{T}) where T<:Real
 A wrapper for StatsBase.mean to calculate a mean after skipping `Inf`, `-Inf`, and `NaN` values.
@@ -455,11 +448,13 @@ number. This is an internal function used for isolating sibship pairs from simul
 pairs (via `PopGenSims.jl`) to perform `relatedness` estimates only on those pairs.
 
 **Example**
+```julia
 julia> a = ["sim1_off1", "sim1_off2", "sim2_off1", "sim2_off2"] ;
 
 julia> sim_pairs(a)
 ("sim1_off1", "sim1_off2")
 ("sim2_off1", "sim2_off2")
+```
 """
 function sim_pairs(data::Vector{String})
     n = length(data)
@@ -475,7 +470,7 @@ function Base.sort(x::NTuple{N,T}) where N where T <: Signed
     Tuple(sort(SVector(x)))
 end
 
-#TODO add to API docs
+
 """
     strict_shuffle(x::T) where T <: AbstractArray
 Shuffle only the non-missing values of a Vector and return a copy of the vector,
@@ -503,13 +498,12 @@ function strict_shuffle!(x::T) where T <: AbstractArray
 end
 
 
-#TODO add to docs API
 """
     generate_meta(data::DataFrame)
 Given a genotype DataFrame formatted like `PopData.loci`, generates a corresponding
 `meta` DataFrame. In other words, it creates the `.meta` part of `PopData` from the `.loci` part.
 
-**Example**:
+**Example**
 ```
 julia> cats = @nancycats ;
 
