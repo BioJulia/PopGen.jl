@@ -21,6 +21,14 @@ Return an array of all the unique non-missing alleles of a locus.
 
 ----
 
+### `count_nonzeros`
+```julia
+count_nonzeros(x::AbstractVector{T}) where T<:Real
+```
+Return the number of non-zero values in a vector
+
+----
+
 ### `convert_coord`
 ```julia
 convert_coord(coordinate::string)
@@ -62,6 +70,40 @@ Return a `PopData` object omitting any monomorphic loci. Will inform you which l
 ### `drop_monomorphic!`
     drop_monomorphic!(data::PopData)
 Edit a `PopData` object in place by omitting any monomorphic loci. Will inform you which loci were removed.
+
+----
+
+### `generate_meta`
+```julia
+generate_meta(data::DataFrame)
+```
+Given a genotype DataFrame formatted like `PopData.loci`, generates a corresponding
+`meta` DataFrame. In other words, it creates the `.meta` part of `PopData` from the `.loci` part.
+
+**Example**:
+```
+julia> cats = @nancycats ;
+julia> cats_nometa = cats.loci ;
+julia> cats_meta = generate_meta(cats_nometa)
+237×5 DataFrame
+ Row │ name    population  ploidy  longitude  latitude 
+     │ String  String      Int8    Float32?   Float32? 
+─────┼─────────────────────────────────────────────────
+   1 │ N215    1                2   missing   missing  
+   2 │ N216    1                2   missing   missing  
+   3 │ N217    1                2   missing   missing  
+   4 │ N218    1                2   missing   missing  
+   5 │ N219    1                2   missing   missing  
+   6 │ N220    1                2   missing   missing  
+   7 │ N221    1                2   missing   missing  
+  ⋮  │   ⋮         ⋮         ⋮         ⋮         ⋮
+ 232 │ N295    17               2   missing   missing  
+ 233 │ N296    17               2   missing   missing  
+ 234 │ N297    17               2   missing   missing  
+ 235 │ N281    17               2   missing   missing  
+ 236 │ N289    17               2   missing   missing  
+ 237 │ N290    17               2   missing   missing  
+        
 
 ----
 
@@ -138,6 +180,13 @@ Convenience function to count the number of non-`missing` values in a vector.
 Convenience function to count the number of non-`missing` samples
 at a locus.
 
+
+```julia
+nonmissing(data::PopData, locus::String)
+```
+Convenience function to count the number of non-`missing` samples
+
+
 ----
 
 ### `nonmissings`
@@ -175,9 +224,9 @@ multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
 ----
 
 ### `pairwise_pairs`
-    pairwise_pairs(smp_names::Vector{String})
-Given a vector of sample names, returns a vector of tuples of unique all x 
-all combinations of sample pairs, excluding self-comparisons.
+    pairwise_pairs(smp_names::Vector{T}) hwere T
+Given a vector of some iterable, returns a vector of tuples of unique all x 
+all combinations of pairs, excluding self-comparisons.
 
 **Example**
 ```
@@ -190,6 +239,22 @@ julia> pairwise_pairs(samps)
  ("red_2", "blue_1")
  ("red_2", "blue_2")
  ("blue_1", "blue_2")
+```
+
+----
+
+### `partitionarray`
+```julia
+partitionarray(array::AbstractArray, steps::AbstractVector{<:Integer})
+```
+Like `Base.Iterators.partition`, except you can apply arbitrary sizes to
+partition the array by. The `steps` must add up to the total row length
+of the array.
+
+***Example***
+```
+julia> partitionmatrix(rand(20,5), [10,3,4,3]) .|> size
+((10, 5), (3, 5), (4, 5), (3, 5))
 ```
 
 ----
@@ -244,6 +309,46 @@ Returns the reciprocal (1/number) of a number. Will return `0` when
 the number is `0` instead of returning `Inf`.
 
 ----
+
+### `safemean`
+```julia
+safemean(::AbstractVector{T}) where T<:Real
+```
+A wrapper for `StatsBase.mean` to calculate a mean after skipping `Inf`, `-Inf`, and `NaN` values.
+
+----
+
+### `size`
+```julia
+Base.size(data::PopData)
+```
+Returns a `NamedTuple` of the number of samples and loci in a `PopData` object.
+
+----
+
+### `sim_pairs`
+```julia
+sim_pairs(data::Vector{String})
+```
+Takes a Vector of sample names and returns a Tuple of sample pairs, grouped by simulation
+number. This is an internal function used for isolating sibship pairs from simulated shipship
+pairs (via `PopGenSims.jl`) to perform `relatedness` estimates only on those pairs.
+
+**Example**
+```
+julia> a = ["sim1_off1", "sim1_off2", "sim2_off1", "sim2_off2"] ;
+julia> sim_pairs(a)
+("sim1_off1", "sim1_off2")
+("sim2_off1", "sim2_off2")
+```
+
+----
+
+### `sort`
+```julia
+Base.sort(x::NTuple{N,T}) where N where T <: Signed 
+```
+Sort the integers within a Tuple and return the sorted Tuple.
 
 ### `strict_shuffle`
 ```julia
