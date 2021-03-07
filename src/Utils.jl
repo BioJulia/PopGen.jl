@@ -1,4 +1,4 @@
-export quickstart, size, drop_monomorphic, drop_monomorphic!
+export size, drop_monomorphic, drop_monomorphic!
 
 ## experimental and not exported or documented!
 function adjacency_matrix(data::PopData)
