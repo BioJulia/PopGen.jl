@@ -3,9 +3,9 @@ export dataset, @nancycats, @gulfsharks
 
 """
     dataset(::String)
-Load an example dataset from either `"gulfsharks"` (SNP) or `"nancycats"` (microsatellite). Can also use `"sharks"` and `"cats"`
-as shorthands. Use `?@nancycats` and `?@gulfsharks` to learn more about
-these datasets.
+Load an example dataset from either `"gulfsharks"` (SNP) or `"nancycats"` (microsatellite). 
+Can also use `"sharks"` and `"cats"` as shorthands. Use `?@nancycats` and 
+`?@gulfsharks` to learn more about these datasets.
 
 ### Example
 ```
@@ -26,9 +26,9 @@ end
 
 """
     @nancycats
-Returns a `PopObj` of corresponding "nancycats" dataset as featured in
-the R package `adegenet`. This is microsatellite data of 9 loci in 237
-individuals across 17 populations.
+Returns `PopData` of corresponding "nancycats" dataset as featured in
+the R package `adegenet`. This dataset is composed of 9 microsatellite 
+loci in 237 individuals across 17 populations.
 
 Example:
 ```
@@ -44,8 +44,8 @@ end
 
 """
     @gulfsharks
-Returns a `PopObj` corresponding the Blacknose shark dataset as used in
-Dimens et al. 2019. This is a mid-sized SNV dataset of 2209 haplotypes 
+Returns `PopData` corresponding the Blacknose shark dataset as used in
+Dimens et al. 2019. This is a mid-sized SNP dataset of 2209 haplotypes 
 in 212 individuals, across 7 populations.
 
 Example:
