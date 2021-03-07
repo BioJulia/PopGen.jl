@@ -108,7 +108,9 @@ julia> cats_meta = generate_meta(cats_nometa)
 ----
 
 ### `loci_dataframe`
-    loci_dataframe(data::PopData)
+```julia
+loci_dataframe(data::PopData)
+```
 Return a wide `DataFrame` of samples as columns, ommitting population information.
 
 **Example**
@@ -132,7 +134,9 @@ julia> loci_dataframe(@nancycats)
 ----
 
 ### `loci_matrix`
-    loci_matrix(data::PopData)
+```julia
+loci_matrix(data::PopData)
+```
 Return a matrix of genotypes with dimensions `samples × loci`.
 Rows are samples and columns are loci. Will return an error if ploidy varies between samples. 
 
@@ -190,7 +194,9 @@ Convenience function to count the number of non-`missing` samples
 ----
 
 ### `nonmissings`
-    nonmissings(vec1::AbstractVector, vec2::AbstractVector)
+```julia
+nonmissings(vec1::AbstractVector, vec2::AbstractVector)
+```
 Return a vector of indices where neither input vectors have a `missing` value, i.e. an
 intersection of the indices of their non-missing elements.
 
@@ -224,7 +230,9 @@ multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")`
 ----
 
 ### `pairwise_pairs`
-    pairwise_pairs(smp_names::Vector{T}) hwere T
+```julia
+pairwise_pairs(smp_names::Vector{T}) hwere T
+```
 Given a vector of some iterable, returns a vector of tuples of unique all x 
 all combinations of pairs, excluding self-comparisons.
 
@@ -251,7 +259,7 @@ Like `Base.Iterators.partition`, except you can apply arbitrary sizes to
 partition the array by. The `steps` must add up to the total row length
 of the array.
 
-***Example***
+**Example**
 ```
 julia> partitionmatrix(rand(20,5), [10,3,4,3]) .|> size
 ((10, 5), (3, 5), (4, 5), (3, 5))
@@ -349,6 +357,8 @@ julia> sim_pairs(a)
 Base.sort(x::NTuple{N,T}) where N where T <: Signed 
 ```
 Sort the integers within a Tuple and return the sorted Tuple.
+
+----
 
 ### `strict_shuffle`
 ```julia
