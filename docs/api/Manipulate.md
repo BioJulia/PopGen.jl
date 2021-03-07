@@ -163,11 +163,11 @@ locus(@gulfsharks, "contig_475")
 ### `populations`
 
 ```julia
-    populations(data::PopData; listall::Bool = false)
+    populations(data::PopData; counts::Bool = false)
 ```
-View unique population ID's and their counts in a `PopData`.
+View unique population ID's in a `PopData` objec
 
-- `listall = true` displays all samples and their `population` instead (default = `false`)
+- `counts = true` returns the number of samples per population  (default = `false`)
 
 ----
 

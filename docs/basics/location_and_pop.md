@@ -98,61 +98,53 @@ This method tolerates `missing` values, but you will need to `replace!` instance
 ### View population names
 
 ```julia
-populations(data::PopData; listall::Bool = false)
+populations(data::PopData; counts::Bool = false)
 ```
 
-Just as you can view population names with `PopData.meta.population`, you can also view them with the `populations` command, which by default shows you a summary of the number of individuals in each population.  
+Just as you can view population names with `PopData.meta.population`, you can also view them with the `populations` command.  
 
 <Tabs
   block={true}
   defaultValue="pop"
   values={[
-    { label: 'populations', value: 'pop', },
-    { label: 'listall = true', value: 'all', },
+    { label: 'populations', value: 'unique', },
+    { label: 'counts = true', value: 'counts', },
   ]
 }>
-<TabItem value="pop">
+<TabItem value="counts">
+
+You can return a table of the populations and their counts
 
 ``` julia
-julia> populations(sharks)
+julia> populations(sharks, counts = true)
 7×2 DataFrame
-│ Row │ population     │ count │
-│     │ String         │ Int64 │
-├─────┼────────────────┼───────┤
-│ 1   │ Cape Canaveral │ 21    │
-│ 2   │ Georgia        │ 30    │
-│ 3   │ South Carolina │ 28    │
-│ 4   │ Florida Keys   │ 65    │
-│ 5   │ Mideast Gulf   │ 28    │
-│ 6   │ Northeast Gulf │ 20    │
-│ 7   │ Southeast Gulf │ 20    │
+ Row │ population      count 
+     │ String          Int64 
+─────┼───────────────────────
+   1 │ Cape Canaveral     21
+   2 │ Georgia            30
+   3 │ South Carolina     28
+   4 │ Florida Keys       65
+   5 │ Mideast Gulf       28
+   6 │ Northeast Gulf     20
+   7 │ Southeast Gulf     20
 ```
 
 </TabItem>
-<TabItem value="all">
+<TabItem value="unique">
 
-You can use the keyword `listall = true` to display each individual and their associated population as a table. 
+You can display the unique populations. 
 
 ``` julia
-julia> populations(sharks, listall=true)
-212×2 DataFrame
-│ Row │ name    │ population     │
-│     │ String  │ String         │
-├─────┼─────────┼────────────────┤
-│ 1   │ cc_001  │ Cape Canaveral │
-│ 2   │ cc_002  │ Cape Canaveral │
-│ 3   │ cc_003  │ Cape Canaveral │
-│ 4   │ cc_005  │ Cape Canaveral │
-│ 5   │ cc_007  │ Cape Canaveral │
-│ 6   │ cc_008  │ Cape Canaveral │
-⋮
-│ 206 │ seg_025 │ Southeast Gulf │
-│ 207 │ seg_026 │ Southeast Gulf │
-│ 208 │ seg_027 │ Southeast Gulf │
-│ 209 │ seg_028 │ Southeast Gulf │
-│ 210 │ seg_029 │ Southeast Gulf │
-│ 211 │ seg_030 │ Southeast Gulf │
-│ 212 │ seg_031 │ Southeast Gulf │
+julia> populations(sharks)
+7-element Array{String,1}:
+ "Cape Canaveral"
+ "Georgia"
+ "South Carolina"
+ "Florida Keys"
+ "Mideast Gulf"
+ "Northeast Gulf"
+ "Southeast Gulf"
 ```
 
 </TabItem>

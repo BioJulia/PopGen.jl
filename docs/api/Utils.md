@@ -126,15 +126,6 @@ julia> loci_matrix(@nancycats)
  ```
 
 
-
-----
-
-### `motivational_quote`
-```julia
-motivational_quote()
-```
-Randomly returns one of ~50 _somewhat_ motivational quotes.
-
 ----
 
 ### `nonmissing`
@@ -242,14 +233,6 @@ julia> mtx[1]
  137         130  135     missing  150  142  193  113         208
  135         130  135     missing  150  142  197     missing  208
 ```
-
-----
-
-### `quickstart`
-```julia
-quickstart()
-```
-Prints helpful text of how to get started using PopGen.
 
 ----
 
