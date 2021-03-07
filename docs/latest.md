@@ -4,6 +4,15 @@ title: What's New
 sidebar_label: What's New
 ---
 
+## v.0.5.0
+This release fixes a critical bug in all the file importing functions that returned nothing when dropping monomorphic loci. Other changes include
+- Dropping `JLD2.jl` suport due to its version-to-version instability. Two fewer dependencies!
+  - As a result, `datasets()` now reads nancycats and gulfsharks directly from their source data files
+  - To maintain all of the information, gulfsharks reads from a delimited file rather than a genepop file
+- `populations` type signature and behavior has been changed:
+  - the default returns an array of the unique population names
+  - the keyword `listall::Bool` has been replaced with `counts::Bool`, which now returns a dataframe of the number of samples per population
+
 ## v0.4.5
 This release builds off of `0.4.3` and does a better job with the VCF loading logic. Along with that, `vcf` and `bcf` exist in the namespace before loading in `GeneticVariation.jl`, meaning you can always view the docstrings. These stripped-down methods in the namespace will give helpful errors to remind you to load in `GeneticVariation.jl` and/or `GZip.jl`.
 
