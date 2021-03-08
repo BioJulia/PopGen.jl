@@ -6,10 +6,6 @@ sidebar_label: Provided datasets
 
 PopGen.jl provides two datasets as examples, `nancycats` and `gulfsharks`. The datasets can be retrieved using the `dataset` function, or their names as macros  (e.g. `@gulfsharks`).
 
-:::caution
-As of v0.4.2 we are deprecating `nancycats()` and `gulfsharks()` in favor of their macros. You will still be able to use them, but you'll get a deprecation warning. We will remove `nancycats()` and `gulfsharks()` in the v0.5.0 release.
-:::
-
 :::info identitcal methods
 The methods are identical (one is a wrapper for the other), but the benefit of calling the datasets directly by name is that you get the luxury of tab auto-completion :grin:
 :::
