@@ -25,14 +25,16 @@ exclude(data::PopData, kwargs...)
 omit(data::PopData, kwargs...)
 remove(data::PopData, kwargs...)
 ```
-Returns a new `PopData` object without the sample or samples provided. Input can be a
-single sample, or an array of samples. This command will inform you if your criteria
+Returns a new `PopData` object without the criteria provided. Input can be a
+single item or, or an array of items. You will be informed you if your criteria
 were not found in the `PopData`.
 
 ### Keyword Arguments
-- `locus`: A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
-- `population`: A `String` or `Vector{String}` of populations you want to remove from the `PopData`.
-- `name`: A `String` or `Vector{String}` of samples you want to remove from the `PopData`.
+Everything gets converted to string, so `Symbol` works too if you want to cut down on keystrokes
+Integers work too if things are named `"1"`, `"2"`, etc.
+- `locus::Union{String, Vector{String}}`: locus or loci you want to remove from the `PopData`
+- `population::Union{String, Vector{String}}`: population(s) you want to remove from the `PopData`
+- `name::Union{String, Vector{String}}`: sample(s) you want to remove from the `PopData`
 
 <Tabs
   block={true}
@@ -134,3 +136,23 @@ PopData Object
 </Tabs>
 
 The in-place variant `exclude!()` follows all the same syntax as `exclude()`, therefore all examples above would be identical for `exclude!()`.
+
+## Keep only certain things
+```julia
+keep(data::PopData, kwargs...)
+```
+Returns a new `PopData` object keeping only the occurrences of the specified keyword.
+Unlike `exclude()`. only one keyword can be used at a time. All values are 
+converted to `String` for filtering, so `Symbol` and numbers will also work.
+### Keyword Arguments
+- `locus::Union{String, Vector{String}}`: locus or loci you want to keep in the `PopData`
+- `population::Union{String, Vector{String}}`: population(s) you want to keep in the `PopData`
+- `name::Union{String, Vector{String}}`: sample(s) you want to keep in the `PopData`.
+
+**Examples**
+```
+cats = @nancycats;
+keep(cats, population = 1:5)
+keep(cats, name = ["N100", "N102", "N211"])
+keep(cats, locus = [:fca8, "fca37"])
+```
