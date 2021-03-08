@@ -111,9 +111,9 @@ Write a `PopData` object to a Stucture format file
 - `data`: the `PopData` object you wish to convert to a Structure file
 
 ### Keyword Arguments
-- `filename`: a `String` of the output filename
-- `delim` : a `String` of either `"tab"` or `"space"` indicating the delimiter (default: `"tab"`)
-- `faststructure`: true/false of whether the output should be formatted for fastStructure (default: `false`)
+- `filename::String`: the output filename
+- `delim::String` : either `"tab"` or `"space"` indicating the delimiter (default: `"tab"`)
+- `faststructure::Bool`: if the output should be formatted for fastStructure (default: `false`)
 
 #### Example
 ```
