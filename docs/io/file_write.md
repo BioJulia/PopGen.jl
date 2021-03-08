@@ -13,7 +13,6 @@ will infer the correct output file type from the output filename's extensions. C
 | File Format | Extensions             | Docstring            |
 | :---------- | :--------------------- | :------------------- |
 | genepop     | `.gen`, `.genepop`     | `?genepop`   |
-| JLD2        | `.jld2`                | `?jld2`      |
 | delimited   | `.csv`, `.txt`, `.tsv` | `?delimited` |
 | Structure/fastStructure   | `.str`, `.structure` | `?structure` |
 
@@ -24,5 +23,4 @@ cats = @nancycats;
 fewer_cats = omit(cats, names = samples(cats)[1:10]);
 write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "horizontal")
 write_to(fewer_cats, filename = "filtered_nancycats.txt", digits = 4, format = "tidy", delim = ",")
-write_to(fewer_cats, filename = "filtered_nancycats.jld2")
 ```
