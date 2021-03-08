@@ -93,14 +93,14 @@ delimited(data::PopData; filename::String, delim::String = ",", digits::Integer 
 ```
 Write PopData to a text-delimited file. 
 ### Keyword Arguments
-- `filename`: a `String` of the output filename
-- `digits` : an `Integer` of how many digits to format each allele (default: `3`)
+- `filename::String`: the output filename
+- `digits::Integer` : how many digits to format each allele (default: `3`)
   - e.g. `digits = 3` will turn `(1, 2)` into `001002`
-- `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
+- `format::String`: whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
   - `wide` : the standard-format CSV for importing into PopGen.jl (default)
   - `long` : the `loci` table with `longitude` and `latitude` columns added
-- `delim` : the `String` delimiter to use for writing the file (default: `","`)
-- `miss` : an `Integer` for how you would like missing values written 
+- `delim::String`: delimiter to use for writing the file (default: `","`)
+- `miss::Integer`: how you would like missing values written 
     - `0` : As a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 
     - `-9` : As a single value `-9`
 
