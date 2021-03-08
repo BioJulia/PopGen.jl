@@ -13,12 +13,9 @@ This section covers situations where one may want to selectively remove informat
 :::note alias functions
 The exclusion commands are interchangeable with `omit` and `remove`, both with and
 without the bang (`!`). This was done so you can use the function comfortably without
-needing to remember the specific name to perform it. Maybe you just prefer the word `omit` to `remove`. We're not here to judge.
-
-The examples below use any combination of `omit`, `remove`, and `exclude`, and are
-similarly using varied keyword synonyms to demonstrate the flexibility of this
-function's syntax, along with demonstrating that it doesn't matter whether the
-keyword is singular or plural (like `locus` vs `loci`).
+needing to remember the specific name to perform it. Maybe you just prefer the word 
+`omit` to `remove`. We're not here to judge. The examples below use any combination 
+of `omit`, `remove`, and `exclude`.
 :::
 
 ## Exclude samples, loci, or entire populations
@@ -34,11 +31,8 @@ were not found in the `PopData`.
 
 ### Keyword Arguments
 - `locus`: A `String` or `Vector{String}` of loci you want to remove from the `PopData`.
-    - The keyword `loci` also works.
 - `population`: A `String` or `Vector{String}` of populations you want to remove from the `PopData`.
-    - The keyword `populations` also works.
 - `name`: A `String` or `Vector{String}` of samples you want to remove from the `PopData`.
-    - The keywords `names`, `sample`, and `samples` also work.
 
 <Tabs
   block={true}
@@ -53,7 +47,7 @@ were not found in the `PopData`.
 <TabItem value="s">
 
 ``` julia
-julia> fewer_sharks = exclude(sharks, sample = "cc_001")
+julia> fewer_sharks = exclude(sharks, name = "cc_001")
 PopData Object
   Marker: SNP
   Ploidy: 2
@@ -76,7 +70,7 @@ PopData Object
 <TabItem value="m">
 
 ``` julia
-julia> fewer_shark_loci = exclude(sharks, loci = "contig_475")
+julia> fewer_shark_loci = exclude(sharks, locus = "contig_475")
 PopData Object
   Marker: SNP
   Ploidy: 2
@@ -122,7 +116,7 @@ PopData Object
 <TabItem value="c">
 
 ``` julia
-julia> tiny_shark = exclude(sharks, loci = "contig_475", name = ["cc_001", "neg_021", "mango_111"], population = ["Cape Canaveral", "kiwi"])
+julia> tiny_shark = exclude(sharks, locus = "contig_475", name = ["cc_001", "neg_021", "mango_111"], population = ["Cape Canaveral", "kiwi"])
 Notices:
   sample "mango_111" not found
   population "kiwi" not found
@@ -139,15 +133,4 @@ PopData Object
 </TabItem>
 </Tabs>
 
-:::note ______ not found!
-If removing a single thing and it is not found in the PopData, an error will be returned. However, if attempting removing multiple things, you will receive a notice above the PopData output indicating which things were not found, while still removing the ones that were present.
-:::
-
 The in-place variant `exclude!()` follows all the same syntax as `exclude()`, therefore all examples above would be identical for `exclude!()`.
-
-:::info Efficient Exclusion
-1. Internally, there are two things that try to speed up data exclusion.
-Exclusion occurs in the order of populations => samples => loci because this order removes the most volume of data per search so that each subsequent step has fewer data to process. Because of this order, you may get erroneous warnings if something isn't not found in the data if the previous step removed it.
-
-2. If you are excluding more than half of the present data for any particular category, the function will instead just "keep the opposite". It's *much* faster to keep 53 loci than it is to remove 5400 of them (390ms vs 20s)!. 
-:::
