@@ -18,7 +18,7 @@ needing to remember the specific name to perform it. Maybe you just prefer the w
 of `omit`, `remove`, and `exclude`.
 :::
 
-## Exclude samples, loci, or entire populations
+## Exclude certain things
 
 ```julia
 exclude(data::PopData, kwargs...)
