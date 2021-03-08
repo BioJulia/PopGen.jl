@@ -97,16 +97,16 @@ Writes a `PopData` object to a Genepop-formatted file.
 ### Arguments
 - `data`: the `PopData` object you wish to convert to a Genepop file
 ### Keyword arguments
-- `filename`: a `String` of the output filename
-- `digits` : an `Integer` indicating how many digits to format each allele
+- `filename::String`: the output filename
+- `digits::Integer`: how many digits to format each allele
   -  e.g. `digits = 3` will turn `(1, 2)` into `001002` 
-- `format` : a `String` indicating whether loci should be formatted 
+- `format::String` : the way loci should be formatted 
   - vertically (`"v"` or `"vertical"`)
   - hortizontally (`"h"`, or `"horizontal"`)
   - isolation-by-distance (`"ibd"`) where each sample is a population with coordinate data prepended
-- `miss` : an `Integer` for how you would like missing values written 
-  - `0` : As a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 
-  - `-9` : As a single value `-9`
+- `miss::Integer` : how you would like missing values written 
+  - `0` : as a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 
+  - `-9` : as a single value `-9`
 
 ### Example
 ```julia
