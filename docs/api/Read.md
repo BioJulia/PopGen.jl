@@ -41,7 +41,6 @@ to Genepop format, call up the docstring to `genepop` with `?genepop`.
 | File Format | Extensions             | Docstring            |
 | :---------- | :--------------------- | :------------------- |
 | genepop     | `.gen`, `.genepop`     | `?genepop`   |
-| JLD2        | `.jld2`                | `?jld2`      |
 | structure   | `.str`, `.structure`   | `?structure` |
 | delimited   | `.csv`, `.txt`, `.tsv` | `?delimited` |
 
@@ -51,11 +50,3 @@ cats = @nancycats;
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
 write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
-
-----
-
-### `jld2`
-```julia
-jdl2(data::PopData; filename::String)
-```
-Write PopData to a `JLD2` file.
