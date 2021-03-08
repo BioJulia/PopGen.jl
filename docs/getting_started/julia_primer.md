@@ -96,11 +96,11 @@ Julia encourages strong typing of variables, and the functions in `PopGen` are n
 You'll notice types follow a specific format, which is `object::type`. This format is a type declaration, so in the function `population`, which looks like: 
 
 ```julia
-population(data::PopData; listall::Bool = false)
+population(data::PopData; counts::Bool = false)
 ```
 
-- `data` is a variable of type `PopData` 
-- `listall` is a variable of type `Bool` (Boolean) meaning it only takes `true` or `false` without quotes, and the default value is set to `false`
+- `data` is a positional argument of type `PopData` 
+- `counts` is a keyword argument of type `Bool` (Boolean) meaning it only takes `true` or `false` without quotes, and the default value is set to `false`
 
 ### Type Unions
 
