@@ -297,12 +297,19 @@ to run this calculation. The conversion will be a separate step so as not
 to add unnecessary (or unfair) overhead to the benchmark. This benchmark is 
 going to take **forever** (relatively), so if you absolutely insist on 
 trying it out yourself, you may want to pop outside and enjoy some fresh 
-air for a bit. Seriously, you don't want to watch this paint dry 🖌️.
+air for a bit (I ran it overnight). Seriously, you don't want to watch this paint dry 🖌️.
 
 ```r
 > sharks_hierf <- genind2hierfstat(sharks)
 
 > microbenchmark(pairwise.WCfst(sharks_hierf))
+Unit: seconds
+                    expr      min       lq     mean   median       uq      max neval
+ pairwise.WCfst(sharks2) 192.2786 192.9277 199.4861 193.5743 195.0079 301.6879   100
 
 </TabItem>
 </Tabs>
+
+![pairwise fst plot](/img/fstplot.png)
+
+On a single thread, pairwise FST in `PopGen.jl` is **~170x** faster than in `hierfstat`, and a whopping **248x** faster using 4 threads. Daaaang!

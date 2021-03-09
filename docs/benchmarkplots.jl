@@ -47,6 +47,7 @@ end
 
 pop_adeg = ["PopGen.jl", "adegenet"]
 pop_hierf = ["PopGen.jl", "hierfstat"]
+pop_p_hierf = ["PopGen.jl", "PopGen.jl (4 threads)", "hierfstat"]
 
 #### Load in Data ####
 import_speed = [.910, 6.745]
@@ -110,26 +111,52 @@ chitest = [0.176, 6.2659]
 comparison_plot(pop_adeg, chitest, "Seconds", "Hardy-Weinberg Equilibrium Χ² test (less is better)") |> save("static/img/chisqplot.png")
 
 
-#### Makie version
-using Makie
-# Made in Juno, so preferring the Plot pane
-popdisplay(AbstractPlotting.PlotDisplay())
-AbstractPlotting.inline!(true)
 
-# set generic X axis
-xaxis = ["Julia", "R"]
-
-# create generic plotting function
-function comparison_plot(x::Vector{String},y::Vector{Float64}, yaxis::String)
-    scene = barplot(
-        x,
-        y,
-        color = ["#aa79c1","#769fd2"]
+function comparison_plot_3x(x::Vector{String},y::Vector{Float64}, yaxis::String, main::String)
+    corners = 10
+    @vlplot(
+        height=300,
+        width=650,
+        title={
+          text=main,
+          fontSize=20,
+          fontWeight="normal"
+        },
+        mark={
+            :bar,
+            cornerRadiusTopLeft=0,
+            cornerRadiusTopRight=corners,
+            cornerRadiusBottomLeft=0,
+            cornerRadiusBottomRight=corners
+        },
+        x={y,
+            axis={
+                title=yaxis,
+                titleFontSize = 17,
+                titleFontWeight = "normal",
+                labelFontSize = 12,
+                grid = false,
+                domain = false
+            }
+        },
+        y={x,
+            axis={
+                title="",
+                labelAngle= 0,
+                labelFontSize = 17,
+                domain = false,
+                ticks = false,
+                labelPadding = 4
+                }
+            },
+        color={
+            x,
+            scale={range=["#aa79c1","#aa79c1","#769fd2"]},
+            legend=false
+        }
     )
-    axis= scene[Axis]
-    axis[:names][:axisnames] = ("", yaxis)
-    axis[:grid][:linewidth] = (0, 0)
-    axis[:ticks][:linewidth] = (0,0)
-    axis[:frame][:frames] = ((true,false),(true,false))
-    return scene
 end
+
+fst_speed = [1.17, 0.804799, 119.48]
+tt = comparison_plot_3x(pop_p_hierf, fst_speed, "Seconds", "Weir & Cockerham Pairwise FST (less is better)")
+save("static/img/fstplot.png", tt)
