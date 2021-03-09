@@ -306,6 +306,7 @@ air for a bit (I ran it overnight). Seriously, you don't want to watch this pain
 Unit: seconds
                     expr      min       lq     mean   median       uq      max neval
  pairwise.WCfst(sharks2) 192.2786 192.9277 199.4861 193.5743 195.0079 301.6879   100
+```
 
 </TabItem>
 </Tabs>
