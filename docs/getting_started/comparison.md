@@ -233,3 +233,55 @@ Unit: seconds
 ![chi squared plot](/img/chisqplot.png)
 
 Comparing averages, PopGen.jl clocks in at ~`176ms` versus adegenet's `6.3s`, so ~**35.8x** faster on these data(!)
+
+
+### Pairwise FST
+You all know it, you all love it. What's population genetics without a little pairwise FST sprinkled in? This benchmark compairs the Weir & Cockerham pairwise FST calculation in `PopGen.jl` against `hierfstat`
+
+
+<Tabs
+  block={true}
+  defaultValue="j"
+  values={[
+    { label: 'Julia', value: 'j', },
+    { label: 'R', value: 'r', },
+  ]
+}>
+<TabItem value="j">
+
+We will add the extra keywords `samples` and `seconds` to the benchmark
+macro so we can get a full 100 evaluations.
+
+```julia
+julia> @benchmark pairwise_fst(sharks) samples = 100 seconds = 700
+BenchmarkTools.Trial:
+  memory estimate:  1.26 GiB_pairwise_WeirCockerham
+  allocs estimate:  8024669
+
+  --------------
+  minimum time:     1.102 s (11.11% GC)
+  median time:      1.147 s (12.68% GC)
+  mean time:        1.170 s (13.25% GC)
+  maximum time:     1.474 s (29.64% GC)
+  --------------
+  samples:          100
+  evals/sample:     1
+```
+
+</TabItem>
+<TabItem value="r">
+
+We'll need to convert `sharks` into the matrix/dataframe `hierfstat` needs
+to run this calculation. The conversion will be a separate step so as not
+to add unnecessary (or unfair) overhead to the benchmark. This benchmark is 
+going to take **forever** (relatively), so if you absolutely insist on 
+trying it out yourself, you may want to pop outside and enjoy some fresh 
+air for a bit. Seriously, you don't want to watch this paint dry 🖌️.
+
+```r
+> sharks_hierf <- genind2hierfstat(sharks)
+
+> microbenchmark(pairwise.WCfst(sharks_hierf))
+
+</TabItem>
+</Tabs>
