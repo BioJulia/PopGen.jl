@@ -244,6 +244,7 @@ You all know it, you all love it. What's population genetics without a little pa
   defaultValue="j"
   values={[
     { label: 'Julia', value: 'j', },
+    { label: 'Julia (parallel)','jp', },
     { label: 'R', value: 'r', },
   ]
 }>
@@ -263,6 +264,26 @@ BenchmarkTools.Trial:
   median time:      1.147 s (12.68% GC)
   mean time:        1.170 s (13.25% GC)
   maximum time:     1.474 s (29.64% GC)
+  --------------
+  samples:          100
+  evals/sample:     1
+```
+
+</TabItem>
+<TabItem value="jp">
+
+This is demonstrate what the speed is like when starting Julia with 4 available threads via `julia --threads 4` (julia >= v1.5) or `JULIA_NUM_THREADS=4` (< v1.5).
+
+```julia
+julia> @benchmark pairwise_fst(sharks) samples = 100 seconds = 700
+BenchmarkTools.Trial: 
+  memory estimate:  1.26 GiB
+  allocs estimate:  8024707
+  --------------
+  minimum time:     654.677 ms (24.79% GC)
+  median time:      787.848 ms (26.16% GC)
+  mean time:        804.779 ms (26.32% GC)
+  maximum time:     1.308 s (18.52% GC)
   --------------
   samples:          100
   evals/sample:     1
