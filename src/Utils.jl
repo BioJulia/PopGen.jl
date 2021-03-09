@@ -425,6 +425,51 @@ function reciprocal_sum(x::AbstractVector{T}) where T<:Real
 end
 
 
+# TODO add skip____ to docs/API/Utils.jl
+"""
+    skipnan(itr)
+Return an iterator over the elements in `itr` skipping `Inf` and `-Inf` values. The returned
+object can be indexed using indices of itr if the latter is indexable. Indices
+corresponding to `Inf` values are not valid: they are skipped by keys and eachindex,   
+and a MissingException is thrown when trying to use them. This is effectively `skipmissing`
+for `Inf` and `-Inf` values.
+
+Use collect to obtain an `Array` containing the non-`Inf` values in `itr`. Note that even  
+if `itr` is a multidimensional array, the result will always be a `Vector` since it is not   
+possible to remove `Inf`s while preserving dimensions of the input.
+"""
+function skipinf(itr)
+    Iterators.filter(isfinite, itr)
+end
+
+
+"""
+    skipnan(itr)
+Return an iterator over the elements in `itr` skipping `NaN` values. The returned
+object can be indexed using indices of itr if the latter is indexable. Indices
+corresponding to `NaN` values are not valid: they are skipped by keys and eachindex,   
+and a MissingException is thrown when trying to use them. This is effectively `skipmissing`
+for `NaN` values.
+
+Use collect to obtain an `Array` containing the non-`NaN` values in `itr`. Note that even  
+if `itr` is a multidimensional array, the result will always be a `Vector` since it is not   
+possible to remove `NaN`s while preserving dimensions of the input.
+"""
+function skipnan(itr) 
+    Iterators.filter(!isnan, itr)
+end
+
+"""
+    skipinfnan(itr)
+Return an iterator over the elements in `itr` skipping `NaN`, `Inf` and `-Inf` values.
+See the docstrings of `skipinf` and `skipnan` more details.
+"""
+function skipinfnan(itr)
+    Iterators.filter(x -> (isfinite(x) & !isnan(x)), itr)
+end
+
+
+#TODO REMOVE AND REPLACE OCCURANCES WITH ABOVE
 """
     safemean(::AbstractVector{T}) where T<:Real
 A wrapper for StatsBase.mean to calculate a mean after skipping `Inf`, `-Inf`, and `NaN` values.
