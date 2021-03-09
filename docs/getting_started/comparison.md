@@ -295,7 +295,7 @@ BenchmarkTools.Trial:
 We'll need to convert `sharks` into the matrix/dataframe `hierfstat` needs
 to run this calculation. The conversion will be a separate step so as not
 to add unnecessary (or unfair) overhead to the benchmark. This benchmark is 
-going to take **forever** (relatively), so if you absolutely insist on 
+going to take **forever** (200s/run x 100 runs = 5.5hrs), so if you absolutely insist on 
 trying it out yourself, you may want to pop outside and enjoy some fresh 
 air for a bit (I ran it overnight). Seriously, you don't want to watch this paint dry 🖌️.
 
