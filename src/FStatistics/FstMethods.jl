@@ -32,9 +32,11 @@ function _pairwise_Nei(data::PopData)
     pops = getindex.(keys(idx_pdata), :population)
     npops = length(idx_pdata)
     results = zeros(npops, npops)
-    for i in 2:npops
-        for j in 1:(i-1)
-            results[i,j] = nei_fst(DataFrame(idx_pdata[[j,i]]))
+    @sync for i in 2:npops
+        Base.Threads.@spawn begin
+            for j in 1:(i-1)
+                results[i,j] = nei_fst(DataFrame(idx_pdata[[j,i]]))
+            end
         end
     end
     return PairwiseFST(DataFrame(results, Symbol.(pops)), "Nei 1987")
@@ -145,14 +147,17 @@ function weircockerham_fst(data::AbstractDataFrame)
     fst_total = round(σ_total[1] / sum(σ_total), digits = 5)
 end
 
+
 function _pairwise_WeirCockerham(data::PopData)
     idx_pdata = groupby(data.loci, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = length(idx_pdata)
     results = zeros(npops, npops)
-    for i in 2:npops
-        for j in 1:(i-1)
-            results[i,j] = weircockerham1984(DataFrame(idx_pdata[[j,i]]))
+    @sync for i in 2:npops
+        Base.Threads.@spawn begin
+            for j in 1:(i-1)
+                results[i,j] = weircockerham1984(DataFrame(idx_pdata[[j,i]]))
+            end
         end
     end
     return PairwiseFST(DataFrame(results, Symbol.(pops)), "Weir-Cockerham")
