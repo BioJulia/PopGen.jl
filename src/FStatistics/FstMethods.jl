@@ -1,4 +1,3 @@
-
 ## Nei 1987 FST ##
 function nei_fst(data::AbstractDataFrame)
     # observed/expected het per locus per pop
@@ -156,9 +155,9 @@ function _pairwise_WeirCockerham(data::PopData)
     @sync for i in 2:npops
         Base.Threads.@spawn begin
             for j in 1:(i-1)
-                results[i,j] = weircockerham1984(DataFrame(idx_pdata[[j,i]]))
+                results[i,j] = weircockerham_fst(DataFrame(idx_pdata[[j,i]]))
             end
         end
     end
-    return PairwiseFST(DataFrame(results, Symbol.(pops)), "Weir-Cockerham")
+    return PairwiseFST(DataFrame(results, Symbol.(pops)), "Weir & Cockerham")
 end

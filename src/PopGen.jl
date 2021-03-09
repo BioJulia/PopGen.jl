@@ -76,11 +76,9 @@ include("Manipulate.jl")
 include("SummaryInfo.jl")
 #Analyses
 include("HardyWeinberg.jl")
-#TODO uncomment when ready
-#include("FStats.jl")
+include("FStatistics/FstMethods.jl")
 include("Relatedness/PairwiseRelatedness.jl")
 include("Relatedness/RelatednessMoments.jl")
 include("Relatedness/RelatednessPostHocs.jl")
-#include(PlotRecipes.jl)  # not yet ready
 
 end # module PopGen
