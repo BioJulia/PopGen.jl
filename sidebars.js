@@ -28,6 +28,7 @@ module.exports = {
     "Analyses":[
       "analyses/hardyweinberg",
       "analyses/relatedness",
+      "analyses/fstatistics"
     ],
     "Simulations":[
       "simulations/simulate_samples",

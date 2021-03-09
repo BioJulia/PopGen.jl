@@ -4,6 +4,14 @@ title: What's New
 sidebar_label: What's New
 ---
 
+## v.0.5.1
+### New features
+- `pairwise_fst` is now available for Weir & Cockerham (1984) and Nei (1987) methods
+  - check out the [benchmarks](/docs/getting_started/comparison)!
+- added `skipinf`, `skipnan`, and `skipinfnan` methods (unexported) to `Utils.jl`
+- dropped `safemean` because the skip___ methods are a lot faster and slimmer
+
+
 ## v.0.5.0
 This release fixes a critical bug in all the file importing functions that returned nothing when dropping monomorphic loci. Other changes include
 - Dropping `JLD2.jl` suport due to its version-to-version instability. Two fewer dependencies!
