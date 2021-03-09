@@ -12,13 +12,13 @@ There's a reason we started investing so many hours and so many new grey hairs i
 2. written in a single language
 3. easy to use
 
-So, we'd like to prove that Julia and PopGen.jl actually achieves that by showing a few benchmarks comparing PopGen.jl to `adegenet` and `pegas`, which along with `ape` are arguably the most commonly used and robust population genetic packages available. It's worth mentioning that we ourselves use and have published work incorporating these packages, and are incredibly grateful for the work invested in those packages. We appreciate those folks and have tremendous respect and envy for the work they continue to do! Here are links to [adegenet](https://github.com/thibautjombart/adegenet), [pegas](https://academic.oup.com/bioinformatics/article/26/3/419/215731/), and [ape](https://cran.r-project.org/package=ape).  
+So, we'd like to prove that Julia and PopGen.jl actually achieves that by showing a few benchmarks comparing PopGen.jl to popular population genetics packages in R. It's worth mentioning that we ourselves use and have published work incorporating these packages, and are incredibly grateful for the work invested in them. We appreciate those folks and have tremendous respect and envy for the work they continue to do! Here are links to [adegenet](https://github.com/thibautjombart/adegenet), [pegas](https://academic.oup.com/bioinformatics/article/26/3/419/215731/), [hierfstat](https://cran.r-project.org/web/packages/hierfstat/index.html), and [ape](https://cran.r-project.org/package=ape).  
 
 
 
 ## Benchmarks
 
-To make this a practical comparison, we're going to use the `gulfsharks` data because it is considerably larger (212 samples x 2213 loci) than `nancycats` (237 x 9) and a bit more of a "stress test".  All benchmarks in R are performed using the `microbenchmark` package, and  `BenchmarkTools` are used for Julia.
+To make this a practical comparison, we're going to use the `gulfsharks` data because it is considerably larger (212 samples x 2209 loci) than `nancycats` (237 x 9) and a bit more of a "stress test".  All benchmarks in R are performed using the `microbenchmark` package, and  `BenchmarkTools` are used for Julia.
 
 <Tabs
   block={true}
