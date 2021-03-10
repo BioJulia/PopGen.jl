@@ -303,7 +303,7 @@ Return a vector of indices where neither input vectors have a `missing` value, i
 intersection of the indices of their non-missing elements.
 """
 @inline function nonmissings(vec1::T, vec2::T) where T <: AbstractVector
-    intersect(map(i -> findall(!ismissing, i), (vec1, vec2))...)
+    mapreduce(i -> findall(!ismissing, i), intersect, (vec1, vec2))
 end
 
 
