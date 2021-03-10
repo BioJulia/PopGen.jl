@@ -35,7 +35,7 @@ end
 Return the number of unique alleles present at a locus.
 """
 @inline function allele_count(locus::T) where T<:GenoArray
-    Base.Iterators.flatten(skipmissing(locus)) |> collect |> unique |> length
+    unique(locus) |> skipmissing |> Base.Iterators.flatten |> unique |> length
 end
 
 
@@ -94,9 +94,9 @@ function convert_coord(coordinate::String)
     lowercase(coordinate) == "missing" && return missing
     coord_strip = replace(uppercase(coordinate), r"[NSEW]" => "")
     split_coord = parse.(Float32, split(coord_strip, r"\s|:"))
-    split_coord[2] /=60.0
+    split_coord[2] /= 60.0
     if length(split_coord) == 3
-        split_coord[3] /=3600.0
+        split_coord[3] /= 3600.0
     end
     conv = mapreduce(abs, +, split_coord)
     # N + E are positive | S + W are negative
@@ -327,7 +327,8 @@ julia> pairwise_pairs(samps)
 ```
 """
 @inline function pairwise_pairs(smp_names::AbstractVector{T}) where T
-    [tuple(smp_names[i], smp_names[j]) for i in 1:length(smp_names)-1 for j in i+1:length(smp_names)]
+    len = length(smp_names)
+    [tuple(smp_names[i], smp_names[j]) for i in 1:len-1 for j in i+1:len]
 end
 
 
@@ -466,23 +467,6 @@ See the docstrings of `skipinf` and `skipnan` more details.
 """
 function skipinfnan(itr)
     Iterators.filter(x -> (isfinite(x) & !isnan(x)), itr)
-end
-
-
-#TODO REMOVE AND REPLACE OCCURANCES WITH ABOVE
-"""
-    safemean(::AbstractVector{T}) where T<:Real
-A wrapper for StatsBase.mean to calculate a mean after skipping `Inf`, `-Inf`, and `NaN` values.
-"""
-function safemean(x::AbstractVector{T}) where T<:Real
-    y = x
-    if any(isinf.(x))
-        y =  x[.!isinf.(x)]
-    end
-    if any(isnan.(x))
-        y = y[.!isnan.(y)]
-    end
-    mean(y)
 end
 
 
