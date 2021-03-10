@@ -11,27 +11,27 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 
 ## Background
-Originating with [Wright's `F` fixation index](https://www.genetics.org/content/16/2/97) (inbreeding coefficient), `F` has 
+Originating with [Wright's $F$ fixation index](https://www.genetics.org/content/16/2/97) (inbreeding coefficient), $F$ has 
 since evolved into a whole slew of statistics used to describe the differentiation/divergence within or between groups. As
-you may have seen from `summary()`, there are a common group of these indices ($F_{IS}$, $F_{IT}$, and $F_{ST}$) that compare the `F` at various hierarchical levels. The notation is pretty straightforward: $I$ is for individuals, $T$ is the total, and $S$ is for subpopulations.
+you may have seen from `summary()`, there are a common group of these indices ($F_{IS}$, $F_{IT}$, and $F_{ST}$) that compare the $F$ at various hierarchical levels. The notation is pretty straightforward: $I$ is for individuals, $T$ is the total, and $S$ is for subpopulations.
 
 | F-statistic  | Compares           |   Against         |
-| :----------: |     :------:       |   :----------:    |
+| :----------: |     :------       |   :----------    |
 |    $F_{IS}$  |   **I**ndividual   | **S**ubpopulation |
 |    $F_{IT}$  |   **I**ndividual   | **T**otal         |
 |    $F_{ST}$  |  **S**ubpopulation | **T**otal         |
 
 
-Often, we are interested in pairwise $F_{ST}$, which is a type of coefficient that helps us infer how panmictic (fully mixed) two groups of interest are. A colloquial way of phrasing that is "how much genetic mixing is there between these two groups?". The value of $F_{ST}$ (and its derivatives) should typically range between `0` and `1` and can be interpreted like so:
+Often, we are interested in pairwise $F_{ST}$, which is a type of coefficient that helps us infer how panmictic (fully mixed) two groups of interest are. A colloquial way of phrasing that is "how much genetic mixing is there between these two groups?". The value of $F_{ST}$ (and its derivatives) should typically range between 0 and 1 and can be interpreted like so:
 
 | $F_{ST}$ value    |                  Interpretation           |
 | :----------:      |           :-----------------------:       |
 |         0         |   the two groups are completely panmictic |
 |         1         |   the two groups are completely isolated  |
 
-However, it's not a linear relationship, and Wright considered `0.125` as the cutoff for when to consider populations as divergent.
+However, it's not a linear relationship, and Wright considered 0.125 as the cutoff for when to determine populations as divergent.
 
-:::note FST isn't everything
+:::note $F_{ST}$ isn't everything
 An important caveat to always consider is that $F_{ST}$ is just one tool to help us understand trends and not the entire picture.
 The genetic data we collect is just a snapshot in current time and populations can be completely isolated but still have near-zero
 $F_{ST}$ values for a number of reasons (slow divergence time, recent introgression, etc.). Significance testing helps add context
@@ -42,7 +42,7 @@ to observed $F_{ST}$ values.
 ```julia
 pairwise_fst(data::PopData; method::String)
 ```
-Calculate pairwise FST between populations in a `PopData` object.
+Calculate pairwise $F_{ST}$ between populations in a `PopData` object.
 
 :::note custom output type
 The returned object is a custom `PairwiseFST` type with the fields `results` (stores the dataframe of $F_{ST}$ values) and `method` (a string of which method was used to calculate it). This was done to define a custom `show` method to make the results a little nicer, and so you never lose track of which method was used for the calculation. If you want to access the dataframe directly, you will need to do so with `varname.results`.  
