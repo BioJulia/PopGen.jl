@@ -56,10 +56,20 @@ The returned object is a custom `PairwiseFST` type with the fields `results` (st
     - `"WC84"`: the [Weir & Cockerham (1984)](https://www.jstor.org/stable/2408641?casa_token=_0gGbCbYpqMAAAAA:f9BvW9Xvx_8WaWSaRN4iqg0HB7KkaP21712ds28cTjhsvVQrYRTyHon7hKCcyHLcmTRA9H_1oM5iF3TZAl5xPm5gil2GmcGzHyEFFYAOl8pDVEBMQQ&seq=1#metadata_info_tab_contents) method (default)
     - `"Nei87"`: [Nei's (1987)](https://books.google.com/books?hl=en&lr=&id=UhRSsLkjxDgC&oi=fnd&pg=PP11&ots=Qu7vO8EMmw&sig=T6cTISYEEm-hL8aWU8EgeGgzP5E#v=onepage&q&f=false) genetic distance method
 
-**Examples**
+**Example**
 ```
 julia> sharks = @gulfsharks ;
 
 julia> pairwise_fst(sharks, method = "WC84")
+Pairwise FST: Weir & Cockerham
+                │ Cape Canaveral  Georgia   South Carolina  Florida Keys  Mideast Gulf  Northeast Gulf  Southeast Gulf 
+────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────
+ Cape Canaveral │        0.0       0.0             0.0           0.0           0.0             0.0                 0.0
+        Georgia │        0.00081   0.0             0.0           0.0           0.0             0.0                 0.0
+ South Carolina │       -0.0003   -0.00076         0.0           0.0           0.0             0.0                 0.0
+   Florida Keys │        0.00282   0.00202         0.00204       0.0           0.0             0.0                 0.0
+   Mideast Gulf │        0.00423   0.00354         0.00329       0.00042       0.0             0.0                 0.0
+ Northeast Gulf │        0.00264   0.00147         0.00146      -7.0e-5       -0.00023         0.0                 0.0
+ Southeast Gulf │        0.00312   0.00222         0.00191      -3.0e-5        0.00079         0.00118             0.0
 
 ```
