@@ -77,6 +77,7 @@ include("SummaryInfo.jl")
 #Analyses
 include("HardyWeinberg.jl")
 include("FStatistics/FstMethods.jl")
+include("FStatistics/PairwiseFST.jl")
 include("Relatedness/PairwiseRelatedness.jl")
 include("Relatedness/RelatednessMoments.jl")
 include("Relatedness/RelatednessPostHocs.jl")
