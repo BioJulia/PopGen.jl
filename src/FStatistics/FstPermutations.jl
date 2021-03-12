@@ -37,7 +37,6 @@ function weircockerham_fst2(population_1::T, population_2::T) where T<:AbstractM
     n_total = sum(n_per_locpop, dims = 2)
     # screen for completely absent loci
     present_loc = 0 .∉ eachrow(n_per_locpop)
-    #return present_loc
     if 0 ∈ present_loc
         # index locus names by the missing indices
         pop_1 = @view population_1[:,present_loc]
@@ -53,6 +52,12 @@ function weircockerham_fst2(population_1::T, population_2::T) where T<:AbstractM
     merged = vcat(pop_1, pop_2)
 
     n_pop_per_loc = map(count_nonzeros, eachrow(n_per_locpop))
+    # global allele counts
+    glob_allele_counts = map(allele_count, eachcol(merged))
+    # global allele frequencies
+    glob_allele_freqs = map(allele_freq, eachcol(merged))
+    
+    return glob_allele_counts
     per_loc = groupby(tmp_data, :locus)
     # find all the alleles for
     allele_counts = DataFrames.combine(
