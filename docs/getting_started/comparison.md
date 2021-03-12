@@ -244,7 +244,7 @@ You all know it, you all love it. What's population genetics without a little pa
   defaultValue="j"
   values={[
     { label: 'Julia', value: 'j', },
-    { label: 'Julia (parallel)','jp', },
+    { label: 'Julia (parallel)', value: 'jp', },
     { label: 'R', value: 'r', },
   ]
 }>

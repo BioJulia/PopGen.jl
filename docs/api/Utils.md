@@ -316,13 +316,50 @@ reciprocal(num::T) where T <: Signed
 Returns the reciprocal (1/number) of a number. Will return `0` when 
 the number is `0` instead of returning `Inf`.
 
+---
+
+### `skipinf`
+
+```julia
+skipinf(itr)
+```
+Return an iterator over the elements in `itr` skipping `Inf` and `-Inf` values. The returned
+object can be indexed using indices of itr if the latter is indexable. Indices
+corresponding to `Inf` values are not valid: they are skipped by keys and eachindex,   
+and a MissingException is thrown when trying to use them. This is effectively `skipmissing`
+for `Inf` and `-Inf` values.
+
+Use collect to obtain an `Array` containing the non-`Inf` values in `itr`. Note that even  
+if `itr` is a multidimensional array, the result will always be a `Vector` since it is not   
+possible to remove `Inf`s while preserving dimensions of the input.
+
 ----
 
-### `safemean`
+### `skipnan`
+
 ```julia
-safemean(::AbstractVector{T}) where T<:Real
+skipnan(itr)
 ```
-A wrapper for `StatsBase.mean` to calculate a mean after skipping `Inf`, `-Inf`, and `NaN` values.
+Return an iterator over the elements in `itr` skipping `NaN` values. The returned
+object can be indexed using indices of itr if the latter is indexable. Indices
+corresponding to `NaN` values are not valid: they are skipped by keys and eachindex,   
+and a MissingException is thrown when trying to use them. This is effectively `skipmissing`
+for `NaN` values.
+
+Use collect to obtain an `Array` containing the non-`NaN` values in `itr`. Note that even  
+if `itr` is a multidimensional array, the result will always be a `Vector` since it is not   
+possible to remove `NaN`s while preserving dimensions of the input.
+
+----
+
+### `skipinfnan`
+
+```julia
+skipinfnan(itr)
+```
+Return an iterator over the elements in `itr` skipping `NaN`, `Inf` and `-Inf` values.
+See the docstrings of `skipinf` and `skipnan` more details.
+
 
 ----
 
