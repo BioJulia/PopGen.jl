@@ -40,23 +40,23 @@ To view the entire `meta` table.
 ```julia
 julia> ncats.meta
 237×5 DataFrame
-│ Row │ name   │ population │ ploidy │ latitude │ longitude │
-│     │ String │ String     │ Int8   │ Float32? │ Float32?  │
-├─────┼────────┼────────────┼────────┼──────────┼───────────┤
-│ 1   │ N215   │ 1          │ 2      │ missing  │ missing   │
-│ 2   │ N216   │ 1          │ 2      │ missing  │ missing   │
-│ 3   │ N217   │ 1          │ 2      │ missing  │ missing   │
-│ 4   │ N218   │ 1          │ 2      │ missing  │ missing   │
-│ 5   │ N219   │ 1          │ 2      │ missing  │ missing   │
-│ 6   │ N220   │ 1          │ 2      │ missing  │ missing   │
-⋮
-│ 231 │ N294   │ 17         │ 2      │ missing  │ missing   │
-│ 232 │ N295   │ 17         │ 2      │ missing  │ missing   │
-│ 233 │ N296   │ 17         │ 2      │ missing  │ missing   │
-│ 234 │ N297   │ 17         │ 2      │ missing  │ missing   │
-│ 235 │ N281   │ 17         │ 2      │ missing  │ missing   │
-│ 236 │ N289   │ 17         │ 2      │ missing  │ missing   │
-│ 237 │ N290   │ 17         │ 2      │ missing  │ missing   │
+ Row │ name    population  ploidy  longitude  latitude
+     │ String  String      Int8    Float32?   Float32?
+─────┼─────────────────────────────────────────────────
+   1 │ N215    1                2   missing   missing
+   2 │ N216    1                2   missing   missing
+   3 │ N217    1                2   missing   missing
+   4 │ N218    1                2   missing   missing
+   5 │ N219    1                2   missing   missing
+   6 │ N220    1                2   missing   missing
+  ⋮  │   ⋮         ⋮         ⋮         ⋮         ⋮
+ 232 │ N295    17               2   missing   missing
+ 233 │ N296    17               2   missing   missing
+ 234 │ N297    17               2   missing   missing
+ 235 │ N281    17               2   missing   missing
+ 236 │ N289    17               2   missing   missing
+ 237 │ N290    17               2   missing   missing
+                                       225 rows omitted
 ```
 
 ### .name
@@ -201,23 +201,23 @@ julia> sharks = @gulfsharks ;    # semicolon just supresses printing output
 
 julia> select(sharks.meta, :name, :longitude, :latitude)
 212×3 DataFrame
-│ Row │ name    │ longitude │ latitude │
-│     │ String  │ Float64   │ Float64  │
-├─────┼─────────┼───────────┼──────────┤
-│ 1   │ cc_001  │ -80.5993  │ 28.3062  │
-│ 2   │ cc_002  │ -80.5995  │ 28.3079  │
-│ 3   │ cc_003  │ -80.5996  │ 28.3023  │
-│ 4   │ cc_005  │ -80.4225  │ 28.6123  │
-│ 5   │ cc_007  │ -80.3578  │ 27.8666  │
-│ 6   │ cc_008  │ -80.3579  │ 27.8666  │
-⋮
-│ 206 │ seg_025 │ -86.5374  │ 30.064   │
-│ 207 │ seg_026 │ -86.5376  │ 30.0696  │
-│ 208 │ seg_027 │ -86.0905  │ 29.9065  │
-│ 209 │ seg_028 │ -87.3661  │ 30.0532  │
-│ 210 │ seg_029 │ -87.3662  │ 30.0522  │
-│ 211 │ seg_030 │ -85.7143  │ 29.8234  │
-│ 212 │ seg_031 │ -85.7143  │ 29.8234  │
+ Row │ name     longitude  latitude
+     │ String   Float64    Float64
+─────┼──────────────────────────────
+   1 │ cc_001     28.3062  -80.5993
+   2 │ cc_002     28.3079  -80.5995
+   3 │ cc_003     28.3023  -80.5996
+   4 │ cc_005     28.6123  -80.4225
+   5 │ cc_007     27.8666  -80.3578
+   6 │ cc_008     27.8666  -80.3579
+  ⋮  │    ⋮         ⋮         ⋮
+ 207 │ seg_026    30.0696  -86.5376
+ 208 │ seg_027    29.9065  -86.0905
+ 209 │ seg_028    30.0532  -87.3661
+ 210 │ seg_029    30.0522  -87.3662
+ 211 │ seg_030    29.8234  -85.7143
+ 212 │ seg_031    29.8234  -85.7143
+                    200 rows omitted
 ```
 :::
 
@@ -232,23 +232,23 @@ This will show you the entire `loci` table.
 ```julia
 julia> ncats.loci
 2133×4 DataFrame
-│ Row  │ name │ population │ locus │ genotype   │
-│      │ Str… │ String     │ Str…  │ Tuple…?    │
-├──────┼──────┼────────────┼───────┼────────────┤
-│ 1    │ N215 │ 1          │ fca8  │ missing    │
-│ 2    │ N216 │ 1          │ fca8  │ missing    │
-│ 3    │ N217 │ 1          │ fca8  │ (135, 143) │
-│ 4    │ N218 │ 1          │ fca8  │ (133, 135) │
-│ 5    │ N219 │ 1          │ fca8  │ (133, 135) │
-│ 6    │ N220 │ 1          │ fca8  │ (135, 143) │
-⋮
-│ 2127 │ N294 │ 17         │ fca37 │ (208, 208) │
-│ 2128 │ N295 │ 17         │ fca37 │ (208, 208) │
-│ 2129 │ N296 │ 17         │ fca37 │ (208, 220) │
-│ 2130 │ N297 │ 17         │ fca37 │ (208, 208) │
-│ 2131 │ N281 │ 17         │ fca37 │ (208, 208) │
-│ 2132 │ N289 │ 17         │ fca37 │ (208, 208) │
-│ 2133 │ N290 │ 17         │ fca37 │ (208, 208) │
+  Row │ name    population  locus   genotype
+      │ String  String      String  Tuple…?
+──────┼────────────────────────────────────────
+    1 │ N215    1           fca8    missing
+    2 │ N216    1           fca8    missing
+    3 │ N217    1           fca8    (135, 143)
+    4 │ N218    1           fca8    (133, 135)
+    5 │ N219    1           fca8    (133, 135)
+    6 │ N220    1           fca8    (135, 143)
+  ⋮   │   ⋮         ⋮         ⋮         ⋮
+ 2128 │ N295    17          fca37   (208, 208)
+ 2129 │ N296    17          fca37   (208, 220)
+ 2130 │ N297    17          fca37   (208, 208)
+ 2131 │ N281    17          fca37   (208, 208)
+ 2132 │ N289    17          fca37   (208, 208)
+ 2133 │ N290    17          fca37   (208, 208)
+                              2121 rows omitted
 ```
 
 ### locus names
@@ -304,76 +304,74 @@ Because the genotype data is in "tidy" format, accessing genotypes in a meaningf
 
 ```julia
 julia> @where(ncats.loci, :locus .== "fca8")
-2133×4 DataFrame
-│ Row  │ name │ population │ locus │ genotype   │
-│      │ Str… │ Str…       │ Str…  │ Tuple…?    │
-├──────┼──────┼────────────┼───────┼────────────┤
-│ 1    │ N215 │ 1          │ fca8  │ missing    │
-│ 2    │ N216 │ 1          │ fca8  │ missing    │
-│ 3    │ N217 │ 1          │ fca8  │ (135, 143) │
-│ 4    │ N218 │ 1          │ fca8  │ (133, 135) │
-│ 5    │ N219 │ 1          │ fca8  │ (133, 135) │
-│ 6    │ N220 │ 1          │ fca8  │ (135, 143) │
-⋮
-│ 2127 │ N294 │ 17         │ fca8  │ (208, 208) │
-│ 2128 │ N295 │ 17         │ fca8  │ (208, 208) │
-│ 2129 │ N296 │ 17         │ fca8  │ (208, 220) │
-│ 2130 │ N297 │ 17         │ fca8  │ (208, 208) │
-│ 2131 │ N281 │ 17         │ fca8  │ (208, 208) │
-│ 2132 │ N289 │ 17         │ fca8  │ (208, 208) │
-│ 2133 │ N290 │ 17         │ fca8  │ (208, 208) │
+237×4 DataFrame
+ Row │ name    population  locus   genotype
+     │ String  String      String  Tuple…?
+─────┼────────────────────────────────────────
+   1 │ N215    1           fca8    missing
+   2 │ N216    1           fca8    missing
+   3 │ N217    1           fca8    (135, 143)
+   4 │ N218    1           fca8    (133, 135)
+   5 │ N219    1           fca8    (133, 135)
+   6 │ N220    1           fca8    (135, 143)
+  ⋮  │   ⋮         ⋮         ⋮         ⋮
+ 232 │ N295    17          fca8    (133, 141)
+ 233 │ N296    17          fca8    (133, 141)
+ 234 │ N297    17          fca8    (133, 143)
+ 235 │ N281    17          fca8    (135, 141)
+ 236 │ N289    17          fca8    (137, 143)
+ 237 │ N290    17          fca8    (135, 141)
+                              225 rows omitted
 ```
 
 </TabItem>
 <TabItem value="m">
 
 ```julia
-julia> @where(ncats.loci, :locus .∈ Ref(["fca8", "fca23"])
+julia> @where(ncats.loci, :locus .∈ Ref(["fca8", "fca23"]))
 474×4 DataFrame
-│ Row │ name │ population │ locus │ genotype   │
-│     │ Cat… │ Cat…       │ Cat…  │ Tuple…?    │
-├─────┼──────┼────────────┼───────┼────────────┤
-│ 1   │ N215 │ 1          │ fca8  │ missing    │
-│ 2   │ N216 │ 1          │ fca8  │ missing    │
-│ 3   │ N217 │ 1          │ fca8  │ (135, 143) │
-│ 4   │ N218 │ 1          │ fca8  │ (133, 135) │
-│ 5   │ N219 │ 1          │ fca8  │ (133, 135) │
-│ 6   │ N220 │ 1          │ fca8  │ (135, 143) │
-⋮
-│ 468 │ N294 │ 17         │ fca23 │ (136, 146) │
-│ 469 │ N295 │ 17         │ fca23 │ (130, 136) │
-│ 470 │ N296 │ 17         │ fca23 │ (136, 146) │
-│ 471 │ N297 │ 17         │ fca23 │ (130, 130) │
-│ 472 │ N281 │ 17         │ fca23 │ (136, 144) │
-│ 473 │ N289 │ 17         │ fca23 │ (130, 136) │
-│ 474 │ N290 │ 17         │ fca23 │ (130, 146) │
+ Row │ name    population  locus   genotype
+     │ String  String      String  Tuple…?
+─────┼────────────────────────────────────────
+   1 │ N215    1           fca8    missing
+   2 │ N216    1           fca8    missing
+   3 │ N217    1           fca8    (135, 143)
+   4 │ N218    1           fca8    (133, 135)
+   5 │ N219    1           fca8    (133, 135)
+   6 │ N220    1           fca8    (135, 143)
+  ⋮  │   ⋮         ⋮         ⋮         ⋮
+ 469 │ N295    17          fca23   (130, 136)
+ 470 │ N296    17          fca23   (136, 146)
+ 471 │ N297    17          fca23   (130, 130)
+ 472 │ N281    17          fca23   (136, 144)
+ 473 │ N289    17          fca23   (130, 136)
+ 474 │ N290    17          fca23   (130, 146)
+                              462 rows omitted
 ```
 
 </TabItem>
 <TabItem value="p">
 
 ```julia
-julia> @where(x.loci, :population .== "9")
-81×4 DataFrames.DataFrame
-│ Row │ name │ population │ locus │ genotype   │
-│     │ Cat… │ Cat…       │ Cat…  │ Tuple…?    │
-├─────┼──────┼────────────┼───────┼────────────┤
-│ 1   │ N104 │ 9          │ fca8  │ (121, 135) │
-│ 2   │ N105 │ 9          │ fca8  │ (137, 137) │
-│ 3   │ N106 │ 9          │ fca8  │ (135, 135) │
-│ 4   │ N107 │ 9          │ fca8  │ (121, 135) │
-│ 5   │ N108 │ 9          │ fca8  │ (135, 135) │
-│ 6   │ N109 │ 9          │ fca8  │ (137, 137) │
-│ 7   │ N111 │ 9          │ fca8  │ (135, 135) │
-⋮
-│ 74  │ N105 │ 9          │ fca37 │ (182, 182) │
-│ 75  │ N106 │ 9          │ fca37 │ (182, 208) │
-│ 76  │ N107 │ 9          │ fca37 │ (182, 208) │
-│ 77  │ N108 │ 9          │ fca37 │ (208, 208) │
-│ 78  │ N109 │ 9          │ fca37 │ (182, 208) │
-│ 79  │ N111 │ 9          │ fca37 │ (208, 214) │
-│ 80  │ N112 │ 9          │ fca37 │ (182, 206) │
-│ 81  │ N113 │ 9          │ fca37 │ (208, 214) │
+julia> @where(ncats.loci, :population .== "9")
+81×4 DataFrame
+ Row │ name    population  locus   genotype
+     │ String  String      String  Tuple…?
+─────┼────────────────────────────────────────
+   1 │ N104    9           fca8    (121, 135)
+   2 │ N105    9           fca8    (137, 137)
+   3 │ N106    9           fca8    (135, 135)
+   4 │ N107    9           fca8    (121, 135)
+   5 │ N108    9           fca8    (135, 135)
+   6 │ N109    9           fca8    (137, 137)
+  ⋮  │   ⋮         ⋮         ⋮         ⋮
+  76 │ N107    9           fca37   (182, 208)
+  77 │ N108    9           fca37   (208, 208)
+  78 │ N109    9           fca37   (182, 208)
+  79 │ N111    9           fca37   (208, 214)
+  80 │ N112    9           fca37   (182, 206)
+  81 │ N113    9           fca37   (208, 214)
+                               69 rows omitted
 ```
 
 </TabItem>
