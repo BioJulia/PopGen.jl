@@ -58,7 +58,7 @@ julia> ?PopGen
 
         Quickstart for PopGen
 
-Documentation: https://pdimens.github.io/PopGen.jl/
+Documentation: https://BioJuia.net/PopGen.jl/
 
 A few things things you can do to get started:
 
