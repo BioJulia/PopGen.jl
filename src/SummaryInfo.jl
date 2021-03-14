@@ -137,12 +137,12 @@ function Base.summary(data::PopData; by::String = "global")
             :DEST => round.(DEST, digits = 4)
         )
     elseif lowercase(by) == "global"
-        Het_obs = safemean(n_df.Het_obs)
-        HS = safemean(n_df.HS)
-        Ht = safemean(Ht)
-        DST = safemean(DST)
-        DST′ = safemean(DST′)
-        HT′ = safemean(HT′)
+        Het_obs = mean(skipinfnan(n_df.Het_obs))
+        HS = mean(skipinfnan(n_df.HS))
+        Ht = mean(skipinfnan(Ht))
+        DST = mean(skipinfnan(DST))
+        DST′ = mean(skipinfnan(DST′))
+        HT′ = mean(skipinfnan(HT′))
 
         DataFrame(
         :Het_obs => round.(Het_obs, digits = 4),
@@ -161,6 +161,8 @@ function Base.summary(data::PopData; by::String = "global")
     end
 end
 
+#TODO deprecated, delete?
+#=
 function _summary(data::PopData; by::String = "global")
     # observed/expected het per locus per pop
     het_df = DataFrames.combine(
@@ -205,11 +207,11 @@ function _summary(data::PopData; by::String = "global")
         )
     else
         Het_obs = mean(n_df.Het_obs)
-        HS = safemean(n_df.HS)
-        Ht = safemean(Ht)
-        DST = safemean(DST)
-        DST′ = safemean(DST′)
-        HT′ = safemean(HT′)
+        HS = mean(skipinfnan(n_df.HS))
+        Ht = mean(skipinfnan(Ht))
+        DST = mean(skipinfnan(DST))
+        DST′ = mean(skipinfnan(DST′))
+        HT′ = mean(skipinfnan(HT′))
 
         DataFrame(
         :Het_obs => Het_obs,
@@ -225,5 +227,5 @@ function _summary(data::PopData; by::String = "global")
         )
     end
 end
-
+=#
 const summary_stats = summary

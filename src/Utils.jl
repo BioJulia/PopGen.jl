@@ -1,4 +1,4 @@
-export quickstart, size, drop_monomorphic, drop_monomorphic!
+export size, drop_monomorphic, drop_monomorphic!
 
 ## experimental and not exported or documented!
 function adjacency_matrix(data::PopData)
@@ -35,7 +35,7 @@ end
 Return the number of unique alleles present at a locus.
 """
 @inline function allele_count(locus::T) where T<:GenoArray
-    Base.Iterators.flatten(skipmissing(locus)) |> collect |> unique |> length
+    unique(locus) |> skipmissing |> Base.Iterators.flatten |> unique |> length
 end
 
 
@@ -57,7 +57,6 @@ argument as `true` to include missing values.
 end
 
 
-# TODO add to docs: Utils.jl API
 function Base.size(data::PopData)
     return (samples = size(data.meta)[1], loci = length(loci(data)))
 end
@@ -95,9 +94,9 @@ function convert_coord(coordinate::String)
     lowercase(coordinate) == "missing" && return missing
     coord_strip = replace(uppercase(coordinate), r"[NSEW]" => "")
     split_coord = parse.(Float32, split(coord_strip, r"\s|:"))
-    split_coord[2] /=60.0
+    split_coord[2] /= 60.0
     if length(split_coord) == 3
-        split_coord[3] /=3600.0
+        split_coord[3] /= 3600.0
     end
     conv = mapreduce(abs, +, split_coord)
     # N + E are positive | S + W are negative
@@ -114,7 +113,6 @@ function Base.copy(data::PopData)
     PopData(copy.([data.meta,data.loci])...)
 end
 
-#TODO add to docs/API
 """
     count_nonzeros(x::AbstractVector{T}) where T<:Real
 Return the number of non-zero values in a vector
@@ -166,7 +164,6 @@ function drop_monomorphic!(data::PopData)
     exclude!(data, locus = rm_loci)
 end
 
-##TODO add to docs API
 """
     loci_dataframe(data::PopData)
 Return a wide `DataFrame` of samples as columns, ommitting population information.
@@ -193,7 +190,6 @@ function loci_dataframe(data::PopData)
     unstack(select(data.loci, Not(:population)), :name, :genotype)[:, Not(:locus)]
 end
 
-#TODO add to docs API
 #TODO make a SMatrix instead?
 """
     loci_matrix(data::PopData)
@@ -247,7 +243,7 @@ returned array. See MultipleTesting.jl docs for full more detailed information.
 ```
 julia> multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")
 
-````
+```
 
 ### `correction` methods (case insensitive)
 - `"bonferroni"` : Bonferroni adjustment
@@ -292,7 +288,6 @@ in a vector.
 end
 
 
-#TODO add to API docs
 """
     nonmissing(data::PopData, locus::String)
 Convenience function to count the number of non-`missing` samples
@@ -308,11 +303,10 @@ Return a vector of indices where neither input vectors have a `missing` value, i
 intersection of the indices of their non-missing elements.
 """
 @inline function nonmissings(vec1::T, vec2::T) where T <: AbstractVector
-    intersect(map(i -> findall(!ismissing, i), (vec1, vec2))...)
+    mapreduce(i -> findall(!ismissing, i), intersect, (vec1, vec2))
 end
 
 
-#TODO add to docs API
 """
     pairwise_pairs(smp_names::Vector{T}) where T
 Given a vector of some iterable, returns a vector of tuples of unique all x 
@@ -333,7 +327,8 @@ julia> pairwise_pairs(samps)
 ```
 """
 @inline function pairwise_pairs(smp_names::AbstractVector{T}) where T
-    [tuple(smp_names[i], smp_names[j]) for i in 1:length(smp_names)-1 for j in i+1:length(smp_names)]
+    len = length(smp_names)
+    [tuple(smp_names[i], smp_names[j]) for i in 1:len-1 for j in i+1:len]
 end
 
 
@@ -343,8 +338,8 @@ Like Base.Iterators.Partition, except you can apply arbitrary sizes to
 partition the array by. The `steps` must add up to the total row length
 of the array.
 
-***Example***
-````
+**Example**
+```
 julia> partitionmatrix(rand(20,5), [10,3,4,3]) .|> size
 ((10, 5), (3, 5), (4, 5), (3, 5))
 ```
@@ -359,7 +354,6 @@ function partitionarray(array::AbstractArray, steps::AbstractVector{<:Integer})
 end
 
 
-#TODO add to docs API
 """
     phase(data::PopData)
 Return a `Vector` of length `ploidy` composed of allele matrices with dimensions `samples × loci`.
@@ -411,41 +405,6 @@ function phase(data::PopData)
 end
 
 
-"""
-    quickstart()
-Prints helpful text of how to get started using PopGen.
-"""
-function quickstart()
-    printstyled("\n        Quickstart for PopGen\n\n", bold = true)
-    println("Documentation: https://pdimens.github.io/PopGen.jl/")
-    println("Motivational(?) quote: ", motivational_quote())
-    println("\nA few things things you can do to get started:")
-
-    printstyled("\nLoad in data\n\n", color = :magenta)
-    println("- read_from(filename; kwargs...)")
-    println("- genepop(infile; kwargs...)  or similar file-specific importer")
-    println("- use available @gulfsharks or @nancycats datasets")
-
-    printstyled("\nExplore PopData\n\n", color = :blue)
-    println("- populations(PopData) to view population information")
-    println("- loci(PopData) to view locus names")
-    println("- samples(PopData) to view sample names")
-    println("- missing(PopData, by = ...) to view missing information")
-
-    printstyled("\nManipulate PopData\n\n", color = :light_red)
-    println("- populations!(PopData, ...) to rename populations")
-    println("- locations!(PopData, ...) to add geographical coordinates")
-    println("- exclude!(PopData, kwargs...) to selectively remove data")
-
-    printstyled("\nAnalyses\n\n", color = :green)
-    println("- richness(PopData) to calculate allelic richness")
-    println("- allele_avg(PopData) to calculate average # of alleles")
-    println("- summary(PopData) to calculate F-statistics, heterozygosity, etc.")
-    println("- hwe_test(PopData) to test for Hardy-Weinberg Equilibrium")
-
-    return
-end
-
 
 """
     reciprocal(num::T) where T <: Signed
@@ -466,20 +425,48 @@ function reciprocal_sum(x::AbstractVector{T}) where T<:Real
     mapreduce(reciprocal, +, x)
 end
 
-#TODO add to API/utils.jl
+
+# TODO add skip____ to docs/API/Utils.jl
 """
-    safemean(::AbstractVector{T}) where T<:Real
-A wrapper for StatsBase.mean to calculate a mean after skipping `Inf`, `-Inf`, and `NaN` values.
+    skipnan(itr)
+Return an iterator over the elements in `itr` skipping `Inf` and `-Inf` values. The returned
+object can be indexed using indices of itr if the latter is indexable. Indices
+corresponding to `Inf` values are not valid: they are skipped by keys and eachindex,   
+and a MissingException is thrown when trying to use them. This is effectively `skipmissing`
+for `Inf` and `-Inf` values.
+
+Use collect to obtain an `Array` containing the non-`Inf` values in `itr`. Note that even  
+if `itr` is a multidimensional array, the result will always be a `Vector` since it is not   
+possible to remove `Inf`s while preserving dimensions of the input.
 """
-function safemean(x::AbstractVector{T}) where T<:Real
-    y = x
-    if any(isinf.(x))
-        y =  x[.!isinf.(x)]
-    end
-    if any(isnan.(x))
-        y = y[.!isnan.(y)]
-    end
-    mean(y)
+function skipinf(itr)
+    Iterators.filter(isfinite, itr)
+end
+
+
+"""
+    skipnan(itr)
+Return an iterator over the elements in `itr` skipping `NaN` values. The returned
+object can be indexed using indices of itr if the latter is indexable. Indices
+corresponding to `NaN` values are not valid: they are skipped by keys and eachindex,   
+and a MissingException is thrown when trying to use them. This is effectively `skipmissing`
+for `NaN` values.
+
+Use collect to obtain an `Array` containing the non-`NaN` values in `itr`. Note that even  
+if `itr` is a multidimensional array, the result will always be a `Vector` since it is not   
+possible to remove `NaN`s while preserving dimensions of the input.
+"""
+function skipnan(itr) 
+    Iterators.filter(!isnan, itr)
+end
+
+"""
+    skipinfnan(itr)
+Return an iterator over the elements in `itr` skipping `NaN`, `Inf` and `-Inf` values.
+See the docstrings of `skipinf` and `skipnan` more details.
+"""
+function skipinfnan(itr)
+    Iterators.filter(x -> (isfinite(x) & !isnan(x)), itr)
 end
 
 
@@ -490,11 +477,13 @@ number. This is an internal function used for isolating sibship pairs from simul
 pairs (via `PopGenSims.jl`) to perform `relatedness` estimates only on those pairs.
 
 **Example**
+```julia
 julia> a = ["sim1_off1", "sim1_off2", "sim2_off1", "sim2_off2"] ;
 
 julia> sim_pairs(a)
 ("sim1_off1", "sim1_off2")
 ("sim2_off1", "sim2_off2")
+```
 """
 function sim_pairs(data::Vector{String})
     n = length(data)
@@ -510,7 +499,7 @@ function Base.sort(x::NTuple{N,T}) where N where T <: Signed
     Tuple(sort(SVector(x)))
 end
 
-#TODO add to API docs
+
 """
     strict_shuffle(x::T) where T <: AbstractArray
 Shuffle only the non-missing values of a Vector and return a copy of the vector,
@@ -539,68 +528,11 @@ end
 
 
 """
-    motivational_quote()
-Randomly returns one of ~50 _somewhat_ motivational quotes.
-"""
-function motivational_quote()
-# quotes retrieved on 06/11/2020 from https://www.coburgbanks.co.uk/blog/friday-funnies/50-funny-motivational-quotes/
-    quotes =  [
-    "\"The elevator to success is out of order. You’ll have to use the stairs, one step at a time.\" Joe Girard",
-    "\"People often say that motivation doesn’t last. Well, neither does bathing – that’s why we recommend it daily.\" Zig Ziglar",
-    "\"I always wanted to be somebody, but now I realise I should have been more specific.\" Lily Tomlin",
-    "\"I am so clever that sometimes I don’t understand a single word of what I am saying.\" Oscar Wilde",
-    "\"People say nothing is impossible, but I do nothing every day.\" Winnie the Pooh",
-    "\"Life is like a sewer… what you get out of it depends on what you put into it.\" Tom Lehrer",
-    "\"You can’t have everything. Where would you put it?\" Steven Wright",
-    "\"Work until your bank account looks like a phone number.\" Unknown ",
-    "\"Change is not a four letter word… but often your reaction to it is!\" Jeffrey Gitomer",
-    "\"If you think you are too small to make a difference, try sleeping with a mosquito.\" Dalai Lama",
-    "\"Bad decisions make good stories.\" Ellis Vidler",
-    "\"I’ll probably never fully become what I wanted to be when I grew up, but that’s probably because I wanted to be a ninja princess.\" Cassandra Duffy",
-    "\"When life gives you lemons, squirt someone in the eye.\" Cathy Guisewite",
-    "\"A clear conscience is a sure sign of a bad memory.\" Mark Twain",
-    "\"Well-behaved women seldom make history.\" Laurel Thatcher Ulrich",
-    "\"I didn’t fail the test. I just found 100 ways to do it wrong.\" Benjamin Franklin",
-    "\"I used to think I was indecisive, but now I’m not so sure.\" Unknown",
-    "\"Don’t worry about the world coming to an end today. It’s already tomorrow in Australia.\" Charles Schulz",
-    "\"Think like a proton. Always positive.\" Unknown",
-    "\"Be happy – it drives people crazy.\" Unknown",
-    "\"Optimist: someone who figures that taking a step backward after taking a step forward is not a disaster, it’s more like a cha-cha.\" Robert Brault",
-    "\"The question isn’t who is going to let me, it’s who is going to stop me.\" Ayn Rand.",
-    "\"You’re only given a little spark of madness. You mustn’t lose it.\" Robin Williams",
-    "\"I am an early bird and a night owl… so I am wise and I have worms\" Michael Scott",
-    "\"If you let your head get too big, it’ll break your neck.\" Elvis Presley",
-    "\"The road to success is dotted with many tempting parking spaces.\" Will Rogers",
-    "\"Live each day like it’s your second to the last. That way you can fall asleep at night.\" Jason Love",
-    "\"Even a stopped clock is right twice every day. After some years, it can boast of a long series of successes.\" Marie Von Ebner-Eschenbach",
-    "\"Honest criticism is hard to take, particularly from a relative, a friend, an acquaintance, or a stranger.\" Franklin P. Jones",
-    "\"Opportunity is missed by most people because it is dressed in overalls and looks like work.\" Thomas Eddison",
-    "\"A diamond is merely a lump of coal that did well under pressure.\" Unknown",
-    "\"Nothing is impossible, the word itself says “I’m possible!\" Audrey Hepburn",
-    "\"Friendship is like peeing on yourself: everyone can see it, but only you get the warm feeling that it brings.\" Robert Bloch",
-    "\"Women who seek to be equal with men lack ambition.\" Marilyn Monroe",
-    "\"By working faithfully eight hours a day you may eventually get to be boss and work twelve hours a day.\" Robert Frost",
-    "\"The trouble with having an open mind, of course, is that people will insist on coming along and trying to put things in it.\" Terry Pratchett",
-    "\"Age is of no importance unless you’re a cheese.\" Billie Burke",
-    "\"When tempted to fight fire with fire, remember that the Fire Department usually uses water.\" Unknown",
-    "\"Trying is the first step toward failure.\" Homer Simpson",
-    "\"Happiness is just sadness that hasn’t happened yet.\" Unknown",
-    "\"The best things in life are actually really expensive.\" Unknown",
-    "\"A few harmless flakes working together can unleash an avalanche of destruction.\" Justin Sewell",
-    "\"It could be that your purpose in life is to serve as a warning to others.\"  Ashleigh Brilliant",
-    "\"If the world didn’t suck we’d all fly into space.\" Unknown",
-    "\"Always remember that you are unique – just like everybody else.\" Unknown"
-    ]
-    return quotes[rand(1:length(quotes))]
-end
-
-#TODO add to docs API
-"""
     generate_meta(data::DataFrame)
 Given a genotype DataFrame formatted like `PopData.loci`, generates a corresponding
 `meta` DataFrame. In other words, it creates the `.meta` part of `PopData` from the `.loci` part.
 
-**Example**:
+**Example**
 ```
 julia> cats = @nancycats ;
 
