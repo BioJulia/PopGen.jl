@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://pdimens.github.io/blog</id>
+    <id>https://BioJulia.net/blog</id>
     <title>PopGen.jl Blog</title>
     <updated>2020-11-14T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://pdimens.github.io/blog"/>
+    <link rel="alternate" href="https://BioJulia.net/blog"/>
     <subtitle>PopGen.jl Blog</subtitle>
-    <icon>https://pdimens.github.io/img/favicon.ico</icon>
+    <icon>https://BioJulia.net/img/favicon.ico</icon>
     <rights>Copyright © 2021 PopGen.jl</rights>
     <entry>
         <title type="html"><![CDATA[Relatedness Tutorial]]></title>
         <id>relatedness</id>
-        <link href="https://pdimens.github.io/PopGen.jl/blog/relatedness"/>
+        <link href="https://BioJulia.net/PopGen.jl/blog/relatedness"/>
         <updated>2020-11-14T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Getting Started]]></summary>
     </entry>
     <entry>
         <title type="html"><![CDATA[Logo Graveyard]]></title>
         <id>logos</id>
-        <link href="https://pdimens.github.io/PopGen.jl/blog/logos"/>
+        <link href="https://BioJulia.net/PopGen.jl/blog/logos"/>
         <updated>2020-06-03T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[What is that logo?]]></summary>
     </entry>

@@ -2,7 +2,7 @@
 <rss version="2.0">
     <channel>
         <title>PopGen.jl Blog</title>
-        <link>https://pdimens.github.io/blog</link>
+        <link>https://BioJulia.net/blog</link>
         <description>PopGen.jl Blog</description>
         <lastBuildDate>Sat, 14 Nov 2020 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
@@ -10,14 +10,14 @@
         <copyright>Copyright © 2021 PopGen.jl</copyright>
         <item>
             <title><![CDATA[Relatedness Tutorial]]></title>
-            <link>https://pdimens.github.io/PopGen.jl/blog/relatedness</link>
+            <link>https://BioJulia.net/PopGen.jl/blog/relatedness</link>
             <guid>relatedness</guid>
             <pubDate>Sat, 14 Nov 2020 00:00:00 GMT</pubDate>
             <description><![CDATA[Getting Started]]></description>
         </item>
         <item>
             <title><![CDATA[Logo Graveyard]]></title>
-            <link>https://pdimens.github.io/PopGen.jl/blog/logos</link>
+            <link>https://BioJulia.net/PopGen.jl/blog/logos</link>
             <guid>logos</guid>
             <pubDate>Wed, 03 Jun 2020 00:00:00 GMT</pubDate>
             <description><![CDATA[What is that logo?]]></description>
