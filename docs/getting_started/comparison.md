@@ -256,7 +256,7 @@ macro so we can get a full 100 evaluations.
 ```julia
 julia> @benchmark pairwise_fst(sharks) samples = 100 seconds = 700
 BenchmarkTools.Trial:
-  memory estimate:  1.26 GiB_pairwise_WeirCockerham
+  memory estimate:  1.26 GiB
   allocs estimate:  8024669
 
   --------------
