@@ -187,6 +187,7 @@ julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]), :locus .== "con
 <TabItem value="advanced">
  
 Here's an advanced example for writing a query that only returns heterozygous genotypes for locus `contig_1784`
+
 ```julia
 julia> @where(sharks.loci, ishet.(:genotype) .== true, :locus .== "contig_2784")
 6×4 DataFrame
