@@ -45,7 +45,7 @@ end
 ## Weir & Cockerham 1984 FST ##
 
 
-function weircockerham_fst(data::AbstractDataFrame)
+function weircockerham_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     n_loci = size(population_1, 2)
     n_pops = 2
     # get genotype counts
