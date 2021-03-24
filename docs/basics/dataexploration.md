@@ -133,7 +133,7 @@ julia> geno_freqtable(cats, by = "population")
 ## Missing Data
 
 ```julia
-missing(data::PopData; by::String = "sample")
+missing_data(data::PopData; by::String = "sample")
 ```
 
 Get missing genotype information in a `PopData` object. Specify a mode of operation using the `by =` keyword to return a table corresponding with that missing information type.
@@ -160,25 +160,27 @@ Get missing genotype information in a `PopData` object. Specify a mode of operat
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missing(sharks)
+julia> missing_data(sharks)
 212×2 DataFrame
-│ Row │ name    │ missing │
-│     │ String  │ Int64   │
-├─────┼─────────┼─────────┤
-│ 1   │ cc_001  │ 124     │
-│ 2   │ cc_002  │ 94      │
-│ 3   │ cc_003  │ 100     │
-│ 4   │ cc_005  │ 0       │
-│ 5   │ cc_007  │ 2       │
-│ 6   │ cc_008  │ 1       │
-⋮
-│ 206 │ seg_025 │ 0       │
-│ 207 │ seg_026 │ 0       │
-│ 208 │ seg_027 │ 2       │
-│ 209 │ seg_028 │ 25      │
-│ 210 │ seg_029 │ 0       │
-│ 211 │ seg_030 │ 1       │
-│ 212 │ seg_031 │ 1       │
+ Row │ name     missing
+     │ String   Int64
+─────┼──────────────────
+   1 │ cc_001       124
+   2 │ cc_002        94
+   3 │ cc_003       100
+   4 │ cc_005         0
+   5 │ cc_007         2
+   6 │ cc_008         1
+   7 │ cc_009         2
+  ⋮  │    ⋮        ⋮
+ 206 │ seg_025        0
+ 207 │ seg_026        0
+ 208 │ seg_027        2
+ 209 │ seg_028       25
+ 210 │ seg_029        0
+ 211 │ seg_030        1
+ 212 │ seg_031        1
+        198 rows omitted
 ```
 
 </TabItem>
@@ -187,18 +189,18 @@ julia> missing(sharks)
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missing(sharks, by = "pop")
+julia> missing_data(sharks, by = "pop")
 7×2 DataFrame
-│ Row │ population     │ missing │
-│     │ String         │ Int64   │
-├─────┼────────────────┼─────────┤
-│ 1   │ Florida Keys   │ 1246    │
-│ 2   │ Cape Canaveral │ 666     │
-│ 3   │ Mideast Gulf   │ 99      │
-│ 4   │ Georgia        │ 425     │
-│ 5   │ Northeast Gulf │ 474     │
-│ 6   │ Southeast Gulf │ 1504    │
-│ 7   │ South Carolina │ 234     │
+ Row │ population      missing
+     │ String          Int64
+─────┼─────────────────────────
+   1 │ Cape Canaveral      666
+   2 │ Georgia             423
+   3 │ South Carolina      233
+   4 │ Florida Keys       1241
+   5 │ Mideast Gulf         99
+   6 │ Northeast Gulf      472
+   7 │ Southeast Gulf     1504
 ```
 
 </TabItem>
@@ -207,25 +209,27 @@ julia> missing(sharks, by = "pop")
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missing(sharks, by = "locus")
-2213×2 DataFrame
-│ Row  │ locus        │ missing │
-│      │ String       │ Int64   │
-├──────┼──────────────┼─────────┤
-│ 1    │ contig_35208 │ 0       │
-│ 2    │ contig_23109 │ 6       │
-│ 3    │ contig_4493  │ 3       │
-│ 4    │ contig_10742 │ 2       │
-│ 5    │ contig_14898 │ 0       │
-│ 6    │ contig_8483  │ 0       │
-⋮
-│ 2207 │ contig_18959 │ 0       │
-│ 2208 │ contig_43517 │ 6       │
-│ 2209 │ contig_27356 │ 2       │
-│ 2210 │ contig_475   │ 0       │
-│ 2211 │ contig_19384 │ 5       │
-│ 2212 │ contig_22368 │ 3       │
-│ 2213 │ contig_2784  │ 7       │
+julia> missing_data(sharks, by = "locus")
+2209×2 DataFrame
+  Row │ locus         missing
+      │ String        Int64
+──────┼───────────────────────
+    1 │ contig_35208        0
+    2 │ contig_23109        6
+    3 │ contig_4493         3
+    4 │ contig_10742        2
+    5 │ contig_14898        0
+    6 │ contig_8483         0
+    7 │ contig_8065         0
+  ⋮   │      ⋮           ⋮
+ 2203 │ contig_18959        0
+ 2204 │ contig_43517        6
+ 2205 │ contig_27356        2
+ 2206 │ contig_475          0
+ 2207 │ contig_19384        5
+ 2208 │ contig_22368        3
+ 2209 │ contig_2784         7
+             2195 rows omitted
 ```
 
 </TabItem>
@@ -234,26 +238,27 @@ julia> missing(sharks, by = "locus")
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missing(sharks, by = "full")
-
-15491×3 DataFrame
-│ Row   │ locus        │ population     │ missing │
-│       │ String       │ String         │ Int64   │
-├───────┼──────────────┼────────────────┼─────────┤
-│ 1     │ contig_35208 │ Cape Canaveral │ 0       │
-│ 2     │ contig_35208 │ Georgia        │ 0       │
-│ 3     │ contig_35208 │ South Carolina │ 0       │
-│ 4     │ contig_35208 │ Florida Keys   │ 0       │
-│ 5     │ contig_35208 │ Mideast Gulf   │ 0       │
-│ 6     │ contig_35208 │ Northeast Gulf │ 0       │
-⋮
-│ 15485 │ contig_2784  │ Cape Canaveral │ 0       │
-│ 15486 │ contig_2784  │ Georgia        │ 2       │
-│ 15487 │ contig_2784  │ South Carolina │ 1       │
-│ 15488 │ contig_2784  │ Florida Keys   │ 2       │
-│ 15489 │ contig_2784  │ Mideast Gulf   │ 1       │
-│ 15490 │ contig_2784  │ Northeast Gulf │ 0       │
-│ 15491 │ contig_2784  │ Southeast Gulf │ 1       │
+julia> missing_data(sharks, by = "full")
+15463×3 DataFrame
+   Row │ locus         population      missing
+       │ String        String          Int64
+───────┼───────────────────────────────────────
+     1 │ contig_35208  Cape Canaveral        0
+     2 │ contig_35208  Georgia               0
+     3 │ contig_35208  South Carolina        0
+     4 │ contig_35208  Florida Keys          0
+     5 │ contig_35208  Mideast Gulf          0
+     6 │ contig_35208  Northeast Gulf        0
+     7 │ contig_35208  Southeast Gulf        0
+   ⋮   │      ⋮              ⋮            ⋮
+ 15457 │ contig_2784   Cape Canaveral        0
+ 15458 │ contig_2784   Georgia               2
+ 15459 │ contig_2784   South Carolina        1
+ 15460 │ contig_2784   Florida Keys          2
+ 15461 │ contig_2784   Mideast Gulf          1
+ 15462 │ contig_2784   Northeast Gulf        0
+ 15463 │ contig_2784   Southeast Gulf        1
+                             15449 rows omitted
 ```
 
 </TabItem>
@@ -413,12 +418,11 @@ Population genetics famously includes all manner of coefficients with which to s
 
 ```julia
 julia> summary(@nancycats)
-
 1×10 DataFrame
-│ Row │ Het_obs │ HS      │ HT      │ DST     │ HT′     │ DST′    │ FST     │ FST′    │ FIS     │ DEST    │
-│     │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │
-├─────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ 1   │ 0.6299  │ 0.7083  │ 0.7717  │ 0.0634  │ 0.7757  │ 0.0674  │ 0.0821  │ 0.0869  │ 0.1108  │ 0.231   │
+ Row │ Het_obs  HS       HT       DST      HT′      DST′     FST      FST′     FIS      DEST
+     │ Float64  Float64  Float64  Float64  Float64  Float64  Float64  Float64  Float64  Float64
+─────┼──────────────────────────────────────────────────────────────────────────────────────────
+   1 │  0.6299   0.7083   0.7717   0.0634   0.7757   0.0674   0.0821   0.0869   0.1108    0.231
 ```
 
 </TabItem>
@@ -427,18 +431,18 @@ julia> summary(@nancycats)
 ```julia
 julia> summary(@nancycats, by = "locus")
 9×11 DataFrame
-│ Row │ locus  │ Het_obs │ HS      │ HT      │ DST     │ HT′     │ DST′    │ FST     │ FST′    │ FIS     │ DEST    │
-│     │ String │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │ Float64 │
-├─────┼────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-│ 1   │ fca8   │ 0.667   │ 0.779   │ 0.8619  │ 0.0829  │ 0.8671  │ 0.0881  │ 0.0962  │ 0.1016  │ 0.1438  │ 0.3987  │
-│ 2   │ fca23  │ 0.6838  │ 0.7439  │ 0.7994  │ 0.0555  │ 0.8029  │ 0.0589  │ 0.0694  │ 0.0734  │ 0.0809  │ 0.2302  │
-│ 3   │ fca43  │ 0.6814  │ 0.7442  │ 0.7937  │ 0.0495  │ 0.7968  │ 0.0526  │ 0.0623  │ 0.066   │ 0.0844  │ 0.2054  │
-│ 4   │ fca45  │ 0.71    │ 0.7085  │ 0.7642  │ 0.0557  │ 0.7679  │ 0.0594  │ 0.0729  │ 0.0774  │ -0.0021 │ 0.2039  │
-│ 5   │ fca77  │ 0.6295  │ 0.7828  │ 0.8659  │ 0.0831  │ 0.8711  │ 0.0883  │ 0.096   │ 0.1014  │ 0.1958  │ 0.4067  │
-│ 6   │ fca78  │ 0.5773  │ 0.6339  │ 0.6773  │ 0.0434  │ 0.6801  │ 0.0462  │ 0.0641  │ 0.0679  │ 0.0893  │ 0.1261  │
-│ 7   │ fca90  │ 0.6454  │ 0.7408  │ 0.8144  │ 0.0736  │ 0.819   │ 0.0782  │ 0.0904  │ 0.0955  │ 0.1287  │ 0.3017  │
-│ 8   │ fca96  │ 0.6259  │ 0.6747  │ 0.7657  │ 0.091   │ 0.7714  │ 0.0967  │ 0.1189  │ 0.1254  │ 0.0723  │ 0.2973  │
-│ 9   │ fca37  │ 0.4485  │ 0.5671  │ 0.6027  │ 0.0356  │ 0.6049  │ 0.0379  │ 0.0591  │ 0.0626  │ 0.2091  │ 0.0874  │
+ Row │ locus   Het_obs  HS       HT       DST      HT′      DST′     FST      FST′     FIS      DEST
+     │ String  Float64  Float64  Float64  Float64  Float64  Float64  Float64  Float64  Float64  Float64
+─────┼──────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │ fca8     0.667    0.779    0.8619   0.0829   0.8671   0.0881   0.0962   0.1016   0.1438   0.3987
+   2 │ fca23    0.6838   0.7439   0.7994   0.0555   0.8029   0.0589   0.0694   0.0734   0.0809   0.2302
+   3 │ fca43    0.6814   0.7442   0.7937   0.0495   0.7968   0.0526   0.0623   0.066    0.0844   0.2054
+   4 │ fca45    0.71     0.7085   0.7642   0.0557   0.7679   0.0594   0.0729   0.0774  -0.0021   0.2039
+   5 │ fca77    0.6295   0.7828   0.8659   0.0831   0.8711   0.0883   0.096    0.1014   0.1958   0.4067
+   6 │ fca78    0.5773   0.6339   0.6773   0.0434   0.6801   0.0462   0.0641   0.0679   0.0893   0.1261
+   7 │ fca90    0.6454   0.7408   0.8144   0.0736   0.819    0.0782   0.0904   0.0955   0.1287   0.3017
+   8 │ fca96    0.6259   0.6747   0.7657   0.091    0.7714   0.0967   0.1189   0.1254   0.0723   0.2973
+   9 │ fca37    0.4485   0.5671   0.6027   0.0356   0.6049   0.0379   0.0591   0.0626   0.2091   0.0874
 ```
 
 </TabItem>

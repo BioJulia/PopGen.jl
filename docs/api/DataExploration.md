@@ -95,9 +95,9 @@ julia> geno_freqtable(cats, by = "population")
 
 ----
 
-### `missing`
+### `missing_data`
 ```julia
-missing(data::PopData; by::String = "sample")
+missing_data(data::PopData; by::String = "sample")
 ```
 Get missing genotype information in a `PopData`. Specify a mode of operation to return a DataFrame corresponding with that missing information.
 
@@ -109,7 +109,7 @@ Get missing genotype information in a `PopData`. Specify a mode of operation to 
 
 **Example**
 ```julia
-missing(@gulfsharks, by = "pop")
+missing_data(@gulfsharks, by = "pop")
 ```
 
 -----

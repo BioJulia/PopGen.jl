@@ -118,30 +118,30 @@ This can be done fairly easily using DataFramesMeta macro `@where`
     { label: 'single sample', value: 's', },
     { label: 'multiple samples', value: 'm', },
     { label: 'name and locus', value: 'nl', },
+    { label: 'advanced usage', value: 'advanced', },
   ]
 }>
 <TabItem value="s">
 
 ```julia
 julia> @where(sharks.loci, :name .== "cc_001")
-2213×4 DataFrame
-│ Row  │ name   │ population     │ locus        │ genotype │
-│      │ Str…   │ String         │ String       │ Tuple…?  │
-├──────┼────────┼────────────────┼──────────────┼──────────┤
-│ 1    │ cc_001 │ Cape Canaveral │ contig_35208 │ (1, 2)   │
-│ 2    │ cc_001 │ Cape Canaveral │ contig_23109 │ (1, 1)   │
-│ 3    │ cc_001 │ Cape Canaveral │ contig_4493  │ (1, 2)   │
-│ 4    │ cc_001 │ Cape Canaveral │ contig_10742 │ (1, 1)   │
-│ 5    │ cc_001 │ Cape Canaveral │ contig_14898 │ (1, 2)   │
-│ 6    │ cc_001 │ Cape Canaveral │ contig_8483  │ (1, 1)   │
-⋮
-│ 2207 │ cc_001 │ Cape Canaveral │ contig_18959 │ (1, 2)   │
-│ 2208 │ cc_001 │ Cape Canaveral │ contig_43517 │ (1, 1)   │
-│ 2209 │ cc_001 │ Cape Canaveral │ contig_27356 │ (1, 1)   │
-│ 2210 │ cc_001 │ Cape Canaveral │ contig_475   │ (1, 2)   │
-│ 2211 │ cc_001 │ Cape Canaveral │ contig_19384 │ (2, 2)   │
-│ 2212 │ cc_001 │ Cape Canaveral │ contig_22368 │ (1, 1)   │
-│ 2213 │ cc_001 │ Cape Canaveral │ contig_2784  │ (1, 1)   │
+2209×4 DataFrame
+  Row │ name    population      locus         genotype
+      │ String  String          String        Tuple…?
+──────┼────────────────────────────────────────────────
+    1 │ cc_001  Cape Canaveral  contig_35208  (1, 2)
+    2 │ cc_001  Cape Canaveral  contig_23109  (1, 1)
+    3 │ cc_001  Cape Canaveral  contig_4493   (1, 2)
+    4 │ cc_001  Cape Canaveral  contig_10742  (1, 1)
+    5 │ cc_001  Cape Canaveral  contig_14898  (1, 2)
+    6 │ cc_001  Cape Canaveral  contig_8483   (1, 1)
+  ⋮   │   ⋮           ⋮              ⋮           ⋮
+ 2205 │ cc_001  Cape Canaveral  contig_27356  (1, 1)
+ 2206 │ cc_001  Cape Canaveral  contig_475    (1, 2)
+ 2207 │ cc_001  Cape Canaveral  contig_19384  (2, 2)
+ 2208 │ cc_001  Cape Canaveral  contig_22368  (1, 1)
+ 2209 │ cc_001  Cape Canaveral  contig_2784   (1, 1)
+                                      2198 rows omitted
 ```
 
 </TabItem>
@@ -149,24 +149,23 @@ julia> @where(sharks.loci, :name .== "cc_001")
 
 ```julia
 julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]))
-4426×4 DataFrame
-│ Row  │ name   │ population     │ locus        │ genotype │
-│      │ Str…   │ String         │ String       │ Tuple…?  │
-├──────┼────────┼────────────────┼──────────────┼──────────┤
-│ 1    │ cc_001 │ Cape Canaveral │ contig_35208 │ (1, 2)   │
-│ 2    │ cc_002 │ Cape Canaveral │ contig_35208 │ (1, 2)   │
-│ 3    │ cc_001 │ Cape Canaveral │ contig_23109 │ (1, 1)   │
-│ 4    │ cc_002 │ Cape Canaveral │ contig_23109 │ (1, 2)   │
-│ 5    │ cc_001 │ Cape Canaveral │ contig_4493  │ (1, 2)   │
-│ 6    │ cc_002 │ Cape Canaveral │ contig_4493  │ (1, 1)   │
-⋮
-│ 4420 │ cc_002 │ Cape Canaveral │ contig_475   │ (1, 2)   │
-│ 4421 │ cc_001 │ Cape Canaveral │ contig_19384 │ (2, 2)   │
-│ 4422 │ cc_002 │ Cape Canaveral │ contig_19384 │ (2, 2)   │
-│ 4423 │ cc_001 │ Cape Canaveral │ contig_22368 │ (1, 1)   │
-│ 4424 │ cc_002 │ Cape Canaveral │ contig_22368 │ (1, 1)   │
-│ 4425 │ cc_001 │ Cape Canaveral │ contig_2784  │ (1, 1)   │
-│ 4426 │ cc_002 │ Cape Canaveral │ contig_2784  │ (1, 1)   │
+4418×4 DataFrame
+  Row │ name    population      locus         genotype
+      │ String  String          String        Tuple…?
+──────┼────────────────────────────────────────────────
+    1 │ cc_001  Cape Canaveral  contig_35208  (1, 2)
+    2 │ cc_002  Cape Canaveral  contig_35208  (1, 2)
+    3 │ cc_001  Cape Canaveral  contig_23109  (1, 1)
+    4 │ cc_002  Cape Canaveral  contig_23109  (1, 2)
+    5 │ cc_001  Cape Canaveral  contig_4493   (1, 2)
+    6 │ cc_002  Cape Canaveral  contig_4493   (1, 1)
+  ⋮   │   ⋮           ⋮              ⋮           ⋮
+ 4414 │ cc_002  Cape Canaveral  contig_19384  (2, 2)
+ 4415 │ cc_001  Cape Canaveral  contig_22368  (1, 1)
+ 4416 │ cc_002  Cape Canaveral  contig_22368  (1, 1)
+ 4417 │ cc_001  Cape Canaveral  contig_2784   (1, 1)
+ 4418 │ cc_002  Cape Canaveral  contig_2784   (1, 1)
+                                      4407 rows omitted
 ```
 
 </TabItem>
@@ -182,6 +181,25 @@ julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]), :locus .== "con
 ├─────┼────────┼────────────────┼─────────────┼──────────┤
 │ 1   │ cc_001 │ Cape Canaveral │ contig_2784 │ (1, 1)   │
 │ 2   │ cc_002 │ Cape Canaveral │ contig_2784 │ (1, 1)   │
+```
+
+</TabItem>
+<TabItem value="advanced">
+ 
+Here's an advanced example for writing a query that only returns heterozygous genotypes for locus `contig_1784`
+
+```julia
+julia> @where(sharks.loci, ishet.(:genotype) .== true, :locus .== "contig_2784")
+6×4 DataFrame
+ Row │ name     population      locus        genotype
+     │ String   String          String       Tuple…?
+─────┼────────────────────────────────────────────────
+   1 │ key_003  Florida Keys    contig_2784  (1, 2)
+   2 │ key_055  Florida Keys    contig_2784  (1, 2)
+   3 │ key_072  Florida Keys    contig_2784  (1, 2)
+   4 │ meg_001  Mideast Gulf    contig_2784  (1, 2)
+   5 │ meg_011  Mideast Gulf    contig_2784  (1, 2)
+   6 │ seg_016  Southeast Gulf  contig_2784  (1, 2)
 ```
 
 </TabItem>
