@@ -37,10 +37,14 @@ wc = pairwise_fst(data, method = "WC84")
 wc_sig = pairwise_fst(data, iterations = 1000)
 ```
 """
-function pairwise_fst(data::PopData; method::String = "WC", iterations::Int64 = 0)
-    occursin("nei", lowercase(method)) && return _pairwise_Nei(data)
-    if occursin("wc", lowercase(method))
+function pairwise_fst(data::PopData; method::String = "WC84", iterations::Int64 = 0)
+    if occursin("nei", lowercase(method))
+        iterations > 0 && return _permuted_Nei(data, iterations)
+        iterations == 0 && return _pairwise_Nei(data)
+    elseif occursin("wc", lowercase(method))
         iterations > 0 && return _permuted_WeirCockerham(data, iterations)
         iterations == 0 && return _pairwise_WeirCockerham(data)
+    else
+        throw(ArgumentError("please use one of \"WC84\" or \"Nei87\" methods"))
     end
 end

@@ -1,28 +1,33 @@
 ## Nei 1987 FST ##
-function nei_fst(data::AbstractDataFrame)
-    # observed/expected het per locus per pop
-    het_df = DataFrames.combine(
-        groupby(data, [:locus, :population]),
-        :genotype => nonmissing => :n,
-        :genotype => hetero_o => :het_obs,
-        :genotype => hetero_e => :het_exp,
-        :genotype => allele_freq => :alleles
-    )
-    # collapse down to retrieve averages and counts
-    n_df = DataFrames.combine(
-        groupby(het_df, :locus),
-        :n => count_nonzeros => :count,
-        :n => (n -> count_nonzeros(n) / reciprocal_sum(n)) => :mn,
-        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e, o, count_nonzeros(n) / reciprocal_sum(n))))) => :HS,
-        :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
-        :alleles => (alleles ->  sum(values(avg_allele_freq(alleles, 2))))=> :avg_freq
-        )
+function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
+    n =  hcat(map(nonmissing, eachcol(population_1)), map(nonmissing, eachcol(population_2)))
+    # number of populations represented per locus
+    n_pop_per_loc = map(count_nonzeros, eachrow(n)) 
+    # corrected n for population size
+    corr_n_per_loc = n_pop_per_loc ./ map(reciprocal_sum, eachrow(n))
+    # observed heterozygosity
+    het_obs_p1 = map(hetero_o, eachcol(population_1))
+    het_obs_p2 = map(hetero_o, eachcol(population_2))
+    # expected heterozygosity
+    het_exp_p1 = map(hetero_e, eachcol(population_1))
+    het_exp_p2 = map(hetero_e, eachcol(population_2))
+    # genic diversity for population 1 and 2
+    p1_nei = gene_diversity_nei87.(het_exp_p1, het_obs_p1, corr_n_per_loc)
+    p2_nei = gene_diversity_nei87.(het_exp_p2, het_obs_p2, corr_n_per_loc)
+    # mean genic diversity
+    HS = map(i -> mean(skipmissing(i)), zip(p1_nei, p2_nei))
+    # allele freqs for population 1 and 2
+    alle_freq_p1 = map(allele_freq, eachcol(population_1))
+    alle_freq_p2 = map(allele_freq, eachcol(population_2))
+    # sum of the squared average allele frequencies
+    avg_freq = avg_allele_freq.(zip(alle_freq_p1, alle_freq_p2),2) .|> values .|> sum
+    # average observed heterozygosity per locus
+    Het_obs = map(i -> mean(skipmissing(i)), zip(het_obs_p1, het_obs_p2))
 
-    Ht = @inbounds 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)
-    DST = @inbounds Ht .- n_df.HS
-    DST′ = @inbounds n_df.count ./ (n_df.count .- 1) .* DST
-    HT′ = @inbounds n_df.HS .+ DST′
-    #TODO replace safemean
+    Ht = @inbounds 1.0 .- avg_freq .+ (HS ./ corr_n_per_loc ./ n_pop_per_loc) - (Het_obs ./ 2.0 ./ corr_n_per_loc ./ n_pop_per_loc)
+    DST = @inbounds Ht .- HS
+    DST′ = @inbounds n_pop_per_loc ./ (n_pop_per_loc .- 1) .* DST
+    HT′ = @inbounds HS .+ DST′
     round(mean(skipinfnan(DST′)) / mean(skipinfnan(HT′)), digits = 5)
 end
 
@@ -30,12 +35,15 @@ function _pairwise_Nei(data::PopData)
     idx_pdata = groupby(data.loci, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = length(idx_pdata)
+    n_loci = size(data)[2]
     results = zeros(npops, npops)
     @sync for i in 2:npops
         Base.Threads.@spawn begin
             for j in 1:(i-1)
-                results[i,j] = nei_fst(DataFrame(idx_pdata[[j,i]]))
-            end
+                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                results[i,j] = nei_fst(pop1,pop2)
+           end
         end
     end
     return PairwiseFST(DataFrame(results, Symbol.(pops)), "Nei 1987")
@@ -43,8 +51,6 @@ end
 
 
 ## Weir & Cockerham 1984 FST ##
-
-
 function weircockerham_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     n_loci = size(population_1, 2)
     n_pops = 2
@@ -151,7 +157,7 @@ function _pairwise_WeirCockerham(data::PopData)
             for j in 1:(i-1)
                 pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
                 pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
-                results[i,j] = weircockerham_fst2(pop1,pop2)
+                results[i,j] = weircockerham_fst(pop1,pop2)
            end
         end
     end
