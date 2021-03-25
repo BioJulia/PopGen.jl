@@ -20,7 +20,7 @@ gsharks = dataset("sharks")
 
 ----
 
-### `nancycats`
+### `@nancycats`
 ```julia
 @nancycats
 ```
@@ -35,7 +35,7 @@ ncats = @nancycats
 
 ----
 
-### `gulfsharks`
+### `@gulfsharks`
 ```julia
 @gulfsharks
 ```
