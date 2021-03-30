@@ -27,8 +27,9 @@ Calculate pairwise FST between populations in a `PopData` object. Set `iteration
 to a value greater than `0` to perform a single-tailed permutation test to obtain
 P-values of statistical significance.
 #### Methods:
+- `"Hudson92"`: Hudson et al. (1992) method (only for biallelic data)
 - `"Nei87"`: Nei (1987) method
-- `"WC84"` : Weir-Cockerham (1984) method (default)
+- `"WC84"` : Weir & Cockerham (1984) method (default)
 
 **Examples**
 ```julia
@@ -44,6 +45,9 @@ function pairwise_fst(data::PopData; method::String = "WC84", iterations::Int64 
     elseif occursin("wc", lowercase(method))
         iterations > 0 && return _permuted_WeirCockerham(data, iterations)
         iterations == 0 && return _pairwise_WeirCockerham(data)
+    elseif occursin("hudson", lowercase(method))
+        iterations > 0 && return _permuted_Hudson(data, iterations)
+        iterations == 0 && return _pairwise_Hudson(data)
     else
         throw(ArgumentError("please use one of \"WC84\" or \"Nei87\" methods"))
     end
