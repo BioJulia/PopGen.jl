@@ -164,6 +164,26 @@ function drop_monomorphic!(data::PopData)
     exclude!(data, locus = rm_loci)
 end
 
+
+"""
+    isbiallelic(data::GenoArray)
+Returns `true` if the `GenoArray` is biallelic, `false` if not.
+"""
+function isbiallelic(data::T) where T<:GenoArray
+    length(unique(Base.Iterators.flatten(skipmissing(data)))) == 2
+end
+
+
+"""
+    isbiallelic(data::PopData)
+Returns `true` all the loci in the `PopData` are biallelic, `false` if not.
+"""
+function isbiallelic(data::PopData)
+    mtx = reshape(data.loci.genotype, length(samples(data)), :)
+    all(map(isbiallelic, eachcol(mtx)))
+end
+
+
 """
     loci_dataframe(data::PopData)
 Return a wide `DataFrame` of samples as columns, ommitting population information.
