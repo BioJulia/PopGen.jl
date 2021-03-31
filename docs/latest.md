@@ -4,6 +4,31 @@ title: What's New
 sidebar_label: What's New
 ---
 
+# v.0.6
+## v.0.6.0
+### ✨✨ New Features
+- Hudson pairwise FST & Permutation
+  - adds the Hudson et al. 1992 method
+- `isbiallelic`
+  - adds boolean test if a `PopData` object has only biallelic loci
+  - adds boolean test if a `GenoArray` is biallelic
+- `drop_multiallelic`
+  - mutating and non-mutating methods to remove non-biallelic loci from a `PopData` object
+
+### ⚡⚡ Improvements
+- `drop_monomorphic` now uses the same logic as `drop_multiallelic`, which should make it faster and leaner
+
+
+### 🐛🐛 Bug fixes
+- `vcf` and `bcf` kwarg `rename_loci` now consistent in functions and docstrings
+- `generate_meta` now uses a comprehension rather than deprecated `map(fn, groupeddataframe)` method
+
+### Breaking Changes
+- none
+
+----
+
+# v.0.5
 ## v.0.5.2
 ### ⚡⚡ Improvements
 - a rewrite of nei and weir-cockerham fst methods to be matrix-based (faster!)
@@ -29,6 +54,9 @@ This release fixes a critical bug in all the file importing functions that retur
   - the default returns an array of the unique population names
   - the keyword `listall::Bool` has been replaced with `counts::Bool`, which now returns a dataframe of the number of samples per population
 
+-----
+
+# v.0.4
 ## v0.4.5
 This release builds off of `0.4.3` and does a better job with the VCF loading logic. Along with that, `vcf` and `bcf` exist in the namespace before loading in `GeneticVariation.jl`, meaning you can always view the docstrings. These stripped-down methods in the namespace will give helpful errors to remind you to load in `GeneticVariation.jl` and/or `GZip.jl`.
 
@@ -38,8 +66,6 @@ This release fixes and simplifies the under-the-hood `allele_freq`, `geno_freq`,
 ### Changes
 - You no longer need to import both `GeneticVariations.jl` and `GZip.jl` to have the `vcf` and `bcf` functions work. The reason is that if your file isn't gzipped, then why load in an unnecessary library? Therefore, if your file is gzipped, then you'll need to load in `GZip.jl` too, otherwise you just need `GeneticVariation.jl`. :cool:
 - `avg_allele_freq` now has a different method, where the second positional argument is `power`, which will raise the calculated frequencies to the given value (default = `1`). This simplifies having to do things like square the values of the resulting `Dict`.
-
------
 
 ## v0.4.0
 This release adds a slew of relatedness estimators, which can be bootstrapped and are performed in parallel. Paired with release of `PopGenSims.jl v0.0.2`.
