@@ -1,7 +1,7 @@
 export bcf, vcf
 
 """
-    bcf(infile::String; ; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
+    bcf(infile::String; ; rename_loci::Bool, silent::Bool, allow_monomorphic::Bool)
 Load a BCF file into memory as a PopData object. Population information needs to be provided separately. 
 - `infile` : path to BCF file (can be gzipped)
 
@@ -33,7 +33,7 @@ end
 ### VCF parsing ###
 
 """
-    vcf(infile::String; ; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
+    vcf(infile::String; ; rename_loci::Bool, silent::Bool, allow_monomorphic::Bool)
 Load a VCF file into memory as a PopData object. Population information needs to be provided separately. 
 - `infile` : path to VCF file (can be gzipped)
 

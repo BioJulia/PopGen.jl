@@ -1,4 +1,4 @@
-export size, drop_monomorphic, drop_monomorphic!
+export size, drop_monomorphic, drop_monomorphic!, drop_multiallelic, drop_multiallelic!
 
 ## experimental and not exported or documented!
 function adjacency_matrix(data::PopData)
@@ -128,19 +128,18 @@ Return a `PopData` object omitting any monomorphic loci. Will inform you which
 loci were removed.
 """
 function drop_monomorphic(data::PopData)
-    rm_loci = Vector{String}()
-    for (loc, loc_sdf) in pairs(groupby(data.loci, :locus))
-        length(unique(skipmissing(loc_sdf[:, :genotype]))) == 1 && push!(rm_loci, loc.locus)
-    end
-
-    if length(rm_loci) == 0
+    all_loci = loci(data)
+    mtx = reshape(data.loci.genotype, length(samples(data)), :)
+    monomorphs = [length(unique(skipmissing(x))) == 1 for x in eachcol(mtx)]
+    loci_to_rm = all_loci[monomorphs]
+    if length(loci_to_rm) == 0
         return data
-    elseif length(rm_loci) == 1
-        @info "Dropping monomorphic locus " * rm_loci[1]
+    elseif length(loci_to_rm) == 1
+        @info "Removing monomorphic locus " * loci_to_rm[1]
     else
-        @info "Dropping $(length(rm_loci)) monomorphic loci" * "\n $rm_loci"
+        @info "Removing $(length(loci_to_rm)) monomorphic loci:" * "\n $loci_to_rm"
     end
-    exclude(data, locus = rm_loci)
+    exclude(data, locus = loci_to_rm)
 end
 
 
@@ -150,19 +149,80 @@ Edit a `PopData` object in place by omitting any monomorphic loci. Will inform y
 loci were removed.
 """
 function drop_monomorphic!(data::PopData)
-    rm_loci = Vector{String}()
-    for (loc, loc_sdf) in pairs(groupby(data.loci, :locus))
-        length(unique(skipmissing(loc_sdf[:, :genotype]))) == 1 && push!(rm_loci, loc.locus)
-    end
-    if length(rm_loci) == 0
+    all_loci = loci(data)
+    mtx = reshape(data.loci.genotype, length(samples(data)), :)
+    monomorphs = [length(unique(skipmissing(x))) == 1 for x in eachcol(mtx)]
+    loci_to_rm = all_loci[monomorphs]
+    if length(loci_to_rm) == 0
         return data
-    elseif length(rm_loci) == 1
-        @info "Dropping monomorphic locus " * rm_loci[1]
+    elseif length(loci_to_rm) == 1
+        @info "Removing monomorphic locus " * loci_to_rm[1]
     else
-        @info "Dropping $(length(rm_loci)) monomorphic loci" * "\n $rm_loci"
+        @info "Removing $(length(loci_to_rm)) monomorphic loci:" * "\n $loci_to_rm"
     end
-    exclude!(data, locus = rm_loci)
+    exclude!(data, locus = loci_to_rm)
 end
+
+
+#TODO add to docs
+"""
+    drop_multiallelic(data::PopData)
+Return a `PopData` object omitting loci that are not biallelic.
+"""
+function drop_multiallelic(data::PopData)
+    all_loci = loci(data)
+    mtx = reshape(data.loci.genotype, length(samples(data)), :)
+    nonbi = [!isbiallelic(x) for x in eachcol(mtx)]
+    loci_to_rm = all_loci[nonbi]
+    if length(loci_to_rm) == 0
+        return data
+    elseif length(loci_to_rm) == 1
+        @info "Removing 1 multiallelic locus"
+    else
+        @info "Removing $(length(loci_to_rm)) multialleic loci"
+    end
+    exclude(data, locus = loci_to_rm)
+end
+
+
+"""
+    drop_multiallelic!(data::PopData)
+Edit a `PopData` object in place, removing loci that are not biallelic.
+"""
+function drop_multiallelic!(data::PopData)
+    all_loci = loci(data)
+    mtx = reshape(data.loci.genotype, length(samples(data)), :)
+    nonbi = [!isbiallelic(x) for x in eachcol(mtx)]
+    loci_to_rm = all_loci[nonbi]
+    if length(loci_to_rm) == 0
+        return data
+    elseif length(loci_to_rm) == 1
+        @info "Removing 1 multiallelic locus"
+    else
+        @info "Removing $(length(loci_to_rm)) multialleic loci"
+    end
+    exclude!(data, locus = loci_to_rm)
+end
+
+
+"""
+    isbiallelic(data::GenoArray)
+Returns `true` if the `GenoArray` is biallelic, `false` if not.
+"""
+function isbiallelic(data::T) where T<:GenoArray
+    length(unique(Base.Iterators.flatten(skipmissing(data)))) == 2
+end
+
+
+"""
+    isbiallelic(data::PopData)
+Returns `true` all the loci in the `PopData` are biallelic, `false` if not.
+"""
+function isbiallelic(data::PopData)
+    mtx = reshape(data.loci.genotype, length(samples(data)), :)
+    all(map(isbiallelic, eachcol(mtx)))
+end
+
 
 """
     loci_dataframe(data::PopData)
@@ -563,8 +623,8 @@ julia> cats_meta = generate_meta(cats_nometa)
 function generate_meta(data::DataFrame)
     grp = groupby(data, :name)
     nms = map(z -> z.name, keys(grp))
-    pops = map(z -> first(z.population), grp)
-    ploids = map(z -> find_ploidy(z.genotype), grp)
+    pops = [first(z.population) for z in grp]
+    ploids = [find_ploidy(z.genotype) for z in grp]
     DataFrame(
         :name => nms,
         :population => pops,

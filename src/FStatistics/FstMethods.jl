@@ -1,3 +1,48 @@
+function pairwise_Hudson(data::PopData)
+    !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
+    idx_pdata = groupby(data.loci, :population)
+    pops = getindex.(keys(idx_pdata), :population)
+    npops = length(idx_pdata)
+    n_loci = size(data)[2]
+    results = zeros(npops, npops)
+    @sync for i in 2:npops
+        Base.Threads.@spawn begin
+            for j in 1:(i-1)
+                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                results[i,j] = fst_hudson(pop1,pop2)
+           end
+        end
+    end
+    return PairwiseFST(DataFrame(results, Symbol.(pops)), "Hudson et al. 1992")
+end
+
+function hudson_fst(population_1::T, population_2::T) where T<:AbstractMatrix
+    fst_perloc = @views [_hudson_fst(population_1[:,i], population_2[:,i]) for i in 1:size(population_1,2)]
+    return mean(skipmissing(skipinfnan(fst_perloc)))
+end
+
+# helper function to do the math for Hudson FST on a locus
+function _hudson_fst(pop1::T, pop2::T) where T<:GenoArray
+    p1_frq = allele_freq(pop1)
+    p2_frq = allele_freq(pop2)
+    # find the shared allele(s) and choose one of them to be "P"
+    # this is a safeguard if one population is completely homozygous for an allele
+    p_allele = intersect(keys(p1_frq), keys(p2_frq)) |> first
+    p1 = p1_frq[p_allele]
+    q1 = 1.0 - p1
+    p2 = p2_frq[p_allele]
+    q2 = 1.0 - p2 
+    # degrees of freedom is the number of alleles - 1
+    df1 = (count(!ismissing, pop1) * 2) - 1
+    df2 = (count(!ismissing, pop2) * 2) - 1
+    numerator = (p1 - p2)^2 - (p1*q1/df1) - (p2*q2/df2)
+    denominator = (p1*q2) + (p2*q1)
+    return numerator/denominator
+end
+
+
+
 ## Nei 1987 FST ##
 function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     n =  hcat(map(nonmissing, eachcol(population_1)), map(nonmissing, eachcol(population_2)))
