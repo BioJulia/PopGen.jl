@@ -20,7 +20,6 @@ function Base.show(io::IO, data::PairwiseFST)
 end
 
 
-#TODO add methods and complete docstring
 """
     pairwise_fst(data::PopData; method::String, iterations::Int64)
 Calculate pairwise FST between populations in a `PopData` object. Set `iterations` 

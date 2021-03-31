@@ -1,6 +1,5 @@
 export read_from, file_import, write_to
 
-#TODO update docs with edits to this docstring and structure info
 """
     read_from(infile::String; kwargs...)
 Wraps the individual file importers to read a file in as a `PopData` object. File type is

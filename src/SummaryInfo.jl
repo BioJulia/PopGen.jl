@@ -39,7 +39,6 @@ function richness(data::PopData; by::String = "locus")
 end
 
 
-#TODO add citations to docstring
 """
     summary(data::PopData; by::String = "global")
 Provides summary statistics for a `PopData` object. Use `by = "locus"` for
@@ -161,71 +160,4 @@ function Base.summary(data::PopData; by::String = "global")
     end
 end
 
-#TODO deprecated, delete?
-#=
-function _summary(data::PopData; by::String = "global")
-    # observed/expected het per locus per pop
-    het_df = DataFrames.combine(
-        groupby(data.loci, [:locus, :population]),
-        :genotype => nonmissing => :n,
-        :genotype => hetero_o => :het_obs,
-        :genotype => hetero_e => :het_exp,
-        :genotype => allele_freq => :alleles
-    )
-    # collapse down to retrieve averages and counts
-    n_df = DataFrames.combine(
-        groupby(het_df, :locus),
-        :n => count_nonzeros => :count,
-        :n => (n -> count_nonzeros(n) / reciprocal_sum(n)) => :mn,
-        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e, o, count_nonzeros(n) / reciprocal_sum(n))))) => :HS,
-        :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
-        :alleles => (alleles ->  sum(values(avg_allele_freq(alleles, 2))))=> :avg_freq
-        )
-
-    Ht = 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)
-    DST = Ht .- n_df.HS
-    DST′ = n_df.count ./ (n_df.count .- 1) .* DST
-    HT′ = n_df.HS .+ DST′
-
-    if lowercase(by) != "global"
-        FIS =  1.0 .- (n_df.Het_obs ./ n_df.HS)
-        FST = DST ./ Ht
-        DEST = DST′ ./ (1.0 .- n_df.HS)
-        FST′ = DST′ ./ HT′
-        DataFrame(
-            :locus => n_df.locus,
-            :Het_obs => n_df.Het_obs,
-            :HS => n_df.HS,
-            :HT => Ht,
-            :DST => DST,
-            :HT′ => HT′,
-            :DST′ =>DST′,
-            :FST => FST,
-            :FST′ => FST′,
-            :FIS => FIS,
-            :DEST => DEST
-        )
-    else
-        Het_obs = mean(n_df.Het_obs)
-        HS = mean(skipinfnan(n_df.HS))
-        Ht = mean(skipinfnan(Ht))
-        DST = mean(skipinfnan(DST))
-        DST′ = mean(skipinfnan(DST′))
-        HT′ = mean(skipinfnan(HT′))
-
-        DataFrame(
-        :Het_obs => Het_obs,
-        :HS => HS,
-        :HT => Ht,
-        :DST => DST,
-        :HT′ => HT′,
-        :DST′ => DST′,
-        :FST => DST / Ht,
-        :FST′ => DST′ / HT′,
-        :FIS => 1.0 - (Het_obs / HS),
-        :DEST => DST′ / (1.0 - HS)
-        )
-    end
-end
-=#
 const summary_stats = summary

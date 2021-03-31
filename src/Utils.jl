@@ -15,8 +15,6 @@ function adjacency_matrix(data::PopData)
     return out_vec
 end
 
-#TODO change location in API docs and rename allele_pool?
-#TODO replace alleles with universal Symbol type?
 """
     alleles(locus::T) where T<:GenoArray
 Return an array of all the non-missing alleles of a locus.
@@ -164,7 +162,6 @@ function drop_monomorphic!(data::PopData)
 end
 
 
-#TODO add to docs
 """
     drop_multiallelic(data::PopData)
 Return a `PopData` object omitting loci that are not biallelic.
@@ -486,7 +483,6 @@ function reciprocal_sum(x::AbstractVector{T}) where T<:Real
 end
 
 
-# TODO add skip____ to docs/API/Utils.jl
 """
     skipnan(itr)
 Return an iterator over the elements in `itr` skipping `Inf` and `-Inf` values. The returned

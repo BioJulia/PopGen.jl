@@ -1,4 +1,3 @@
-#TODO add to docs/API
 """
     _fst_permutation(population_1::T, population_2::T) where T<:AbstractMatrix
 Returns two matrices with rows (samples) shuffled between them. Respects the

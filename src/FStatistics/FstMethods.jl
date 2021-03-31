@@ -10,7 +10,7 @@ function _pairwise_Hudson(data::PopData)
             for j in 1:(i-1)
                 pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
                 pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
-                results[i,j] = fst_hudson(pop1,pop2)
+                results[i,j] = hudson_fst(pop1,pop2)
            end
         end
     end
