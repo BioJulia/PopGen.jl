@@ -34,8 +34,8 @@ sidebar_label: What's New
 - a rewrite of nei and weir-cockerham fst methods to be matrix-based (faster!)
 ### ✨✨ New Features
 - fully implements permutation testing for both pairwise fst methods
-- adds method for avg_allele_freq to accommodate new pairwise_nei
-- extends pairwise_fst to include iterations keyword to activate permutation testing
+- adds method for `avg_allele_freq` to accommodate new `pairwise_nei`
+- extends `pairwise_fst` to include iterations keyword to activate permutation testing
 
 ## v.0.5.1
 ### New features

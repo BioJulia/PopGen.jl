@@ -313,4 +313,4 @@ Unit: seconds
 
 ![pairwise fst plot](/img/fstplot.png)
 
-On a single thread, pairwise FST in `PopGen.jl` is **~170x** faster than in `hierfstat`, and a whopping **248x** faster using 4 threads. Daaaang!
+On a single thread, pairwise FST in `PopGen.jl` is **~170x** faster than in `hierfstat`, and a whopping **248x** faster using 4 threads. We reran this benchmark on the new matrix-based implementation in `v.0.5.2` using 8 threads (not shown) and it was **580x faster** than the R implementation. Daaaang!
