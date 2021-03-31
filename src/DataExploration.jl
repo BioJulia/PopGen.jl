@@ -1,7 +1,6 @@
 
 export pairwise_identical, missing_data, geno_freqtable, allele_freqtable
 
-#TODO update docs (API/dataexploration) and tests
 """
     missing_data(data::PopData; by::String = "sample")
 Get missing genotype information in a `PopData`. Specify a mode of operation
