@@ -157,7 +157,7 @@ keep(cats, locus = [:fca8, "fca37"])
 ## Remove monomorphic loci
 While included in the file parsers by default, you may want to do this manually with
 `drop_monomorphic`, which returns a new `PopData` object excluding any
-monomorphic loci. You can use the mutable version `drop_monomorphic` to
+monomorphic loci. You can use the mutable version `drop_monomorphic!` to
 edit a `PopData` object in-place.
 ```julia
 drop_monomorphic(::PopData)
