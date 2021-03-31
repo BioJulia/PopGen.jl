@@ -1,4 +1,4 @@
-function pairwise_Hudson(data::PopData)
+function _pairwise_Hudson(data::PopData)
     !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
     idx_pdata = groupby(data.loci, :population)
     pops = getindex.(keys(idx_pdata), :population)
