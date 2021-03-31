@@ -37,7 +37,7 @@ function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
         insertcols!(geno_df, Symbol(BCF.chrom(record) * "_" * string(BCF.pos(record))) => conv_geno)
     end
     close(stream)
-    if rename_snp
+    if rename_loci
         rnm = append!([:name, :population], [Symbol.("snp_" * i) for i in string.(1:nmarkers)])
         rename!(geno_df, rnm)
     end
@@ -75,7 +75,7 @@ end
 
 ### VCF parsing ###
 
-function vcf(infile::String; rename_snp::Bool = false, silent::Bool = false, allow_monomorphic::Bool = false)
+function vcf(infile::String; rename_loci::Bool = false, silent::Bool = false, allow_monomorphic::Bool = false)
     bases = (A = Int8(1), T = Int8(2), C = Int8(3), G = Int8(4), miss = Int8(0))
     stream = VCF.Reader(openvcf(infile))
     nmarkers = countlines(openvcf(infile)) - length(VCF.header(stream)) - 1
@@ -97,7 +97,7 @@ function vcf(infile::String; rename_snp::Bool = false, silent::Bool = false, all
         insertcols!(geno_df, Symbol(VCF.chrom(record) * "_" * string(VCF.pos(record))) => conv_geno)
     end
     close(stream)
-    if rename_snp
+    if rename_loci
         rnm = append!([:name, :population], [Symbol.("snp_" * i) for i in string.(1:nmarkers)])
         rename!(geno_df, rnm)
     end
