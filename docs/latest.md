@@ -5,7 +5,7 @@ sidebar_label: What's New
 ---
 
 # v.0.6
-## v.0.6.0
+## v.0.6.1
 ### ✨✨ New Features
 - Hudson pairwise FST & Permutation
   - adds the Hudson et al. 1992 method

@@ -73,6 +73,23 @@ Edit a `PopData` object in place by omitting any monomorphic loci. Will inform y
 
 ----
 
+### `drop_multiallelic`
+```julia
+drop_multiallelic(data::PopData)
+```
+Return a `PopData` object omitting loci that are not biallelic.
+
+----
+
+### `drop_multiallelic!`
+```julia
+drop_multiallelic!(data::PopData)
+```
+Edit a `PopData` object in place, removing loci that are not biallelic.
+
+
+----
+
 ### `generate_meta`
 ```julia
 generate_meta(data::DataFrame)
@@ -103,7 +120,20 @@ julia> cats_meta = generate_meta(cats_nometa)
  235 │ N281    17               2   missing   missing  
  236 │ N289    17               2   missing   missing  
  237 │ N290    17               2   missing   missing  
-        
+```        
+
+----
+
+### `isbiallelic`
+```julia
+isbiallelic(data::T) where T<:GenoArray
+```
+Returns `true` if the `GenoArray` is biallelic, `false` if not.
+
+```julia
+isbiallelic(data::PopData)
+```
+Returns `true` all the loci in the `PopData` are biallelic, `false` if not.
 
 ----
 
