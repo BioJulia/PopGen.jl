@@ -623,8 +623,8 @@ julia> cats_meta = generate_meta(cats_nometa)
 function generate_meta(data::DataFrame)
     grp = groupby(data, :name)
     nms = map(z -> z.name, keys(grp))
-    pops = map(z -> first(z.population), grp)
-    ploids = map(z -> find_ploidy(z.genotype), grp)
+    pops = [first(z.population) for z in grp]
+    ploids = [find_ploidy(z.genotype) for z in grp]
     DataFrame(
         :name => nms,
         :population => pops,
