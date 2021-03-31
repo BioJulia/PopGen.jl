@@ -64,6 +64,7 @@ end
 # example data
 include("io/Datasets.jl")
 # utility functions
+include("Conditionals.jl")
 include("Utils.jl")
 include("Permutations.jl")
 # allele frequency and heterozygosity functions
