@@ -7,8 +7,8 @@ sidebar_label: Variant Call Format
 ## Import a BCF/VCF file as `PopData`
 
 ```julia
-vcf(infile::String; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
-bcf(infile::String; rename_snp::Bool, silent::Bool, allow_monomorphic::Bool)
+vcf(infile::String; rename_loci::Bool, silent::Bool, allow_monomorphic::Bool)
+bcf(infile::String; rename_loci::Bool, silent::Bool, allow_monomorphic::Bool)
 ```
 PopGen.jl provides the commands `vcf` and `bcf` to import a variant call format files into `PopData`. The reader also accepts files that are gzipped. 
 
