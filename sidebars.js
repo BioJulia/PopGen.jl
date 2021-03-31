@@ -16,14 +16,15 @@ module.exports = {
       "io/structure",
       "io/vcf",
     ],
-    "PopData Basics": [
-      "basics/manipulate",
-      "basics/accessing",
-      "basics/add_info",
-      "basics/exclusion",
-      "basics/populations",
-      "basics/viewdata",
-      "basics/dataexploration"
+    "Working with PopData": [
+      "popdata_basics/manipulate",
+      "popdata_basics/accessing",
+      "popdata_basics/add_info",
+      "popdata_basics/exclusion",
+      "popdata_basics/conditionals",
+      "popdata_basics/populations",
+      "popdata_basics/viewdata",
+      "popdata_basics/dataexploration"
     ],
     "Analyses":[
       "analyses/hardyweinberg",
@@ -38,6 +39,7 @@ module.exports = {
     "API": [
       "api/api",
       "api/allelefreq",
+      "api/conditionals",
       "api/datasets",
       "api/dataexploration",
       "api/delimited",

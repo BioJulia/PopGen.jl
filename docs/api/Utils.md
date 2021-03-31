@@ -124,19 +124,6 @@ julia> cats_meta = generate_meta(cats_nometa)
 
 ----
 
-### `isbiallelic`
-```julia
-isbiallelic(data::T) where T<:GenoArray
-```
-Returns `true` if the `GenoArray` is biallelic, `false` if not.
-
-```julia
-isbiallelic(data::PopData)
-```
-Returns `true` all the loci in the `PopData` are biallelic, `false` if not.
-
-----
-
 ### `loci_dataframe`
 ```julia
 loci_dataframe(data::PopData)

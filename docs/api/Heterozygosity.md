@@ -7,25 +7,6 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 <link rel="stylesheet" href={useBaseUrl("katex/katex.min.css")} />
 
-### `ishom`
-```julia
-ishom(locus::T) where T <: GenotypeArray
-ishom(locus::Genotype)
-ishom(locus::Missing)
-```
-A series of methods to test if a locus or loci are homozygous and return `true` if it is, `false` if it isn't, and `missing` if it's `missing`. The vector version simply broadcasts the function over the elements.
-
-----
-
-### `ishet`
-```julia
-ishet(locus::T) where T <: GenotypeArray
-ishet(locus::Genotype)
-ishet(locus::Missing)
-```
-A series of methods to test if a locus or loci are heterozygous and return `true` if it is, `false` if it isn't. The vector version simply broadcasts the function over the elements. Under the hood, this function is simply `!ishom`.
-
-----
 
 ### `gene_diversity_nei87`
 ```julia

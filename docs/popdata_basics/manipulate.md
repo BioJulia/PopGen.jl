@@ -20,6 +20,7 @@ julia> sharks = @gulfsharks ;
 #### [Accessing Elements](accessing)
 #### [Adding Information](add_info)
 #### [Data Exclusion](exclusion)
+#### [Conditionals and Logic](conditionals)
 #### [Location and Population Data](populations)
 #### [Viewing Data](viewdata)
 #### [Data Exploration](dataexploration)
