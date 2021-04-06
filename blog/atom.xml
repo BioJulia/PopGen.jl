@@ -2,12 +2,19 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://BioJulia.net/blog</id>
     <title>PopGen.jl Blog</title>
-    <updated>2020-11-14T00:00:00.000Z</updated>
+    <updated>2021-04-04T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://BioJulia.net/blog"/>
     <subtitle>PopGen.jl Blog</subtitle>
     <icon>https://BioJulia.net/img/favicon.ico</icon>
     <rights>Copyright © 2021 PopGen.jl</rights>
+    <entry>
+        <title type="html"><![CDATA[A bit about FST]]></title>
+        <id>fst</id>
+        <link href="https://BioJulia.net/PopGen.jl/blog/fst"/>
+        <updated>2021-04-04T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[A bit about FST]]></summary>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Relatedness Tutorial]]></title>
         <id>relatedness</id>

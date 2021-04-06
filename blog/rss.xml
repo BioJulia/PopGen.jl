@@ -4,10 +4,17 @@
         <title>PopGen.jl Blog</title>
         <link>https://BioJulia.net/blog</link>
         <description>PopGen.jl Blog</description>
-        <lastBuildDate>Sat, 14 Nov 2020 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 04 Apr 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <copyright>Copyright © 2021 PopGen.jl</copyright>
+        <item>
+            <title><![CDATA[A bit about FST]]></title>
+            <link>https://BioJulia.net/PopGen.jl/blog/fst</link>
+            <guid>fst</guid>
+            <pubDate>Sun, 04 Apr 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[A bit about FST]]></description>
+        </item>
         <item>
             <title><![CDATA[Relatedness Tutorial]]></title>
             <link>https://BioJulia.net/PopGen.jl/blog/relatedness</link>
