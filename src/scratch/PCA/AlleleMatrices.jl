@@ -147,10 +147,10 @@ function _freq_matrix(data::PopData; missings::String = "zero")
                 @inbounds _counts[.!ismissing.(_counts)] .= _counts[.!ismissing.(_counts)] ./ data.meta.ploidy[_sample]
             end
         end
-        means = map(x -> mean(skipmissing(x)), eachcol(counts))
-        # fill in missing values with the means we calculated above
+        #means = map(x -> mean(skipmissing(x)), eachcol(counts))
+        # fill in missing values with the means
         @inbounds for (idx,_allele) in enumerate(eachcol(counts))
-            @inbounds _allele[ismissing.(_allele)] .= means[idx]
+            @inbounds _allele[ismissing.(_allele)] .= mean(skipmissing(_allele))
         end
         return Matrix{Float32}(counts)
     else
