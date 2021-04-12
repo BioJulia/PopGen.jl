@@ -1,4 +1,4 @@
-export ishom, ishet, isbiallelic
+export ishom, ishet, isbiallelic, ismixedploidy
 
 
 """
@@ -76,11 +76,9 @@ end
 
 ishet(locus::Missing) = missing
 
-
 @inline function ishet(locus::T) where T<:GenoArray
     return @inbounds map(ishet, locus)
 end
-
 
 @inline function ishet(locus::T) where T<:Base.SkipMissing
     return @inbounds map(ishet, locus)
@@ -99,3 +97,18 @@ end
 ishet(geno::T, allele::U) where T<:GenoArray where U<:Integer = map(i -> ishet(i, allele), geno)
 
 ishet(geno::Missing, allele::U) where U<:Integer = missing
+
+#TODO add to docs/api and conditionals
+"""
+    ismixedploidy(::PopData)
+    ismixedploidy(::GenoArray)
+Returns `true` if the provided `PopData` or `GenoArray` objects have
+a varying number of ploidy between samples or loci.
+"""
+function ismixedploidy(data::PopData)
+    length(unique(data.meta.ploidy)) > 1
+end
+
+function ismixedploidy(data::T) where T <: GenoArray
+    length(unique(map(length, unique(skipmissing(data))))) > 1
+end
