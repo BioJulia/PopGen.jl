@@ -6,9 +6,9 @@ function _pairwise_Hudson(data::PopData)
     n_loci = size(data)[2]
     results = zeros(npops, npops)
     @sync for i in 2:npops
+        pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
         Base.Threads.@spawn begin
             for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
                 pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
                 results[i,j] = hudson_fst(pop1,pop2)
            end
@@ -83,9 +83,9 @@ function _pairwise_Nei(data::PopData)
     n_loci = size(data)[2]
     results = zeros(npops, npops)
     @sync for i in 2:npops
+        pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
         Base.Threads.@spawn begin
             for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
                 pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
                 results[i,j] = nei_fst(pop1,pop2)
            end
@@ -198,9 +198,9 @@ function _pairwise_WeirCockerham(data::PopData)
     n_loci = size(data)[2]
     results = zeros(npops, npops)
     @sync for i in 2:npops
+        pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
         Base.Threads.@spawn begin
             for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
                 pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
                 results[i,j] = weircockerham_fst(pop1,pop2)
            end
