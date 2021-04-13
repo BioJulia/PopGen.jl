@@ -133,9 +133,9 @@ function drop_monomorphic(data::PopData)
     if length(loci_to_rm) == 0
         return data
     elseif length(loci_to_rm) == 1
-        @info "Removing monomorphic locus " * loci_to_rm[1]
+        @info "\nRemoving monomorphic locus " * loci_to_rm[1]
     else
-        @info "Removing $(length(loci_to_rm)) monomorphic loci:" * "\n $loci_to_rm"
+        @info "\nRemoving $(length(loci_to_rm)) monomorphic loci:" * "\n $loci_to_rm"
     end
     exclude(data, locus = loci_to_rm)
 end
@@ -154,9 +154,9 @@ function drop_monomorphic!(data::PopData)
     if length(loci_to_rm) == 0
         return data
     elseif length(loci_to_rm) == 1
-        @info "Removing monomorphic locus " * loci_to_rm[1]
+        @info "\nRemoving monomorphic locus " * loci_to_rm[1]
     else
-        @info "Removing $(length(loci_to_rm)) monomorphic loci:" * "\n $loci_to_rm"
+        @info "\nRemoving $(length(loci_to_rm)) monomorphic loci:" * "\n $loci_to_rm"
     end
     exclude!(data, locus = loci_to_rm)
 end
@@ -174,9 +174,9 @@ function drop_multiallelic(data::PopData)
     if length(loci_to_rm) == 0
         return data
     elseif length(loci_to_rm) == 1
-        @info "Removing 1 multiallelic locus"
+        @info "\nRemoving 1 multiallelic locus"
     else
-        @info "Removing $(length(loci_to_rm)) multialleic loci"
+        @info "\nRemoving $(length(loci_to_rm)) multialleic loci"
     end
     exclude(data, locus = loci_to_rm)
 end
@@ -194,9 +194,9 @@ function drop_multiallelic!(data::PopData)
     if length(loci_to_rm) == 0
         return data
     elseif length(loci_to_rm) == 1
-        @info "Removing 1 multiallelic locus"
+        @info "\nRemoving 1 multiallelic locus"
     else
-        @info "Removing $(length(loci_to_rm)) multialleic loci"
+        @info "\nRemoving $(length(loci_to_rm)) multialleic loci"
     end
     exclude!(data, locus = loci_to_rm)
 end
@@ -378,7 +378,7 @@ of the array.
 
 **Example**
 ```
-julia> partitionmatrix(rand(20,5), [10,3,4,3]) .|> size
+julia> partitionarray(rand(20,5), [10,3,4,3]) .|> size
 ((10, 5), (3, 5), (4, 5), (3, 5))
 ```
 """

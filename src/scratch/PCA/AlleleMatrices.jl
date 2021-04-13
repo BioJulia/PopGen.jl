@@ -94,7 +94,7 @@ and columns are the occurence count of an allele for that locus in that sample.
 function _count_matrix(data::PopData)
     geno_mtx = loci_matrix(data)
     n_samples, n_loci = size(data)
-    keytype = eltype(x.loci.genotype |> eltype |> nonmissingtype)
+    keytype = eltype(data.loci.genotype |> eltype |> nonmissingtype)
     # create a vector of empty dicts
     all_alleles = [Dict{keytype, Vector{Union{Missing,Int8}}}() for i in 1:n_loci]
     # fill the dicts with keys for every allele for that locus, and the values are a vector of zeros
