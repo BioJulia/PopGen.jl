@@ -251,39 +251,40 @@ You all know it, you all love it. What's population genetics without a little pa
 <TabItem value="j">
 
 We will add the extra keywords `samples` and `seconds` to the benchmark
-macro so we can get a full 100 evaluations.
+macro so we can get a full 100 evaluations. You will need to start Julia with 1 available threads via `julia --threads 1` (julia >= v1.5) or `JULIA_NUM_THREADS=1` (< v1.5).
+
 
 ```julia
 julia> @benchmark pairwise_fst(sharks) samples = 100 seconds = 700
-BenchmarkTools.Trial:
-  memory estimate:  1.26 GiB
-  allocs estimate:  8024669
-
+BenchmarkTools.Trial: 
+  memory estimate:  869.93 MiB
+  allocs estimate:  6090633
   --------------
-  minimum time:     1.102 s (11.11% GC)
-  median time:      1.147 s (12.68% GC)
-  mean time:        1.170 s (13.25% GC)
-  maximum time:     1.474 s (29.64% GC)
+  minimum time:     557.995 ms (9.29% GC)
+  median time:      571.297 ms (11.26% GC)
+  mean time:        580.627 ms (12.59% GC)
+  maximum time:     754.451 ms (31.41% GC)
   --------------
   samples:          100
   evals/sample:     1
+
 ```
 
 </TabItem>
 <TabItem value="jp">
 
-This is demonstrate what the speed is like when starting Julia with 4 available threads via `julia --threads 4` (julia >= v1.5) or `JULIA_NUM_THREADS=4` (< v1.5).
+This is to demonstrate what the speed is like when starting Julia with 4 available threads via `julia --threads 6` (julia >= v1.5) or `JULIA_NUM_THREADS=6` (< v1.5).
 
 ```julia
 julia> @benchmark pairwise_fst(sharks) samples = 100 seconds = 700
 BenchmarkTools.Trial: 
-  memory estimate:  1.26 GiB
-  allocs estimate:  8024707
+  memory estimate:  869.93 MiB
+  allocs estimate:  6090639
   --------------
-  minimum time:     654.677 ms (24.79% GC)
-  median time:      787.848 ms (26.16% GC)
-  mean time:        804.779 ms (26.32% GC)
-  maximum time:     1.308 s (18.52% GC)
+  minimum time:     205.038 ms (0.00% GC)
+  median time:      305.189 ms (28.90% GC)
+  mean time:        299.227 ms (25.03% GC)
+  maximum time:     359.663 ms (27.05% GC)
   --------------
   samples:          100
   evals/sample:     1
@@ -313,4 +314,4 @@ Unit: seconds
 
 ![pairwise fst plot](/img/fstplot.png)
 
-On a single thread, pairwise FST in `PopGen.jl` is **~170x** faster than in `hierfstat`, and a whopping **248x** faster using 4 threads. We reran this benchmark on the new matrix-based implementation in `v.0.5.2` using 8 threads (not shown) and it was **580x faster** than the R implementation. Daaaang!
+On a single thread, pairwise FST in `PopGen.jl` is **~340x** faster than in `hierfstat`, and a whopping **665x** faster using 6 threads with the optimized matrix-based implementation in the `pca` branch. Daaaang!

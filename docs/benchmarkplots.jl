@@ -47,7 +47,7 @@ end
 
 pop_adeg = ["PopGen.jl", "adegenet"]
 pop_hierf = ["PopGen.jl", "hierfstat"]
-pop_p_hierf = ["PopGen.jl", "PopGen.jl (4 threads)", "hierfstat"]
+pop_p_hierf = ["PopGen.jl", "PopGen.jl (6 threads)", "hierfstat"]
 
 #### Load in Data ####
 import_speed = [.910, 6.745]
@@ -157,6 +157,6 @@ function comparison_plot_3x(x::Vector{String},y::Vector{Float64}, yaxis::String,
     )
 end
 
-fst_speed = [1.17, 0.804799, 199.48]
+fst_speed = [.580, 0.299, 199.48]
 tt = comparison_plot_3x(pop_p_hierf, fst_speed, "Seconds", "Weir & Cockerham Pairwise FST (less is better)")
 save("static/img/fstplot.png", tt)
