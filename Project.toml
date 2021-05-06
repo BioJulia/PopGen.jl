@@ -1,7 +1,7 @@
 name = "PopGen"
 uuid = "af524d12-c74b-11e9-22a8-3b091653023f"
 authors = ["Pavel Dimens", "Jason Selwyn"]
-version = "0.6.3"
+version = "0.6.4"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
@@ -18,8 +18,8 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 CSV = "0.7, 0.8"
-DataFrames = "0.21, 0.22"
-Distributions = "0.23, 0.24"
+DataFrames = "0.21, 0.22, 1.0, 1.1"
+Distributions = "0.23, 0.24, 0.25"
 MultipleTesting = "0.4"
 PooledArrays = "0.5, 1.1"
 ProgressMeter = "1.4"
