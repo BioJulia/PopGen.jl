@@ -26,7 +26,7 @@ end
 function _hudson_fst(pop1::T, pop2::T) where T<:GenoArray
     p1_frq = allele_freq(pop1)
     p2_frq = allele_freq(pop2)
-    # find the shared allele(s) and choose one of them to be "P"
+    # find the first shared allele(s) and make it "P"
     # this is a safeguard if one population is completely homozygous for an allele
     p_allele = intersect(keys(p1_frq), keys(p2_frq)) |> first
     p1 = p1_frq[p_allele]

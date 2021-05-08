@@ -13,6 +13,10 @@ function _fst_permutation(data::T, n1::Integer, n2::Integer) where T<:AbstractMa
     return new_pop_1, new_pop_2 
 end
 
+function _fst_permutation(data::T) where T<:AbstractMatrix
+    @inbounds data[shuffle(Xoroshiro128Star(),1:size(data,1)), :]
+end
+
 
 function _permuted_Hudson(data::PopData, iterations::Int64)
     !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
