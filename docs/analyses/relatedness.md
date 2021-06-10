@@ -49,7 +49,6 @@ of bootstrap iterations you wish to perform for each pair. The default confidenc
 
 ### Arguments
 - `data` : A PopData object
-- `sample_names` : A list of samples names to calculate relatedness for (optional)
 
 ### Keyword Arguments
 - `method` : A method function or vector of method functions (see below)
@@ -93,7 +92,7 @@ however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, h
 
 ### Arguments
 - `data` : A PopData object
-- `sample_names` : A list of samples names to calculate relatedness for (optional)
+- `sample_names` : A list of samples names to calculate relatedness for
 
 ### Keyword Arguments
 - `method` : A method function or vector of method functions (see below)
