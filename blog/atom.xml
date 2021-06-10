@@ -13,7 +13,7 @@
         <id>fst</id>
         <link href="https://BioJulia.net/PopGen.jl/blog/fst"/>
         <updated>2021-04-04T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[A bit about FST]]></summary>
+        <summary type="html"><![CDATA[If you have spent any time being exposed to population genetics, you've likely encountered the term  FST, our field's most beloved/maligned one-size-fits all coefficient. That description is a gross oversimplification, but the purpose of this post isn't to dig deep into the world of differentiation statistics, but instead shed light on the general concept and the logic behind its significance testing.]]></summary>
     </entry>
     <entry>
         <title type="html"><![CDATA[Relatedness Tutorial]]></title>

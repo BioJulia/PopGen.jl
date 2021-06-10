@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[18],{91:function(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"A bit about FST","permalink":"/PopGen.jl/blog/fst"},{"title":"Relatedness Tutorial","permalink":"/PopGen.jl/blog/relatedness"},{"title":"Logo Graveyard","permalink":"/PopGen.jl/blog/logos"}]}')}}]);

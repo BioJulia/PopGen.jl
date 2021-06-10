@@ -1,0 +1,1 @@
+(self.webpackChunkpop_gen_jl=self.webpackChunkpop_gen_jl||[]).push([[4210],{6171:function(n){"use strict";n.exports=JSON.parse('{"allTagsPath":"/PopGen.jl/blog/tags","slug":"info","name":"info","count":1,"permalink":"/PopGen.jl/blog/tags/info"}')}}]);
