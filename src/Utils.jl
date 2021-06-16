@@ -27,16 +27,6 @@ Return an array of all the non-missing alleles of a locus.
     alle_out = Base.Iterators.flatten(skipmissing(locus)) |> collect
 end
 
-
-"""
-    allele_count(locus::T) where T<:GenoArray
-Return the number of unique alleles present at a locus.
-"""
-@inline function allele_count(locus::T) where T<:GenoArray
-    unique(locus) |> skipmissing |> Base.Iterators.flatten |> unique |> length
-end
-
-
 """
     alleles(locus::T, miss::Bool = false) where T<:GenoArray
 Return an array of all the non-missing alleles of a locus. Use the second positional
@@ -54,6 +44,45 @@ argument as `true` to include missing values.
     return alle_out
 end
 
+#TODO rename in docs
+"""
+    allele_number(locus::T) where T<:GenoArray
+Return the number of unique alleles present at a locus.
+"""
+@inline function allele_number(locus::T) where T<:GenoArray
+    length(unique_alleles(locus))
+end
+
+#TODO add to docs
+"""
+    allele_matrix(data::PopData)
+Convert the genotypes of a `PopData` object into a matrix of
+samples (rows) x allele_counts (columns). Every column is a
+unique allele for a locus. This structure is analogus to the
+`tab` component of a `genind` object from `R::adegenet`.
+"""
+function allele_matrix(data::PopData)
+    geno_mtx = loci_matrix(data)
+    # create a vector of vectors of unique alleles
+    alle = map(unique_alleles, eachcol(geno_mtx))
+    # instantiate empty matrix of zeroes to fill with allele counts
+    allele_mtx = zeros(Int8,size(geno_mtx)[1], sum(map(length,alle)))
+    # instantiate vector of count-dictionaries filled with zeroes 
+    countdict = [Dict([k => 0 for k in i]) for i in alle]
+
+    # for every row in the genotype matrix
+    for (rowid,samplerow) in enumerate(eachrow(geno_mtx))
+        # for every genotype in that row
+        counts = map(enumerate(samplerow)) do (idx,geno)
+            # if the genotype is missing return the dictionary of zeros
+            # else, "add" the new counts to the zeros dictionary
+            collect(ismissing(geno) ? values(countdict[idx]) : values(sort(merge(countdict[idx], allele_count(geno)))))
+        end
+        # populate the row in the allele matrix with the resulting allele counts
+        allele_mtx[rowid, :] = reduce(vcat, counts) 
+    end
+    return allele_mtx
+end
 
 function Base.size(data::PopData)
     return (samples = size(data.meta)[1], loci = length(loci(data)))
@@ -63,10 +92,9 @@ end
     unique_alleles(locus::T) where T<:GenoArray
 Return an array of all the unique non-missing alleles of a locus.
 """
-@inline function unique_alleles(locus::GenoArray)
-    unique(alleles(locus))
+@inline function unique_alleles(locus::T) where T<:GenoArray
+    unique(locus) |> skipmissing |> Base.Iterators.flatten |> unique
 end
-
 
 """
     convert_coord(coordinate::String)
