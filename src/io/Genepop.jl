@@ -12,6 +12,12 @@ Load a Genepop format file into memory as a PopData object.
 - `silent::Bool`   : whether to print file information during import (default: `false`)
 - `allow_monomorphic::Bool` : whether to keep monomorphic loci in the dataset (default: `false`)
 
+## Example
+```
+waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
+```
+
+# Extended help
 
 ### File must follow standard Genepop formatting:
 - First line is a comment (and skipped)
@@ -35,10 +41,6 @@ Newcomb_01, 254230  564558  080100
 Newcomb_02, 000230  564558  090080
 Newcomb_03, 254230  000000  090100
 Newcomb_04, 254230  564000  090120
-```
-## Example
-```
-waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
 ```
 """
 function genepop(

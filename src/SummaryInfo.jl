@@ -45,6 +45,8 @@ Provides summary statistics for a `PopData` object. Use `by = "locus"` for
 summary information by locus. Global values are given as unweighted means of
 the per-locus parameters.
 
+# Extended help
+
 ### Het_obs
 observed heterozygosity given as:\n
 1 - ∑ₖ ∑ᵢ Pₖᵢᵢ/np \n

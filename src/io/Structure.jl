@@ -35,6 +35,13 @@ Load a Structure format file into memory as a PopData object.
 - `allow_monomorphic::Bool` : whether to keep monomorphic loci in the dataset (default: `false`)
 - `faststructure::Bool`: whether the file is fastStructure format (default: `false`)
 
+## Example
+```
+walnuts = structure("juglans_nigra.str", extracols = 0, extrarows = 0)
+```
+
+# Extended help
+
 ### File must follow this Structure format:
 - the file is `tab` or `space` delimited **but not both**
 - first row is locus names separated by the delimiter
@@ -77,11 +84,6 @@ chestnut_02	1	106	142	68	1	92
 chestnut_02	1	106	148	64	0	94
 chestnut_03	2	110	145	-9	0	92
 chestnut_03	2	110	148	66	1	-9
-```
-
-## Example
-```
-walnuts = structure("juglans_nigra.str", extracols = 0, extrarows = 0)
 ```
 """
 function structure(infile::String; silent::Bool = false, extracols::Int = 0, extrarows::Int = 0, allow_monomorphic::Bool = false, missingval::String = "-9", faststructure::Bool = false)

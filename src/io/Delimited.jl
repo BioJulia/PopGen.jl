@@ -37,6 +37,8 @@ blank, otherwise there will be transcription errors! (look at line 3 in the exam
 lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
 
+# Extended help
+
 ### Formatting example:
 ```
 name,population,long,lat,Locus1,Locus2,Locus3 
