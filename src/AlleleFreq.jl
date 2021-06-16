@@ -1,3 +1,16 @@
+#TODO add to docs
+"""
+    allele_count(geno::Genotype)
+Return a `Dict` of allele counts of a single genotype.
+"""
+@inline function allele_count(geno::Genotype)
+    d = Dict{eltype(geno),Int8}()
+    @inbounds @simd for allele in geno
+        d[allele] = @inbounds get!(d, allele, 0) + 1
+    end
+    return d
+end
+
 """
     allele_freq(data::PopData)
 Return a NamedTuple of `Dicts` of allele frequencies of all
