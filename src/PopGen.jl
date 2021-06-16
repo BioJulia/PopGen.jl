@@ -1,6 +1,6 @@
 """
 # Population genetics analyses in Julia
-Documentation: https://pdimens.github.io/PopGen.jl/
+Documentation: https://biojulia.net/PopGen.jl/
 
 \nA few things things you can do to get started:
 
