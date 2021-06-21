@@ -79,7 +79,10 @@ and columns are the frequency of an allele for that locus in that sample.
 function _scaled_freq_matrix(data::PopData; missings::String = "mean", scale::Bool = true, center::Bool = true)
     if lowercase(missings) ∈ ["0", "zero", "zeros", "mean"]
         freqs = _freq_matrix(data, missings = missings)
-        return standardize(ZScoreTransform, freqs, dims = 1, scale = scale, center = center)
+        mtx = standardize(ZScoreTransform, freqs, dims = 1, scale = scale, center = center)
+        # replace almost-zero values caused by missing values with 0.0
+        replace!(x ->  0 < x < (10^-9) ? 0.0 : x, mtx)
+        return mtx
     else
         occursin(lowercase(missings), "missings") && throw(ArgumentError("\"missing\" method cannot be scaled"))
         !occursin(lowercase(missings), "missings") && throw(ArgumentError("use one of \"zero\" or \"mean\" for handling missing values"))
@@ -90,6 +93,8 @@ end
     _count_matrix(data::PopData)
 Create a matrix of allele count per genotype where rows are samples
 and columns are the occurence count of an allele for that locus in that sample.
+This is differentiated from `allele_count_matrix` by preserving missing values as
+`missing`
 """
 function _count_matrix(data::PopData)
     geno_mtx = loci_matrix(data)
@@ -103,7 +108,7 @@ function _count_matrix(data::PopData)
     end
     # for every sample row
     @inbounds @sync for (idx,sample_row) in enumerate(eachrow(geno_mtx))
-        Base.Threads.@spawn begin
+        #Base.Threads.@spawn begin
             # for each nonmissing genotype in that sample
             @inbounds for (loc_idx, geno) in enumerate(sample_row)
                 # if the genotype is missing, fill in missing for all alleles of that locus
@@ -117,7 +122,7 @@ function _count_matrix(data::PopData)
                     @inbounds all_alleles[loc_idx][allele][idx] += 1
                 end
             end
-        end
+        #end
     end
     # concatenate the alleles into a matrix and those into one big matrix
     return reduce(hcat, [reduce(hcat, values(sort(i))) for i in all_alleles])

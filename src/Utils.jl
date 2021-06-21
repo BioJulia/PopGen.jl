@@ -61,7 +61,7 @@ samples (rows) x allele_counts (columns). Every column is a
 unique allele for a locus. This structure is analogus to the
 `tab` component of a `genind` object from `R::adegenet`.
 """
-function allele_matrix(data::PopData)
+function allele_count_matrix(data::PopData)
     geno_mtx = loci_matrix(data)
     # create a vector of vectors of unique alleles
     alle = map(unique_alleles, eachcol(geno_mtx))
@@ -72,6 +72,7 @@ function allele_matrix(data::PopData)
 
     # for every row in the genotype matrix
     for (rowid,samplerow) in enumerate(eachrow(geno_mtx))
+        #Base.Threads.@spawn begin
         # for every genotype in that row
         counts = map(enumerate(samplerow)) do (idx,geno)
             # if the genotype is missing return the dictionary of zeros
@@ -80,6 +81,7 @@ function allele_matrix(data::PopData)
         end
         # populate the row in the allele matrix with the resulting allele counts
         allele_mtx[rowid, :] = reduce(vcat, counts) 
+        #end
     end
     return allele_mtx
 end
