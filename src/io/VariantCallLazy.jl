@@ -23,7 +23,7 @@ function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
     loci_names = fill("marker", nmarkers)
     geno_df = DataFrame(:name => sample_ID, :population =>  "missing")
     if silent == false
-        @info "\n $(abspath(infile))\n data: samples = $nsample, populations = 0, loci = $nmarkers\n ---> population info must be added"
+        @info "\n $(abspath(infile))\n data: samples = $nsamples, populations = 0, loci = $nmarkers\n ---> population info must be added"
         #@info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
     end
         for record in stream
@@ -84,7 +84,7 @@ function vcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
     loci_names = fill("marker", nmarkers)
     geno_df = DataFrame(:name => sample_ID, :population =>  "missing")
     if silent == false
-        @info "\n $(abspath(infile))\n data: samples = $nsample, populations = 0, loci = $nmarkers\n ---> population info must be added"
+        @info "\n $(abspath(infile))\n data: samples = $nsamples, populations = 0, loci = $nmarkers\n ---> population info must be added"
         #@info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
     end
     for record in stream
