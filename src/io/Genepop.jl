@@ -91,7 +91,8 @@ function genepop(
     end
 
     if !silent
-        @info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nloci formatting: $(format)\n$(sum(popcounts)) samples from $(length(popcounts)) populations detected\n$(length(locinames)) loci detected"
+        @info "\n $(abspath(infile))\n formatting: delimiter = $(delim_txt), loci = $(format)\n data: loci = $(length(locinames)), samples = $(sum(popcounts)), populations = $(length(popcounts))"
+        #@info "\n$(abspath(infile))\n$(delim_txt) delimiter detected\nloci formatting: $(format)\n$(sum(popcounts)) samples from $(length(popcounts)) populations detected\n$(length(locinames)) loci detected"
     end
 
     # load in samples and genotypes

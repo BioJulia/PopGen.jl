@@ -81,7 +81,8 @@ function delimited(
     )
 
     if !silent
-        @info "\n$(abspath(infile))\n$(length(meta[!, 1])) samples from $(length(unique(meta[!,2]))) populations detected\n$(length(locinames)) loci detected"
+        @info "\n $(abspath(infile))\n data: loci = $(length(locinames)), samples = $(length(meta[!, 1])), populations = $(length(unique(meta[!,2])))"
+        #@info "\n$(abspath(infile))\n$(length(meta[!, 1])) samples from $(length(unique(meta[!,2]))) populations detected\n$(length(locinames)) loci detected"
     end
 
     ploidy = DataFrames.combine(

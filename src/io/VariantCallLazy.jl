@@ -14,7 +14,6 @@ function openvcf(infile::String)
     end
 end
 
-
 function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, allow_monomorphic::Bool = false)
     bases = (A = Int8(1), T = Int8(2), C = Int8(3), G = Int8(4), miss = Int8(0))
     stream = BCF.Reader(openvcf(infile))
@@ -24,7 +23,8 @@ function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
     loci_names = fill("marker", nmarkers)
     geno_df = DataFrame(:name => sample_ID, :population =>  "missing")
     if silent == false
-        @info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
+        @info "\n $(abspath(infile))\n data: samples = $nsamples, populations = 0, loci = $nmarkers\n ---> population info must be added"
+        #@info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
     end
         for record in stream
         ref_alt = Dict(-1 => "miss", 0 => BCF.ref(record), [i => j for (i,j) in enumerate(BCF.alt(record))]...)
@@ -67,7 +67,7 @@ function bcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
     )
     insertcols!(meta_df, 2, :population => "missing")
     insertcols!(meta_df, 4, :longitude => Vector{Union{Missing, Float32}}(undef, nsamples), :latitude => Vector{Union{Missing, Float32}}(undef, nsamples))
-    
+    meta_df.name = Vector{String}(meta_df.name)
     pd_out = PopData(meta_df, stacked_geno_df)
     !allow_monomorphic && drop_monomorphic!(pd_out)
     return pd_out
@@ -84,7 +84,8 @@ function vcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
     loci_names = fill("marker", nmarkers)
     geno_df = DataFrame(:name => sample_ID, :population =>  "missing")
     if silent == false
-        @info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
+        @info "\n $(abspath(infile))\n data: samples = $nsamples, populations = 0, loci = $nmarkers\n ---> population info must be added"
+        #@info "\n$(abspath(infile))\n$nsamples samples detected\n$nmarkers markers detected\npopulation info must be added <---"
     end
     for record in stream
         ref_alt = Dict(-1 => "miss", 0 => VCF.ref(record), [i => j for (i,j) in enumerate(VCF.alt(record))]...)
@@ -121,13 +122,13 @@ function vcf(infile::String; rename_loci::Bool = false, silent::Bool = false, al
     end
     sort!(stacked_geno_df, [:name, :locus])
     # ploidy finding
-    #meta_df = generate_meta(stacked_geno_df)
     meta_df = DataFrames.combine(DataFrames.groupby(stacked_geno_df, :name),
         :genotype => (i -> Int8(length(first(skipmissing(i))))) => :ploidy    
     )
     insertcols!(meta_df, 2, :population => "missing")
     insertcols!(meta_df, 4, :longitude => Vector{Union{Missing, Float32}}(undef, nsamples), :latitude => Vector{Union{Missing, Float32}}(undef, nsamples))
-    
+
+    meta_df.name = Vector{String}(meta_df.name)
     pd_out = PopData(meta_df, stacked_geno_df)
     !allow_monomorphic && drop_monomorphic!(pd_out)
     return pd_out
