@@ -168,7 +168,8 @@ function structure(infile::String; silent::Bool = false, extracols::Int = 0, ext
     )
     
     if !silent
-        @info "\n$(abspath(infile))\n$(length(meta_df.name)) samples from $(length(unique(meta_df.population))) populations detected\n$(length(locinames)) loci detected"
+        @info "\n $(abspath(infile))\n data: loci = $(length(meta_df.name)), samples = $(length(meta[!, 1])), populations = $(length(unique(meta_df.population)))"
+        #@info "\n$(abspath(infile))\n$(length(meta_df.name)) samples from $(length(unique(meta_df.population))) populations detected\n$(length(locinames)) loci detected"
     end
 
     # create long-format DataFrame
