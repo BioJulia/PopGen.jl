@@ -33,6 +33,16 @@ struct PopData <: PopObj
     loci::DataFrame
 end
 
+#=
+#TODO needs to be included in the struct definition
+function PopData(meta::DataFrame, loci::DataFrame)
+    tmp = issorted(loci, [:locus, :name], lt = natural) ? loci : sort(loci, [:locus, :name], lt = natural)
+    sort(meta.name) != sort(tmp.name.pool) && throw(ArgumentError("meta and loci dataframes do not contain the same sample names"))
+    sort(unique(meta.population)) != sort(tmp.population.pool) && throw(ArgumentError("meta and loci dataframes do not contain the same population names"))
+    PopData(meta, tmp)
+end
+=#
+
 """
     Genotype::DataType
 For convenience purposes, an alias for `NTuple{N, <:Integer} where N`, which is
@@ -62,7 +72,8 @@ function Base.show(io::IO, data::PopData)
     else
         marker = "SNP"
     end
-    print(io,"  Markers: "); printstyled(io, marker, "\n", bold = true)
+    n_loc = length(unique(data.loci.locus))
+    printstyled(io, n_loc, " ", marker, " markers", "\n" , bold = true)
     if "ploidy" ∈ names(data.meta)
         ploidy = unique(data.meta.ploidy) |> sort
         if length(ploidy) == 1
@@ -76,7 +87,6 @@ function Base.show(io::IO, data::PopData)
         print(io, "  Ploidy:") ; printstyled(io, " absent\n", color = :yellow)
     end
     print(io, "  Samples: ") ; printstyled(io, length(data.loci.name.pool), "\n", bold = true)
-    print(io, "  Loci: ") ; printstyled(io, length(unique(data.loci.locus)), "\n", bold = true)
     print(io, "  Populations: ") ; printstyled(io, length(data.loci.population |> unique), "\n", bold = true)
 
     if "longitude" ∈ names(data.meta)
