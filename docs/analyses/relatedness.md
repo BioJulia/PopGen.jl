@@ -47,10 +47,10 @@ method `F` (see below). To calculate means, median, standard error, and confiden
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%), however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`. **Note:** samples must be diploid.
 
-### Arguments
+#### Arguments
 - `data` : A PopData object
 
-### Keyword Arguments
+#### Keyword Arguments
 - `method` : A method function or vector of method functions (see below)
 - `iterations` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
 - `interval` : A Tuple of (low, high) indicating the confidence intervals you would like for bootstrapping (default: `(0.275, 0.975)`, i.e. 95%)
@@ -90,11 +90,11 @@ of bootstrap iterations you wish to perform for each pair. The default confidenc
 however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
 **Note:** samples must be diploid.
 
-### Arguments
+#### Arguments
 - `data` : A PopData object
 - `sample_names` : A list of samples names to calculate relatedness for
 
-### Keyword Arguments
+#### Keyword Arguments
 - `method` : A method function or vector of method functions (see below)
 - `iterations` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
 - `interval` : A Tuple of (low, high) indicating the confidence intervals you would like for bootstrapping (default: `(0.275, 0.975)`, i.e. 95%)
@@ -205,11 +205,11 @@ correct for multiple testing using `MultipleTesting.jl`.
 ```julia
 relatedness_posthoc(data::PopData, results::Union{DataFrame, NamedTuple}; iterations::Int)
 ```
-### Arguments
+#### Arguments
 - `data` : A PopData object
 - `results` : the DataFrame or NamedTuple results from `relatedness()`
 
-### Keyword Arguments
+#### Keyword Arguments
 - `iterations` : number of iterations for the permutation tests (default: `20000`)
 
 :::tip not a great name
