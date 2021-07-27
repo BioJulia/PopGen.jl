@@ -21,7 +21,7 @@ const features = [
     imageUrl: 'img/sane.svg',
     description: (
       <>
-        Sensible function and arguments names, and default settings. Get more done without scratching your head.
+        Sensible function names, arguments, and default settings. Get more done without scratching your head.
       </>
     ),
   },

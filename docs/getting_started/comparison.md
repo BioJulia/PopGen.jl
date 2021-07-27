@@ -138,7 +138,7 @@ julia> Base.summarysize(sharks)
 
 ![data structure plot](/img/objectplot.png)
 
-The original file is `3.2mb` (the horizontal line), and our `PopData` object takes up ~`3.5mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
+The original genepop file is `3.2mb` (the vertical line), and our `PopData` object takes up ~`3.5mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
 
 ### Summary statistics
 The obvious hallmark of population genetics is heterozygosity values and F-statistics. Here we'll compare the basic summary statistics that can be produced using `hierfstat` and `PopGen.jl`.

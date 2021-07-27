@@ -42,25 +42,25 @@ module.exports = {
           position: 'left',
         },
         {
+          to: 'docs/getting_started/quickstart',
+          label: 'Quickstart',
+          position: 'left',
+        },
+        {
           to: 'docs/getting_started/about',
           label: 'About',
           position: 'left',
         },        
-        {
-          to: 'docs/getting_started/quickstart',
-          label: 'Quickstart',
-          position: 'right',
-        },
         {to: 'blog', label: 'Blog', position: 'left'},
         {
         to: 'docs/latest',
-        label: 'What\'s New',
+        label: 'News',
         position: 'left',
         },
         {
           to: 'docs/getting_started/community',
           label: 'Get Involved',
-          position: 'right',
+          position: 'left',
         },
         {
         href: 'https://github.com/pdimens/popgen.jl',
@@ -84,7 +84,7 @@ module.exports = {
           //homePageId: 'docs/',
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
-          editUrl: 'https://github.com/pdimens/popgen.jl/edit/documentation/',
+          editUrl: 'https://github.com/BioJulia/PopGen.jl/edit/documentation/',
           showLastUpdateTime: true,
           remarkPlugins: [remarkMath],
           rehypePlugins: [[rehypeKatex, {strict: false}]],
@@ -93,7 +93,7 @@ module.exports = {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/pdimens/popgen.jl/edit/documentation/',
+            'https://github.com/BioJulia/PopGen.jl/edit/documentation/',
           feedOptions: {
             type: 'all',
             copyright: `Copyright © ${new Date().getFullYear()} PopGen.jl`,
