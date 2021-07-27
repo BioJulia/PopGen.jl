@@ -132,21 +132,23 @@ There are several estimators available and are listed below. `relatedness` takes
 function names as arguments (**case sensitive**), therefore do not use quotes or colons
 in specifying the methods. Methods can be supplied as a vector. 
 
-- [Blouin](analyses/relatedness.md#blouin)
-- [LiHorvitz](analyses/relatedness.md#li--horvitz)
-- [Loiselle](analyses/relatedness.md#loiselle)
-- [Lynch](analyses/relatedness.md#lynch)
-- [LynchLi](analyses/relatedness.md#lynch--li)
-- [LynchRitland](analyses/relatedness.md#lynch--ritland)
-- [Moran](analyses/relatedness.md#lynch--moran)
-- [QuellerGoodnight](analyses/relatedness.md#queller--goodnight)
-- [Ritland](analyses/relatedness.md#ritland)
-##### In Progress (incomplete*)
-- [dyadML](analyses/relatedness.md#dyadic-maximum-likelihood)
-- [Wang](analyses/relatedness.md#wang)
+| Method | Type | Method Call |
+|:----|:-----|:-----|
+| [Blouin 1996](https://onlinelibrary.wiley.com/doi/10.1046/j.1365-294X.1996.00094.x) | moments-based | `Blouin` |
+| [Li & Horvitz 1953](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1716461/)| moments-based | `LiHorvitz` |
+| [Loiselle 1995](https://bsapubs.onlinelibrary.wiley.com/doi/abs/10.1002/j.1537-2197.1995.tb12679.x) | moments-based | `Loiselle` |
+| [Lynch 1988](https://pubmed.ncbi.nlm.nih.gov/3193879/) | moments-based | `Lynch` |
+| [Lynch/Li 1993](https://pubmed.ncbi.nlm.nih.gov/8514326/) | moments-based | `LynchLi` |
+| [Lynch & Ritland 1999](https://www.genetics.org/content/152/4/1753.short) | moments-based | `LynchRitland` |
+| [Moran 1950](https://www.jstor.org/stable/2332142?origin=crossref&seq=1#metadata_info_tab_contents) | moments-based | `Moran` |
+| [Queller & Goodnight 1989](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1989.tb04226.x) | moments-based | `QuellerGoodnight` |
+| [Ritland 1996](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1996.tb02347.x) | moments-based | `Ritland` |
+| [Milligan 2003](https://pubmed.ncbi.nlm.nih.gov/12663552/) "DyadML" | maximum-likelihood | incomplete* |
+| [Wang 2002](https://www.genetics.org/content/160/3/1203.short) | moments-based | incomplete* |
 
 :::note *more relatedness
-Contact us or submit a pull request if you're interested in contributing to the relatedness methods. We're currently in the process of adding dryadML and Wang (2002) estimators and speeding up the existing methods. More help is always welcomed! :smile:
+Contact us or submit a pull request if you're interested in contributing to the relatedness methods. DyadML and Wang (2002) estimators are currently incomplete and the others
+could use some optimizations. More help is always welcomed! Our wishlist also includes the KING method :smile:
 :::
 
 #### Examples
@@ -193,43 +195,6 @@ julia> cat_kin = relatendess(cats, method = [Ritland, Wang], iterations = 100)
 Since the methods correspond to function names, they will tab-autocomplete when 
 inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
 :::
-
-## Relatedness Estimators
-### Blouin
-The moments based estimator developed by [Blouin (1996)](https://onlinelibrary.wiley.com/doi/10.1046/j.1365-294X.1996.00094.x). Call `method = Blouin` to use this method. 
-
-### Li & Horvitz
-The moments based estimator developed by [Li & Horvitz (1953)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1716461/). Call `method = LiHorvitz` to use this method. 
-
-### Loiselle
-The moments based estimator developed by [Loiselle (1995)](https://bsapubs.onlinelibrary.wiley.com/doi/abs/10.1002/j.1537-2197.1995.tb12679.x). Call `method = Loiselle` to use this method. 
-
-### Lynch
-The moments based estimator developed by [Lynch (1988)](https://pubmed.ncbi.nlm.nih.gov/3193879/). Call `method = Lynch` to use this method. 
-
-### Lynch / Li
-The moments based estimator developed by [Lynch/Li (1993)](https://pubmed.ncbi.nlm.nih.gov/8514326/). Call `method = LynchLi` to use this method. 
-
-### Lynch & Ritland
-The moments based estimator developed by [Lynch & Ritland (1999)](https://www.genetics.org/content/152/4/1753.short). Call `method = LynchRitland` to use this method. 
-
-### Moran
-The moments based estimator developed by [Moran (1950)](https://www.jstor.org/stable/2332142?origin=crossref&seq=1#metadata_info_tab_contents). Call `method = Moran` to use this method. 
-
-### Queller & Goodnight
-The moments based estimator developed by [Queller & Goodnight (1989)](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1989.tb04226.x). Call `method = QuellerGoodnight` to use this method. 
-
-
-### Ritland
-The moments based estimator developed by [Ritland (1996)](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1996.tb02347.x). Call `method = Ritland` to use this method. 
-
-### Incomplete
-#### Dyadic Maximum Likelihood
-The moments based estimator developed by [Milligan (2003)](https://pubmed.ncbi.nlm.nih.gov/12663552/).
-
-#### Wang
-The moments based estimator developed by [Wang (2002)](https://www.genetics.org/content/160/3/1203.short).
-
 
 ## Posthoc analyses
 There are several different kinds of things you can do with kinship information (e.g. network analysis), and one that's provided is lovingly
