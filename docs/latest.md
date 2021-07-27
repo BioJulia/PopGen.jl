@@ -5,6 +5,23 @@ sidebar_label: What's New
 ---
 
 # v.0.6
+## v.0.6.5
+**Summary of changes from 0.6.2-5**
+
+### ⚡⚡ Improvements
+- Bumped compat for `DataFrames.jl` to 1.0
+- VCF/BCF importing now naturally sorts the loci names
+  - includes new `NaturalSort.jl` dep
+- file import `INFO` text consolidated somewhat
+- `PopData` show method information consolidated somehwat
+
+### 🐛🐛 Bug fixes
+- Hudson fst works as expected
+- `isbiallelic` returns correct answer when used on `PopData` object
+- [internal] conditional functions moved to `Conditionals.jl` file
+- `keep` and `keep!` are exported
+
+
 ## v.0.6.1
 ### ✨✨ New Features
 - Hudson pairwise FST & Permutation
