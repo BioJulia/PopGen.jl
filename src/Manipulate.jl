@@ -168,15 +168,6 @@ end
 
 
 """
-    loci(data::PopData)
-Returns an array of strings of the loci names in a `PopData` object.
-"""
-function loci(data::PopData)
-    unique(data.loci.locus)
-end
-
-
-"""
     get_genotype(data::PopObj; sample::String, locus::String)
 Return the genotype of one sample at one locus in a `PopData` object.
 ### Example
@@ -570,12 +561,4 @@ function keep(data::PopData; population::Any = nothing, locus::Any = nothing, na
     tmp = copy(data)
     keep!(tmp; population = population, locus = locus, name = name)
     return tmp
-end
-
-"""
-    samples(data::PopData)
-View individual/sample names in a `PopData`
-"""
-function samples(data::PopData)
-    @view data.meta[!, :name]
 end
