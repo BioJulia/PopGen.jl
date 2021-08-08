@@ -68,17 +68,16 @@ Since `gulfsharks` is shamelessly provided in PopGen.jl, we will just load it wi
 
 ```
 @benchmark sharks = genepop("data/source/gulfsharks.gen", silent = true)
-BenchmarkTools.Trial:
-  memory estimate:  330.58 MiB
-  allocs estimate:  6905285
-  --------------
-  minimum time:     806.202 ms (5.91% GC)
-  median time:      884.887 ms (5.61% GC)
-  mean time:        910.722 ms (5.41% GC)
-  maximum time:     1.071 s (4.82% GC)
-  --------------
-  samples:          6
-  evals/sample:     1
+BenchmarkTools.Trial: 10 samples with 1 evaluation.
+ Range (min … max):  472.671 ms … 526.777 ms  ┊ GC (min … max): 0.00% … 5.75%
+ Time  (median):     507.187 ms               ┊ GC (median):    5.00%
+ Time  (mean ± σ):   501.984 ms ±  17.301 ms  ┊ GC (mean ± σ):  3.47% ± 2.99%
+
+  ▁          ▁     ▁   ▁            ▁        ▁ █   ▁          ▁  
+  █▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁█▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁█▁█▁▁▁█▁▁▁▁▁▁▁▁▁▁█ ▁
+  473 ms           Histogram: frequency by time          527 ms <
+
+ Memory estimate: 172.46 MiB, allocs estimate: 2246870.
 ```
 
 </TabItem>
@@ -99,7 +98,7 @@ microbenchmark)
 
 ![import plot](/img/speedplot.png)
 
-Comparing averages, PopGen.jl clocks in at `910ms` versus adegenet's `6.745s` , so ~7.4x faster.
+Comparing averages, Julia (via PopGen.jl) clocks in at `507ms` versus R (via adegenet) at `6.745s` , so ~13.3x faster.
 
 
 
@@ -121,7 +120,7 @@ It was pretty tricky to come up with a sensible/efficient/convenient data struct
 
 ```julia
 julia> Base.summarysize(sharks)
-3527765
+3452870
 #bytes
 ```
 
@@ -138,7 +137,7 @@ julia> Base.summarysize(sharks)
 
 ![data structure plot](/img/objectplot.png)
 
-The original genepop file is `3.2mb` (the vertical line), and our `PopData` object takes up ~`3.5mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
+The original genepop file is `3.2mb` (the vertical line), and our `PopData` object takes up ~`3.45mb` in memory (300kb larger than the source file) versus the ~`5.3mb` of a `genind`, which is ~1.5x larger than the source file. That's quite a big difference!
 
 ### Summary statistics
 The obvious hallmark of population genetics is heterozygosity values and F-statistics. Here we'll compare the basic summary statistics that can be produced using `hierfstat` and `PopGen.jl`.
