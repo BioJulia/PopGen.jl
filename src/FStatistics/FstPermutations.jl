@@ -3,21 +3,18 @@
 Returns two matrices with rows (samples) shuffled between them. Respects the
 number of rows of the original matrices (i.e. population sizes).
 """
-function _fst_permutation(population_1::T, population_2::T) where T<:AbstractMatrix
-    merged = vcat(population_1, population_2)
-    # get n for each population
-    p1_size = size(population_1, 1)
-    p2_size = size(population_2, 1)
+function _fst_permutation(data::T, n1::Integer, n2::Integer) where T<:AbstractMatrix
     # total number of samples
-    n_samples = p1_size + p2_size
+    n_range = 1:(n1 +n2)
     # generate permutation indices for the first "population"
-    perm1 = sample(Xoroshiro128Star(), 1:n_samples, p1_size, replace = false)
-    # generate permutation indices for the second "population"
-    perm2 = @inbounds (1:n_samples)[Not(perm1)]
-    # index the merged matrix with the permuted indices
-    new_pop_1 = @inbounds @view merged[perm1,:]
-    new_pop_2 = @inbounds @view merged[perm2,:]
+    perm_matrix = @inbounds data[shuffle(n_range), :]
+    #partition shuffled matrix into original sample sizes
+    new_pop_1, new_pop_2 = partitionarray(perm_matrix, [n1, n2])
     return new_pop_1, new_pop_2 
+end
+
+function _fst_permutation(data::T) where T<:AbstractMatrix
+    @inbounds data[shuffle(1:size(data,1)), :]
 end
 
 
@@ -31,14 +28,17 @@ function _permuted_Hudson(data::PopData, iterations::Int64)
     perm_vector = zeros(iterations-1)
     p = Progress(sum(1:(npops - 1)) * (iterations - 1), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
     @inbounds for i in 2:npops
+        pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+        n_pop1 = size(pop1, 1)
         @inbounds for j in 1:(i-1)
-            pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
             pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+            n_pop2 = size(pop2, 1)
+            merged = vcat(pop1, pop2)
             fst_val = hudson_fst(pop1,pop2)
             @inbounds @sync for iter in 1:iterations-1
                 Base.Threads.@spawn begin
-                    perm_p1, perm_p2 = _fst_permutation(pop1, pop2)
-                    perm_vector[iter] = hudson_fst(perm_p1, perm_p2)
+                    perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
+                    @inbounds perm_vector[iter] = hudson_fst(perm_p1, perm_p2)
                     pops_text = string(pops[i]) * " & " * string(pops[j])
                     ProgressMeter.next!(p; showvalues = [(:Populations, pops_text), (:Iteration, "$iter")])
                 end
@@ -61,14 +61,17 @@ function _permuted_Nei(data::PopData, iterations::Int64)
     perm_vector = zeros(iterations-1)
     p = Progress(sum(1:(npops - 1)) * (iterations - 1), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
     @inbounds for i in 2:npops
+        pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+        n_pop1 = size(pop1, 1)
         @inbounds for j in 1:(i-1)
-            pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
             pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+            n_pop2 = size(pop2, 1)
+            merged = vcat(pop1, pop2)
             fst_val = nei_fst(pop1,pop2)
             @inbounds @sync for iter in 1:iterations-1
                 Base.Threads.@spawn begin
-                    perm_p1, perm_p2 = _fst_permutation(pop1, pop2)
-                    perm_vector[iter] = nei_fst(perm_p1, perm_p2)
+                    perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
+                    @inbounds perm_vector[iter] = nei_fst(perm_p1, perm_p2)
                     pops_text = string(pops[i]) * " & " * string(pops[j])
                     ProgressMeter.next!(p; showvalues = [(:Populations, pops_text), (:Iteration, "$iter")])
                 end
@@ -91,14 +94,17 @@ function _permuted_WeirCockerham(data::PopData, iterations::Int64)
     perm_vector = zeros(iterations-1)
     p = Progress(sum(1:(npops - 1)) * (iterations - 1), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
     @inbounds for i in 2:npops
+        pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+        n_pop1 = size(pop1, 1)
         @inbounds for j in 1:(i-1)
-            pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
             pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+            n_pop2 = size(pop2, 1)
+            merged = vcat(pop1, pop2)
             fst_val = weircockerham_fst(pop1,pop2)
             @inbounds @sync for iter in 1:iterations-1
                 Base.Threads.@spawn begin
-                    perm_p1, perm_p2 = _fst_permutation(pop1, pop2)
-                    perm_vector[iter] = weircockerham_fst(perm_p1, perm_p2)
+                    perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
+                    @inbounds perm_vector[iter] = weircockerham_fst(perm_p1, perm_p2)
                     pops_text = string(pops[i]) * " & " * string(pops[j])
                     ProgressMeter.next!(p; showvalues = [(:Populations, pops_text), (:Iteration, "$iter")])
                 end
