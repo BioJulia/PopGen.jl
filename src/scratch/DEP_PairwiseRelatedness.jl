@@ -171,7 +171,7 @@ the 9 Jacquard Identity States for all loci Creates Table 1 from Milligan 2002
 function all_loci_Pr_L_S(data::PopData, ind1::String, ind2::String, alleles::Dict)
     #Need to skip loci where one or both individuals have missing data
     Pr_L_S = []
-    for locus in String.(names(data.loci))
+    for locus in String.(names(data.genodata))
         #Extract the pair of interest's genotypes
         gen1 = get_genotype(data, sample = ind1, locus = locus)
         gen2 = get_genotype(data, sample = ind2, locus = locus)
@@ -430,7 +430,7 @@ Available methods:
 
 function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
-    all(data.meta.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    all(data.metadata.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
@@ -489,8 +489,8 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
     all(data.samples.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
     allele_frequencies = Dict()
-    for locus in names(data.loci)
-        allele_frequencies[String(locus)] = allele_freq(data.loci[:, locus])
+    for locus in names(data.genodata)
+        allele_frequencies[String(locus)] = allele_freq(data.genodata[:, locus])
     end
 
     n = size(data.samples)[1]

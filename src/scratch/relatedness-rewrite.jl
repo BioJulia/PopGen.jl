@@ -2,12 +2,12 @@ function relatedness_no_boot_fix2(data::PopData, sample_names::Vector{String}; m
     loci_names = Symbol.(loci(data))
     n_samples = length(samples(data))
     sample_pairs = pairwise_pairs(sample_names)
-    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
-    popdata_idx = groupby(data.loci, :name)
+    popdata_idx = groupby(data.genodata, :name)
     @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
         @inbounds sample_1 = sample_pairs[i][1]
         @inbounds sample_2 = sample_pairs[i][2]
@@ -30,14 +30,14 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
     n_samples = length(samples(data))
-    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
-    popdata_idx = groupby(data.loci, :name)
+    popdata_idx = groupby(data.genodata, :name)
     @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
         @inbounds sample_1 = sample_pairs[i][1]
         @inbounds sample_2 = sample_pairs[i][2]
@@ -79,13 +79,13 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
     sample_pairs = pairwise_pairs(sample_names)
     n_samples = length(samples(data))
     allele_frequencies = allele_freq(data)
-    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
-    popdata_idx = groupby(data.loci, :name)
+    popdata_idx = groupby(data.genodata, :name)
     @inbounds Base.Threads.@threads for i in 1:length(sample_pairs)
         @inbounds sample_1 = sample_pairs[i][1]
         @inbounds sample_2 = sample_pairs[i][2]
@@ -127,13 +127,13 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
     sample_pairs = pairwise_pairs(sample_names)
     n_samples = length(samples(data))
     allele_frequencies = allele_freq(data)
-    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
-    popdata_idx = groupby(data.loci, :name)
+    popdata_idx = groupby(data.genodata, :name)
     idx = 0
     @inbounds for (sample_n, ind1) in enumerate(sample_names[1:end-1])
         geno1 = popdata_idx[(ind1,)].genotype

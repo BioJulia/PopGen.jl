@@ -15,7 +15,7 @@ end
 Returns `true` all the loci in the `PopData` are biallelic, `false` if not.
 """
 function isbiallelic(data::PopData)
-    tmp = issorted(data.loci, [:locus, :name], lt = natural) ? data.loci : sort(data.loci, [:locus, :name], lt = natural)
+    tmp = issorted(data.genodata, [:locus, :name], lt = natural) ? data.genodata : sort(data.genodata, [:locus, :name], lt = natural)
     mtx = reshape(tmp.genotype, length(samples(data)), :)
     all(map(isbiallelic, eachcol(mtx)))
 end

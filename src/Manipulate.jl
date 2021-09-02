@@ -4,30 +4,30 @@ export add_meta!, locations, locations!, loci, genotypes, get_genotypes, get_gen
 """
     add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Metadata 
-must be in the same order as the samples in `PopData.meta`.
+must be in the same order as the samples in `Popdata.metadata`.
 
 #### Arguments
 - `popdata` : The `PopData` object to add information to
-- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `Popdata.metadata`
 
 #### Keyword Arguments
 - `name` : String of the name of this new column
-- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `loci` : Boolean of whether to also add this information to `Popdata.genodata` (default: `true`)
 - `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
 """
 function add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
-    length(metadata) != length(popdata.meta.name) && error("Provided metadata vector (n = $length(metadata)) and samples in PopData (n = $length(popdata.meta.name)) have different lengths")
-    @info "Adding $Symbol(name) column to .meta dataframe"
+    length(metadata) != length(popdata.metadata.name) && error("Provided metadata vector (n = $length(metadata)) and samples in PopData (n = $length(popdata.metadata.name)) have different lengths")
+    @info "Adding $Symbol(name) column to .metadata dataframe"
     # add to meta
-    insertcols!(popdata.meta, Symbol(name) => metadata)
+    insertcols!(popdata.metadata, Symbol(name) => metadata)
 
     # add to loci
     if loci
-        @info "Adding $Symbol(name) column to .meta and .loci dataframes"
-        tmp = DataFrame(:name => popdata.meta.name, Symbol(name) => metadata)
-        popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
+        @info "Adding $Symbol(name) column to .metadata and .genodata dataframes"
+        tmp = DataFrame(:name => popdata.metadata.name, Symbol(name) => metadata)
+        popdata.genodata = outerjoin(popdata.genodata, tmp, on = :name)
         if categorical == true
-            popdata.loci[name] = PooledArray(popdata.loci[name])
+            popdata.genodata[name] = PooledArray(popdata.genodata[name])
         end
     end
     return
@@ -37,32 +37,32 @@ end
 """
     add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Takes a vector of
-sample names if the metadata is not in the same order as samples appear in `PopData.meta`.
+sample names if the metadata is not in the same order as samples appear in `Popdata.metadata`.
 
 #### Arguments
 - `popdata` : The `PopData` object to add information to
 - `sample` : A `Vector{String}` of sample names corresponding to the order of the `metadata` 
-- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `Popdata.metadata`
 
 #### Keyword Arguments
 - `name` : String of the name of this new column
-- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `loci` : Boolean of whether to also add this information to `Popdata.genodata` (default: `true`)
 - `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
 """
 function add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true) where T <: AbstractVector
-    length(samples) != length(popdata.meta.name) && error("Provided sample vector (n = $length(samples)) and samples in PopData (n = $length(popdata.meta.name)) have different lengths")
+    length(samples) != length(popdata.metadata.name) && error("Provided sample vector (n = $length(samples)) and samples in PopData (n = $length(popdata.metadata.name)) have different lengths")
     length(samples) != length(metadata) && error("Sample names (n = $length(samples)) and metadata vectors (n = $length(metadata)) have different lengths")
-    sort(samples) != sort(popdata.meta.name) && error("Sample names are not identical")
-    @info "Adding $Symbol(name) column to .meta dataframe"
+    sort(samples) != sort(popdata.metadata.name) && error("Sample names are not identical")
+    @info "Adding $Symbol(name) column to .metadata dataframe"
 
     tmp = DataFrame(:name => samples, Symbol(name) => metadata)
-    popdata.meta = outerjoin(popdata.meta, tmp, on = :name)
+    popdata.metadata = outerjoin(popdata.metadata, tmp, on = :name)
 
     if loci
-        @info "Adding $Symbol(name) column to .meta and .loci dataframes"
-        popdata.loci = outerjoin(popdata.loci, tmp, on = :name)
+        @info "Adding $Symbol(name) column to .metadata and .genodata dataframes"
+        popdata.genodata = outerjoin(popdata.genodata, tmp, on = :name)
         if categorical == true
-            popdata.loci[name] = PooledArray(popdata.loci[name])
+            popdata.genodata[name] = PooledArray(popdata.genodata[name])
         end
     end
     return
@@ -78,7 +78,7 @@ derived from the PopData. Changes made to this table will not alter the source
 Use `locations!` to add spatial data to a `PopData` object.
 """
 function locations(data::PopData)
-    @view data.meta[!, [:longitude, :latitude]]
+    @view data.metadata[!, [:longitude, :latitude]]
 end
 
 
@@ -102,10 +102,10 @@ function locations!(data::PopData, long::Vector{Union{Missing,T}}, lat::Vector{U
     long_len = length(long)
     lat_len = length(lat)
     long_len != lat_len && error("latitude ($lat_len) and longitude ($long_len) arrays not equal in length")
-    long_len != length(data.meta.name) && error("lat/long array length ($long_len) and number of samples in PopData ($long_len) are not equal")
+    long_len != length(data.metadata.name) && error("lat/long array length ($long_len) and number of samples in PopData ($long_len) are not equal")
 
-    data.meta.longitude .= long
-    data.meta.latitude .= lat
+    data.metadata.longitude .= long
+    data.metadata.latitude .= lat
     return
 end
 
@@ -148,11 +148,11 @@ function locations!(data::PopData, long::Vector{String}, lat::Vector{String})
     long_len = length(long)
     lat_len = length(lat)
     lat_len != long_len && error("latitude ($lat_len) and longitude ($long_len) arrays not equal in length")
-    lat_len != length(data.meta.name) && error("lat/long array length ($lat_len) and number of samples in PopData ($long_len) are not equal")
+    lat_len != length(data.metadata.name) && error("lat/long array length ($lat_len) and number of samples in PopData ($long_len) are not equal")
     @info "Converting decimal minutes to decimal degrees"
     # convert coordinates to decimal degrees
-    data.meta.longitude .= convert_coord.(long)
-    data.meta.latitude .= convert_coord.(lat)
+    data.metadata.longitude .= convert_coord.(long)
+    data.metadata.latitude .= convert_coord.(lat)
     return
 end
 
@@ -177,7 +177,7 @@ get_genotype(cats, sample = "N115", locus = "fca8")
 ```
 """
 function get_genotype(data::PopData; sample::String, locus::String)
-    @views data.loci[(data.loci.name .== sample) .& (data.loci.locus .== locus), :genotype][1]
+    @views data.genodata[(data.genodata.name .== sample) .& (data.genodata.locus .== locus), :genotype][1]
 end
 
 
@@ -191,7 +191,7 @@ get_genotypes(cats, "N115")
 ```
 """
 function get_genotypes(data::PopObj, sample::String)
-    data.loci[data.loci.name .== sample, :genotype]
+    data.genodata[data.genodata.name .== sample, :genotype]
 end
 
 """
@@ -214,7 +214,7 @@ function get_genotypes(data::PopData; name::Union{String, Vector{String}}, locus
     if typeof(locus) == String
         locus = [locus]
     end
-    @view data.loci[(data.loci.name .∈ Ref(name)) .& (data.loci.locus .∈ Ref(locus)), :] 
+    @view data.genodata[(data.genodata.name .∈ Ref(name)) .& (data.genodata.locus .∈ Ref(locus)), :] 
 end
 
 
@@ -228,7 +228,7 @@ genotypes(@gulfsharks, "contig_475")
 ```
 """
 function genotypes(data::PopData, locus::String)
-    @view data.loci[data.loci.locus .== locus, :genotype]
+    @view data.genodata[data.genodata.locus .== locus, :genotype]
 end
 
 
@@ -239,17 +239,17 @@ View unique population ID's and/or their counts in `PopData`.
 - `counts` returns a dataframe of samples per `population` instead (default = `false`)
 """
 @inline function populations(data::PopData; counts::Bool = false)
-    if all(ismissing.(data.meta.population)) == true
+    if all(ismissing.(data.metadata.population)) == true
         @info "no population data present in PopData"
         return
     end
     
-    uniq_pops = unique(data.meta.population)
+    uniq_pops = unique(data.metadata.population)
     
     if counts == false
         return uniq_pops
     else
-        pops = countmap(data.meta.population)
+        pops = countmap(data.metadata.population)
         return DataFrame(:population => uniq_pops, :count => [pops[i] for i in uniq_pops])
     end
 end
@@ -274,7 +274,7 @@ populations!(potatoes, potatopops)
 ```
 
 ## Rename using a Vector of Strings
-`Vector` of new unique population names in the order that they appear in the PopData.meta
+`Vector` of new unique population names in the order that they appear in the Popdata.metadata
 \n**Example**
 ```
 potatopops = ["Idaho", "Russet"]
@@ -294,11 +294,11 @@ populations!(potatoes, ["potato_1", "potato_2"], ["north_russet", "south_russet"
 function populations!(data::PopData, rename::Dict)
     msg = ""
     @inbounds for key in keys(rename)
-        if key ∉ unique(data.meta.population)
+        if key ∉ unique(data.metadata.population)
             msg *= "  Population \"$key\" not found in PopData\n"
         else
-            replace!(data.meta.population, key => rename[key])
-            replace!(data.loci.population.pool, key => rename[key])
+            replace!(data.metadata.population, key => rename[key])
+            replace!(data.genodata.population.pool, key => rename[key])
         end
     end
     msg != "" && printstyled("Warnings:", color = :yellow) ; print("\n"*msg)
@@ -306,7 +306,7 @@ function populations!(data::PopData, rename::Dict)
 end
 
 function populations!(data::PopData, rename::Vector{String})
-    current_popnames = unique(data.meta.population)
+    current_popnames = unique(data.metadata.population)
     rn_dict = Dict{String, String}()
     [rn_dict[string(i)] = j for (i,j) in zip(current_popnames, rename)]
     populations!(data, rn_dict)
@@ -314,14 +314,14 @@ function populations!(data::PopData, rename::Vector{String})
 end
 
 function populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
-    meta_df = groupby(data.meta, :name)
-    loci_df = groupby(data.loci, :name)
+    meta_df = groupby(data.metadata, :name)
+    loci_df = groupby(data.genodata, :name)
     for (sample, new_pop) in zip(samples, populations)
         meta_df[(name = sample,)].population .= new_pop
         loci_df[(name = sample,)].population .= new_pop
     end
     # drop old levels
-    data.loci.population = data.loci.population |> Array |> PooledArray
+    data.genodata.population = data.genodata.population |> Array |> PooledArray
     return
 end
 
@@ -362,7 +362,7 @@ function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing
 
     if !isnothing(population)
         filter_by[:population] = typeof(population) <: AbstractArray ? string.(population) : [string(population)]
-        err = filter_by[:population][filter_by[:population] .∉ Ref(unique(data.meta.population))]
+        err = filter_by[:population][filter_by[:population] .∉ Ref(unique(data.metadata.population))]
         if length(err) > 0
             printstyled("Populations not found: ", bold = true)
             print("\"" * err[1] * "\"")
@@ -384,7 +384,7 @@ function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing
     end
     if !isnothing(name)
         filter_by[:name] = typeof(name) <: AbstractArray ? string.(name) : [string(name)]
-        err = filter_by[:name][filter_by[:name] .∉ Ref(data.meta.name)]
+        err = filter_by[:name][filter_by[:name] .∉ Ref(data.metadata.name)]
         if length(err) > 0
             printstyled("Samples not found: ", bold = true)
             print("\"" * err[1] * "\"")
@@ -398,25 +398,25 @@ function exclude!(data::PopData; population::Any = nothing, locus::Any = nothing
     meta_keys = filter_keys[filter_keys .!= :locus]
 
     if length(filter_keys) == 1
-        filter!(filter_keys[1] => x -> x ∉ filter_by[filter_keys[1]] , data.loci)
+        filter!(filter_keys[1] => x -> x ∉ filter_by[filter_keys[1]] , data.genodata)
         if !isempty(meta_keys)
-            filter!(meta_keys[1] => x -> x ∉ filter_by[meta_keys[1]] , data.meta)
+            filter!(meta_keys[1] => x -> x ∉ filter_by[meta_keys[1]] , data.metadata)
         end
     elseif length(filter_keys) == 2
-        filter!([filter_keys[1], filter_keys[2]] => (x,y) -> x ∉ filter_by[filter_keys[1]] && y ∉ filter_by[filter_keys[2]] , data.loci)
+        filter!([filter_keys[1], filter_keys[2]] => (x,y) -> x ∉ filter_by[filter_keys[1]] && y ∉ filter_by[filter_keys[2]] , data.genodata)
         if !isempty(meta_keys)
-            [filter!(i => x -> x ∉ filter_by[i] , data.meta) for i in meta_keys]
+            [filter!(i => x -> x ∉ filter_by[i] , data.metadata) for i in meta_keys]
         end
     elseif length(filter_keys) == 3
-        filter!([filter_keys[1], filter_keys[2], filter_keys[3]] => (x,y,z) -> x ∉ filter_by[filter_keys[1]] && y ∉ filter_by[filter_keys[2]] && z ∉ filter_by[filter_keys[3]] , data.loci)
+        filter!([filter_keys[1], filter_keys[2], filter_keys[3]] => (x,y,z) -> x ∉ filter_by[filter_keys[1]] && y ∉ filter_by[filter_keys[2]] && z ∉ filter_by[filter_keys[3]] , data.genodata)
         if !isempty(meta_keys)
-            [filter!(i => x -> x ∉ filter_by[i] , data.meta) for i in meta_keys]
+            [filter!(i => x -> x ∉ filter_by[i] , data.metadata) for i in meta_keys]
         end
     else
         throw(ArgumentError("Please specify at least one filter parameter of population, locus, or name"))   
     end
     # make sure to update all the PooledArray pools
-    [data.loci[!, i] = PooledArray(Array(data.loci[!, i])) for i in [:population, :locus, :name]]
+    [data.genodata[!, i] = PooledArray(Array(data.genodata[!, i])) for i in [:population, :locus, :name]]
     return
 end
 
@@ -486,7 +486,7 @@ function keep!(data::PopData; population::Any = nothing, locus::Any = nothing, n
 
     if !isnothing(population)
         filter_by[:population] = typeof(population) <: AbstractArray ? string.(population) : [string(population)]
-        err = filter_by[:population][filter_by[:population] .∉ Ref(unique(data.meta.population))]
+        err = filter_by[:population][filter_by[:population] .∉ Ref(unique(data.metadata.population))]
         if length(err) > 0
             notice = "Criteria not found in PopData\nPopulations: "
             notice *= "\"" * err[1] * "\""
@@ -510,7 +510,7 @@ function keep!(data::PopData; population::Any = nothing, locus::Any = nothing, n
     end
     if !isnothing(name)
         filter_by[:name] = typeof(name) <: AbstractArray ? string.(name) : [string(name)]
-        err = filter_by[:name][filter_by[:name] .∉ Ref(data.meta.name)]
+        err = filter_by[:name][filter_by[:name] .∉ Ref(data.metadata.name)]
         if length(err) > 0
             notice = "Criteria not found in PopData\nSamples: "
             notice *= "\"" * err[1] * "\""
@@ -524,11 +524,11 @@ function keep!(data::PopData; population::Any = nothing, locus::Any = nothing, n
     filter_keys = Symbol.(keys(filter_by))
     meta_keys = filter_keys[filter_keys .!= :locus]
 
-    filter!(filter_keys[1] => x -> x ∈ filter_by[filter_keys[1]] , data.loci)
+    filter!(filter_keys[1] => x -> x ∈ filter_by[filter_keys[1]] , data.genodata)
     if !isempty(meta_keys)
-        filter!(meta_keys[1] => x -> x ∈ filter_by[meta_keys[1]] , data.meta)
+        filter!(meta_keys[1] => x -> x ∈ filter_by[meta_keys[1]] , data.metadata)
     end
-    [data.loci[!, i] = PooledArray(Array(data.loci[!, i])) for i in [:population, :locus, :name]]
+    [data.genodata[!, i] = PooledArray(Array(data.genodata[!, i])) for i in [:population, :locus, :name]]
     return
 end
 

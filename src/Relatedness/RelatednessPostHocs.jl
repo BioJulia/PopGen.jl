@@ -2,7 +2,7 @@ export relatedness_posthoc
 
 function sig_within(data::PopData, results::DataFrame, population::String, iterations::Int = 20000)
     # add extra columns of population names
-    pop_names = select(data.meta, :name => :sample_1 ,:population => :pop_1)
+    pop_names = select(data.metadata, :name => :sample_1 ,:population => :pop_1)
     tmp_res = innerjoin(results, pop_names, on = :sample_1)
     select!(pop_names, :sample_1 => :sample_2,:pop_1 => :pop_2)
     tmp_res = innerjoin(tmp_res, pop_names, on = :sample_2)
@@ -98,7 +98,7 @@ julia> relatedness_posthoc(cats, rel_out)
 ```
 """
 function relatedness_posthoc(data::PopData, results::DataFrame; iterations::Int = 20000)
-    all_pops = unique(data.meta.population)
+    all_pops = unique(data.metadata.population)
     estimators = Symbol.(names(results)[names(results) .∉ Ref(["sample_1", "sample_2", "n_loci"])] .* "_P")
     sigs = map(pop -> sig_within(data, results, pop, iterations), all_pops)
 

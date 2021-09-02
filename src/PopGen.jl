@@ -34,7 +34,14 @@ module PopGen
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-using PopGenCore, Reexport
+using Reexport
+using PopGenCore
+@reexport module PopGenCore
+    export isbiallelic, ishom, ishet
+    export read_from, delimited, csv, genepop, @nancycats, @gulfsharks
+end
+
+
 using Distributions, DataFrames, PooledArrays
 using Requires, ProgressMeter
 using MultipleTesting, StatsBase
@@ -46,7 +53,6 @@ using MultipleTesting, StatsBase
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-include("Permutations.jl")
 # allele frequency and heterozygosity functions
 include("AlleleFreq.jl")
 include("Heterozygosity.jl")

@@ -25,12 +25,12 @@ locus by population.
 function richness(data::PopData; by::String = "locus")
     if by == "locus"
         DataFrames.combine(
-            groupby(data.loci, :locus),
+            groupby(data.genodata, :locus),
             :genotype => (geno -> length(unique_alleles(geno))) => :richness
         )
     elseif by == "population"
         DataFrames.combine(
-            groupby(data.loci, [:locus, :population]),
+            groupby(data.genodata, [:locus, :population]),
             :genotype => (geno -> length(unique_alleles(geno))) => :richness
         )
     else
@@ -93,7 +93,7 @@ population differentiation (Jost 2008) given as: \n
 function Base.summary(data::PopData; by::String = "global")
     # observed/expected het per locus per pop
     het_df = DataFrames.combine(
-        groupby(data.loci, [:locus, :population]),
+        groupby(data.genodata, [:locus, :population]),
         :genotype => nonmissing => :n,
         :genotype => hetero_o => :het_obs,
         :genotype => hetero_e => :het_exp,

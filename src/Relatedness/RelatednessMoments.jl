@@ -369,7 +369,7 @@ function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs.
         i,j = gen1
         k,l = gen2
 
-        #N = nonmissing(data.loci[data.loci.locus .== string(loc), :genotype])
+        #N = nonmissing(data.genodata[data.genodata.locus .== string(loc), :genotype])
 
         a = a_wang(2 * N, alleles[loc])
         a2_sq = a[2] ^ 2

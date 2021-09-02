@@ -37,7 +37,7 @@ end
 function FST_locus(data::PopData)
     # observed/expected het per locus per pop
     het_df = DataFrames.combine(
-        groupby(data.loci, [:locus, :population]),
+        groupby(data.genodata, [:locus, :population]),
         :genotype => nonmissing => :n,
         :genotype => hetero_o => :het_obs,
         :genotype => (i -> hetero_e(i)) => :het_exp,
@@ -70,7 +70,7 @@ end
 
 function f_stat_p(data::PopData; nperm::Int = 1000)
     observed = FST_global(data)
-    popnames = data.meta.population    
+    popnames = data.metadata.population    
     perm_dict = Dict{Symbol,Vector{Float64}}(
         :FST => Vector{Float64}(undef, nperm-1),
         :FST′ => Vector{Float64}(undef, nperm-1)
@@ -78,7 +78,7 @@ function f_stat_p(data::PopData; nperm::Int = 1000)
     p = Progress(nperm-1, dt = 1, color = :blue)
     @inbounds @sync for n in 1:nperm-1
         Base.Threads.@spawn begin
-            tmp = FST_global(permute_samples!(copy(data.loci), popnames))
+            tmp = FST_global(permute_samples!(copy(data.genodata), popnames))
             perm_dict[:FST][n] = tmp[:FST]
             perm_dict[:FST′][n] = tmp[:FST′]
             next!(p)

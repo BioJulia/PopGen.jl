@@ -72,7 +72,7 @@ the `all` method, where resampling occurs over all loci. This is an internal fun
 """
 function relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    uniq_pops = unique(data.meta.population)
+    uniq_pops = unique(data.metadata.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
         sample_pairs = sim_pairs(sample_names)
     else
@@ -81,13 +81,13 @@ function relatedness_boot_all(data::PopData, sample_names::Vector{String}; metho
     n_pairs = length(sample_pairs)
     n_samples = length(samples(data))
     allele_frequencies = allele_freq(data)
-    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, n_pairs), 1:length(method))
     shared_loci = Vector{Int}(undef, n_pairs)
     p = Progress(n_pairs*length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
-    popdata_idx = groupby(data.loci, :name)
+    popdata_idx = groupby(data.genodata, :name)
     @inbounds for i in 1:n_pairs
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
@@ -135,7 +135,7 @@ the `nonmissing` method, where resampling occurs over only shared non-missing lo
 """
 function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    uniq_pops = unique(data.meta.population)
+    uniq_pops = unique(data.metadata.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
         sample_pairs = sim_pairs(sample_names)
     else
@@ -143,14 +143,14 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
     end
     n_pairs = length(sample_pairs)
     n_samples = length(samples(data))
-    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, n_pairs), 1:length(method))
     shared_loci = Vector{Int}(undef, n_pairs)
     p = Progress(n_pairs * length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
-    popdata_idx = groupby(data.loci, :name)
+    popdata_idx = groupby(data.genodata, :name)
     @inbounds for i in 1:n_pairs
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
         @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
@@ -198,19 +198,19 @@ This is an internal function with arguments provided by `relatedness`.
 function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     n_samples = length(samples(data))
-    uniq_pops = unique(data.meta.population)
+    uniq_pops = unique(data.metadata.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
         sample_pairs = sim_pairs(sample_names)
     else
         sample_pairs = pairwise_pairs(sample_names)
     end
     n_pairs = length(sample_pairs)
-    n_per_loci = DataFrames.combine(groupby(data.loci, :locus), :genotype => nonmissing => :n)[:, :n]
+    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
     shared_loci = Vector{Int}(undef, n_pairs)
     p = Progress(n_pairs* length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
-    popdata_idx = groupby(data.loci, :name)
+    popdata_idx = groupby(data.genodata, :name)
     @inbounds @sync for i in 1:n_pairs
         Base.Threads.@spawn begin
             @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
@@ -343,7 +343,7 @@ julia> merge_relatedness(rel_out)
 ```
 """
 function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
-    all(data.meta[data.meta.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    all(data.metadata[data.metadata.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
     errs = ""
     all_samples = samples(data)
     if sample_names != all_samples

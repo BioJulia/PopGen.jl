@@ -6,7 +6,7 @@ loci in a `PopData` object. These are global allele frequencies.
 function allele_freq(data::PopData)
     NamedTuple{Tuple(Symbol.(loci(data)))}(
             DataFrames.combine(
-            groupby(data.loci, :locus),
+            groupby(data.genodata, :locus),
             :genotype => allele_freq => :frq
         )[:, :frq] |> Tuple
     )
@@ -147,9 +147,9 @@ allele_freq(cats, "fca8", population = true)
 """
 function allele_freq(data::PopData, locus::String; population::Bool=false)
     if !population
-        data.loci[data.loci.locus .== locus, :genotype] |> allele_freq
+        data.genodata[data.genodata.locus .== locus, :genotype] |> allele_freq
     else
-        tmp = groupby(data.loci[data.loci.locus .== locus, :], :population)
+        tmp = groupby(data.genodata[data.genodata.locus .== locus, :], :population)
         DataFrames.combine(tmp, :genotype => allele_freq => :frequency)
     end
 end
@@ -266,10 +266,10 @@ geno_freq(cats, "fca8", population = true)
 """
 function geno_freq(data::PopData, locus::String; population::Bool=false)
     if !population
-        tmp = data.loci[data.loci.locus .== locus, :genotype]
+        tmp = data.genodata[data.genodata.locus .== locus, :genotype]
         geno_freq(tmp)
     else
-        tmp = data.loci[data.loci.locus .== locus, :]
+        tmp = data.genodata[data.genodata.locus .== locus, :]
         DataFrames.combine(groupby(tmp, :population), :genotype => geno_freq => :freq)
     end
 end
@@ -317,10 +317,10 @@ geno_freq_expected(cats, "fca8", population = true)
 """
 function geno_freq_expected(data::PopData, locus::String; population::Bool=false)
     if !population
-        tmp = data.loci[data.loci.locus .== locus, :genotype]
+        tmp = data.genodata[data.genodata.locus .== locus, :genotype]
         geno_freq_expected(tmp)
     else
-        tmp = data.loci[data.loci.locus .== locus, :]
+        tmp = data.genodata[data.genodata.locus .== locus, :]
         DataFrames.combine(groupby(tmp, :population), :genotype => geno_freq_expected => :freq)
     end
 end

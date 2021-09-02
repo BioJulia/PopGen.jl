@@ -103,7 +103,7 @@ heterozygosity(@nancycats, "population" )
 function heterozygosity(data::PopData, by::String = "locus")
     if by ∈ ["locus", "loci"]
         tmp = DataFrames.combine(
-                groupby(data.loci, [:locus, :population]),
+                groupby(data.genodata, [:locus, :population]),
                 :genotype => nonmissing => :n_tmp,
                 :genotype => hetero_o => :het_pop_obs,
                 :genotype => hetero_e => :het_pop_exp
@@ -117,14 +117,14 @@ function heterozygosity(data::PopData, by::String = "locus")
 
     elseif lowercase(by) ∈  ["sample", "ind", "individual"]
         return DataFrames.combine(
-                groupby(data.loci, :name),
+                groupby(data.genodata, :name),
                 :genotype => nonmissing => :n,
                 :genotype => hetero_o => :het_obs
             )
 
     elseif lowercase(by) ∈  ["pop", "population"]
         return DataFrames.combine(
-                groupby(data.loci, :population),
+                groupby(data.genodata, :population),
                 :genotype => nonmissing => :n,
                 :genotype => hetero_o => :het_obs,
                 :genotype => hetero_e => :het_exp
@@ -143,5 +143,5 @@ const het = heterozygosity
 Calculate the observed heterozygosity for an individual in a `PopData` object.
 """
 @inline function het_sample(data::PopData, individual::String)
-    data.loci[data.loci.name .== individual, :genotype] |> hetero_o
+    data.genodata[data.genodata.name .== individual, :genotype] |> hetero_o
 end

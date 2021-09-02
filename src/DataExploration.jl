@@ -20,23 +20,23 @@ missing_data(@gulfsharks, by = "pop")
 @inline function missing_data(data::PopData; by::String = "sample")
     if by ∈ ["sample", "individual"]
         DataFrames.combine(
-            DataFrames.groupby(data.loci, :name),
+            DataFrames.groupby(data.genodata, :name),
             :genotype => (i -> count(ismissing, i)) => :missing
         )
     elseif by ∈ ["pop", "population"]
                 DataFrames.combine(
-            DataFrames.groupby(data.loci, :population),
+            DataFrames.groupby(data.genodata, :population),
             :genotype => (i -> count(ismissing, i)) => :missing
         )
     elseif by ∈ ["locus", "loci"]
         DataFrames.combine(
-            DataFrames.groupby(data.loci, :locus),
+            DataFrames.groupby(data.genodata, :locus),
             :genotype => (i -> count(ismissing, i)) => :missing
         )
 
     elseif by ∈ ["detailed", "full"]
         DataFrames.combine(
-            DataFrames.groupby(data.loci, [:locus, :population]),
+            DataFrames.groupby(data.genodata, [:locus, :population]),
             :genotype => (i -> count(ismissing, i)) => :missing
         )
     else
@@ -121,7 +121,7 @@ function pairwise_identical(data::PopData, sample_names::Vector{String})
     n = length(sample_pairs)
     perc_ident_vec = Vector{Float64}(undef, n)
     n_vec = Vector{Int}(undef, n)
-    popdata_idx = groupby(data.loci, :name)
+    popdata_idx = groupby(data.genodata, :name)
     idx = 0
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     @inbounds @sync for i in 1:length(sample_pairs)
@@ -131,10 +131,9 @@ function pairwise_identical(data::PopData, sample_names::Vector{String})
             len_1 = nonmissing(geno_1)
             len_2 = nonmissing(geno_2)
             shared_geno = minimum([len_1, len_2])
-                shared_geno = minimum([len_1, len_2])
-                shared = sum(skipmissing(geno_1 .== geno_2))
-                @inbounds perc_ident_vec[i] = round(shared/shared_geno, digits = 2)
-                @inbounds n_vec[i] = shared_geno
+            shared = sum(skipmissing(geno_1 .== geno_2))
+            @inbounds perc_ident_vec[i] = round(shared/shared_geno, digits = 2)
+            @inbounds n_vec[i] = shared_geno
             next!(p)
         end
     end
@@ -185,14 +184,14 @@ julia> geno_freqtable(cats, by = "population")
 """
 function geno_freqtable(data::PopData; by::String = "global")
     if by == "global"
-        grp = groupby(dropmissing(data.loci, :genotype), [:locus, :genotype])
+        grp = groupby(dropmissing(data.genodata, :genotype), [:locus, :genotype])
         counts = DataFrames.combine(grp, nrow => :count)
         counts = DataFrames.combine(
             groupby(counts, :locus), :genotype, :count,
             :count => (x -> x / sum(x)) => :frequency
         )
     elseif by in ["local", "population"]
-        grp = groupby(dropmissing(data.loci, :genotype), [:locus, :population, :genotype])
+        grp = groupby(dropmissing(data.genodata, :genotype), [:locus, :population, :genotype])
         counts = DataFrames.combine(grp, nrow => :count)
         counts = DataFrames.combine(
             groupby(counts, [:locus, :population]), :genotype, :count,
@@ -247,7 +246,7 @@ julia> allele_freqtable(cats, by = "population")
 """
 function allele_freqtable(data::PopData; by::String = "global")
     if by == "global"
-        grp = groupby(dropmissing(data.loci, :genotype), :locus)
+        grp = groupby(dropmissing(data.genodata, :genotype), :locus)
         _alleles = DataFrames.combine(grp, :genotype => alleles => :allele, ungroup = false)
         counts = DataFrames.combine(
             _alleles,
@@ -261,7 +260,7 @@ function allele_freqtable(data::PopData; by::String = "global")
             [:n, :allele] => ((n,al) -> length(al)/first(n)) => :frequency
         )
     elseif by in ["local", "population"]
-        grp = groupby(dropmissing(data.loci, :genotype), [:locus, :population])
+        grp = groupby(dropmissing(data.genodata, :genotype), [:locus, :population])
         _alleles = DataFrames.combine(grp, :genotype => alleles => :allele, ungroup = false)
         counts = DataFrames.combine(
             _alleles,

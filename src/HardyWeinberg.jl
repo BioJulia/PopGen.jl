@@ -61,7 +61,7 @@ adjustment method for multiple testing.
 @inline function hwe_test(data::PopData; by::String = "locus", correction::String = "none")
     if by == "locus"
         tmp =DataFrames.combine(
-            groupby(data.loci, :locus),
+            groupby(data.genodata, :locus),
             :genotype => chisq_locus => :chisq
         )
         out_table = select(tmp, :locus, 
@@ -71,7 +71,7 @@ adjustment method for multiple testing.
         )
     else
         tmp =DataFrames.combine(
-            groupby(data.loci, [:locus, :population]),
+            groupby(data.genodata, [:locus, :population]),
             :genotype => chisq_locus => :chisq
         )
         out_table = select(tmp, :locus, :population, 

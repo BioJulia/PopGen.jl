@@ -1,6 +1,6 @@
 function _pairwise_Hudson(data::PopData)
     !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
-    idx_pdata = groupby(data.loci, :population)
+    idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = length(idx_pdata)
     n_loci = size(data)[2]
@@ -77,7 +77,7 @@ function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
 end
 
 function _pairwise_Nei(data::PopData)
-    idx_pdata = groupby(data.loci, :population)
+    idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = length(idx_pdata)
     n_loci = size(data)[2]
@@ -192,7 +192,7 @@ end
 
 
 function _pairwise_WeirCockerham(data::PopData)
-    idx_pdata = groupby(data.loci, :population)
+    idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = length(idx_pdata)
     n_loci = size(data)[2]
