@@ -11,6 +11,8 @@
   "dependencies": {
     "@docusaurus/core": "^2.0.0-beta.6",
     "@docusaurus/preset-classic": "^2.0.0-beta.6",
+    "@docusaurus/plugin-ideal-image": "2.0.0-beta.6",
+    "@docusaurus/plugin-pwa": "2.0.0-beta.6",
     "classnames": "^2.2.6",
     "clsx": "^1.1.1",
     "react": "^17.0.2",
