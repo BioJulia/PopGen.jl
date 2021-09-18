@@ -35,7 +35,7 @@ Simulated parents will be crossed to generate offspring depending on the `relati
 The relationship between the newly generated samples can be identified by:
 - Sample names will specify their simulation number, relationship, and whether parent or offspring
     - Naming convention: `[simulation #]_[relationship]_[offspring #]`
-    - example: sim005_fullsib_1 = `[simulation 005]_[full sibling]_[offspring 1]`
+    - example: `sim005_fullsib_1` = `[simulation 005]_[full sibling]_[offspring 1]`
 - Their `population` name will be that of their relationship (e.g. "fullsib")
 
 :::tip plugging into relatedness
