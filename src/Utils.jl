@@ -3,10 +3,10 @@
 ## experimental and not exported or documented!
 function adjacency_matrix(data::PopData)
     data_loci = groupby(data.genodata, :locus)
-    out_vec = Vector{Array{Int8,2}}(undef, length(data_loci))
+    out_vec = Vector{Array{Int8,2}}(undef, data.metadata.loci)
     for (j,i) in enumerate(data_loci)
         uniq = unique(skipmissing(i.genotype))
-        adj_mat = fill(Int8(0), length(samples(data)), length(uniq))
+        adj_mat = fill(Int8(0), data.metadata.samples, length(uniq))
         for (j,k) in zip(i.genotype, eachrow(adj_mat))
             k .= Ref(j) .=== uniq 
         end

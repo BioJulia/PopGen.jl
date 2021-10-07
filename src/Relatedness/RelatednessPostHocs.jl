@@ -98,7 +98,7 @@ julia> relatedness_posthoc(cats, rel_out)
 ```
 """
 function relatedness_posthoc(data::PopData, results::DataFrame; iterations::Int = 20000)
-    all_pops = unique(data.metadata.population)
+    all_pops = unique(data.metadata.sampleinfo.population)
     estimators = Symbol.(names(results)[names(results) .∉ Ref(["sample_1", "sample_2", "n_loci"])] .* "_P")
     sigs = map(pop -> sig_within(data, results, pop, iterations), all_pops)
 

@@ -48,7 +48,7 @@ end
 
 function relatedness_no_boot_fix(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    n_samples = length(samples(data))
+    n_samples = data.metadata.samples
     sample_pairs = pairwise_pairs(sample_names)
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
@@ -81,7 +81,7 @@ end
 
 
 function relatedness2(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
-    all(data.metadata[data.metadata.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    all(data.metadata[data.metadata.sampleinfo.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
     errs = ""
     all_samples = samples(data)
     if sample_names != all_samples
@@ -117,7 +117,7 @@ end
 ## original function -- threading does not work as expected ###
 function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    n_samples = length(samples(data))
+    n_samples = data.metadata.samples
     sample_pairs = pairwise_pairs(sample_names)
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
@@ -152,7 +152,7 @@ end
 function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
-    n_samples = length(samples(data))
+    n_samples = data.metadata.samples
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
@@ -222,7 +222,7 @@ end
 function relatedness(data::PopData, sample_names::Vector{String}; kwargs...)
     #method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
     kw_dict = Dict(kwargs...)
-    all(data.metadata[data.metadata.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    all(data.metadata[data.metadata.sampleinfo.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
     all_samples = samples(data)
     errs = ""
     if sample_names != all_samples
@@ -280,7 +280,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
     n_loci = length(loci_names)
-    n_samples = length(samples(data))
+    n_samples = data.metadata.samples
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))

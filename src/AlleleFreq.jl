@@ -20,13 +20,6 @@ a `PopData` object.
 @inline function allele_freq(locus::GenoArray)
     all(ismissing.(locus)) == true && return Dict{eltype(nonmissingtype(eltype(locus))), Float64}()
     proportionmap(alleles(locus))
-    #=  # deprecated in favor of proportionmap
-    len = length(flat_alleles)
-    @inbounds @simd for allele in flat_alleles
-        d[allele] = @inbounds get!(d, allele, 0.0) + 1.0/len
-    end
-    return d
-    =#
 end
 
 """
@@ -188,15 +181,6 @@ Return a `Dict` of genotype counts of a single locus in a
     # conditional testing if all genos are missing
     all(ismissing.(locus)) && return missing
     countmap(skipmissing(locus))
-
-    #= # deprecated in favor of countmap
-    d = Dict{Tuple, Float32}()
-    @inbounds for genotype in skipmissing(locus)
-        # sum up non-missing genotypes
-        d[genotype] = get!(d, genotype, 0.0) + 1.0 
-    end
-    return d
-    =#
 end
 
 """
@@ -215,7 +199,6 @@ function geno_count_expected(locus::T) where T<:GenoArray
 
     ## split the appropriate pairs into their own vectors
     alle, freq = collect(keys(allele_dict)), collect(values(allele_dict))
-    #return alle, freq
     ## calculate expected genotype frequencies by multiplying all-by-all x n
     expected_genotype_freq = vec(freq * freq' .* n)
 
@@ -239,16 +222,6 @@ Return a `Dict` of genotype frequencies of a single locus in a
     # conditional testing if all genos are missing
     all(ismissing.(locus)) && return missing
     proportionmap(locus |> skipmissing |> collect)
-    #= deprecated in favor of proportionmap
-    d = Dict{Tuple, Float32}()
-    @inbounds for genotype in skipmissing(locus)
-        # sum up non-missing genotypes
-        d[genotype] = get!(d, genotype, 0.0) + 1.0
-    end
-    total = values(d) |> sum    # sum of all non-missing genotypes
-    [d[i] = d[i] / total for i in keys(d)] # genotype count/total
-    return d
-    =#
 end
 
 

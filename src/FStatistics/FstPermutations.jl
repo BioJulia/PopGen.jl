@@ -22,8 +22,8 @@ function _permuted_Hudson(data::PopData, iterations::Int64)
     !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
-    npops = length(idx_pdata)
-    n_loci = size(data)[2]
+    npops = data.metadata.populations
+    n_loci = data.metadata.loci
     results = zeros(npops, npops)
     perm_vector = zeros(iterations-1)
     p = Progress(sum(1:(npops - 1)) * (iterations - 1), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
@@ -55,8 +55,8 @@ end
 function _permuted_Nei(data::PopData, iterations::Int64)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
-    npops = length(idx_pdata)
-    n_loci = size(data)[2]
+    npops = data.metadata.populations
+    n_loci = data.metadata.loci
     results = zeros(npops, npops)
     perm_vector = zeros(iterations-1)
     p = Progress(sum(1:(npops - 1)) * (iterations - 1), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
@@ -88,8 +88,8 @@ end
 function _permuted_WeirCockerham(data::PopData, iterations::Int64)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
-    npops = length(idx_pdata)
-    n_loci = size(data)[2]
+    npops = data.metadata.populations
+    n_loci = data.metadata.loci
     results = zeros(npops, npops)
     perm_vector = zeros(iterations-1)
     p = Progress(sum(1:(npops - 1)) * (iterations - 1), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)

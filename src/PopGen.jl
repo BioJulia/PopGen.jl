@@ -37,13 +37,15 @@ module PopGen
 using Reexport
 using PopGenCore
 @reexport module PopGenCore
+    export PopData, PopDataInfo, GenoArray, Genotype, SNP, Msat
     export isbiallelic, ishom, ishet
-    export read_from, delimited, csv, genepop, @nancycats, @gulfsharks
+    export delimited, csv, genepop, vcf, bcf, @nancycats, @gulfsharks
+    export ishom, ishet
 end
 
 
 using Distributions, DataFrames, PooledArrays
-using Requires, ProgressMeter
+using ProgressMeter
 using MultipleTesting, StatsBase
 
 

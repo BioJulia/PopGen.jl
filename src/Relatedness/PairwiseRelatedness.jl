@@ -72,14 +72,14 @@ the `all` method, where resampling occurs over all loci. This is an internal fun
 """
 function relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    uniq_pops = unique(data.metadata.population)
+    uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
         sample_pairs = sim_pairs(sample_names)
     else
         sample_pairs = pairwise_pairs(sample_names)
     end    
     n_pairs = length(sample_pairs)
-    n_samples = length(samples(data))
+    n_samples = data.metadata.samples
     allele_frequencies = allele_freq(data)
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
@@ -135,14 +135,14 @@ the `nonmissing` method, where resampling occurs over only shared non-missing lo
 """
 function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    uniq_pops = unique(data.metadata.population)
+    uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
         sample_pairs = sim_pairs(sample_names)
     else
         sample_pairs = pairwise_pairs(sample_names)
     end
     n_pairs = length(sample_pairs)
-    n_samples = length(samples(data))
+    n_samples = data.metadata.samples
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allele_frequencies = allele_freq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
@@ -197,8 +197,8 @@ This is an internal function with arguments provided by `relatedness`.
 """
 function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    n_samples = length(samples(data))
-    uniq_pops = unique(data.metadata.population)
+    n_samples = data.metadata.samples
+    uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
         sample_pairs = sim_pairs(sample_names)
     else
@@ -343,7 +343,7 @@ julia> merge_relatedness(rel_out)
 ```
 """
 function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
-    all(data.metadata[data.metadata.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    all(data.metadata[data.metadata.sampleinfo.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
     errs = ""
     all_samples = samples(data)
     if sample_names != all_samples

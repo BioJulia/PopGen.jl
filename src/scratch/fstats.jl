@@ -70,7 +70,7 @@ end
 
 function f_stat_p(data::PopData; nperm::Int = 1000)
     observed = FST_global(data)
-    popnames = data.metadata.population    
+    popnames = data.metadata.sampleinfo.population    
     perm_dict = Dict{Symbol,Vector{Float64}}(
         :FST => Vector{Float64}(undef, nperm-1),
         :FST′ => Vector{Float64}(undef, nperm-1)

@@ -1,31 +1,51 @@
+# TODO create an optimized method for all FST types for loc-by-loc
 function _pairwise_Hudson(data::PopData)
     !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
-    idx_pdata = groupby(data.genodata, :population)
+    idx_pdata = groupby(data.loci, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci
+    locnames = loci(data)
     results = zeros(npops, npops)
-    @sync for i in 2:npops
-        Base.Threads.@spawn begin
+    res = Float64[]
+    p1 = String[]
+    p2 = String[]
+    locs = String[]
+    for i in 2:npops
+        #Base.Threads.@spawn begin
+            #=
+            x = mapreduce(vcat,1:(i-1)) do j
+                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                hudson_fst(pop1, pop2)
+            end
+            return x
+            =#
             for j in 1:(i-1)
                 pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
                 pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
-                results[i,j] = hudson_fst(pop1,pop2)
+                #results[i,j] = hudson_fst(pop1,pop2)
+                append!(res, hudson_fst(pop1, pop2))
+                append!(p1, fill(pops[i], n_loci))
+                append!(p2, fill(pops[j], n_loci))
+                append!(locs, locnames)
            end
-        end
+        #end
     end
-    return PairwiseFST(DataFrame(results, Symbol.(pops)), "Hudson et al. 1992")
+    return DataFrame(:pop1 => p1, :pop2 => p2,:locus => locs ,:fst => res)
+    return PopGen.PairwiseFST(DataFrame(results, Symbol.(pops)), "Hudson et al. 1992")
 end
 
 function hudson_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     fst_perloc = @views [_hudson_fst(population_1[:,i], population_2[:,i]) for i in 1:size(population_1,2)]
-    return mean(skipmissing(skipinfnan(fst_perloc)))
+    #return mean(skipmissing(PopGen.skipinfnan(fst_perloc)))
 end
 
+
 # helper function to do the math for Hudson FST on a locus
-function _hudson_fst(pop1::T, pop2::T) where T<:GenoArray
-    p1_frq = allele_freq(pop1)
-    p2_frq = allele_freq(pop2)
+function _hudson_fst(pop1::T, pop2::T) where T<:PopGen.GenoArray
+    p1_frq = PopGen.allele_freq(pop1)
+    p2_frq = PopGen.allele_freq(pop2)
     # find the shared allele(s) and choose one of them to be "P"
     # this is a safeguard if one population is completely homozygous for an allele
     p_allele = intersect(keys(p1_frq), keys(p2_frq)) |> first
@@ -77,7 +97,7 @@ function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
 end
 
 function _pairwise_Nei(data::PopData)
-    idx_pdata = groupby(data.genodata, :population)
+    idx_pdata = groupby(data.loci, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci
@@ -192,7 +212,7 @@ end
 
 
 function _pairwise_WeirCockerham(data::PopData)
-    idx_pdata = groupby(data.genodata, :population)
+    idx_pdata = groupby(data.loci, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci

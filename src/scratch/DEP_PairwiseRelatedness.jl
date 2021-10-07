@@ -430,7 +430,7 @@ Available methods:
 
 function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::Bool = true, verbose::Bool = true)
     # check that dataset is entirely diploid
-    all(data.metadata.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+    all(data.metadata.sampleinfo.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
     allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
                             Tuple(allele_freq.(locus.(Ref(data), loci(data))))
