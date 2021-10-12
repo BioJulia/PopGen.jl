@@ -110,7 +110,7 @@ julia> pairwise_identical(cats, interesting_cats)
   10 │ N218      N219           0.33      9 
 ```
 """
-function pairwise_identical(data::PopData, sample_names::Vector{String})
+function pairwise_identical(data::PopData, sample_names::Vector{T}) where T<:AbstractString
     errs = ""
     all_samples = samples(data)
     if sample_names != all_samples
