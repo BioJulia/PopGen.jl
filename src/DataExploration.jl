@@ -117,8 +117,8 @@ function pairwise_identical(data::PopData, sample_names::Vector{T}) where T<:Abs
         [errs *= "\n  $i" for i in sample_names if i ∉ all_samples]
         errs != "" && error("Samples not found in the PopData: " * errs)
     end
-    sample_pairs = pairwise_pairs(sample_names)
-    n = length(sample_names) * (length(sample_names) - 1) ÷ 2
+    sample_pairs = collect(pairwise_pairs(sample_names))
+    n = length(sample_pairs)
     perc_ident_vec = Vector{Float64}(undef, n)
     n_vec = Vector{Int}(undef, n)
     popdata_idx = groupby(data.genodata, :name)
