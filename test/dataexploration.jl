@@ -19,7 +19,7 @@ cats = @nancycats;
         pw_i = pairwise_identical(cats)
         @test typeof(pw_i) == DataFrame
         @test size(pw_i) == (27966, 4)
-        pw_i_2 = pairwise_identical(cats, samples(cats)[1:10])
+        pw_i_2 = pairwise_identical(cats, cats.sampleinfo.name[1:10])
         @test typeof(pw_i_2) == DataFrame
         @test size(pw_i_2) == (45, 4)
     end
