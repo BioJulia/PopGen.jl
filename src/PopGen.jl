@@ -5,7 +5,7 @@ Documentation: https://pdimens.github.io/PopGen.jl/
 \nA few things things you can do to get started:
 
 ## Load in data
-- `read_from(filename; kwargs...)`
+- `PopGen.read(filename; kwargs...)`
 - `genepop(infile; kwargs...)`  or similar file-specific importer
 - use available `@gulfsharks` or `@nancycats` datasets
 
