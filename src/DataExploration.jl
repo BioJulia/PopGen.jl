@@ -118,11 +118,10 @@ function pairwise_identical(data::PopData, sample_names::Vector{T}) where T<:Abs
         errs != "" && error("Samples not found in the PopData: " * errs)
     end
     sample_pairs = pairwise_pairs(sample_names)
-    n = length(sample_pairs)
+    n = length(sample_names) * (length(sample_names) - 1) ÷ 2
     perc_ident_vec = Vector{Float64}(undef, n)
     n_vec = Vector{Int}(undef, n)
     popdata_idx = groupby(data.genodata, :name)
-    idx = 0
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
     @inbounds @sync for i in 1:length(sample_pairs)
         Base.Threads.@spawn begin

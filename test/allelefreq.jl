@@ -14,7 +14,7 @@ sharks = @gulfsharks;
         @test eltype(PopGen.allele_freq(cats)) == Dict{Int16,Float64}
         @test typeof(PopGen.allele_freq(cats.genodata.genotype)) == Dict{Int16,Float64}
         df_cats = DataFrames.combine(
-            groupby(cats.loci, :population),
+            groupby(cats.genodata, :population),
             :genotype => PopGen.allele_freq => :genos
         )
         @test size(df_cats) == (17,2)
@@ -26,7 +26,7 @@ sharks = @gulfsharks;
         @test eltype(PopGen.allele_freq(sharks)) == Dict{Int8,Float64}
         @test typeof(PopGen.allele_freq(sharks.genodata.genotype)) == Dict{Int8,Float64}
         df_sharks = DataFrames.combine(
-            groupby(sharks.loci, :population),
+            groupby(sharks.genodata, :population),
             :genotype => PopGen.allele_freq => :genos
         )
         @test size(df_sharks) == (7,2)
