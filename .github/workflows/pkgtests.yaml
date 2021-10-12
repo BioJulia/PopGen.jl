@@ -1,4 +1,4 @@
-name: CI_dev
+name: pkgtests
 on:
   pull_request:
     branches: [dev]
