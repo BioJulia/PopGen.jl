@@ -8,14 +8,14 @@ cats = @nancycats;
 
 @testset "Data Exploration" begin
 
-    @testset "missing()" begin
+    @testset "missing data" begin
         @test typeof(missing_data(cats)) == DataFrame
         @test typeof(missing_data(cats, by = "population")) == DataFrame
         @test typeof(missing_data(cats, by = "locus")) == DataFrame
         @test typeof(missing_data(cats, by = "full")) == DataFrame
     end
 
-    @testset "pairwise_identical" begin
+    @testset "pairwise identical" begin
         pw_i = pairwise_identical(cats)
         @test typeof(pw_i) == DataFrame
         @test size(pw_i) == (27966, 4)

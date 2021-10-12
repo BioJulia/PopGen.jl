@@ -35,7 +35,7 @@ function pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
     cats = @nancycats
     cat1=get_genotype(cats, sample = "N100", locus = "fca23")
     cat2=get_genotype(cats, sample = "N111", locus = "fca23")
-    allele = allele_freq(cats.loci.fca23)
+    allele = allele_freq(cats.genodata.fca23)
     pr_l_s(cat1, cat2, allele)
     =#
     #=
