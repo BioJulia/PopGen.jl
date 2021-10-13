@@ -41,8 +41,15 @@ using PopGenCore
     export isbiallelic, ishom, ishet
     export delimited, csv, genepop, vcf, bcf, @nancycats, @gulfsharks
     export ishom, ishet
+    export copy, size, sort, drop_monomorphic, drop_monomorphic!
+    export drop_multiallelic, drop_multiallelic!
+    export loci, samples, add_meta!, locations, locations!
+    export loci_dataframe, loci_matrix
+    export genotypes, get_genotypes, get_genotype
+    export populations, population, populations!, population!
+    export exclude, remove, omit, exclude!, remove!, omit!, keep, keep!, filter, filter!
 end
-
+@reexport import PopGenCore: read, write
 
 using Distributions, DataFrames, PooledArrays
 using ProgressMeter
