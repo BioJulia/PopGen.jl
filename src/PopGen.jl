@@ -37,7 +37,7 @@ module PopGen
 using Reexport
 using PopGenCore
 @reexport module PopGenCore
-    export PopData, PopDataInfo, GenoArray, Genotype, SNP, Msat
+    export PopData, PopDataInfo, GenoArray, Genotype, SNP, Msat, genodata, sampleinfo, locusinfo
     export isbiallelic, ishom, ishet
     export delimited, csv, genepop, vcf, bcf, @nancycats, @gulfsharks
     export ishom, ishet
