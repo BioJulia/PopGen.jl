@@ -25,13 +25,9 @@ population using the nancycats data, which has 17 populations, therefore the res
 cats = @nancycats;
 
 julia> sims = simulate(cats , n = 100)
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+PopData{Diploid, 9 Microsatellite loci}
   Samples: 1700
-  Loci: 9
   Populations: 17
-  Coordinates: absent
 ```
 
 Here is a look inside the `PopData` to verify everything looks as expected.

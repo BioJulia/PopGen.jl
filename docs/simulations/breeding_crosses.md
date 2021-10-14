@@ -31,14 +31,9 @@ The cross function performs a simple parental cross from individuals `parent1` a
 julia> cats = @nancycats;
 
 julia> f1 = cross(cats, "N111", "N107", n = 100000)
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+PopData{Diploid, 9 Microsatellite loci}
   Samples: 100000
-  Loci: 9
   Populations: 1
-  Longitude: absent
-  Latitude: absent
 ```
 Here is a look at the resulting `PopData`
 
@@ -59,21 +54,21 @@ There are two things that should jump out at you:
 ```
 julia> f1.sampleinfo
 100000×6 DataFrame
-│ Row    │ name                │ ploidy │ population │ latitude │ longitude │ parents          │
-│        │ String              │ Int64  │ String     │ Float32? │ Float32?  │ Tuple…           │
-├────────┼─────────────────────┼────────┼────────────┼──────────┼───────────┼──────────────────┤
-│ 1      │ F1_offspring_1      │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
-│ 2      │ F1_offspring_2      │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
-│ 3      │ F1_offspring_3      │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
-│ 4      │ F1_offspring_4      │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
-│ 5      │ F1_offspring_5      │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
+│ Row    │ name                │ ploidy │ population │ parents          │
+│        │ String              │ Int8   │ String     │ Tuple…           │
+├────────┼─────────────────────┼────────┼────────────┼──────────────────┤
+│ 1      │ F1_offspring_1      │ 2      │ F1         │ ("N111", "N107") │
+│ 2      │ F1_offspring_2      │ 2      │ F1         │ ("N111", "N107") │
+│ 3      │ F1_offspring_3      │ 2      │ F1         │ ("N111", "N107") │
+│ 4      │ F1_offspring_4      │ 2      │ F1         │ ("N111", "N107") │
+│ 5      │ F1_offspring_5      │ 2      │ F1         │ ("N111", "N107") │
 ⋮
-│ 99995  │ F1_offspring_99995  │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
-│ 99996  │ F1_offspring_99996  │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
-│ 99997  │ F1_offspring_99997  │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
-│ 99998  │ F1_offspring_99998  │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
-│ 99999  │ F1_offspring_99999  │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
-│ 100000 │ F1_offspring_100000 │ 2      │ F1         │ missing  │ missing   │ ("N111", "N107") │
+│ 99995  │ F1_offspring_99995  │ 2      │ F1         │ ("N111", "N107") │
+│ 99996  │ F1_offspring_99996  │ 2      │ F1         │ ("N111", "N107") │
+│ 99997  │ F1_offspring_99997  │ 2      │ F1         │ ("N111", "N107") │
+│ 99998  │ F1_offspring_99998  │ 2      │ F1         │ ("N111", "N107") │
+│ 99999  │ F1_offspring_99999  │ 2      │ F1         │ ("N111", "N107") │
+│ 100000 │ F1_offspring_100000 │ 2      │ F1         │ ("N111", "N107") │
 ```
 
 </TabItem>
@@ -112,14 +107,9 @@ This syntax uses the `Pair` notation of `PopData => "Parent"` to specify inputs.
 #### Example
 ```julia
 julia> f2_backcross = cross(cats => "N111", f1 => "F1_offspring_99", n = 100000, generation = "F2_manycats")
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+PopData{Diploid, 9 Microsatellite loci}
   Samples: 100000
-  Loci: 9
   Populations: 1
-  Longitude: absent
-  Latitude: absent
 ```
 
 And here you can see that `generation` was again prepended to each offspring `name`, along with assigned to the `population` for each.
@@ -127,21 +117,21 @@ And here you can see that `generation` was again prepended to each offspring `na
 ```
 julia> f2_backcross.sampleinfo
 100000×6 DataFrame
-│ Row    │ name                         │ ploidy │ population  │ latitude │ longitude │ parents                     │
-│        │ String                       │ Int64  │ String      │ Float32? │ Float32?  │ Tuple{String,String}        │
-├────────┼──────────────────────────────┼────────┼─────────────┼──────────┼───────────┼─────────────────────────────┤
-│ 1      │ F2_manycats_offspring_1      │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
-│ 2      │ F2_manycats_offspring_2      │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
-│ 3      │ F2_manycats_offspring_3      │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
-│ 4      │ F2_manycats_offspring_4      │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
-│ 5      │ F2_manycats_offspring_5      │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
+│ Row    │ name                         │ ploidy │ population  │ parents                     │
+│        │ String                       │ Int8   │ String      │ Tuple{String,String}        │
+├────────┼──────────────────────────────┼────────┼─────────────┼─────────────────────────────┤
+│ 1      │ F2_manycats_offspring_1      │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
+│ 2      │ F2_manycats_offspring_2      │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
+│ 3      │ F2_manycats_offspring_3      │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
+│ 4      │ F2_manycats_offspring_4      │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
+│ 5      │ F2_manycats_offspring_5      │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
 ⋮
-│ 99995  │ F2_manycats_offspring_99995  │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
-│ 99996  │ F2_manycats_offspring_99996  │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
-│ 99997  │ F2_manycats_offspring_99997  │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
-│ 99998  │ F2_manycats_offspring_99998  │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
-│ 99999  │ F2_manycats_offspring_99999  │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
-│ 100000 │ F2_manycats_offspring_100000 │ 2      │ F2_manycats │ missing  │ missing   │ ("N111", "F1_offspring_99") │
+│ 99995  │ F2_manycats_offspring_99995  │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
+│ 99996  │ F2_manycats_offspring_99996  │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
+│ 99997  │ F2_manycats_offspring_99997  │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
+│ 99998  │ F2_manycats_offspring_99998  │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
+│ 99999  │ F2_manycats_offspring_99999  │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
+│ 100000 │ F2_manycats_offspring_100000 │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
 ```
 
 :::caution

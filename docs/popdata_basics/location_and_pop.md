@@ -167,8 +167,8 @@ There are a handful of methods to alter `PopData` population names depending on 
   block={true}
   defaultValue="dict"
   values={[
-    { label: 'using a Dictionary', value: 'dict', },
-    { label: 'using a Vector of names', value: 'vec', },
+    { label: 'with a Dictionary', value: 'dict', },
+    { label: 'with a Vector of names', value: 'vec', },
 	{ label: 'reassign by sample', value: 'samp', },
   ]
 }>

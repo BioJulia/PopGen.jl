@@ -12,13 +12,6 @@ bcf(infile::String; rename_loci::Bool, silent::Bool, allow_monomorphic::Bool)
 ```
 PopGen.jl provides the commands `vcf` and `bcf` to import a variant call format files into `PopData`. The reader also accepts files that are gzipped. 
 
-:::note Lazy Loading
-The packages required to import BCF/VCF files (`GeneticVariation.jl` and `GZip.jl`) are lazy-loaded and not included as dependencies within PopGen.jl, so you will need to install them manually with (`]add GeneticVariation GZip`). If you have not-gzipped variant call files, then
-you'll need to call `using GeneticVariation` before `bcf` and `vcf` become available to use. If your files are compressed, then you'll need to call
-`using GZip` too.
-:::
-
-
 ### Arguments
 
 - `infile::String` : path to file, in quotes. **must end in `.gz` if gzipped**
@@ -82,4 +75,4 @@ but they **will not** provide:
 This means you will need to add that information separately afterwards. Location data (which is *optional*) can be added to the `PopData` with the `locations!` command. Population names (*mandatory*) can be added using `populations!()`
 
 ## Acknowledgements
-The majority of the BCF/VCF reader is thanks to the tremendous efforts of Ben J. Ward and the BioJulia contributors involved in [GeneticVariation.jl](https://github.com/BioJulia/GeneticVariation.jl), which we use to parse your files into `PopData` format. If you love the file importer, then give those folks your thanks. If something is wrong and/or you hate the importer, blame us first (and please [open up an issue](https://github.com/pdimens/PopGen.jl/issues) 😅).
+The majority of the BCF/VCF reader is thanks to the tremendous efforts of the contributors involved with [GeneticVariation.jl](https://github.com/BioJulia/GeneticVariation.jl), and its successor [VariantCallFormat.jl](https://github.com/rasmushenningsson/VariantCallFormat.jl) which we use to parse files into `PopData` format. If you love the file importer, then give those folks your thanks. If something is wrong and/or you hate the importer, blame us first (and please [open up an issue](https://github.com/biojulia/PopGenCore.jl/issues) 😅).

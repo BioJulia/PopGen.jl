@@ -21,8 +21,19 @@ If you believe one of these standards has been violated, you can either file an 
 Adopted from the [Julia Community Standards](https://julialang.org/community/standards/).
 :::
 
+## The PopGen.jl "ecosystem"
+The general approach to Julia is smaller packages that do specific things,
+with the goal of composability (interoperability) with other packages.
+Likewise, starting from version 0.7.0, `PopGen.jl` has been split into a
+series of packages. Unless explicitly stated, "`PopGen.jl`" broadly refers to these packages.
+#### The current roster
+- [PopGenCore.jl](https://www.github.com/biojulia/popgencore.jl): Core functionality for reading/writing files, PopData and other formats, PopData manipulation. Required by the other packages.
+- [PopGen.jl](https://www.github.com/biojulia/popgen.jl): The general toolset for population genetic analyses, like FST, relatedness, PCA, etc.
+- [PopGenSims.jl](https://www.github.com/pdimens/popgensims.jl): Sample and siblingship simulations.
+
 ## Contributing
 We absolutely welcome contributors to this package/project! See below for ways you can help PopGen.jl grow.
+
 
 ### Improving available code
 

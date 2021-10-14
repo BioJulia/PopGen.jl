@@ -4,7 +4,7 @@ title: Reading in data
 sidebar_label: Reading in data
 ---
 
-Currently, PopGen.jl provides a handful of file readers with which to create `PopData`. Each of the file types have their own file reader denoted simply by the file type:
+PopGen.jl (via PopGenCore.jl) provides a handful of file readers with which to create `PopData`. Each of the file types have their own file reader denoted simply by the file type:
 
 | File Format         | Extensions             | Docstring     |
 | :------------------ | :--------------------- | :------------ |
@@ -14,7 +14,7 @@ Currently, PopGen.jl provides a handful of file readers with which to create `Po
 | variant call format (vcf) | `.vcf`, `.vcf.gz`| `?vcf`  |
 | variant call format (bcf) | `.bcf`, `.bcf.gz`| `?bcf`  |
 
-You're encouraged to use functions, but PopGen.jl also provides you with an all-encompassing wrapper  called `read_from()`. This wrapper is also aliased with the more-explicit name `file_import()`. Feel free to use whichever you like best.
+You're encouraged to use these functions, but PopGen.jl also provides you with an all-encompassing wrapper  `PopGen.read()`. Given the ubiquity of the function name, it is not exported. If using PopGenCore.jl directly, you will need to call it with `PopGenCore.read`.
 
 :::caution Windows users
 Make sure to change the backslashes `\` in your file path to double-backslashes `\\` or forward slashes `/` 
@@ -26,16 +26,21 @@ behavior with the argument `allow_monomorphic = true`. Monomorphic loci are remo
 can give spurious/misleading results for some analyses, such as relatedness estimators.
 :::
 
-## `read_from()`
+## `PopGen.read()`
 
 ```julia
-read_from(infile::String; kwargs...)
-file_import(infile::String; kwargs...)
+PopGen.read(infile::String; kwargs...)
 ```
 
-where `infile` is a String of your filename (in quotes) and `kwargs` are the corresponding keyword arguments associated with your file type. The function `read_from()` uses all the same keyword arguments as do the commands specific to their file types, therefore you should have a look at those commands (usually the defaults suffice).
+where `infile` is a String of your filename (in quotes) and `kwargs` are the corresponding keyword arguments associated with your file type. The function `PopGen.read()` uses all the same keyword arguments as do the commands specific to their file types, therefore you should have a look at those commands (usually the defaults suffice).
 
-`read_from()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below (case insensitive). If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.gen.final.v2.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and ignore file extensions. Ultimately, what crazy extensions you give your files is your business, and we love that about you.
+`PopGen.read()` infers the file type from the file extension, so for it to work properly your file must end with the extensions permitted below (case insensitive). If you're feeling particularly rebellious and your file does not conform to these extensions (such as a genepop file with a `.gen.final.v2.seriously` extension), then feel free to use the specific file importers, since they use the same exact syntax, there is zero difference in performance, and ignore file extensions. Ultimately, what crazy extensions you give your files is your business, and we love that about you.
+
+** Examples **
+```julia
+salmon = PopGen.read("o_mykiss.gen", digits = 3, popsep = "SALMON")
+ginko = PopGen.read("g_biloba.txt", delim = ",", digits = 2, silent = true)
+```
 
 ## Supported File Types
 

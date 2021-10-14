@@ -4,7 +4,15 @@ title: Conditionals and Logic
 sidebar_label: Conditionals
 ---
 
-Included in PopGen.jl are some functions to help discriminate your data a bit more. Like all conditionals, these return `true` or `false` depending on the test. 
+Included in PopGen.jl are some functions to help discriminate your data a bit more. Like all⋆ conditionals, these return `true` or `false` depending on the test.
+
+:::note Missing values
+By Julia's design, conditionals on `missing` values return `missing`. For
+indexing and subsetting reasons, `ishom` and `ishet` return `false` on
+missing values, however unexported methods `_ishom` and `_ishet` return
+`missing` as per the standard design. These unexported methods are critical
+for calculations where `missing` values should absolutely not be treated as `false`.
+:::
 
 ## Homozygosity
 ```julia
@@ -36,17 +44,16 @@ false
 
 julia> ishom(subset)
 10-element Vector{Union{Missing, Bool}}:
-      missing
-      missing
  false
  false
  false
  false
-  true
  false
  false
   true
-
+ false
+ false
+  true
 ```
 :::note using skipmissing
 If you want to avoid `missing` genotypes, you can use `skipmissing` to ignore them. This also works for `ishet`.
@@ -86,8 +93,8 @@ false
 
 julia> ishom(subset, 135)
 10-element Vector{Union{Missing, Bool}}:
-      missing
-      missing
+ false
+ false
  false
  false
  false
@@ -127,8 +134,8 @@ true
 
 julia> ishet(subset)
 10-element Vector{Union{Missing, Bool}}:
-      missing
-      missing
+  false
+  false
   true
   true
   true
@@ -162,8 +169,8 @@ true
 
 julia> ishom(subset, 135)
 10-element Vector{Union{Missing, Bool}}:
-      missing
-      missing
+  false
+  false
   true
   true
   true
