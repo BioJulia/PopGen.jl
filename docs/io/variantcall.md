@@ -41,12 +41,12 @@ potato = vcf("/home/data/russet_potatoes.vcf.gz", allow_monomorphic = true)
 ```
 
 ### Mixed-Ploidy data
-In the event your variant call file is for mixed-ploidy data (where ploidy is not the same across all samples, e.g. PoolSeq), you will need to perform an additional step after reading in your data as `PopData` to convert the `.loci.genotype` column into a `GenoArray`:
+In the event your variant call file is for mixed-ploidy data (where ploidy is not the same across all samples, e.g. PoolSeq), you will need to perform an additional step after reading in your data as `PopData` to convert the `.genodata.genotype` column into a `GenoArray`:
 
 ```julia
 julia> mydata = bcf("path/to/file.bcf", silent = true, rename_loci = true) ;
 
-julia> mydata.loci.genotype =  mydata.loci.genotype |> Array{Union{Missing, NTuple}}
+julia> mydata.genodata.genotype =  mydata.genodata.genotype |> Array{Union{Missing, NTuple}}
 ```
 
 ### Format

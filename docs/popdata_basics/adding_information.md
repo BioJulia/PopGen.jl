@@ -16,7 +16,7 @@ PopData's standard/default format includes information on:
 But, sometimes you might want to add more information to the data structure. That's where the convenience function `add_meta!` comes in.
 
 ## `add_meta!`
-This function has two methods, one for when the additional information you're adding is in the order with which your samples appear in `PopData.meta`, and another for when they don't. 
+This function has two methods, one for when the additional information you're adding is in the order with which your samples appear in `PopData.sampleinfo`, and another for when they don't. 
 
 <Tabs
   block={true}
@@ -32,15 +32,15 @@ This function has two methods, one for when the additional information you're ad
 add_meta!(data::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
 ```
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Metadata 
-must be in the same order as the samples in `PopData.meta`.
+must be in the same order as the samples in `PopData.sampleinfo`.
 
 #### Arguments
 - `data` : The `PopData` object to add information to
-- `metadata::Vector{Any}` : the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+- `metadata::Vector{Any}` : the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.sampleinfo`
 
 #### Keyword Arguments
 - `name::String` : the name of this new column
-- `loci::Bool` : whether to also add this information to `PopData.loci` (default: `true`)
+- `loci::Bool` : whether to also add this information to `PopData.genodata` (default: `true`)
 - `categorical::Bool` : whether the metadata being added is categorical aka "factors" (default: `true`)
 
 </TabItem>
@@ -51,16 +51,16 @@ add_meta!(data::PopData, samples::Vector{String}, metadata::T; name::String, loc
 ```
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. 
 Takes a vector of sample names if the metadata is not in the same order as samples appear 
-in `PopData.meta`.
+in `PopData.sampleinfo`.
 
 #### Arguments
 - `data` : The `PopData` object to add information to
 - `sample::`Vector{String}` : sample names corresponding to the order of the provided `metadata` 
-- `metadata::Vector{Any}` : the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+- `metadata::Vector{Any}` : the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.sampleinfo`
 
 #### Keyword Arguments
 - `name::String` : the name of this new column
-- `loci::Bool` : whether to also add this information to `PopData.loci` (default: `true`)
+- `loci::Bool` : whether to also add this information to `PopData.genodata` (default: `true`)
 - `categorical::Bool` : whether the metadata being added is categorical aka "factors" (default: `true`)
 
 </TabItem>

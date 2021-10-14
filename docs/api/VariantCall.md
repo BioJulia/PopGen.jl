@@ -38,7 +38,7 @@ If importing mixed-ploidy data (such as poolseq), you will need to perform an ad
 step to convert the genotype column into the correct `GenoArray` type:
 ```julia
 julia> mydata = bcf("path/to/file.bcf", silent = true, rename_loci = true) ;
-julia> mydata.loci.genotype =  mydata.loci.genotype |> Array{Union{Missing, NTuple}}
+julia> mydata.genodata.genotype =  mydata.genodata.genotype |> Array{Union{Missing, NTuple}}
 ```
 ----
 
@@ -62,5 +62,5 @@ If importing mixed-ploidy data (such as poolseq), you will need to perform an ad
 step to convert the genotype column into the correct `GenoArray` type:
 ```julia
 julia> mydata = vcf("path/to/file.vcf", silent = true, rename_loci = true) ;
-julia> mydata.loci.genotype =  mydata.loci.genotype |> Array{Union{Missing, NTuple}}
+julia> mydata.genodata.genotype =  mydata.genodata.genotype |> Array{Union{Missing, NTuple}}
 ```

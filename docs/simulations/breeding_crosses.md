@@ -57,7 +57,7 @@ There are two things that should jump out at you:
 2. There is a never-before-seen `parents` column. This column exists for better record keeping of who has what parents if you are performing multiple crosses.
 
 ```
-julia> f1.meta
+julia> f1.sampleinfo
 100000×6 DataFrame
 │ Row    │ name                │ ploidy │ population │ latitude │ longitude │ parents          │
 │        │ String              │ Int64  │ String     │ Float32? │ Float32?  │ Tuple…           │
@@ -80,7 +80,7 @@ julia> f1.meta
 <TabItem value="loci">
 
 ```
-julia> f1.loci
+julia> f1.genodata
 900000×4 DataFrame
 │ Row    │ name                │ population │ locus  │ genotype   │
 │        │ String              │ String     │ String │ Tuple…?    │
@@ -125,7 +125,7 @@ PopData Object
 And here you can see that `generation` was again prepended to each offspring `name`, along with assigned to the `population` for each.
 
 ```
-julia> f2_backcross.meta
+julia> f2_backcross.sampleinfo
 100000×6 DataFrame
 │ Row    │ name                         │ ploidy │ population  │ latitude │ longitude │ parents                     │
 │        │ String                       │ Int64  │ String      │ Float32? │ Float32?  │ Tuple{String,String}        │

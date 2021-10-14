@@ -19,52 +19,68 @@ Let's keep things simple by loading in the nancycats data and calling it `ncats`
 
 ``` julia
 julia> ncats = @nancycats
-PopData Object
-  Marker type: Microsatellite
-  Ploidy: 2
-  Number of individuals: 237
-  Number of loci: 9
+PopData{Diploid, 9 Microsatellite loci}
+  Samples: 237
   Populations: 17
-  Longitude: absent
-  Latitude: absent
 ```
 
-Now that we have nancycats loaded in, we can use standard Julia accessor conventions to view the elements within our PopData. The DataFrames uses the convention `PopData.meta.colname` to directly access the columns we want.
+Now that we have nancycats loaded in, we can use standard Julia accessor conventions to view the elements within our PopData. The DataFrames uses the convention `PopData.sampleinfo.colname` to directly access the columns we want.
 
-## The metadata table
+## The metadata (data about the data)
+Some critical information about the data is front-loaded into a PopData object to eliminate constantly getting these values in calculations.
+To view this information, use `popdata.metadata` or `popdata.info`. Each
+of these fields can be directly accessed to retrieve those values (e.g. `popdata.metadata.samples`, `popdata.metadata.loci`, etc.)
+```
+julia> ncats.metadata
+ ploidy:        2
+ # loci:        9
+ # samples:     237
+ # populations: 17
+ biallelic:     false
+ ```
 
-### .meta
+Included in `metadata` are two DataFrames, one for sample information, and another for locus information.
+<Tabs
+  block={true}
+  defaultValue="s"
+  values={[
+    { label: 'sample information', value: 's', },
+    { label: 'locus information', value: 'l', },
+  ]
+}>
+<TabItem value="s">
 
-To view the entire `meta` table.
+### .sampleinfo
+
+To view the sample information, you can use `popdata.metadata.sampleinfo`, or the shortcut `PopData.sampleinfo`
 
 ```julia
-julia> ncats.meta
-237×5 DataFrame
- Row │ name    population  ploidy  longitude  latitude
-     │ String  String      Int8    Float32?   Float32?
-─────┼─────────────────────────────────────────────────
-   1 │ N215    1                2   missing   missing
-   2 │ N216    1                2   missing   missing
-   3 │ N217    1                2   missing   missing
-   4 │ N218    1                2   missing   missing
-   5 │ N219    1                2   missing   missing
-   6 │ N220    1                2   missing   missing
-  ⋮  │   ⋮         ⋮         ⋮         ⋮         ⋮
- 232 │ N295    17               2   missing   missing
- 233 │ N296    17               2   missing   missing
- 234 │ N297    17               2   missing   missing
- 235 │ N281    17               2   missing   missing
- 236 │ N289    17               2   missing   missing
- 237 │ N290    17               2   missing   missing
-                                       225 rows omitted
+julia> ncats.sampleinfo
+237×3 DataFrame
+ Row │ name      population  ploidy 
+     │ String7…  String      Int8   
+─────┼──────────────────────────────
+   1 │ N217      1                2
+   2 │ N218      1                2
+   3 │ N219      1                2
+   4 │ N220      1                2
+   5 │ N221      1                2
+   6 │ N222      1                2
+  ⋮  │    ⋮          ⋮         ⋮
+ 232 │ N197      14               2
+ 233 │ N198      14               2
+ 234 │ N199      14               2
+ 235 │ N200      14               2
+ 236 │ N201      14               2
+ 237 │ N206      14               2
+                    222 rows omitted
+
 ```
 
-### .name
-
-This will access the names of the samples.
+Using the standard DataFrames `getindex` methods, we can access these columns like so:
 
 ``` julia
-julia> ncats.meta.name
+julia> ncats.sampleinfo.name
 237-element Array{String,1}:
  "N1"  
  "N2"  
@@ -85,152 +101,43 @@ julia> ncats.meta.name
  "N237"
 ```
 
-### .population
+</TabItem>
+<TabItem value="l">
 
-This will access the names of the populations associated with each sample, in the same order as the  samples.
+### .locusinfo
 
-``` julia
-julia> ncats.meta.population
-237-element Array{String,1}:
- "1" 
- "1" 
- "1" 
- "1" 
- "1" 
- "1" 
- "1" 
- "1" 
- ⋮   
- "17"
- "17"
- "17"
- "17"
- "17"
- "17"
- "17"
- "17"
-```
-
-These ID's aren't super informative. Later, we'll change them using the `populations!` command.
-
-### .ploidy
-
-This shows you the ploidy of the data per individual
-
-``` julia
-julia> ncats.meta.ploidy
-237-element Array{Int8,1}:
- 2
- 2
- 2
- 2
- 2
- 2
- 2
- 2
- ⋮
- 2
- 2
- 2
- 2
- 2
- 2
- 2
- 2
-```
-
-### .latitude
-
-This accesses the latitude information of the PopObj. If there is none, like in the nancycats data, it returns a vector of `missing`.
+To view the locus information, you can use `popdata.metadata.locusinfo`, of the shortcut `popdata.locusinfo`. Locus information is not mandatory,
+but present if needed for future analyses.
 
 ```julia
-julia> ncats.meta.latitude
-237-element Array{Union{Missing, Float32},1}:
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- ⋮      
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
+julia> ncats.locusinfo
+9×4 DataFrame
+ Row │ chromosome  locus   cm       bp   
+     │ Int8        String  Float64  Int64 
+─────┼───────────────────────────────────
+   1 │          0  fca8       0       0
+   2 │          0  fca23      0       0
+   3 │          0  fca43      0       0
+   4 │          0  fca45      0       0
+   5 │          0  fca77      0       0
+   6 │          0  fca78      0       0
+   7 │          0  fca90      0       0
+   8 │          0  fca96      0       0
+   9 │          0  fca37      0       0
 ```
 
-### .longitude
-
-This accesses the longitude information of the PopObj. Like before, if there is none, like in the nancycats data, it returns an array of `missing`.
-
-
-```julia
-julia> ncats.meta.longitude
-237-element Array{Union{Missing, Float32},1}:
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- ⋮      
- missing
- missing
- missing
- missing
- missing
- missing
- missing
- missing
-```
-
-
-
-:::note actually seeing some location info 
-The nancycats data has some weird coordinate system for information, so those data were omitted. If you want a proof of concept for `.longitude` and `.latitude`, load in `gulfsharks` and try it out. We'll use `DataFrames.select` to isolate just the information we want. Later, you'll see that the `locations` command does this.
-``` julia
-julia> sharks = @gulfsharks ;    # semicolon just supresses printing output
-
-julia> select(sharks.meta, :name, :longitude, :latitude)
-212×3 DataFrame
- Row │ name     longitude  latitude
-     │ String   Float64    Float64
-─────┼──────────────────────────────
-   1 │ cc_001     28.3062  -80.5993
-   2 │ cc_002     28.3079  -80.5995
-   3 │ cc_003     28.3023  -80.5996
-   4 │ cc_005     28.6123  -80.4225
-   5 │ cc_007     27.8666  -80.3578
-   6 │ cc_008     27.8666  -80.3579
-  ⋮  │    ⋮         ⋮         ⋮
- 207 │ seg_026    30.0696  -86.5376
- 208 │ seg_027    29.9065  -86.0905
- 209 │ seg_028    30.0532  -87.3661
- 210 │ seg_029    30.0522  -87.3662
- 211 │ seg_030    29.8234  -85.7143
- 212 │ seg_031    29.8234  -85.7143
-                    200 rows omitted
-```
-:::
-
+</TabItem>
+</Tabs>
 --------------------
 
 ## The genotype table
 
-### .loci
+### .genodata
 
-This will show you the entire `loci` table.
+This will show you the entire `genodata` table.
 
 ```julia
-julia> ncats.loci
+julia> ncats.genodata
 2133×4 DataFrame
   Row │ name    population  locus   genotype
       │ String  String      String  Tuple…?
@@ -251,130 +158,8 @@ julia> ncats.loci
                               2121 rows omitted
 ```
 
-### locus names
+Because the genotype data is in "tidy" format, accessing genotypes in a meaningful way is fairly straightforward if you have any experience
+with dataframe manipulation. For a deeper look into indexing `PopData`,
+read [Advanced PopData Indexing](indexing) 
 
-This will access the names of the loci as they appear in the data. We need to use  `unique()` from Base to pull out the unique loci. 
-
-```julia
-julia> unique(ncats.loci.locus)
-9-element Array{String,1}:
- "fca8" 
- "fca23"
- "fca43"
- "fca45"
- "fca77"
- "fca78"
- "fca90"
- "fca96"
- "fca37"
-```
-
-### locus population
-
-This will access the population of the individual for a genotype of a locus. We need to use `unique()` from Base to pull out the unique populations. 
-
-```julia
-julia> unique(ncats.loci.locus)
-17-element Array{String,1}:
- "1" 
- "2"
- "3"
- "4"
- "5"
- ⋮
- "14"
- "15"
- "16"
- "17"
-```
-
-### view genotypes
-
-Because the genotype data is in "tidy" format, accessing genotypes in a meaningful way is not immediately obvious. We can of course follow the same convention of `data.loci.genotype` as we have above, but a list of all the genotypes across all individuals, loci, and populations isn't terribly useful. Instead, we can use the DataFrames or DataFramesMeta interfaces to retrieve this information. Here are examples using `@where` from DataFramesMeta:
-<Tabs
-  block={true}
-  defaultValue="s"
-  values={[
-    { label: 'single locus', value: 's', },
-    { label: 'multiple loci', value: 'm', },
-    { label: 'population', value: 'p', },
-  ]
-}>
-<TabItem value="s">
-
-```julia
-julia> @where(ncats.loci, :locus .== "fca8")
-237×4 DataFrame
- Row │ name    population  locus   genotype
-     │ String  String      String  Tuple…?
-─────┼────────────────────────────────────────
-   1 │ N215    1           fca8    missing
-   2 │ N216    1           fca8    missing
-   3 │ N217    1           fca8    (135, 143)
-   4 │ N218    1           fca8    (133, 135)
-   5 │ N219    1           fca8    (133, 135)
-   6 │ N220    1           fca8    (135, 143)
-  ⋮  │   ⋮         ⋮         ⋮         ⋮
- 232 │ N295    17          fca8    (133, 141)
- 233 │ N296    17          fca8    (133, 141)
- 234 │ N297    17          fca8    (133, 143)
- 235 │ N281    17          fca8    (135, 141)
- 236 │ N289    17          fca8    (137, 143)
- 237 │ N290    17          fca8    (135, 141)
-                              225 rows omitted
-```
-
-</TabItem>
-<TabItem value="m">
-
-```julia
-julia> @where(ncats.loci, :locus .∈ Ref(["fca8", "fca23"]))
-474×4 DataFrame
- Row │ name    population  locus   genotype
-     │ String  String      String  Tuple…?
-─────┼────────────────────────────────────────
-   1 │ N215    1           fca8    missing
-   2 │ N216    1           fca8    missing
-   3 │ N217    1           fca8    (135, 143)
-   4 │ N218    1           fca8    (133, 135)
-   5 │ N219    1           fca8    (133, 135)
-   6 │ N220    1           fca8    (135, 143)
-  ⋮  │   ⋮         ⋮         ⋮         ⋮
- 469 │ N295    17          fca23   (130, 136)
- 470 │ N296    17          fca23   (136, 146)
- 471 │ N297    17          fca23   (130, 130)
- 472 │ N281    17          fca23   (136, 144)
- 473 │ N289    17          fca23   (130, 136)
- 474 │ N290    17          fca23   (130, 146)
-                              462 rows omitted
-```
-
-</TabItem>
-<TabItem value="p">
-
-```julia
-julia> @where(ncats.loci, :population .== "9")
-81×4 DataFrame
- Row │ name    population  locus   genotype
-     │ String  String      String  Tuple…?
-─────┼────────────────────────────────────────
-   1 │ N104    9           fca8    (121, 135)
-   2 │ N105    9           fca8    (137, 137)
-   3 │ N106    9           fca8    (135, 135)
-   4 │ N107    9           fca8    (121, 135)
-   5 │ N108    9           fca8    (135, 135)
-   6 │ N109    9           fca8    (137, 137)
-  ⋮  │   ⋮         ⋮         ⋮         ⋮
-  76 │ N107    9           fca37   (182, 208)
-  77 │ N108    9           fca37   (208, 208)
-  78 │ N109    9           fca37   (182, 208)
-  79 │ N111    9           fca37   (208, 214)
-  80 │ N112    9           fca37   (182, 206)
-  81 │ N113    9           fca37   (208, 214)
-                               69 rows omitted
-```
-
-</TabItem>
-</Tabs>
-
-Now that you're somewhat familiar with the parts of `PopData`, [have a look at the commands](view_data.md) to view and manipulate `PopData` objects.
+Now that you're somewhat familiar with the parts of `PopData`, have a look at [the commands](view_data.md) to view and manipulate `PopData` objects.

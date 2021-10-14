@@ -101,7 +101,7 @@ This method tolerates `missing` values, but you will need to `replace!` instance
 populations(data::PopData; counts::Bool = false)
 ```
 
-Just as you can view population names with `PopData.meta.population`, you can also view them with the `populations` command.  
+Just as you can view population names with `PopData.sampleinfo.population`, you can also view them with the `populations` command.  
 
 <Tabs
   block={true}
@@ -210,7 +210,7 @@ julia> populations!(sharks, new_popnames)
 populations!(data::PopData, rename::Vector{String})
 ```
 
-`Vector` of new unique population names in the order that they appear in the `PopData.meta`.
+`Vector` of new unique population names in the order that they appear in the `PopData.sampleinfo`.
 
 ```julia
 julia> new_popnames = ["Atlantic", "Atlantic", "Atlantic", "Gulf", "Gulf", "Gulf", "Gulf"] ;

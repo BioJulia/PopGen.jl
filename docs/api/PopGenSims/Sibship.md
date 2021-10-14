@@ -82,7 +82,7 @@ PopData Object
   Longitude: absent
   Latitude: absent
 
-julia> fullsib_sims.meta_df100×5 DataFrame
+julia> fullsib_sims.sampleinfo_df100×5 DataFrame
 │ Row │ name          │ population │ ploidy │ longitude │ latitude │
 │     │ String        │ String     │ Int64  │ Float32?  │ Float32? │
 ├─────┼───────────────┼────────────┼────────┼───────────┼──────────┤

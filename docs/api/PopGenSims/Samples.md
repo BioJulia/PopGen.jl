@@ -21,7 +21,7 @@ PopData Object
   Populations: 17
   Coordinates: absent
 
-julia> sims.meta
+julia> sims.sampleinfo
   1700×5 DataFrame
   │ Row  │ name     │ population │ ploidy │ longitude │ latitude │
   │      │ String   │ String     │ Int64  │ Missing   │ Missing  │
@@ -37,7 +37,7 @@ julia> sims.meta
   │ 1699 │ sim_1699 │ 17         │ 2      │ missing   │ missing  │
   │ 1700 │ sim_1700 │ 17         │ 2      │ missing   │ missing  │  
   
-julia> sims.loci
+julia> sims.genodata
   15300×4 DataFrame
   │ Row   │ name     │ population │ locus  │ genotype   │
   │       │ String   │ String     │ String │ Tuple…?    │

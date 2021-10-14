@@ -94,13 +94,13 @@ Edit a `PopData` object in place, removing loci that are not biallelic.
 ```julia
 generate_meta(data::DataFrame)
 ```
-Given a genotype DataFrame formatted like `PopData.loci`, generates a corresponding
-`meta` DataFrame. In other words, it creates the `.meta` part of `PopData` from the `.loci` part.
+Given a genotype DataFrame formatted like `PopData.genodata`, generates a corresponding
+`meta` DataFrame. In other words, it creates the `.sampleinfo` part of `PopData` from the `.genodata` part.
 
 **Example**:
 ```
 julia> cats = @nancycats ;
-julia> cats_nometa = cats.loci ;
+julia> cats_nometa = cats.genodata ;
 julia> cats_meta = generate_meta(cats_nometa)
 237×5 DataFrame
  Row │ name    population  ploidy  longitude  latitude 

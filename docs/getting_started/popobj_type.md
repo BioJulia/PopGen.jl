@@ -29,7 +29,7 @@ While it may seem simple enough to create two DataFrames and make a `PopData` ou
 
 ## Metadata
 
-The `meta` table has 5 specific categories/columns: name, population, ploidy, longitude, latitude. These can be directly accessed with `PopData.meta.colname` where `PopData` is the name of your PopData object, and `colname` is one of the five column names below.
+The `meta` table has 5 specific categories/columns: name, population, ploidy, longitude, latitude. These can be directly accessed with `PopData.sampleinfo.colname` where `PopData` is the name of your PopData object, and `colname` is one of the five column names below.
 
 ### name
 
@@ -89,7 +89,7 @@ Location data is optional for `PopData`. There are functions that use location i
 
 ## Genotype Information
 
-The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions. It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are each a special type of compressed vector from [PooledArrays.jl](https://github.com/JuliaData/PooledArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.loci` can be directly accessed with `PopData.loci.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below. For clarity, the columns will be represented below as though they are regular vectors.
+The genotype information is stored in a separate table called `loci`. This table is rather special in that it is stored in "tidy" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions. It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are each a special type of compressed vector from [PooledArrays.jl](https://github.com/JuliaData/PooledArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.genodata` can be directly accessed with `PopData.genodata.colname` where `PopData` is the name of your PopData object, and `colname` is one of the four column names below. For clarity, the columns will be represented below as though they are regular vectors.
 
 ### name
 

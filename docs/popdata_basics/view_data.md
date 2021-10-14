@@ -124,7 +124,7 @@ This can be done fairly easily using DataFramesMeta macro `@where`
 <TabItem value="s">
 
 ```julia
-julia> @where(sharks.loci, :name .== "cc_001")
+julia> @where(sharks.genodata, :name .== "cc_001")
 2209×4 DataFrame
   Row │ name    population      locus         genotype
       │ String  String          String        Tuple…?
@@ -148,7 +148,7 @@ julia> @where(sharks.loci, :name .== "cc_001")
 <TabItem value="m">
 
 ```julia
-julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]))
+julia> @where(sharks.genodata, :name .∈ Ref(["cc_001", "cc_002"]))
 4418×4 DataFrame
   Row │ name    population      locus         genotype
       │ String  String          String        Tuple…?
@@ -174,7 +174,7 @@ julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]))
 It also means that you can combine different queries with commas. Here is an example of an approach combining a name and locus criteria:
 
 ```julia
-julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]), :locus .== "contig_2784")
+julia> @where(sharks.genodata, :name .∈ Ref(["cc_001", "cc_002"]), :locus .== "contig_2784")
 2×4 DataFrame
 │ Row │ name   │ population     │ locus       │ genotype │
 │     │ Str…   │ String         │ String      │ Tuple…?  │
@@ -189,7 +189,7 @@ julia> @where(sharks.loci, :name .∈ Ref(["cc_001", "cc_002"]), :locus .== "con
 Here's an advanced example for writing a query that only returns heterozygous genotypes for locus `contig_1784`
 
 ```julia
-julia> @where(sharks.loci, ishet.(:genotype) .== true, :locus .== "contig_2784")
+julia> @where(sharks.genodata, ishet.(:genotype) .== true, :locus .== "contig_2784")
 6×4 DataFrame
  Row │ name     population      locus        genotype
      │ String   String          String       Tuple…?

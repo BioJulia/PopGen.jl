@@ -24,7 +24,8 @@ module.exports = {
       "popdata_basics/conditionals",
       "popdata_basics/populations",
       "popdata_basics/viewdata",
-      "popdata_basics/dataexploration"
+      "popdata_basics/dataexploration",
+      "popdata_basics/indexing"
     ],
     "Analyses":[
       "analyses/hardyweinberg",

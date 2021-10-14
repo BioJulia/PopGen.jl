@@ -10,15 +10,15 @@ sidebar_label: Manipulate.jl
 add_meta!(popdata::PopData, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
 ```
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Metadata 
-must be in the same order as the samples in `PopData.meta`.
+must be in the same order as the samples in `PopData.sampleinfo`.
 
 #### Arguments
 - `popdata` : The `PopData` object to add information to
-- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.sampleinfo`
 
 #### Keyword Arguments
 - `name` : String of the name of this new column
-- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `loci` : Boolean of whether to also add this information to `PopData.genodata` (default: `true`)
 - `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
 
 ----
@@ -28,16 +28,16 @@ must be in the same order as the samples in `PopData.meta`.
 add_meta!(popdata::PopData, samples::Vector{String}, metadata::T; name::String, loci::Bool = true, categorical::Bool = true) where T <: AbstractVector
 ```
 Add an additional metadata information to a `PopData` object. Mutates `PopData` in place. Takes a vector of
-sample names if the metadata is not in the same order as samples appear in `PopData.meta`.
+sample names if the metadata is not in the same order as samples appear in `PopData.sampleinfo`.
 
 #### Arguments
 - `popdata` : The `PopData` object to add information to
 - `sample` : A `Vector{String}` of sample names corresponding to the order of the `metadata` 
-- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.meta`
+- `metadata` : A `Vector` with the metadata you wish to add to the `PopData`, in the same order as the names appear in `PopData.sampleinfo`
 
 #### Keyword Arguments
 - `name` : String of the name of this new column
-- `loci` : Boolean of whether to also add this information to `PopData.loci` (default: `true`)
+- `loci` : Boolean of whether to also add this information to `PopData.genodata` (default: `true`)
 - `categorical` : Boolean of whether the metadata being added is categorical aka "factors" (default: `true`)
 
 ----
@@ -196,7 +196,7 @@ populations!(potatoes, potatopops)
 ```julia
 populations!(data::PopData, rename::Vector{String})
 ```
-`Vector` of new unique population names in the order that they appear in the PopData.meta
+`Vector` of new unique population names in the order that they appear in the PopData.sampleinfo
 
 **Example**
 ```

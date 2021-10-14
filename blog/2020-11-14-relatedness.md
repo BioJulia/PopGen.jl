@@ -183,7 +183,7 @@ Technically, we could merge all three results into a single `PopData`, but it wi
 <TabItem value="meta">
 
 ```
-julia> unrelated_sims.meta
+julia> unrelated_sims.sampleinfo
 1000×5 DataFrame
   Row │ name            population  ploidy  longitude  latitude 
       │ String          String      Int64   Float32?   Float32? 
@@ -221,7 +221,7 @@ julia> unrelated_sims.meta
 <TabItem value="loci">
 
 ```
-julia> unrelated_sims.loci
+julia> unrelated_sims.genodata
 9000×4 DataFrame
   Row │ name            population  locus   genotype   
       │ String          String      String  Tuple…     

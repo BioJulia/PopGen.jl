@@ -18,7 +18,7 @@ of `true` or `false`. Returns `missing` if the genotype is `missing`.
 **Example**
 ```julia
 julia> cats = @nancycats ;
-julia> subset = cats.loci.genotype[1:10]
+julia> subset = cats.genodata.genotype[1:10]
 10-element Vector{Union{Missing, Tuple{Int16, Int16}}}:
  missing
  missing
@@ -109,7 +109,7 @@ This is the exact opposite of `ishom`, returning `true` if the genotype (or geno
 **Example**
 ```julia
 julia> cats = @nancycats ;
-julia> subset = cats.loci.genotype[1:10]
+julia> subset = cats.genodata.genotype[1:10]
 10-element Vector{Union{Missing, Tuple{Int16, Int16}}}:
  missing
  missing
