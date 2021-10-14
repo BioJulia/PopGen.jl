@@ -15,24 +15,27 @@ and specify the relationship you want to simulate and how many pairs to create f
 that relationship.
 
 ```julia
-simulate_sibship(data::PopData; n::Int, relationship::String, ploidy::Int)
+simulate_sibship(data::PopData; fullsib::Int, halfsib::Int, unrelated::Int, parentoffspring::Int, ploidy::Int)
 ```
 
-This function will simulate mating crosses to generate `n` sample pairs (default: `500`) 
-having the specified `relationship`, returning a `PopData` object. The simulations will first 
-generate parents of the given `ploidy` (default: `2`) by drawing alleles from a global 
-allele pool derived from the given `data` (i.e. weighted by their frequencies), then simulate mating between them.
+This function will simulate mating crosses to generate sample pairs with any combination of
+the specified relationships, returning a `PopData` object. The simulations will first 
+generate parents of a given `ploidy` (inferred or specified) by drawing alleles from 
+a global allele pool derived from the given `data` (i.e. weighted by their frequencies).
+
 
 ### Relationship
 Simulated parents will be crossed to generate offspring depending on the `relationship`:
-- `"fullsib"` : 2 parents generate 2 full-sibling offspring, returns 2 offspring
-- `"halfsib` : 3 parents generate 2 half-sibling offspring, returns 2 offspring
-- `"unrelated"` : returns 2 randomly generated individuals from the global allele pools
-- `"parent-offspring"` : 2 parents generate 1 offspring, returns 1 offspring and 1 parent
+- `fullsib` : 2 parents generate 2 full-sibling offspring, returns 2 offspring
+- `halfsib` : 3 parents generate 2 half-sibling offspring, returns 2 offspring
+- `unrelated` : returns 2 randomly generated individuals from the global allele pools
+- `parentoffspring` : 2 parents generate 1 offspring, returns 1 offspring and 1 parent
 
 ### Identifying pairs
 The relationship between the newly generated samples can be identified by:
-- Sample `name` will specify the simulation number, relationship, and whether parent or offspring
+- Sample names will specify their simulation number, relationship, and whether parent or offspring
+    - Naming convention: `[simulation #]_[relationship]_[offspring #]`
+    - example: `sim005_fullsib_1` = `[simulation 005]_[full sibling]_[offspring 1]`
 - Their `population` name will be that of their relationship (e.g. "fullsib")
 
 :::tip plugging into relatedness
@@ -58,32 +61,33 @@ there's a 50% chance parent_1 will give 2 alleles for every locus for that simul
 
 ### Example
 ```
-julia> cats = @nancycats ;
+julia> cats = @nanycats ;
 
-julia> fullsib_sims = simulate_sibship(cats, n = 50, relationship= "fullsib")
+julia> cat_sims = simulate_sibship(cats, fullsib = 10, halfsib = 50)
 PopData Object
-  Markers: Microsatellite
+9 Microsatellite markers
   Ploidy: 2
-  Samples: 100
-  Loci: 9
-  Populations: 1
-  Longitude: absent
-  Latitude: absent
+  Samples: 120
+  Populations: 2
+  Coordinates: absent
 
-julia> fullsib_sims.sampleinfo_df100×5 DataFrame
-│ Row │ name          │ population │ ploidy │ longitude │ latitude │
-│     │ String        │ String     │ Int64  │ Float32?  │ Float32? │
-├─────┼───────────────┼────────────┼────────┼───────────┼──────────┤
-│ 1   │ sim1_fs_off1  │ fullsib    │ 2      │ missing   │ missing  │
-│ 2   │ sim1_fs_off2  │ fullsib    │ 2      │ missing   │ missing  │
-│ 3   │ sim2_fs_off1  │ fullsib    │ 2      │ missing   │ missing  │
-│ 4   │ sim2_fs_off2  │ fullsib    │ 2      │ missing   │ missing  │
-│ 5   │ sim3_fs_off1  │ fullsib    │ 2      │ missing   │ missing  │
-⋮
-│ 95  │ sim48_fs_off1 │ fullsib    │ 2      │ missing   │ missing  │
-│ 96  │ sim48_fs_off2 │ fullsib    │ 2      │ missing   │ missing  │
-│ 97  │ sim49_fs_off1 │ fullsib    │ 2      │ missing   │ missing  │
-│ 98  │ sim49_fs_off2 │ fullsib    │ 2      │ missing   │ missing  │
-│ 99  │ sim50_fs_off1 │ fullsib    │ 2      │ missing   │ missing  │
-│ 100 │ sim50_fs_off2 │ fullsib    │ 2      │ missing   │ missing  │
+julia> cat_sims.meta
+120×3 DataFrame
+ Row │ name             population  ploidy 
+     │ String           String      Int64  
+─────┼─────────────────────────────────────
+   1 │ sim01_fullsib_1  fullsib          2
+   2 │ sim01_fullsib_2  fullsib          2
+   3 │ sim02_fullsib_1  fullsib          2
+   4 │ sim02_fullsib_2  fullsib          2
+   5 │ sim03_fullsib_1  fullsib          2
+   6 │ sim03_fullsib_2  fullsib          2
+  ⋮  │        ⋮             ⋮         ⋮
+ 115 │ sim48_halfsib_1  halfsib          2
+ 116 │ sim48_halfsib_2  halfsib          2
+ 117 │ sim49_halfsib_1  halfsib          2
+ 118 │ sim49_halfsib_2  halfsib          2
+ 119 │ sim50_halfsib_1  halfsib          2
+ 120 │ sim50_halfsib_2  halfsib          2
+                           108 rows omitted
 ```
