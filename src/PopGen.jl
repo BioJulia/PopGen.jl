@@ -62,8 +62,7 @@ using MultipleTesting, StatsBase
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
-# allele frequency and heterozygosity functions
-include("AlleleFreq.jl")
+# heterozygosity functions
 include("Heterozygosity.jl")
 # manipulation and exploration
 include("DataExploration.jl")
