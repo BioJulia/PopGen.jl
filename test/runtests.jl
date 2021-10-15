@@ -6,7 +6,6 @@ using PopGen
 using Test
 
 all_tests = [
-    "allelefreq.jl",
     "dataexploration.jl",
     "summaryinfo.jl"
 ]
