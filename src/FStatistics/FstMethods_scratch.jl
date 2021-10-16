@@ -1,7 +1,7 @@
 # TODO create an optimized method for all FST types for loc-by-loc
 function _pairwise_Hudson(data::PopData)
     !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
-    idx_pdata = groupby(data.loci, :population)
+    idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci
@@ -97,7 +97,7 @@ function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
 end
 
 function _pairwise_Nei(data::PopData)
-    idx_pdata = groupby(data.loci, :population)
+    idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci
@@ -212,7 +212,7 @@ end
 
 
 function _pairwise_WeirCockerham(data::PopData)
-    idx_pdata = groupby(data.loci, :population)
+    idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci
