@@ -38,7 +38,7 @@ function _permuted_Hudson(data::PopData, iterations::Int64)
             @inbounds @sync for iter in 1:iterations-1
                 Base.Threads.@spawn begin
                     perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
-                    @inbounds perm_vector[iter] = hudson_fst(perm_p1, perm_p2)
+                    @inbounds perm_vector[iter] = _hudson_fst(perm_p1, perm_p2)
                     pops_text = string(pops[i]) * " & " * string(pops[j])
                     ProgressMeter.next!(p; showvalues = [(:Populations, pops_text), (:Iteration, "$iter")])
                 end
@@ -71,7 +71,7 @@ function _permuted_Nei(data::PopData, iterations::Int64)
             @inbounds @sync for iter in 1:iterations-1
                 Base.Threads.@spawn begin
                     perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
-                    @inbounds perm_vector[iter] = nei_fst(perm_p1, perm_p2)
+                    @inbounds perm_vector[iter] = _nei_fst(perm_p1, perm_p2)
                     pops_text = string(pops[i]) * " & " * string(pops[j])
                     ProgressMeter.next!(p; showvalues = [(:Populations, pops_text), (:Iteration, "$iter")])
                 end
@@ -104,7 +104,7 @@ function _permuted_WeirCockerham(data::PopData, iterations::Int64)
             @inbounds @sync for iter in 1:iterations-1
                 Base.Threads.@spawn begin
                     perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
-                    @inbounds perm_vector[iter] = weircockerham_fst(perm_p1, perm_p2)
+                    @inbounds perm_vector[iter] = _weircockerham_fst(perm_p1, perm_p2)
                     pops_text = string(pops[i]) * " & " * string(pops[j])
                     ProgressMeter.next!(p; showvalues = [(:Populations, pops_text), (:Iteration, "$iter")])
                 end
