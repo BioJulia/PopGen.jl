@@ -1,10 +1,11 @@
 """
 # Population genetics analyses in Julia
-Documentation: https://pdimens.github.io/PopGen.jl/
+Repository:    https://www.github.com/biojulia/PopGen.jl/
+Documentation: https://biojulia.net/PopGen.jl/
 
 \nA few things things you can do to get started:
 
-## Load in data
+## Import Data
 - `PopGen.read(filename; kwargs...)`
 - `genepop(infile; kwargs...)`  or similar file-specific importer
 - use available `@gulfsharks` or `@nancycats` datasets
@@ -25,6 +26,7 @@ Documentation: https://pdimens.github.io/PopGen.jl/
 - `relatedness(PopData, method = ...)` to get pairwise relatedness of individuals
 - `summary(PopData)` to calculate F-statistics, heterozygosity, etc.
 - `hwe_test(PopData)` to test for Hardy-Weinberg Equilibrium
+- `pairwisefst(PopData)` to calculate FST between pairs of populations
 """
 module PopGen
 
@@ -70,7 +72,8 @@ include("DataExploration.jl")
 include("SummaryInfo.jl")
 #Analyses
 include("HardyWeinberg.jl")
-include("FStatistics/FstMethods.jl")
+include("FStatistics/FstGlobal.jl")
+include("FStatistics/FstByLocus.jl")
 include("FStatistics/PairwiseFST.jl")
 include("FStatistics/FstPermutations.jl")
 include("Relatedness/PairwiseRelatedness.jl")
