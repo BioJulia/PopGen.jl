@@ -34,7 +34,7 @@ function _permuted_Hudson(data::PopData, iterations::Int64)
             pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
             n_pop2 = size(pop2, 1)
             merged = vcat(pop1, pop2)
-            fst_val = hudson_fst(pop1,pop2)
+            fst_val = _hudson_fst(pop1,pop2)
             @inbounds @sync for iter in 1:iterations-1
                 Base.Threads.@spawn begin
                     perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
@@ -67,7 +67,7 @@ function _permuted_Nei(data::PopData, iterations::Int64)
             pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
             n_pop2 = size(pop2, 1)
             merged = vcat(pop1, pop2)
-            fst_val = nei_fst(pop1,pop2)
+            fst_val = _nei_fst(pop1,pop2)
             @inbounds @sync for iter in 1:iterations-1
                 Base.Threads.@spawn begin
                     perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
@@ -100,7 +100,7 @@ function _permuted_WeirCockerham(data::PopData, iterations::Int64)
             pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
             n_pop2 = size(pop2, 1)
             merged = vcat(pop1, pop2)
-            fst_val = weircockerham_fst(pop1,pop2)
+            fst_val = _weircockerham_fst(pop1,pop2)
             @inbounds @sync for iter in 1:iterations-1
                 Base.Threads.@spawn begin
                     perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
