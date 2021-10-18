@@ -54,6 +54,7 @@ end
 @reexport import PopGenCore: read, write
 
 using Distributions, DataFrames, PooledArrays
+using Random: shuffle
 using ProgressMeter
 using MultipleTesting, StatsBase
 
