@@ -57,3 +57,5 @@ julia> multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")
     p_copy[.!ismissing.(p_copy)] .= adjust(p_copy[.!ismissing.(p_copy)] |> Vector{Float64}, d[lowercase(method)])
     return p_copy
 end
+
+feature_req() = "\nPlease open an Issue or Pull Request on https://www.github.com/biojulia/PopGen.jl if you would like this feature implemented"
