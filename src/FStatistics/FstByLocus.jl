@@ -1,4 +1,3 @@
-# TODO create an optimized method for all FST types for loc-by-loc
 function _pairwise_Hudson_lxl(data::PopData)
     !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
     idx_pdata = groupby(data.genodata, :population)
@@ -26,29 +25,25 @@ function _hudson_fst_lxl(population_1::T, population_2::T) where T<:AbstractMatr
 end
 
 
-# helper function to do the math for Hudson FST on a locus
-function _hudson_fst(pop1::T, pop2::T) where T<:GenoArray
-    p1_frq = allele_freq(pop1)
-    p2_frq = allele_freq(pop2)
-    # find the shared allele(s) and choose one of them to be "P"
-    # this is a safeguard if one population is completely homozygous for an allele
-    p_allele = intersect(keys(p1_frq), keys(p2_frq)) |> first
-    p1 = p1_frq[p_allele]
-    q1 = 1.0 - p1
-    p2 = p2_frq[p_allele]
-    q2 = 1.0 - p2 
-    # degrees of freedom is the number of alleles - 1
-    df1 = (count(!ismissing, pop1) * 2) - 1
-    df2 = (count(!ismissing, pop2) * 2) - 1
-    numerator = (p1 - p2)^2 - (p1*q1/df1) - (p2*q2/df2)
-    denominator = (p1*q2) + (p2*q1)
-    return numerator/denominator
+function _pairwise_Nei(data::PopData)
+    idx_pdata = groupby(data.genodata, :population)
+    pops = getindex.(keys(idx_pdata), :population)
+    npops = data.metadata.populations
+    n_loci = data.metadata.loci
+    results = zeros(npops, npops)
+    @sync for i in 2:npops
+        Base.Threads.@spawn begin
+            for j in 1:(i-1)
+                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                results[i,j] = _nei_fst(pop1,pop2)
+           end
+        end
+    end
+    return PairwiseFST(DataFrame(results, Symbol.(pops)), "Nei 1987")
 end
 
-
-
-## Nei 1987 FST ##
-function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
+function _nei_fst_lxl(population_1::T, population_2::T) where T<:AbstractMatrix
     n =  hcat(map(nonmissing, eachcol(population_1)), map(nonmissing, eachcol(population_2)))
     # number of populations represented per locus
     n_pop_per_loc = map(count_nonzeros, eachrow(n)) 
@@ -77,30 +72,32 @@ function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     DST = @inbounds Ht .- HS
     DST′ = @inbounds n_pop_per_loc ./ (n_pop_per_loc .- 1) .* DST
     HT′ = @inbounds HS .+ DST′
-    round(mean(skipinfnan(DST′)) / mean(skipinfnan(HT′)), digits = 5)
+    round.(skipinfnan(DST′) ./ skipinfnan(HT′), digits = 5)
 end
 
-function _pairwise_Nei(data::PopData)
+function _pairwise_Nei_lxl(data::PopData)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
-    npops = data.metadata.populations
     nloci = data.metadata.loci
-    results = zeros(npops, npops)
-    @sync for i in 2:npops
+    locnames = loci(data)
+    allpairs = pairwise_pairs(pops)
+    npairs = length(collect(allpairs))
+    results = Vector{Vector{Float64}}(undef, npairs)
+    p1 = repeat(getindex.(allpairs,1), inner = nloci)
+    p2 = repeat(getindex.(allpairs,2), inner = nloci)
+    locs = repeat(locnames, outer = npairs)
+    @inbounds @sync for (i,j) in enumerate(allpairs)
         Base.Threads.@spawn begin
-            for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, nloci)
-                pop2 = reshape(idx_pdata[j].genotype, :, nloci)
-                results[i,j] = nei_fst(pop1,pop2)
-           end
+            pop1 = reshape(idx_pdata[(population = j[1],)].genotype, :, nloci)
+            pop2 = reshape(idx_pdata[(population = j[2],)].genotype, :, nloci)
+            results[i] = _nei_fst_lxl(pop1, pop2)
         end
     end
-    return PairwiseFST(DataFrame(results, Symbol.(pops)), "Nei 1987")
+    return DataFrame(:pop1 => PooledArray(p1, compress = true), :pop2 => PooledArray(p2, compress = true),:locus => PooledArray(locs, compress = true) ,:fst => reduce(vcat, results))
 end
 
-
-## Weir & Cockerham 1984 FST ##
-function weircockerham_fst(population_1::T, population_2::T) where T<:AbstractMatrix
+#=
+function _weircockerham_fst_lxl(population_1::T, population_2::T) where T<:AbstractMatrix
     nloci = size(population_1, 2)
     n_pops = 2
     # get genotype counts
@@ -190,25 +187,32 @@ function weircockerham_fst(population_1::T, population_2::T) where T<:AbstractMa
     σ_b = 0.5 * (MSI - MSG)
     σ_a = 0.5 ./ corr_n_per_loc_exp .* (MSP - MSI)
     σ = hcat(σ_a, σ_b, σ_w)
+    return σ 
     σ_total = map(i -> sum(skipinfnan(i)), eachcol(σ))
     fst_total = round(σ_total[1] / sum(σ_total), digits = 5)
 end
 
 
-function _pairwise_WeirCockerham(data::PopData)
+function _pairwise_WeirCockerham_lxl(data::PopData)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
-    npops = data.metadata.populations
     nloci = data.metadata.loci
-    results = zeros(npops, npops)
-    @sync for i in 2:npops
-        Base.Threads.@spawn begin
-            for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, nloci)
-                pop2 = reshape(idx_pdata[j].genotype, :, nloci)
-                results[i,j] = weircockerham_fst(pop1,pop2)
-           end
-        end
+    locnames = loci(data)
+    allpairs = pairwise_pairs(pops)
+    npairs = length(collect(allpairs))
+    results = Vector{Vector{Float64}}(undef, npairs)
+    p1 = repeat(getindex.(allpairs,1), inner = nloci)
+    p2 = repeat(getindex.(allpairs,2), inner = nloci)
+    locs = repeat(locnames, outer = npairs)
+    @inbounds @sync for (i,j) in enumerate(allpairs)
+        #Base.Threads.@spawn begin
+            pop1 = reshape(idx_pdata[(population = j[1],)].genotype, :, nloci)
+            pop2 = reshape(idx_pdata[(population = j[2],)].genotype, :, nloci)
+            return _weircockerham_fst_lxl(pop1, pop2)
+            results[i] = _weircockerham_fst_lxl(pop1, pop2)
+        #end
     end
-    return PairwiseFST(DataFrame(results, Symbol.(pops)), "Weir & Cockerham")
+    return DataFrame(:pop1 => PooledArray(p1, compress = true), :pop2 => PooledArray(p2, compress = true),:locus => PooledArray(locs, compress = true) ,:fst => reduce(vcat, results))
 end
+
+=#

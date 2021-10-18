@@ -1,30 +1,21 @@
-# TODO create an optimized method for all FST types for loc-by-loc
-function _pairwise_Hudson_lxl(data::PopData)
+function _pairwise_Hudson(data::PopData)
     !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
-    nloci = data.metadata.loci
-    locnames = loci(data)
-    allpairs = pairwise_pairs(pops)
-    npairs = length(collect(allpairs))
-    results = Vector{Vector{Float64}}(undef, npairs)
-    p1 = repeat(getindex.(allpairs,1), inner = nloci)
-    p2 = repeat(getindex.(allpairs,2), inner = nloci)
-    locs = repeat(locnames, outer = npairs)
-    @inbounds @sync for (i,j) in enumerate(allpairs)
+    npops = data.metadata.populations
+    n_loci = data.metadata.loci
+    results = zeros(npops, npops)
+    @sync for i in 2:npops
         Base.Threads.@spawn begin
-            pop1 = reshape(idx_pdata[(population = j[1],)].genotype, :, nloci)
-            pop2 = reshape(idx_pdata[(population = j[2],)].genotype, :, nloci)
-            results[i] = _hudson_fst_lxl(pop1, pop2)
+            for j in 1:(i-1)
+                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                results[i,j] = _hudson_fst(pop1,pop2)
+           end
         end
     end
-    return DataFrame(:pop1 => PooledArray(p1, compress = true), :pop2 => PooledArray(p2, compress = true),:locus => PooledArray(locs, compress = true) ,:fst => reduce(vcat, results))
+    return PairwiseFST(DataFrame(results, Symbol.(pops)), "Hudson et al. 1992")
 end
-
-function _hudson_fst_lxl(population_1::T, population_2::T) where T<:AbstractMatrix
-    @views [_hudson_fst(population_1[:,i], population_2[:,i]) for i in 1:size(population_1,2)]
-end
-
 
 # helper function to do the math for Hudson FST on a locus
 function _hudson_fst(pop1::T, pop2::T) where T<:GenoArray
@@ -45,10 +36,14 @@ function _hudson_fst(pop1::T, pop2::T) where T<:GenoArray
     return numerator/denominator
 end
 
+function _hudson_fst(population_1::T, population_2::T) where T<:AbstractMatrix
+    fst_perloc = @views [_hudson_fst(population_1[:,i], population_2[:,i]) for i in 1:size(population_1,2)]
+    return mean(skipmissing(skipinfnan(fst_perloc)))
+end
 
 
 ## Nei 1987 FST ##
-function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
+function _nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     n =  hcat(map(nonmissing, eachcol(population_1)), map(nonmissing, eachcol(population_2)))
     # number of populations represented per locus
     n_pop_per_loc = map(count_nonzeros, eachrow(n)) 
@@ -84,14 +79,14 @@ function _pairwise_Nei(data::PopData)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
-    nloci = data.metadata.loci
+    n_loci = data.metadata.loci
     results = zeros(npops, npops)
     @sync for i in 2:npops
         Base.Threads.@spawn begin
             for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, nloci)
-                pop2 = reshape(idx_pdata[j].genotype, :, nloci)
-                results[i,j] = nei_fst(pop1,pop2)
+                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                results[i,j] = _nei_fst(pop1,pop2)
            end
         end
     end
@@ -100,8 +95,7 @@ end
 
 
 ## Weir & Cockerham 1984 FST ##
-function weircockerham_fst(population_1::T, population_2::T) where T<:AbstractMatrix
-    nloci = size(population_1, 2)
+function _weircockerham_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     n_pops = 2
     # get genotype counts
     # reshape as a matrix of loci x pop (row x col)
@@ -130,7 +124,6 @@ function weircockerham_fst(population_1::T, population_2::T) where T<:AbstractMa
     # allele freqs per locus per population
     pop_1_freq = map(allele_freq, eachcol(pop_1))
     pop_2_freq = map(allele_freq, eachcol(pop_2))
-    #alle_freqs = DataFrames.combine(per_locpop, :genotype => allele_freq => :freqs)
     # expand out the n matrix to be same dimensions as unique_alleles x pop
     n_expanded = reduce(hcat, repeat.(eachrow(n_per_locpop), 1, glob_allele_counts)) |> permutedims
     # expand n_total matrix to be same dimensions as unique_alleles x pop
@@ -199,14 +192,14 @@ function _pairwise_WeirCockerham(data::PopData)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
-    nloci = data.metadata.loci
+    n_loci = data.metadata.loci
     results = zeros(npops, npops)
     @sync for i in 2:npops
         Base.Threads.@spawn begin
             for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, nloci)
-                pop2 = reshape(idx_pdata[j].genotype, :, nloci)
-                results[i,j] = weircockerham_fst(pop1,pop2)
+                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                results[i,j] = _weircockerham_fst(pop1,pop2)
            end
         end
     end
