@@ -8,7 +8,7 @@ import TabItem from '@theme/TabItem';
 
 ## Allele frequency table
 ```julia
-allele_freqtable(data::PopData; by::String = "global")
+allelefreqtable(data::PopData; by::String = "global")
 ```
 Return a table of the observed `global` (default) or `population` allele frequencies in a PopData object. Use this if you want to see what the frequencies are for every allele at every locus.
 
@@ -25,7 +25,7 @@ Return a table of the observed `global` (default) or `population` allele frequen
 ```julia
 julia> cats = @nancycats ;
 
-julia> allele_freqtable(cats)
+julia> allelefreqtable(cats)
 108×4 DataFrame
  Row │ locus   allele  count  frequency  
      │ String  Int16?  Int64  Float64    
@@ -48,7 +48,7 @@ julia> allele_freqtable(cats)
 ```julia
 julia> cats = @nancycats ;
 
-julia> allele_freqtable(cats, by = "population")
+julia> allelefreqtable(cats, by = "population")
 839×5 DataFrame
  Row │ locus   population  allele  count  frequency 
      │ String  String      Int16?  Int64  Float64   
@@ -70,7 +70,7 @@ julia> allele_freqtable(cats, by = "population")
 
 ## Genotype frequency table
 ```julia
-geno_freqtable(data::PopData; by::String = "global")
+genofreqtable(data::PopData; by::String = "global")
 ```
 Return a table of the observed `global` (default) or `population` genotype frequencies in a PopData object. Use this if you want to see what the frequencies are for every genotype at every locus.
 
@@ -87,7 +87,7 @@ Return a table of the observed `global` (default) or `population` genotype frequ
 ```julia
 julia> cats = @nancycats ;
 
-julia> geno_freqtable(cats)
+julia> genofreqtable(cats)
 341×4 DataFrame
  Row │ locus   genotype    count  frequency  
      │ String  Tuple…      Int64  Float64    
@@ -110,7 +110,7 @@ julia> geno_freqtable(cats)
 ```julia
 julia> cats = @nancycats ;
 
-julia> geno_freqtable(cats, by = "population")
+julia> genofreqtable(cats, by = "population")
 1094×5 DataFrame
   Row │ locus   population  genotype    count  frequency         
       │ String  String      Tuple…      Int64  Float64           
@@ -133,7 +133,7 @@ julia> geno_freqtable(cats, by = "population")
 ## Missing Data
 
 ```julia
-missing_data(data::PopData; by::String = "sample")
+missingdata(data::PopData; by::String = "sample")
 ```
 
 Get missing genotype information in a `PopData` object. Specify a mode of operation using the `by =` keyword to return a table corresponding with that missing information type.
@@ -160,7 +160,7 @@ Get missing genotype information in a `PopData` object. Specify a mode of operat
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missing_data(sharks)
+julia> missingdata(sharks)
 212×2 DataFrame
  Row │ name     missing
      │ String   Int64
@@ -189,7 +189,7 @@ julia> missing_data(sharks)
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missing_data(sharks, by = "pop")
+julia> missingdata(sharks, by = "pop")
 7×2 DataFrame
  Row │ population      missing
      │ String          Int64
@@ -209,7 +209,7 @@ julia> missing_data(sharks, by = "pop")
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missing_data(sharks, by = "locus")
+julia> missingdata(sharks, by = "locus")
 2209×2 DataFrame
   Row │ locus         missing
       │ String        Int64
@@ -238,7 +238,7 @@ julia> missing_data(sharks, by = "locus")
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missing_data(sharks, by = "full")
+julia> missingdata(sharks, by = "full")
 15463×3 DataFrame
    Row │ locus         population      missing
        │ String        String          Int64
@@ -271,7 +271,7 @@ Each mode of operation has an extra synonymous (alternative) name just because w
 
 ## Pairwise Identical Genotypes
 While not a substitute for a [kinship analysis](docs/analyses/relatedness), it may be useful to know or verify how similar your data are in a very literal sense:
-how many identical genotypes do two individuals have across all loci? To do this, we use `pairwise_identical()` to perform an all x all comparison of identical genotypes. This can be done for all individuals in a `PopData` object, or restricted to a specific set of individuals:
+how many identical genotypes do two individuals have across all loci? To do this, we use `pairwiseidentical()` to perform an all x all comparison of identical genotypes. This can be done for all individuals in a `PopData` object, or restricted to a specific set of individuals:
 
 <Tabs
   block={true}
@@ -286,7 +286,7 @@ how many identical genotypes do two individuals have across all loci? To do this
 ```julia
 julia> cats = @nancycats;
 
-julia> pairwise_identical(cats)
+julia> pairwiseidentical(cats)
 27966×4 DataFrame
    Row │ sample_1  sample_2  identical  n     
        │ String    String    Float64    Int64 
@@ -317,7 +317,7 @@ julia> interesting_cats = samples(cats)[1:5]
  "N218"
  "N219"
 
-julia> pairwise_identical(cats, interesting_cats)
+julia> pairwiseidentical(cats, interesting_cats)
 10×4 DataFrame
  Row │ sample_1  sample_2  identical  n     
      │ String    String    Float64    Int64 

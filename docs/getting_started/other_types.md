@@ -15,6 +15,14 @@ NTuple{N,<:Signed} where N
 
 An `NTuple` is itself an alias for a `Tuple{Vararg{}}` , but you can think of it as Tuple of `N` length composed of items of a particular type, in this case it's items that are subtypes of `Signed` (the integer types). The length of the tuple (`N`) will vary based on the ploidy of the sample, and the element `Type` will vary whether the markers are snps (`Int8`) or microsatellites (`Int16`), making this a pretty flexible (but immutable) structure.
 
+#### SNP and Msat
+```julia
+Snp::NTuple{N,Int8} where N
+Msat::NTuple{N,Int8} where N
+```
+These are convenience aliases for the two main kinds of NTuples of genotypes you will see.
+These are typically used internally.
+
 ### GenoArray
 
 ```julia

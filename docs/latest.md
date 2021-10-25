@@ -98,7 +98,7 @@ This release adds a slew of relatedness estimators, which can be bootstrapped an
   - `loci_matrix`
   - `nonmissings`
   - `pairwise_pairs`
-- `pairwise_identical()` to compare percent identical loci
+- `pairwiseidentical()` to compare percent identical loci
 - `phase()` method
 - Structure/fastStructure file IO
 

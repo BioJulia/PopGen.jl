@@ -3,6 +3,7 @@ module.exports = {
     "Getting Started": [
       "getting_started/install",
       "getting_started/julia_primer",
+      "getting_started/tips",
       "getting_started/comparison",
       "getting_started/types",
       "getting_started/other_types",
@@ -39,23 +40,36 @@ module.exports = {
     ],    
     "API": [
       "api/api",
-      "api/allelefreq",
-      "api/conditionals",
-      "api/datasets",
-      "api/dataexploration",
-      "api/delimited",
-      "api/fstmethods",
-      "api/fstpermutations",
-      "api/genepop",
-      "api/hardyweinberg",
-      "api/heterozygosity",
-      "api/ioutils",
-      "api/manipulate",
-      "api/pairwisefst",
-      "api/pairwiserelatedness",
-      "api/permutations",
-      "api/read",
-      "api/relatednessmoments",
+      {
+        "PopGen":[
+          "api/dataexploration",
+          "api/fstmethods",
+          "api/fstpermutations",
+          "api/hardyweinberg",
+          "api/heterozygosity",
+          "api/pairwisefst",
+          "api/pairwiserelatedness",
+          "api/permutations",
+          "api/relatednessmoments",
+          "api/summaryinfo",
+          "api/utils",
+        ]
+      },
+      {
+        "PopGenCore":[
+          "api/PopGenCore/allelefreq",
+          "api/PopGenCore/conditionals",
+          "api/PopGenCore/datasets",
+          "api/PopGenCore/delimited",
+          "api/PopGenCore/genepop",
+          "api/PopGenCore/ioutils",
+          "api/PopGenCore/manipulate",
+          "api/PopGenCore/read",
+          "api/PopGenCore/structure",
+          "api/PopGenCore/types",
+          "api/PopGenCore/variantcall",
+        ]
+      },
       {
       "PopGenSims":[
         "api/PopGenSims/popgensims_cross",
@@ -63,12 +77,7 @@ module.exports = {
         "api/PopGenSims/popgensims_sibship",
         "api/PopGenSims/popgensims_utils",
       ]
-      },
-      "api/structure",
-      "api/summaryinfo",
-      "api/types",
-      "api/utils",
-      "api/variantcall",
+      }
     ]
   }
 }
