@@ -1,4 +1,4 @@
-export heterozygosity, het
+export heterozygosity, samplehet
 
 """
     counthet(geno::T, allele::Int) where T<:GenoArray
@@ -34,8 +34,8 @@ function counthom(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U
 end
 
 """
-    gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)
-Calculate overall gene diversity with the adjustment/correction given by Nei:
+    _genediversitynei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)
+Calculate overall gene diversity with the adjustment/correction, use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 
 Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
 - _ñ_ is the number of genotypes for a locus for a population
@@ -46,50 +46,49 @@ Hₜ = 1 −sum(pbar²ᵢ + Hₛ/(ñ * np) − Het_obs/(2ñ*np))
     - Hₛ =  ñ/(ñ-1) * (1 - sum(pbar²ᵢ - Het_observed / 2ñ))
 
 (Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press).
-use `corr = false` to ignore sample-size correction `* n/(n-1)`.
 """
-@inline function gene_diversity_nei87(het_exp::T, het_obs::T, n::Union{Integer,T}; corr::Bool = true) where T<: AbstractFloat
+@inline function _genediversitynei87(het_exp::T, het_obs::T, n::Union{Integer,T}; corr::Bool = true) where T<: AbstractFloat
     corr_val = corr ? n/(n-1.0) : 1.0
     return @fastmath (het_exp - (het_obs/n/2.0)) * corr_val
 end
 
-@inline function gene_diversity_nei87(het_exp::AbstractFloat, het_obs::Missing, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+@inline function _genediversitynei87(het_exp::AbstractFloat, het_obs::Missing, n::Union{Integer,AbstractFloat}; corr::Bool = true)
     return missing
 end
 
-@inline function gene_diversity_nei87(het_exp::Missing, het_obs::AbstractFloat, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+@inline function _genediversitynei87(het_exp::Missing, het_obs::AbstractFloat, n::Union{Integer,AbstractFloat}; corr::Bool = true)
     return missing
 end
 
-@inline function gene_diversity_nei87(het_exp::Missing, het_obs::Missing, n::Union{Integer,AbstractFloat}; corr::Bool = true)
+@inline function _genediversitynei87(het_exp::Missing, het_obs::Missing, n::Union{Integer,AbstractFloat}; corr::Bool = true)
     return missing
 end
 
 """
-    hetero_o(data::T) where T <: GenoArray
+    _hetero_obs(data::T) where T <: GenoArray
 Returns observed heterozygosity as a mean of the number of heterozygous genotypes, defined
 as genotypes returning `true` for `ishet()`. This is numerically feasible because
 `true` values are mathematically represented as `1`, whereas `false` are represented
 as `0`.
 """
-@inline function hetero_o(data::T) where T <: GenoArray
+@inline function _hetero_obs(data::T) where T <: GenoArray
     adjusted_vector = ishet(data) |> skipmissing
     isempty(adjusted_vector) ? missing : mean(adjusted_vector)
 end
 
 
 """
-    hetero_e(allele_freqs::Vector{T}) where T <: GenoArray
+    _hetero_exp(allele_freqs::Vector{T}) where T <: GenoArray
 Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
-@inline function hetero_e(data::T) where T <: GenoArray
+@inline function _hetero_exp(data::T) where T <: GenoArray
     all(ismissing.(data)) == true ? missing : 1.0 - mapreduce(i -> i^2, + , allele_freq_vec(data))
 end
 
 
 """
-    heterozygosity(data::PopData, by::String = "locus")
+    heterozygosity(data::PopData; by::String = "locus")
 Calculate observed and expected heterozygosity in a `PopData` object. For loci,
 heterozygosity is calculated in the Nei fashion, such that heterozygosity is
 calculated as the average over heterozygosity per locus per population.
@@ -98,15 +97,15 @@ calculated as the average over heterozygosity per locus per population.
 - `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
 - `"population"` or `"pop"` : heterozygosity per population
 ## Example
-heterozygosity(@nancycats, "population" )
+heterozygosity(@nancycats, by = "population" )
 """
-function heterozygosity(data::PopData, by::String = "locus")
+function heterozygosity(data::PopData; by::String = "locus")
     if by ∈ ["locus", "loci"]
         tmp = DataFrames.combine(
                 groupby(data.genodata, [:locus, :population]),
                 :genotype => nonmissing => :n_tmp,
-                :genotype => hetero_o => :het_pop_obs,
-                :genotype => hetero_e => :het_pop_exp
+                :genotype => _hetero_obs => :het_pop_obs,
+                :genotype => _hetero_exp => :het_pop_exp
             )
         return DataFrames.combine(
                 groupby(tmp, :locus),
@@ -119,29 +118,27 @@ function heterozygosity(data::PopData, by::String = "locus")
         return DataFrames.combine(
                 groupby(data.genodata, :name),
                 :genotype => nonmissing => :n,
-                :genotype => hetero_o => :het_obs
+                :genotype => _hetero_obs => :het_obs
             )
 
     elseif lowercase(by) ∈  ["pop", "population"]
         return DataFrames.combine(
                 groupby(data.genodata, :population),
                 :genotype => nonmissing => :n,
-                :genotype => hetero_o => :het_obs,
-                :genotype => hetero_e => :het_exp
+                :genotype => _hetero_obs => :het_obs,
+                :genotype => _hetero_exp => :het_exp
             )
     else
         error("please specify by = \"locus\", \"sample\", or \"population\"")
     end
 end
 
-const het = heterozygosity
-
-
 #NOTE this is not intended to be performant. It's a convenience function. 
 """
-    het_sample(data::PopData, individual::String)
+    samplehet(data::PopData, individual::String)
 Calculate the observed heterozygosity for an individual in a `PopData` object.
 """
-@inline function het_sample(data::PopData, individual::String)
-    data.genodata[data.genodata.name .== individual, :genotype] |> hetero_o
+@inline function samplehet(data::PopData, individual::String)
+    individual ∉ samples(data) && throw(ArgumentError("$individual not found in data"))
+    data.genodata[data.genodata.name .== individual, :genotype] |> _hetero_obs
 end

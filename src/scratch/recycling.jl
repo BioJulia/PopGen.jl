@@ -46,7 +46,7 @@ end
 
 
 
-function relatedness_no_boot_fix(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
+function _relatedness_noboot_fix(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     n_samples = data.metadata.samples
     sample_pairs = pairwise_pairs(sample_names)
@@ -96,14 +96,14 @@ function relatedness2(data::PopData, sample_names::Vector{String}; method::F, it
     errs != "" && throw(ArgumentError(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help."))
     if iterations > 0
         if resample == "all"
-            relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
+            _relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
         elseif resample == "nonmissing"
-            relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
+            _relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
         else
             throw(ArgumentError("Please choose from resample methods \"all\" or \"nonmissing\""))
         end
     else
-        relatedness_no_boot_fix2(data, sample_names, method = method, inbreeding = inbreeding)
+        _relatedness_noboot_fix2(data, sample_names, method = method, inbreeding = inbreeding)
     end
 end
 
@@ -115,7 +115,7 @@ end
 
 
 ## original function -- threading does not work as expected ###
-function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
+function _relatedness_noboot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     n_samples = data.metadata.samples
     sample_pairs = pairwise_pairs(sample_names)
@@ -149,7 +149,7 @@ function relatedness_no_boot(data::PopData, sample_names::Vector{String}; method
 end
 
 
-function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
+function _relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     sample_pairs = pairwise_pairs(sample_names)
     n_samples = data.metadata.samples
@@ -178,8 +178,8 @@ function relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}
             
             @inbounds for (i, mthd) in enumerate(method)
                 @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
-                boot_out = bootstrap_genos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
-                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, interval)
+                boot_out = _bootstrapgenos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
+                @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = _bootstrapsummary(boot_out, interval)
             end
             update!(p, idx)
         end
@@ -241,13 +241,13 @@ function relatedness(data::PopData, sample_names::Vector{String}; kwargs...)
         if kw_dict[:iterations] > 0
             if haskey(kw_dict, :resample)
                 "all" != kw_dict[:resample] != "nonmissing" && throw(ArgumentError("Please choose from resample methods \"all\" or \"nonmissing\""))
-                kw_dict[:resample] == "all" && relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
-                kw_dict[:resample] == "nonmissing" && relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval)
+                kw_dict[:resample] == "all" && _relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
+                kw_dict[:resample] == "nonmissing" && _relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval)
             else
-                relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
+                _relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval)
             end
     else
-        relatedness_no_boot(data, sample_names, method = method)
+        _relatedness_noboot(data, sample_names, method = method)
     end
 end
 
@@ -310,7 +310,7 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
                     @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples)
                     boot_out = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples)
                     #boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
-                    @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = bootstrap_summary(boot_out, iterations, interval)
+                    @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = _bootstrapsummary(boot_out, iterations, interval)
                 end
             update!(p, idx)
         end

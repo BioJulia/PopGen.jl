@@ -4,8 +4,8 @@ function FST_global(data::PopData)
     het_df = DataFrames.combine(
         groupby(data, [:locus, :population]),
         :genotype => nonmissing => :n,
-        :genotype => hetero_o => :het_obs,
-        :genotype => (i -> hetero_e(i)) => :het_exp,
+        :genotype => _hetero_obs => :het_obs,
+        :genotype => (i -> _hetero_exp(i)) => :het_exp,
         :genotype => allele_freq => :alleles
     )
     # collapse down to retrieve averages and counts
@@ -13,7 +13,7 @@ function FST_global(data::PopData)
         groupby(het_df, :locus),
         :n => (n -> sum(.!iszero.(n)))=> :count,
         :n => (n -> sum(.!iszero.(n)) ./ sum(reciprocal.(n))) => :mn,
-        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n)))))) => :HS,
+        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(_genediversitynei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n)))))) => :HS,
         :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
         :alleles => (alleles ->  sum(values(avg_allele_freq(alleles, 2))))=> :avg_freq
         )
@@ -39,8 +39,8 @@ function FST_locus(data::PopData)
     het_df = DataFrames.combine(
         groupby(data.genodata, [:locus, :population]),
         :genotype => nonmissing => :n,
-        :genotype => hetero_o => :het_obs,
-        :genotype => (i -> hetero_e(i)) => :het_exp,
+        :genotype => _hetero_obs => :het_obs,
+        :genotype => (i -> _hetero_exp(i)) => :het_exp,
         :genotype => allele_freq => :alleles
     )
     # collapse down to retrieve averages and counts
@@ -48,7 +48,7 @@ function FST_locus(data::PopData)
         [:het_obs, :het_exp, :n, :alleles] => (o,e,n,alleles) -> (
             count = sum(.!iszero.(n)),
             mn = sum(.!iszero.(n)) ./ sum(reciprocal.(n)),
-            HS = mean(skipmissing(gene_diversity_nei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n))))),
+            HS = mean(skipmissing(_genediversitynei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n))))),
             Het_obs = mean(skipmissing(o)),
             avg_freq = sum(values(avg_allele_freq(alleles)).^2)
             ),

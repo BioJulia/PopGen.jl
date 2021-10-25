@@ -65,6 +65,7 @@ using MultipleTesting, StatsBase
 # O | | o   O | | o   O | | o   O | | o   O | | o
 #   O o       O o       O o       O o       O o
 
+include("Utils.jl")
 # heterozygosity functions
 include("Heterozygosity.jl")
 # manipulation and exploration

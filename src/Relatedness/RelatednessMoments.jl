@@ -326,19 +326,19 @@ function Ritland(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwar
 end
 
 ### Wang 2002 helper functions ###
-function a_wang_base(m::Int, alleles::Dict)
+function _a_wang_base(m::Int, alleles::Dict)
     sum(values(alleles) .^ m)
 end
 
-function a_wang(N::Int, alleles::Dict)
+function _a_wang(N::Int, alleles::Dict)
     #unbiased estimator
     a = 0.0
 
-    b = (N * a_wang_base(2, alleles) - 1) / (N - 1)
+    b = (N * _a_wang_base(2, alleles) - 1) / (N - 1)
 
-    c = (N^2 * a_wang_base(3, alleles) - 3 * (N - 1) * b - 1) / ((N - 1) * (N - 2))
+    c = (N^2 * _a_wang_base(3, alleles) - 3 * (N - 1) * b - 1) / ((N - 1) * (N - 2))
 
-    d = (N^3 * a_wang_base(4, alleles) - 6 * (N - 1) * (N - 2) * c - 7 * (N - 1) * b - 1) / (N^3 - 6 * N^2 + 11 * N - 6)
+    d = (N^3 * _a_wang_base(4, alleles) - 6 * (N - 1) * (N - 2) * c - 7 * (N - 1) * b - 1) / (N^3 - 6 * N^2 + 11 * N - 6)
 
     return [a, b, c, d]
 end
@@ -371,7 +371,7 @@ function Wang(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs.
 
         #N = nonmissing(data.genodata[data.genodata.locus .== string(loc), :genotype])
 
-        a = a_wang(2 * N, alleles[loc])
+        a = _a_wang(2 * N, alleles[loc])
         a2_sq = a[2] ^ 2
 
         u[loc_id] = 2 * a[2] - a[3]

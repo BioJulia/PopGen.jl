@@ -1,8 +1,8 @@
 
-export pairwise_identical, missing_data, geno_freqtable, allele_freqtable
+export pairwiseidentical, missingdata, genofreqtable, allelefreqtable
 
 """
-    missing_data(data::PopData; by::String = "sample")
+    missingdata(data::PopData; by::String = "sample")
 Get missing genotype information in a `PopData`. Specify a mode of operation
 to return a DataFrame corresponding with that missing information.
 
@@ -14,10 +14,10 @@ to return a DataFrame corresponding with that missing information.
 
 ### Example:
 ```
-missing_data(@gulfsharks, by = "pop")
+missingdata(@gulfsharks, by = "pop")
 ```
 """
-@inline function missing_data(data::PopData; by::String = "sample")
+@inline function missingdata(data::PopData; by::String = "sample")
     if by ∈ ["sample", "individual"]
         DataFrames.combine(
             DataFrames.groupby(data.genodata, :name),
@@ -41,19 +41,19 @@ missing_data(@gulfsharks, by = "pop")
         )
     else
         @error "Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"
-        missing_data(data)
+        missingdata(data)
     end
 end
 
 """
-    pairwise_identical(data::PopData)
+    pairwiseidentical(data::PopData)
 Return a table of the percent of identical genotypes at each locus between all pairs of individuals.
 
 ### Example:
 ```
 julia> cats = @nancycats ;
 
-julia> pairwise_identical(cats)
+julia> pairwiseidentical(cats)
 27966×4 DataFrame
    Row │ sample_1  sample_2  identical  n     
        │ String    String    Float64    Int64 
@@ -71,13 +71,13 @@ julia> pairwise_identical(cats)
 ```
 
 """
-function pairwise_identical(data::PopData)
+function pairwiseidentical(data::PopData)
     sample_names = collect(samples(data))
-    pairwise_identical(data, sample_names)
+    pairwiseidentical(data, sample_names)
 end
 
 """
-    pairwise_identical(data::PopData, sample_names::Vector{String})
+    pairwiseidentical(data::PopData, sample_names::Vector{String})
 Return a table of the percent of identical genotypes at each locus
 between all pairs of provided `sample_names`.
 
@@ -93,7 +93,7 @@ julia> interesting_cats = samples(cats)[1:5]
  "N218"
  "N219"
 
-julia> pairwise_identical(cats, interesting_cats)
+julia> pairwiseidentical(cats, interesting_cats)
 10×4 DataFrame
  Row │ sample_1  sample_2  identical  n     
      │ String    String    Float64    Int64 
@@ -110,7 +110,7 @@ julia> pairwise_identical(cats, interesting_cats)
   10 │ N218      N219           0.33      9 
 ```
 """
-function pairwise_identical(data::PopData, sample_names::Vector{T}) where T<:AbstractString
+function pairwiseidentical(data::PopData, sample_names::Vector{T}) where T<:AbstractString
     errs = ""
     all_samples = samples(data)
     if sample_names != all_samples
@@ -140,14 +140,14 @@ function pairwise_identical(data::PopData, sample_names::Vector{T}) where T<:Abs
 end
 
 """
-    geno_freqtable(data::PopData; by::String = "global")
+    genofreqtable(data::PopData; by::String = "global")
 Return a table of the observed `global` (default) or `population` genotype frequencies in a PopData object.
 
 ### Example:
 ```
 julia> cats = @nancycats ;
 
-julia> geno_freqtable(cats)
+julia> genofreqtable(cats)
 
 341×4 DataFrame
  Row │ locus   genotype    count  frequency  
@@ -164,7 +164,7 @@ julia> geno_freqtable(cats)
  341 │ fca37   (208, 210)      3  0.0126582
                              333 rows omitted
 
-julia> geno_freqtable(cats, by = "population")
+julia> genofreqtable(cats, by = "population")
 1094×5 DataFrame
   Row │ locus   population  genotype    count  frequency         
       │ String  String      Tuple…      Int64  Float64           
@@ -181,7 +181,7 @@ julia> geno_freqtable(cats, by = "population")
                                         1086 rows omitted 
 ```
 """
-function geno_freqtable(data::PopData; by::String = "global")
+function genofreqtable(data::PopData; by::String = "global")
     if by == "global"
         grp = groupby(dropmissing(data.genodata, :genotype), [:locus, :genotype])
         counts = DataFrames.combine(grp, nrow => :count)
@@ -203,14 +203,14 @@ end
 
 
 """
-    allele_freqtable(data::PopData; by::String = "global")
+    allelefreqtable(data::PopData; by::String = "global")
 Return a table of the observed `global` (default) or `population` allele frequencies in a PopData object.
 
 ### Example:
 ```
 julia> cats = @nancycats ;
 
-julia> allele_freqtable(cats)
+julia> allelefreqtable(cats)
 108×4 DataFrame
  Row │ locus   allele  count  frequency  
      │ String  Int16?  Int64  Float64    
@@ -226,7 +226,7 @@ julia> allele_freqtable(cats)
  108 │ fca37      204      6  0.0126582
                          100 rows omitted
 
-julia> allele_freqtable(cats, by = "population")
+julia> allelefreqtable(cats, by = "population")
 839×5 DataFrame
  Row │ locus   population  allele  count  frequency 
      │ String  String      Int16?  Int64  Float64   
@@ -243,7 +243,7 @@ julia> allele_freqtable(cats, by = "population")
                                     831 rows omitted
 ```
 """
-function allele_freqtable(data::PopData; by::String = "global")
+function allelefreqtable(data::PopData; by::String = "global")
     if by == "global"
         grp = groupby(dropmissing(data.genodata, :genotype), :locus)
         _alleles = DataFrames.combine(grp, :genotype => alleles => :allele, ungroup = false)

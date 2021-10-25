@@ -1,7 +1,7 @@
 #export
 
 ## experimental and not exported or documented!
-function adjacency_matrix(data::PopData)
+function _adjacency_matrix(data::PopData)
     data_loci = groupby(data.genodata, :locus)
     out_vec = Vector{Array{Int8,2}}(undef, data.metadata.loci)
     for (j,i) in enumerate(data_loci)
@@ -17,13 +17,13 @@ end
 
 
 """
-    multitest_missing(pvals::Vector{T}, method::String) where T <: Union{Missing, <:AbstractFloat}
+    _p_adjust(pvals::Vector{T}, method::String) where T <: Union{Missing, <:AbstractFloat}
 Modification to `MultipleTesting.adjust` to include `missing` values in the
 returned array. See MultipleTesting.jl docs for full more detailed information.
 
 **Example**
 ```
-julia> multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")
+julia> _p_adjust([0.1, 0.01, 0.005, 0.3], "bh")
 
 ```
 ### `correction` methods (case insensitive)
@@ -38,7 +38,7 @@ julia> multitest_missing([0.1, 0.01, 0.005, 0.3], "bh")
 - `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
 """
-@inline function multitest_missing(pvals::Vector{T}, method::String) where T <: Union{Missing, <:AbstractFloat}
+@inline function _p_adjust(pvals::Vector{T}, method::String) where T <: Union{Missing, <:AbstractFloat}
     # make a dict of all possible tests and their respective functions
     d = Dict(
         "bonferroni" => Bonferroni(),

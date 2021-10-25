@@ -1,12 +1,12 @@
-export allele_avg, richness, summary, summary_stats
+export alleleavg, richness, summary, summarystats
 
 """
-    allele_avg(data::PopData; rounding::Bool = true)
+    alleleavg(data::PopData; rounding::Bool = true)
 Returns a NamedTuple of the average number of alleles ('mean') and
 standard deviation (`stdev`) of a `PopData`. Use `rounding = false` to
 not round results. Default (`true`) rounds to 4 digits.
 """
-function allele_avg(data::PopData; rounding::Bool = true)
+function alleleavg(data::PopData; rounding::Bool = true)
     tmp = richness(data)
     if rounding
         (mean = round(mean(tmp.richness), digits = 4), stdev = round(variation(tmp.richness), digits = 4))
@@ -95,8 +95,8 @@ function Base.summary(data::PopData; by::String = "global")
     het_df = DataFrames.combine(
         groupby(data.genodata, [:locus, :population]),
         :genotype => nonmissing => :n,
-        :genotype => hetero_o => :het_obs,
-        :genotype => hetero_e => :het_exp,
+        :genotype => _hetero_obs => :het_obs,
+        :genotype => _hetero_exp => :het_exp,
         :genotype => allele_freq => :alleles
     )
     # collapse down to retrieve averages and counts
@@ -104,7 +104,7 @@ function Base.summary(data::PopData; by::String = "global")
         groupby(het_df, :locus),
         :n => count_nonzeros => :count,
         :n => (n -> count_nonzeros(n) / reciprocal_sum(n)) => :mn,
-        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(gene_diversity_nei87.(e, o, count_nonzeros(n) / reciprocal_sum(n))))) => :HS,
+        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(_genediversitynei87.(e, o, count_nonzeros(n) / reciprocal_sum(n))))) => :HS,
         :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
         :alleles => (alleles ->  sum(values(avg_allele_freq(alleles, 2))))=> :avg_freq
         )
@@ -160,4 +160,4 @@ function Base.summary(data::PopData; by::String = "global")
     end
 end
 
-const summary_stats = summary
+const summarystats = summary

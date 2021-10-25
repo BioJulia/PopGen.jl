@@ -55,14 +55,14 @@ function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     # corrected n for population size
     corr_n_per_loc = n_pop_per_loc ./ map(reciprocal_sum, eachrow(n))
     # observed heterozygosity
-    het_obs_p1 = map(hetero_o, eachcol(population_1))
-    het_obs_p2 = map(hetero_o, eachcol(population_2))
+    het_obs_p1 = map(_hetero_obs, eachcol(population_1))
+    het_obs_p2 = map(_hetero_obs, eachcol(population_2))
     # expected heterozygosity
-    het_exp_p1 = map(hetero_e, eachcol(population_1))
-    het_exp_p2 = map(hetero_e, eachcol(population_2))
+    het_exp_p1 = map(_hetero_exp, eachcol(population_1))
+    het_exp_p2 = map(_hetero_exp, eachcol(population_2))
     # genic diversity for population 1 and 2
-    p1_nei = gene_diversity_nei87.(het_exp_p1, het_obs_p1, corr_n_per_loc)
-    p2_nei = gene_diversity_nei87.(het_exp_p2, het_obs_p2, corr_n_per_loc)
+    p1_nei = _genediversitynei87.(het_exp_p1, het_obs_p1, corr_n_per_loc)
+    p2_nei = _genediversitynei87.(het_exp_p2, het_obs_p2, corr_n_per_loc)
     # mean genic diversity
     HS = map(i -> mean(skipmissing(i)), zip(p1_nei, p2_nei))
     # allele freqs for population 1 and 2

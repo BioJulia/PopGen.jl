@@ -7,7 +7,9 @@ using Test
 
 all_tests = [
     "dataexploration.jl",
-    "summaryinfo.jl"
+    "summaryinfo.jl",
+    "heterozygosity.jl",
+    "hardyweinberg.jl"
 ]
 
 println("Running tests:")

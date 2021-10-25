@@ -1,11 +1,11 @@
-export hwe_test, hwe
+export hwetest, hwe
 
 """
-    locus_chi_sq(locus::T) where T <: GenoArray
+    _chisqlocus(locus::T) where T <: GenoArray
 Calculate the chi square statistic and p-value for a locus
 Returns a tuple with chi-square statistic, degrees of freedom, and p-value
 """
-function chisq_locus(locus::T) where T <: GenoArray
+function _chisqlocus(locus::T) where T <: GenoArray
     ## Get expected number of genotypes in a locus
     expected = geno_count_expected(locus)
 
@@ -34,7 +34,7 @@ end
 
 
 """
-    hwe_test(data::PopData; by::String = "locus"; correction = "none")
+    hwetest(data::PopData; by::String = "locus", correction = "none")
 Calculate chi-squared test of HWE for each locus and returns observed and
 expected heterozygosity with chi-squared, degrees of freedom and p-values for
 each locus. Use `by = "population"` to perform this separately for each population
@@ -42,8 +42,8 @@ each locus. Use `by = "population"` to perform this separately for each populati
 adjustment method for multiple testing.
 
 #### example
-`hwe_test(@gulfsharks, correction = "bh")` \n
-`hwe_test(@gulfsharks, by = "population", correction = "bh")` \n
+`hwetest(@gulfsharks, correction = "bh")` \n
+`hwetest(@gulfsharks, by = "population", correction = "bh")` \n
 
 
 ### `correction` methods (case insensitive)
@@ -58,11 +58,11 @@ adjustment method for multiple testing.
 - `"forwardstop"` or `"fs"` : Forward-Stop adjustment
 - `"bc"` : Barber-Candès adjustment
 """
-@inline function hwe_test(data::PopData; by::String = "locus", correction::String = "none")
+@inline function hwetest(data::PopData; by::String = "locus", correction::String = "none")
     if by == "locus"
         tmp =DataFrames.combine(
             groupby(data.genodata, :locus),
-            :genotype => chisq_locus => :chisq
+            :genotype => _chisqlocus => :chisq
         )
         out_table = select(tmp, :locus, 
             :chisq => (i -> getindex.(i, 1)) => :chisq, 
@@ -72,7 +72,7 @@ adjustment method for multiple testing.
     else
         tmp =DataFrames.combine(
             groupby(data.genodata, [:locus, :population]),
-            :genotype => chisq_locus => :chisq
+            :genotype => _chisqlocus => :chisq
         )
         out_table = select(tmp, :locus, :population, 
             :chisq => (i -> getindex.(i, 1)) => :chisq, 
@@ -84,8 +84,8 @@ adjustment method for multiple testing.
         return out_table
     else
         column_name = Symbol("P_"*correction)
-        transform!(out_table, :P => (i -> multitest_missing(i, correction)) => column_name)
+        transform!(out_table, :P => (i -> _p_adjust(i, correction)) => column_name)
     end
 end
 
-const hwe = hwe_test
+const hwe = hwetest
