@@ -1,12 +1,12 @@
-export alleleavg, richness, summary, summarystats
+export alleleaverage, richness, summary, summarystats
 
 """
-    alleleavg(data::PopData; rounding::Bool = true)
+    alleleaverage(data::PopData; rounding::Bool = true)
 Returns a NamedTuple of the average number of alleles ('mean') and
 standard deviation (`stdev`) of a `PopData`. Use `rounding = false` to
 not round results. Default (`true`) rounds to 4 digits.
 """
-function alleleavg(data::PopData; rounding::Bool = true)
+function alleleaverage(data::PopData; rounding::Bool = true)
     tmp = richness(data)
     if rounding
         (mean = round(mean(tmp.richness), digits = 4), stdev = round(variation(tmp.richness), digits = 4))
