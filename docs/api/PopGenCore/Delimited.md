@@ -4,6 +4,10 @@ title: Delimited.jl
 sidebar_label: Delimited.jl
 ---
 
+❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
+🔵 => exported by PopGen.jl
+
 ### `delimited`
 ```julia
 delimited(infile::String; delim::Union{Char,String,Regex} = "auto", digits::Int64 = 3, silent::Bool = false)

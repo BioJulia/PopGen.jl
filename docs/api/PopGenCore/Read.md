@@ -4,6 +4,10 @@ title: Read.jl
 sidebar_label: Read.jl
 ---
 
+❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
+🔵 => exported by PopGen.jl
+
 ### `read_from`
 ```julia
 read_from(infile::String; kwargs...)

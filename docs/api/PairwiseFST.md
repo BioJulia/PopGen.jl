@@ -4,6 +4,10 @@ title: PairwiseFST.jl
 sidebar_label: PairwiseFST.jl
 ---
 
+
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `Base.show`
 ```julia
 Base.show(io::IO, data::PairwiseFST)

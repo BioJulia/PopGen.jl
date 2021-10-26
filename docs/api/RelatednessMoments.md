@@ -4,6 +4,9 @@ title: RelatednessMoments.jl
 sidebar_label: RelatednessMoments.jl
 ---
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `Blouin`
     Blouin(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Allele sharing index described by Blouin (1996)

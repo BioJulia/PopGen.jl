@@ -8,6 +8,10 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 <link rel="stylesheet" href={useBaseUrl("katex/katex.min.css")} />
 
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
+
 ### `gene_diversity_nei87`
 ```julia
 gene_diversity_nei87(het_exp::Union{Missing,AbstractFloat}, het_obs::Union{Missing,AbstractFloat}, n::Union{Integer, Float64}, corr::Bool = true)

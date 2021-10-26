@@ -4,6 +4,9 @@ title: PairwiseRelatedness.jl
 sidebar_label: PairwiseRelatedness.jl
 ---
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `bootstrap_summary`
 ```julia
     bootstrap_summary(::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})

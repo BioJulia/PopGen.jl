@@ -4,6 +4,9 @@ title: Permutations.jl
 sidebar_label: Permutations.jl
 ---
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `permute_loci!`
 ```julia
 permute_loci!(data::PopData)

@@ -4,6 +4,10 @@ title: Manipulate.jl
 sidebar_label: Manipulate.jl
 ---
 
+❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
+🔵 => exported by PopGen.jl
+
 ### `add_meta!`
 
 ```julia

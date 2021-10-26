@@ -4,6 +4,9 @@ title: Utils.jl
 sidebar_label: Utils.jl
 ---
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `alleles`
 ```julia
 alleles(locus::T; miss::Bool = false) where T<:GenoArray

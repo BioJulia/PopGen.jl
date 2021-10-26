@@ -4,6 +4,9 @@ title: FstMethods.jl
 sidebar_label: FstMethods.jl
 ---
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `_pairwise_Hudson`
 ```
 _pairwise_Hudson(data::PopData)

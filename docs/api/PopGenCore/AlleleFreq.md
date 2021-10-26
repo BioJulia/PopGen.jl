@@ -4,6 +4,10 @@ title: AlleleFreq.jl
 sidebar_label: AlleleFreq.jl
 ---
 
+❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
+🔵 => exported by PopGen.jl
+
 ### allele_freq
 ```julia
 allele_freq(allele::Int, genos::GenoArray)

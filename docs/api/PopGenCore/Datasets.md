@@ -4,6 +4,10 @@ title: Datasets.jl
 sidebar_label: Datasets.jl
 ---
 
+❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
+🔵 => exported by PopGen.jl
+
 ### `dataset`
 ```julia
 dataset(::String)

@@ -4,6 +4,9 @@ title: SummaryInfo.jl
 sidebar_label: SummaryInfo.jl
 ---
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `alele_table`
 ```julia
 allele_table(data::PopData)

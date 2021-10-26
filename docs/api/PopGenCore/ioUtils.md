@@ -4,6 +4,10 @@ title: ioUtils.jl
 sidebar_label: ioUtils.jl
 ---
 
+❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
+🔵 => exported by PopGen.jl
+
 ### `determine_marker`
 ```julia
 determine_marker(geno_parse::T, digits::Int) where T<:AbstractDataFrame

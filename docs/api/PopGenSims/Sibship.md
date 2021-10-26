@@ -4,6 +4,9 @@ title: Sibship.jl
 sidebar_label: Sibship.jl
 ---
 
+❗ => not exported | 
+⚫ => exported by PopGenSims.jl
+
 ```julia
 _cross(parent1::Vector{Vector{T}}, parent2::Vector{Vector{T}}) where T <: Signed
 ```

@@ -4,6 +4,9 @@ title: Conditionals.jl
 sidebar_label: Conditionals.jl
 ---
 
+❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
+🔵 => exported by PopGen.jl
 ### `ishom`
 ```julia
 ishom(locus::T) where T <: GenotypeArray

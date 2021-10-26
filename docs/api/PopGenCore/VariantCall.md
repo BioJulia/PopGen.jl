@@ -4,12 +4,9 @@ title: VariantCall.jl
 sidebar_label: VariantCall.jl
 ---
 
-:::note "Lazy Loading"
-The VariantCall__.jl files are lazy-loaded. To make the `vcf` and `bcf` function docstrings always available to the user, "placeholder" methods are provided in
-VariantCall.jl and overwritten once `VariantCallLazy.jl` and `VariantCallGzLazy.jl` are lazy-loaded in. As such, the docstrings for all three source files are
-consolidated on this page.
-::: 
-
+❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
+🔵 => exported by PopGen.jl
 
 ### `openvcf`
     openvcf(::String)

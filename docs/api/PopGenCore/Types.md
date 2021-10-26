@@ -4,6 +4,10 @@ title: Types.jl
 sidebar_label: Types.jl
 ---
 
+❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
+🔵 => exported by PopGen.jl
+
 ### `PopObj`
 ```Julia
 PopObj

@@ -4,6 +4,9 @@ title: Utils.jl
 sidebar_label: Utils.jl
 ---
 
+❗ => not exported | 
+⚫ => exported by PopGenSims.jl
+
 ### `append!`
 ```julia
 append!(data::PopData, data2::PopData)

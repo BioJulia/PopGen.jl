@@ -4,6 +4,9 @@ title: DataExploration.jl
 sidebar_label: DataExploration.jl
 ---
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `allelefreqtable`
 ```julia
 allelefreqtable(data::PopData; by::String = "global")

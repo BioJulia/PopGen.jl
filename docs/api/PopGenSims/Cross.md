@@ -4,6 +4,9 @@ title: Cross.jl
 sidebar_label: Cross.jl
 ---
 
+❗ => not exported | 
+⚫ => exported by PopGenSims.jl
+
 ### `sample_genotype`
 ```julia
 sample_genotype(geno::T, n_alleles::Int) where T<:Genotype

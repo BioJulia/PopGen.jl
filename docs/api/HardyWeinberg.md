@@ -4,6 +4,9 @@ title: HardyWeinberg.jl
 sidebar_label: HardyWeinberg.jl
 ---
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `locus_chi_sq`
 ```julia
 locus_chi_sq(locus::T) where T <: GenotypeArray

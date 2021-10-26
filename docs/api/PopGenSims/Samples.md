@@ -4,6 +4,9 @@ title: Samples.jl
 sidebar_label: Samples.jl
 ---
 
+❗ => not exported | 
+⚫ => exported by PopGenSims.jl
+
 ## `simulate`
     simulate(data::PopData; n::Int = 100)
 Simulate `n` number of individuals (default: `100`) per population using per-population

@@ -4,6 +4,9 @@ title: FstPermutations.jl
 sidebar_label: FstPermutations.jl
 ---
 
+❗ => not exported | 
+🔵 => exported by PopGen.jl
+
 ### `_fst_permutation`
 ```julia
 _fst_permutation(population_1::T, population_2::T) where T<:AbstractMatrix
