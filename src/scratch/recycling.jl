@@ -10,8 +10,8 @@ function QuellerGoodnight2(data::PopData, ind1::String, ind2::String; alleles::T
     denominator1 = 0.0
     denominator2 = 0.0
 
-    geno1 = get_genotypes(data, ind1)
-    geno2 = get_genotypes(data, ind2)
+    geno1 = genotypes(data, ind1)
+    geno2 = genotypes(data, ind2)
 
     # drop missing values
     loc, geno1, geno2 = collect.(skipmissings(Symbol.(loci(data)), geno1, geno2))
@@ -49,9 +49,9 @@ end
 function _relatedness_noboot_fix(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     n_samples = data.metadata.samples
-    sample_pairs = pairwise_pairs(sample_names)
+    sample_pairs = pairwisepairs(sample_names)
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
-    allele_frequencies = allele_freq(data)
+    allelefrequencies = allelefreq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
@@ -68,7 +68,7 @@ function _relatedness_noboot_fix(data::PopData, sample_names::Vector{String}; me
             
             # populate shared_loci array
             @inbounds shared_loci[idx.value] = length(keep_idx)
-            @inbounds [relate_vecs[i][idx.value] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding) for (i,mth) in enumerate(method)]
+            @inbounds [relate_vecs[i][idx.value] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allelefrequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding) for (i,mth) in enumerate(method)]
 
             update!(p, idx.value)
         end
@@ -83,7 +83,7 @@ end
 function relatedness2(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
     all(data.metadata[data.metadata.sampleinfo.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
     errs = ""
-    all_samples = samples(data)
+    all_samples = samplenames(data)
     if sample_names != all_samples
         [errs *= "$i," for i in sample_names if i ∉ all_samples]
         errs != "" && error("Samples not found in the PopData: " * errs)
@@ -109,7 +109,7 @@ end
 
 
 function relatedness2(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
-    sample_names = samples(data) |> collect
+    sample_names = samplenames(data) |> collect
     relatedness2(data, sample_names, method = method, iterations = iterations, interval = interval, resample = resample, inbreeding = inbreeding)
 end
 
@@ -118,9 +118,9 @@ end
 function _relatedness_noboot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     n_samples = data.metadata.samples
-    sample_pairs = pairwise_pairs(sample_names)
+    sample_pairs = pairwisepairs(sample_names)
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
-    allele_frequencies = allele_freq(data)
+    allelefrequencies = allelefreq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     shared_loci = Vector{Int}(undef, length(sample_pairs))
     p = Progress(length(sample_pairs), dt = 1, color = :blue)
@@ -137,7 +137,7 @@ function _relatedness_noboot(data::PopData, sample_names::Vector{String}; method
             
             # populate shared_loci array
             @inbounds shared_loci[idx] = length(keep_idx)
-            @inbounds [relate_vecs[i][idx] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allele_frequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding) for (i,mth) in enumerate(method)]
+            @inbounds [relate_vecs[i][idx] = @inbounds mth(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allelefrequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding) for (i,mth) in enumerate(method)]
 
             update!(p, idx)
         end
@@ -151,10 +151,10 @@ end
 
 function _relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
-    sample_pairs = pairwise_pairs(sample_names)
+    sample_pairs = pairwisepairs(sample_names)
     n_samples = data.metadata.samples
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
-    allele_frequencies = allele_freq(data)
+    allelefrequencies = allelefreq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
@@ -177,8 +177,8 @@ function _relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String
             @inbounds shared_loci[idx] = length(loc)
             
             @inbounds for (i, mthd) in enumerate(method)
-                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
-                boot_out = _bootstrapgenos_nonmissing(gen1, gen2, loc, n_per_loc, allele_frequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
+                @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allelefrequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
+                boot_out = _bootstrapgenos_nonmissing(gen1, gen2, loc, n_per_loc, allelefrequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
                 @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = _bootstrapsummary(boot_out, interval)
             end
             update!(p, idx)
@@ -223,7 +223,7 @@ function relatedness(data::PopData, sample_names::Vector{String}; kwargs...)
     #method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all") where F
     kw_dict = Dict(kwargs...)
     all(data.metadata[data.metadata.sampleinfo.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
-    all_samples = samples(data)
+    all_samples = samplenames(data)
     errs = ""
     if sample_names != all_samples
         [errs *= "$i," for i in sample_names if i ∉ all_samples]
@@ -278,11 +278,11 @@ Stacktrace:
 # extremely incomplete
 function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975)) where F
     loci_names = Symbol.(loci(data))
-    sample_pairs = pairwise_pairs(sample_names)
+    sample_pairs = pairwisepairs(sample_names)
     n_loci = length(loci_names)
     n_samples = data.metadata.samples
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
-    allele_frequencies = allele_freq(data)
+    allelefrequencies = allelefreq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, length(sample_pairs)), 1:length(method))
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, length(sample_pairs)), 1:length(method))
@@ -307,9 +307,9 @@ function relatedness_bootstrap(data::PopData, sample_names::Vector{String}; meth
                 # populate shared_loci array
                 @inbounds shared_loci[idx] = length(loc)
                 @inbounds for (i, mthd) in enumerate(method)
-                    @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples)
-                    boot_out = mthd(gen1, gen2, loc, allele_frequencies, loc_n = n_per_loc, n_samples = n_samples)
-                    #boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allele_frequencies)
+                    @inbounds relate_vecs[i][idx] = mthd(gen1, gen2, loc, allelefrequencies, loc_n = n_per_loc, n_samples = n_samples)
+                    boot_out = mthd(gen1, gen2, loc, allelefrequencies, loc_n = n_per_loc, n_samples = n_samples)
+                    #boot_out = bootstrap_locus(data, mthd, ind1, ind2, iterations, allelefrequencies)
                     @inbounds boot_means[i][idx], boot_medians[i][idx], boot_ses[i][idx], boot_CI[i][idx] = _bootstrapsummary(boot_out, iterations, interval)
                 end
             update!(p, idx)

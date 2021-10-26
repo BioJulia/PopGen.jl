@@ -7,10 +7,10 @@ Returns a tuple with chi-square statistic, degrees of freedom, and p-value
 """
 function _chisqlocus(locus::T) where T <: GenoArray
     ## Get expected number of genotypes in a locus
-    expected = geno_count_expected(locus)
+    expected = genocount_expected(locus)
 
     ## Get observed number of genotypes in a locus
-    observed = geno_count_observed(locus)
+    observed = genocount_observed(locus)
 
     chisq_stat = expected
     @inbounds for genotype in keys(expected)
@@ -20,7 +20,7 @@ function _chisqlocus(locus::T) where T <: GenoArray
     end
     chisq_stat = values(chisq_stat) |> sum
     n_geno_exp = length(expected)
-    n_alleles = length(unique_alleles(locus))
+    n_alleles = length(uniquealleles(locus))
     df = n_geno_exp - n_alleles
 
     if df > 0

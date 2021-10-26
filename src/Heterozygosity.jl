@@ -83,7 +83,7 @@ Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
 @inline function _hetero_exp(data::T) where T <: GenoArray
-    all(ismissing.(data)) == true ? missing : 1.0 - mapreduce(i -> i^2, + , allele_freq_vec(data))
+    all(ismissing.(data)) == true ? missing : 1.0 - mapreduce(i -> i^2, + , allelefreq_vec(data))
 end
 
 
@@ -139,6 +139,6 @@ end
 Calculate the observed heterozygosity for an individual in a `PopData` object.
 """
 @inline function samplehet(data::PopData, individual::String)
-    individual ∉ samples(data) && throw(ArgumentError("$individual not found in data"))
+    individual ∉ samplenames(data) && throw(ArgumentError("$individual not found in data"))
     data.genodata[data.genodata.name .== individual, :genotype] |> _hetero_obs
 end

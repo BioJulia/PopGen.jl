@@ -6,7 +6,7 @@ function FST_global(data::PopData)
         :genotype => nonmissing => :n,
         :genotype => _hetero_obs => :het_obs,
         :genotype => (i -> _hetero_exp(i)) => :het_exp,
-        :genotype => allele_freq => :alleles
+        :genotype => allelefreq => :alleles
     )
     # collapse down to retrieve averages and counts
     n_df = DataFrames.combine(
@@ -15,7 +15,7 @@ function FST_global(data::PopData)
         :n => (n -> sum(.!iszero.(n)) ./ sum(reciprocal.(n))) => :mn,
         [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(_genediversitynei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n)))))) => :HS,
         :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
-        :alleles => (alleles ->  sum(values(avg_allele_freq(alleles, 2))))=> :avg_freq
+        :alleles => (alleles ->  sum(values(avg_allelefreq(alleles, 2))))=> :avg_freq
         )
 
     Ht = @inbounds 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)
@@ -41,7 +41,7 @@ function FST_locus(data::PopData)
         :genotype => nonmissing => :n,
         :genotype => _hetero_obs => :het_obs,
         :genotype => (i -> _hetero_exp(i)) => :het_exp,
-        :genotype => allele_freq => :alleles
+        :genotype => allelefreq => :alleles
     )
     # collapse down to retrieve averages and counts
     n_df = DataFrames.combine(
@@ -50,7 +50,7 @@ function FST_locus(data::PopData)
             mn = sum(.!iszero.(n)) ./ sum(reciprocal.(n)),
             HS = mean(skipmissing(_genediversitynei87.(e,o,sum(.!iszero.(n)) ./ sum(reciprocal.(n))))),
             Het_obs = mean(skipmissing(o)),
-            avg_freq = sum(values(avg_allele_freq(alleles)).^2)
+            avg_freq = sum(values(avg_allelefreq(alleles)).^2)
             ),
         groupby(het_df, :locus)
     )

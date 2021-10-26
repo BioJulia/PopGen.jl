@@ -72,7 +72,7 @@ julia> pairwiseidentical(cats)
 
 """
 function pairwiseidentical(data::PopData)
-    sample_names = collect(samples(data))
+    sample_names = collect(samplenames(data))
     pairwiseidentical(data, sample_names)
 end
 
@@ -85,7 +85,7 @@ between all pairs of provided `sample_names`.
 ```
 julia> cats = @nancycats ;
 
-julia> interesting_cats = samples(cats)[1:5]
+julia> interesting_cats = samplenames(cats)[1:5]
 5-element Array{String,1}:
  "N215"
  "N216"
@@ -112,12 +112,12 @@ julia> pairwiseidentical(cats, interesting_cats)
 """
 function pairwiseidentical(data::PopData, sample_names::Vector{T}) where T<:AbstractString
     errs = ""
-    all_samples = samples(data)
+    all_samples = samplenames(data)
     if sample_names != all_samples
         [errs *= "\n  $i" for i in sample_names if i ∉ all_samples]
         errs != "" && error("Samples not found in the PopData: " * errs)
     end
-    sample_pairs = collect(pairwise_pairs(sample_names))
+    sample_pairs = collect(pairwisepairs(sample_names))
     n = length(sample_pairs)
     perc_ident_vec = Vector{Float64}(undef, n)
     n_vec = Vector{Int}(undef, n)

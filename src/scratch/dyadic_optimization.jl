@@ -6,7 +6,7 @@ data = @nancycats
 
 alleles = Dict()
 for loc in loci(data)
-    alleles[loc] = allele_freq(locus(data, loc))
+    alleles[loc] = allelefreq(locus(data, loc))
 end
 alleles
 

@@ -33,9 +33,9 @@ Milligan 2003.
 function pr_l_s(x::Tuple, y::Tuple, alleles::Dict)
     #= Example
     cats = @nancycats
-    cat1=get_genotype(cats, sample = "N100", locus = "fca23")
-    cat2=get_genotype(cats, sample = "N111", locus = "fca23")
-    allele = allele_freq(cats.genodata.fca23)
+    cat1=genotype(cats, sample = "N100", locus = "fca23")
+    cat2=genotype(cats, sample = "N111", locus = "fca23")
+    allele = allelefreq(cats.genodata.fca23)
     pr_l_s(cat1, cat2, allele)
     =#
     #=
@@ -173,8 +173,8 @@ function all_loci_Pr_L_S(data::PopData, ind1::String, ind2::String, alleles::Dic
     Pr_L_S = []
     for locus in String.(names(data.genodata))
         #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = locus)
-        gen2 = get_genotype(data, sample = ind2, locus = locus)
+        gen1 = genotype(data, sample = ind1, locus = locus)
+        gen2 = genotype(data, sample = ind2, locus = locus)
 
         if gen1 !== missing && gen2 !== missing
             tmp = pr_l_s(gen1, gen2, alleles[locus])
@@ -185,7 +185,7 @@ function all_loci_Pr_L_S(data::PopData, ind1::String, ind2::String, alleles::Dic
     return transpose(hcat(Pr_L_S...))
 end
 
-#Pr_L_S_inbreeding = all_loci_Pr_L_S(ind1, ind2, data, allele_frequencies)
+#Pr_L_S_inbreeding = all_loci_Pr_L_S(ind1, ind2, data, allelefrequencies)
 
 
 """
@@ -199,7 +199,7 @@ function no_inbreeding(Pr_L_S::Transpose{Float64,Array{Float64,2}})
     return Pr_L_S
 end
 
-#Pr_L_S_noinbreeding = dyadic_ML(data, allele_frequencies) |> no_inbreeding
+#Pr_L_S_noinbreeding = dyadic_ML(data, allelefrequencies) |> no_inbreeding
 
 
 ## Calculate Δ coefficients
@@ -312,8 +312,8 @@ function qg_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
 
     for loc in loci(data)
         #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
+        gen1 = genotype(data, sample = ind1, locus = loc)
+        gen2 = genotype(data, sample = ind2, locus = loc)
 
         #Skip missing
         if gen1 !== missing && gen2 !== missing
@@ -348,8 +348,8 @@ function ritland_relatedness(data::PopData, ind1::String, ind2::String; alleles:
 
     for loc in loci(data)
         #Extract the pair of interest's genotypes
-        gen1 = get_genotype(data, sample = ind1, locus = loc)
-        gen2 = get_genotype(data, sample = ind2, locus = loc)
+        gen1 = genotype(data, sample = ind1, locus = loc)
+        gen2 = genotype(data, sample = ind2, locus = loc)
 
         #Skip missing
         if gen1 !== missing && gen2 !== missing
@@ -388,8 +388,8 @@ function lr_relatedness(data::PopData, ind1::String, ind2::String; alleles::T) w
     n = 0.0
     d = 0.0
     #Extract the pair of interest's genotypes
-    gen1 = get_genotypes(data, ind1)
-    gen2 = get_genotypes(data, ind2)
+    gen1 = genotypes(data, ind1)
+    gen2 = genotypes(data, ind2)
 
     # keep only loci where both are not missing
     # _f implies "filtered"
@@ -432,8 +432,8 @@ function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::
     # check that dataset is entirely diploid
     all(data.metadata.sampleinfo.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
-    allele_frequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
-                            Tuple(allele_freq.(locus.(Ref(data), loci(data))))
+    allelefrequencies = NamedTuple{Tuple(Symbol.(loci(data)))}(
+                            Tuple(allelefreq.(locus.(Ref(data), loci(data))))
                         )
 
     #=
@@ -447,7 +447,7 @@ function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::
         output = DataFrame(ind1 = [], ind2 = [], relatedness = [], convergence = [])
     end
     =#
-    sample_names = samples(data)
+    sample_names = samplenames(data)
     sample_pairs = [tuple(sample_names[i], sample_names[j]) for i in 1:length(sample_names)-1 for j in i+1:length(sample_names)]
     relate_vec = zeros(length(sample_pairs))
     idx = 0
@@ -459,11 +459,11 @@ function pairwise_relatedness(data::PopData; method::String = "qg", inbreeding::
                 idx += 1
                 #=
                 if method == "dyadml"
-                    dyad_out = dyadicML_relatedness(data, ind1, data.samples.name[ind2], alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
+                    dyad_out = dyadicML_relatedness(data, ind1, data.samples.name[ind2], alleles = allelefrequencies, inbreeding = inbreeding, verbose = verbose)
                     append!(output,DataFrame(ind1 = ind1, ind2 = data.samples.name[ind2], relatedness = dyad_out[1], convergence = dyad_out[3]))
                 end
                 =#
-                relate_vec[idx] += qg_relatedness(data, ind1, ind2, alleles = allele_frequencies)
+                relate_vec[idx] += qg_relatedness(data, ind1, ind2, alleles = allelefrequencies)
                 #=
                 if !verbose
                     next!(prog)
@@ -488,9 +488,9 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
     # check that dataset is entirely diploid
     all(data.samples.ploidy .== 2) == false && error("Relatedness analyses currently only support diploid samples")
 
-    allele_frequencies = Dict()
+    allelefrequencies = Dict()
     for locus in names(data.genodata)
-        allele_frequencies[String(locus)] = allele_freq(data.genodata[:, locus])
+        allelefrequencies[String(locus)] = allelefreq(data.genodata[:, locus])
     end
 
     n = size(data.samples)[1]
@@ -520,10 +520,10 @@ function pairwise_relatedness(data::PopObj; method::String, inbreeding::Bool = t
         output[i, :Ind2] = ind2
         output[i, :thread] = Threads.threadid()
         if method == "qg"
-            output[i, :relatedness] = qg_relatedness(data, ind1, ind2, alleles = allele_frequencies)
+            output[i, :relatedness] = qg_relatedness(data, ind1, ind2, alleles = allelefrequencies)
         end
         if method == "dyadml"
-            dyad_out = dyadicML_relatedness(data, ind1, ind2, alleles = allele_frequencies, inbreeding = inbreeding, verbose = verbose)
+            dyad_out = dyadicML_relatedness(data, ind1, ind2, alleles = allelefrequencies, inbreeding = inbreeding, verbose = verbose)
             output[i, :relatedness] = dyad_out[1]
             output[i, :convergence] = dyad_out[3]
         end

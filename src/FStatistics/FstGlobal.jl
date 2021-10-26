@@ -19,8 +19,8 @@ end
 
 # helper function to do the math for Hudson FST on a locus
 function _hudson_fst(pop1::T, pop2::T) where T<:GenoArray
-    p1_frq = allele_freq(pop1)
-    p2_frq = allele_freq(pop2)
+    p1_frq = allelefreq(pop1)
+    p2_frq = allelefreq(pop2)
     # find the shared allele(s) and choose one of them to be "P"
     # this is a safeguard if one population is completely homozygous for an allele
     p_allele = intersect(keys(p1_frq), keys(p2_frq)) |> first
@@ -61,10 +61,10 @@ function _nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     # mean genic diversity
     HS = map(i -> mean(skipmissing(i)), zip(p1_nei, p2_nei))
     # allele freqs for population 1 and 2
-    alle_freq_p1 = map(allele_freq, eachcol(population_1))
-    alle_freq_p2 = map(allele_freq, eachcol(population_2))
+    alle_freq_p1 = map(allelefreq, eachcol(population_1))
+    alle_freq_p2 = map(allelefreq, eachcol(population_2))
     # sum of the squared average allele frequencies
-    avg_freq = avg_allele_freq.(zip(alle_freq_p1, alle_freq_p2),2) .|> values .|> sum
+    avg_freq = avg_allelefreq.(zip(alle_freq_p1, alle_freq_p2),2) .|> values .|> sum
     # average observed heterozygosity per locus
     Het_obs = map(i -> mean(skipmissing(i)), zip(het_obs_p1, het_obs_p2))
 
@@ -117,28 +117,28 @@ function _weircockerham_fst(population_1::T, population_2::T) where T<:AbstractM
     n_pop_per_loc = map(count_nonzeros, eachrow(n_per_locpop))
 
     # global allele counts
-    glob_allele_counts = map(allele_count, eachcol(merged))
+    glob_allelecounts = map(allelecount, eachcol(merged))
     # global allele frequencies
-    glob_allele_freqs = map(allele_freq, eachcol(merged))
+    glob_allelefreqs = map(allelefreq, eachcol(merged))
     
     # allele freqs per locus per population
-    pop_1_freq = map(allele_freq, eachcol(pop_1))
-    pop_2_freq = map(allele_freq, eachcol(pop_2))
-    # expand out the n matrix to be same dimensions as unique_alleles x pop
-    n_expanded = reduce(hcat, repeat.(eachrow(n_per_locpop), 1, glob_allele_counts)) |> permutedims
-    # expand n_total matrix to be same dimensions as unique_alleles x pop
-    n_tot_expanded = reduce(vcat, repeat.(eachrow(n_total), glob_allele_counts))
+    pop_1_freq = map(allelefreq, eachcol(pop_1))
+    pop_2_freq = map(allelefreq, eachcol(pop_2))
+    # expand out the n matrix to be same dimensions as uniquealleles x pop
+    n_expanded = reduce(hcat, repeat.(eachrow(n_per_locpop), 1, glob_allelecounts)) |> permutedims
+    # expand n_total matrix to be same dimensions as uniquealleles x pop
+    n_tot_expanded = reduce(vcat, repeat.(eachrow(n_total), glob_allelecounts))
     # calculate corrected n per locus
     corr_n_per_loc = (n_total .- (sum(n_per_locpop .^2, dims = 2) ./ n_total)) ./ (n_pop_per_loc .- 1) 
-    # expand corr_n matrix to be same dimensions as unique_alleles x pop
-    corr_n_per_loc_exp = reduce(vcat, repeat.(eachrow(corr_n_per_loc), glob_allele_counts))
+    # expand corr_n matrix to be same dimensions as uniquealleles x pop
+    corr_n_per_loc_exp = reduce(vcat, repeat.(eachrow(corr_n_per_loc), glob_allelecounts))
     # list of alleles in each locus
-    _alleles_perloc = [sort(unique_alleles(i)) for i in eachcol(merged)]
+    _alleles_perloc = [sort(uniquealleles(i)) for i in eachcol(merged)]
     # extremely convoluted, creates a big matrix of allele freqs per locus per population
     # TODO are there too many reshapes going on?
     #TODO move into its own function? This seems like it could be a recurring thing
     afreq_tmp = hcat(pop_1_freq, pop_2_freq)
-    allele_freq_pop = reshape(
+    allelefreq_pop = reshape(
         reduce(vcat,
             map(zip(eachrow(afreq_tmp), _alleles_perloc)) do (_freqs_p, _alle)
                 reduce(hcat,
@@ -151,7 +151,7 @@ function _weircockerham_fst(population_1::T, population_2::T) where T<:AbstractM
        :, n_pops  # reshape by these dimensions
     )
     # global allele freqs
-    _freqs = map(i -> values(sort(i)), glob_allele_freqs) |> Base.Iterators.flatten |> collect
+    _freqs = map(i -> values(sort(i)), glob_allelefreqs) |> Base.Iterators.flatten |> collect
 
     #heterozygotes per allele per locus per population
     # gets emptied from the popfirst! calls below(!)
@@ -170,11 +170,11 @@ function _weircockerham_fst(population_1::T, population_2::T) where T<:AbstractM
             )
         end
     )
-    μ_het =  (2 * n_expanded .* allele_freq_pop - het_mtx) / 2
-    SSG = sum(n_expanded .* allele_freq_pop - μ_het, dims = 2)
-    SSi = sum(n_expanded .* (allele_freq_pop - 2 * allele_freq_pop .^ 2) + μ_het, dims = 2)
-    SSP = 2 .* sum(n_expanded .* reduce(hcat, map(i -> (i .- _freqs) .^ 2, eachcol(allele_freq_pop))), dims = 2)
-    n_correction = reduce(vcat, fill.(n_pop_per_loc, glob_allele_counts))
+    μ_het =  (2 * n_expanded .* allelefreq_pop - het_mtx) / 2
+    SSG = sum(n_expanded .* allelefreq_pop - μ_het, dims = 2)
+    SSi = sum(n_expanded .* (allelefreq_pop - 2 * allelefreq_pop .^ 2) + μ_het, dims = 2)
+    SSP = 2 .* sum(n_expanded .* reduce(hcat, map(i -> (i .- _freqs) .^ 2, eachcol(allelefreq_pop))), dims = 2)
+    n_correction = reduce(vcat, fill.(n_pop_per_loc, glob_allelecounts))
 
     MSG = SSG ./ n_tot_expanded
     MSP = SSP ./ (n_correction .- 1)

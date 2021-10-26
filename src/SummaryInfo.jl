@@ -26,12 +26,12 @@ function richness(data::PopData; by::String = "locus")
     if by == "locus"
         DataFrames.combine(
             groupby(data.genodata, :locus),
-            :genotype => (geno -> length(unique_alleles(geno))) => :richness
+            :genotype => (geno -> length(uniquealleles(geno))) => :richness
         )
     elseif by == "population"
         DataFrames.combine(
             groupby(data.genodata, [:locus, :population]),
-            :genotype => (geno -> length(unique_alleles(geno))) => :richness
+            :genotype => (geno -> length(uniquealleles(geno))) => :richness
         )
     else
         throw(ArgumentError("Please use by = \"locus\" (default) or \"population\""))
@@ -97,7 +97,7 @@ function Base.summary(data::PopData; by::String = "global")
         :genotype => nonmissing => :n,
         :genotype => _hetero_obs => :het_obs,
         :genotype => _hetero_exp => :het_exp,
-        :genotype => allele_freq => :alleles
+        :genotype => allelefreq => :alleles
     )
     # collapse down to retrieve averages and counts
     n_df = DataFrames.combine(
@@ -106,7 +106,7 @@ function Base.summary(data::PopData; by::String = "global")
         :n => (n -> count_nonzeros(n) / reciprocal_sum(n)) => :mn,
         [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(_genediversitynei87.(e, o, count_nonzeros(n) / reciprocal_sum(n))))) => :HS,
         :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
-        :alleles => (alleles ->  sum(values(avg_allele_freq(alleles, 2))))=> :avg_freq
+        :alleles => (alleles ->  sum(values(avg_allelefreq(alleles, 2))))=> :avg_freq
         )
 
     Ht = 1.0 .- n_df.avg_freq .+ (n_df.HS ./ n_df.mn ./ n_df.count) - (n_df.Het_obs ./ 2.0 ./ n_df.mn ./ n_df.count)

@@ -13,8 +13,8 @@ Documentation: https://biojulia.net/PopGen.jl/
 ## Explore PopData
 - `populations(PopData)` to view population information
 - `loci(PopData)` to view locus names
-- `samples(PopData)` to view sample names
-- `missing(PopData, by = ...)` to view missing information
+- `samplenames(PopData)` to view sample names
+- `missingdata(PopData, by = ...)` to view missing information
 
 ## Manipulate PopData
 - `populations!(PopData, ...)` to rename populations
@@ -25,7 +25,7 @@ Documentation: https://biojulia.net/PopGen.jl/
 - `richness(PopData)` to calculate allelic richness
 - `relatedness(PopData, method = ...)` to get pairwise relatedness of individuals
 - `summary(PopData)` to calculate F-statistics, heterozygosity, etc.
-- `hwe_test(PopData)` to test for Hardy-Weinberg Equilibrium
+- `hwetest(PopData)` to test for Hardy-Weinberg Equilibrium
 - `pairwisefst(PopData)` to calculate FST between pairs of populations
 """
 module PopGen
@@ -42,13 +42,13 @@ using PopGenCore
     export PopData, PopDataInfo, GenoArray, Genotype, SNP, Msat, genodata, sampleinfo, locusinfo
     export isbiallelic, ishom, ishet
     export delimited, csv, genepop, vcf, bcf, @nancycats, @gulfsharks
-    export ishom, ishet
-    export copy, size, sort, drop_monomorphic, drop_monomorphic!
-    export drop_multiallelic, drop_multiallelic!
-    export loci, samples, add_meta!, locations, locations!
-    export loci_dataframe, loci_matrix
-    export genotypes, get_genotypes, get_genotype
-    export populations, population, populations!, population!
+    export sampleinfo, locusinfo, samplenames, loci
+    export copy, size, sort, dropmonomorphic, dropmonomorphic!
+    export dropmultiallelic, dropmultiallelic!
+    export loci, samples, locations, locations!
+    export locidataframe, locimatrix
+    export genotypes, genotypes, genotype
+    export populations, populations!
     export exclude, remove, omit, exclude!, remove!, omit!, keep, keep!, filter, filter!
 end
 @reexport import PopGenCore: read, write
