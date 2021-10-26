@@ -8,8 +8,8 @@ These pages contains the APIs, or **A**pplication **P**rogramming **I**nterface,
 
 Here's a helpful map of navigating the API:
 1. functions beginning with underscores are never exported
-2. a red dot (🔴) indicates the function is not exported by any package
-3. a pineapple (🍍) indicates the function is exported by PopGenCore.jl
+2. a red exclamation (❗) indicates the function is not exported by any package
+3. a purple sqaure (🟪) indicates the function is exported by PopGenCore.jl
 4. a blue dot (🔵) indicates the function is exported by PopGen.jl
 
 (this notation seemed easier than remembering 3 colors)
