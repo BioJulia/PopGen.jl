@@ -3,7 +3,7 @@ id: fstpermutations
 title: FstPermutations.jl
 sidebar_label: FstPermutations.jl
 ---
-
+## PopGen.jl/src/FStatistics/FstPermutations.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 

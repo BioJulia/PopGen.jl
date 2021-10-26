@@ -3,7 +3,7 @@ id: popgensims_sibship
 title: Sibship.jl
 sidebar_label: Sibship.jl
 ---
-
+PopGenSims.jl/src/Sibship.jl
 ❗ => not exported | 
 ⚫ => exported by PopGenSims.jl
 

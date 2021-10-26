@@ -3,7 +3,7 @@ id: summaryinfo
 title: SummaryInfo.jl
 sidebar_label: SummaryInfo.jl
 ---
-
+## PopGen.jl/src/SummaryInfo.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 

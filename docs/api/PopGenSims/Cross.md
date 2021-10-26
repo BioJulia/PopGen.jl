@@ -3,7 +3,7 @@ id: popgensims_cross
 title: Cross.jl
 sidebar_label: Cross.jl
 ---
-
+## PopGenSims.jl/src/Cross.jl
 ❗ => not exported | 
 ⚫ => exported by PopGenSims.jl
 

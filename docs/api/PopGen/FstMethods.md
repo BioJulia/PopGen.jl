@@ -3,7 +3,7 @@ id: fstmethods
 title: FstMethods.jl
 sidebar_label: FstMethods.jl
 ---
-
+## PopGen.jl/src/FStatistics/FstMethods.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 

@@ -3,7 +3,7 @@ id: allelefreq
 title: AlleleFreq.jl
 sidebar_label: AlleleFreq.jl
 ---
-
+## PopGenCore.jl/src/AlleleFreq.jl
 ❗ => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl

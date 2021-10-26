@@ -4,7 +4,7 @@ title: PairwiseFST.jl
 sidebar_label: PairwiseFST.jl
 ---
 
-
+## PopGen.jl/src/FStatistics/PairwistFST.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 

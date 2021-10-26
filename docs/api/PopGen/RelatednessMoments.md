@@ -4,6 +4,7 @@ title: RelatednessMoments.jl
 sidebar_label: RelatednessMoments.jl
 ---
 
+## PopGen.jl/src/Relatedness/RelatednessMoments.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 

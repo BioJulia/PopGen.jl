@@ -1,9 +1,9 @@
 ---
 id: types
-title: Types.jl
-sidebar_label: Types.jl
+title: PopData.jl
+sidebar_label: PopData.jl
 ---
-
+## PopGenCore.jl/src/PopData.jl
 ❗ => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl

@@ -3,7 +3,7 @@ id: permutations
 title: Permutations.jl
 sidebar_label: Permutations.jl
 ---
-
+## PopGenCore.jl/src/Permutations.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 

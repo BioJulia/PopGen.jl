@@ -3,7 +3,7 @@ id: hardyweinberg
 title: HardyWeinberg.jl
 sidebar_label: HardyWeinberg.jl
 ---
-
+## PopGen.jl/src/HardyWeinberg.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 

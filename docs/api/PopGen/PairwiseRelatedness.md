@@ -3,7 +3,7 @@ id: pairwiserelatedness
 title: PairwiseRelatedness.jl
 sidebar_label: PairwiseRelatedness.jl
 ---
-
+## PopGen.jl/src/Relatedness/PairwiseRelatedness.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 

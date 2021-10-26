@@ -3,7 +3,7 @@ id: popgensims_samples
 title: Samples.jl
 sidebar_label: Samples.jl
 ---
-
+PopGenSims.jl/src/Samples.jl
 ❗ => not exported | 
 ⚫ => exported by PopGenSims.jl
 
