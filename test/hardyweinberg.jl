@@ -1,4 +1,4 @@
-module  TestHeterozygosity
+module  TestHardyWeinberg
 
 using PopGen
 using DataFrames
