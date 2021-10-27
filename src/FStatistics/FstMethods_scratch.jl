@@ -51,7 +51,7 @@ end
 function nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     n =  hcat(map(nonmissing, eachcol(population_1)), map(nonmissing, eachcol(population_2)))
     # number of populations represented per locus
-    n_pop_per_loc = map(count_nonzeros, eachrow(n)) 
+    n_pop_per_loc = map(countnonzeros, eachrow(n)) 
     # corrected n for population size
     corr_n_per_loc = n_pop_per_loc ./ map(reciprocal_sum, eachrow(n))
     # observed heterozygosity
@@ -120,7 +120,7 @@ function weircockerham_fst(population_1::T, population_2::T) where T<:AbstractMa
         pop_2 = population_2
     end
     merged = vcat(pop_1, pop_2)
-    n_pop_per_loc = map(count_nonzeros, eachrow(n_per_locpop))
+    n_pop_per_loc = map(countnonzeros, eachrow(n_per_locpop))
 
     # global allele counts
     glob_allelecounts = map(allelecount, eachcol(merged))

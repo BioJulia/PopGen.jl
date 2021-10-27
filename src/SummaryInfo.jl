@@ -102,9 +102,9 @@ function Base.summary(data::PopData; by::String = "global")
     # collapse down to retrieve averages and counts
     n_df = DataFrames.combine(
         groupby(het_df, :locus),
-        :n => count_nonzeros => :count,
-        :n => (n -> count_nonzeros(n) / reciprocal_sum(n)) => :mn,
-        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(_genediversitynei87.(e, o, count_nonzeros(n) / reciprocal_sum(n))))) => :HS,
+        :n => countnonzeros => :count,
+        :n => (n -> countnonzeros(n) / reciprocal_sum(n)) => :mn,
+        [:het_obs, :het_exp, :n] => ((o,e,n) -> mean(skipmissing(_genediversitynei87.(e, o, countnonzeros(n) / reciprocal_sum(n))))) => :HS,
         :het_obs => (o -> mean(skipmissing(o)))=> :Het_obs,
         :alleles => (alleles ->  sum(values(avg_allelefreq(alleles, 2))))=> :avg_freq
         )

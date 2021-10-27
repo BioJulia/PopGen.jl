@@ -1,6 +1,7 @@
 module  TestHeterozygosity
 
 using PopGen
+using DataFrames
 using Test
 
 cats = @nancycats;
@@ -34,13 +35,13 @@ testarray = cats.genodata.genotype[1:10]
 
     @testset "heterozygosity" begin
         tmp = heterozygosity(cats)
-        @test tmp isa DataFrames.DataFrame
+        @test tmp isa DataFrame
         @test size(tmp) == (9,4)
         tmp = heterozygosity(cats, by = "sample")
-        @test tmp isa DataFrames.DataFrame
+        @test tmp isa DataFrame
         @test size(tmp) == (237,3)
         tmp = heterozygosity(cats, by = "population")
-        @test tmp isa DataFrames.DataFrame
+        @test tmp isa DataFrame
         @test size(tmp) == (17,4)
         @test samplehet(cats, "N215") == 1/3
         @test_throws ArgumentError samplehet(cats, "M115")
