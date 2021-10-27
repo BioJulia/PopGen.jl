@@ -45,7 +45,7 @@ using PopGenCore
     export sampleinfo, locusinfo, samplenames, loci
     export copy, size, sort, dropmonomorphic, dropmonomorphic!
     export dropmultiallelic, dropmultiallelic!
-    export loci, samples, locations, locations!
+    export locations, locations!
     export locidataframe, locimatrix
     export genotypes, genotypes, genotype
     export populations, populations!

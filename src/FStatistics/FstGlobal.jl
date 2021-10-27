@@ -48,7 +48,7 @@ function _nei_fst(population_1::T, population_2::T) where T<:AbstractMatrix
     # number of populations represented per locus
     n_pop_per_loc = map(countnonzeros, eachrow(n)) 
     # corrected n for population size
-    corr_n_per_loc = n_pop_per_loc ./ map(reciprocal_sum, eachrow(n))
+    corr_n_per_loc = n_pop_per_loc ./ map(reciprocalsum, eachrow(n))
     # observed heterozygosity
     het_obs_p1 = map(_hetero_obs, eachcol(population_1))
     het_obs_p2 = map(_hetero_obs, eachcol(population_2))
