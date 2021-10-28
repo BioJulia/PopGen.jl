@@ -1,5 +1,5 @@
 ---
-id: breeding_crosses
+id: breedingcrosses
 title: Simulate Breeding Crosses
 sidebar_label: Breeding Crosses
 ---

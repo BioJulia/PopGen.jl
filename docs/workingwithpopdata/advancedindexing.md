@@ -1,7 +1,7 @@
 ---
-id: indexing
+id: advancedindexing
 title: Advanced PopData Indexing
-sidebar_label: Advanced PopData Indexing
+sidebar_label: Advanced Indexing
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -39,7 +39,7 @@ Basic conditional indexing is a fancy way of saying "pulling out specific
 information". Let's say we wanted to omit locus `fca8`.
 
 ```julia
-julia> ncats[ncats.genodata.locus .!= "fca8"]
+julia> ncats[genodata(ncats).locus .!= "fca8"]
 PopData{Diploid, 8 Microsatellite loci}
   Samples: 237
   Populations: 17
@@ -48,7 +48,7 @@ PopData{Diploid, 8 Microsatellite loci}
 Or, maybe we only want loci `fca8` and `fca23`. We use the `∈` (`\in<TAB>`) operator and wrap the loci in `Ref()` to keep the set from being broadcasted.
 
 ```julia
-julia> ncats[ncats.genodata.locus .∈  Ref(["fca8", "fca23"])]
+julia> ncats[genodata(ncats).locus .∈  Ref(["fca8", "fca23"])]
 PopData{Diploid, 2 Microsatellite loci}
   Samples: 237
   Populations: 17
@@ -56,7 +56,7 @@ PopData{Diploid, 2 Microsatellite loci}
 
 Perhaps we want only populations 1 through 5. Again, we bind the set in `Ref()` to prevent broadcasting over its elements. We also need to change the integers to strings because population names are always strings.
 ```julia
-julia> ncats[ncats.genodata.population .∈  Ref(string.(1:5))]
+julia> ncats[genodata(ncats).population .∈  Ref(string.(1:5))]
 PopData{Diploid, 9 Microsatellite loci}
   Samples: 82
   Populations: 5
@@ -64,7 +64,7 @@ PopData{Diploid, 9 Microsatellite loci}
 
 Maybe we just wanted to know the names of the samples in population `5`. Although for something like this you can just as well index the `sampleinfo` dataframe.
 ```julia
-julia> ncats[ncats.genodata.population .== "5", :name] |> unique
+julia> ncats[genodata(ncats).population .== "5", :name] |> unique
 15-element Vector{InlineStrings.String7}:
  "N55"
  "N56"
@@ -91,7 +91,8 @@ parentheses.
 
 Let's find all the samples in population `2` that are heterozygous for allele `133` in locus `fca8` and return just a dataframe.
 ```julia
-julia> ncats[(ncats.genodata.locus .== "fca8") .& (ncats.genodata.population .== "2") .& (ishet.(ncats.genodata.genotype, 133)), :]
+julia> gd = genodata(ncats) ;
+julia> ncats[(gd.locus .== "fca8") .& (gd.population .== "2") .& (ishet.(gd.genotype, 133)), :]
 
 6×4 DataFrame
  Row │ name      population  locus   genotype   
@@ -107,7 +108,8 @@ julia> ncats[(ncats.genodata.locus .== "fca8") .& (ncats.genodata.population .==
 
 How about which samples are missing data for locus `fca8`?
 ```julia
-julia> ncats[(ncats.genodata.locus .== "fca8") .& (ismissing.(ncats.genodata.genotype)), :name]
+julia> gd = genodata(ncats) ;
+julia> ncats[(gd.locus .== "fca8") .& (ismissing.(gd.genotype)), :name]
 20-element PooledArrays.PooledVector{InlineStrings.String7, UInt8, Vector{UInt8}}:
  "N215"
  "N216"

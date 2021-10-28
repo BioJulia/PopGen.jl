@@ -1,7 +1,7 @@
 ---
 id: genepop
-title: Genepop format
-sidebar_label: Genepop format
+title: Genepop
+sidebar_label: Genepop
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -89,7 +89,7 @@ Newcomb_04,	254230	564000	090120
 </Tabs>
 
 ## Writing to a Genepop file
-All file writing options can be performed using `write_to()`, which calls `genpop` when writing to a Genepop file.
+All file writing options can be performed using `PopGen.write()`, which calls `genpop` when writing to a Genepop file.
 ```julia
 genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical", miss::Int = 0)
 ```
@@ -111,7 +111,7 @@ Writes a `PopData` object to a Genepop-formatted file.
 ### Example
 ```julia
 cats = @nancycats;
-fewer_cats = omit(cats, names = samples(cats)[1:10]);
+fewer_cats = omit(cats, name = samples(cats)[1:10]);
 julia> genepop(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```
 

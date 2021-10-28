@@ -47,7 +47,7 @@ sample names if the metadata is not in the same order as samples appear in `PopD
 ----
 ### `locations`
 ```julia
-locations(data::PopData)
+locationdata(data::PopData)
 ```
 View the longitude and latitude data in a `PopData` object. Returns a table derived from the PopData. Changes made to this table will not alter the source `PopData` object.
 
@@ -57,7 +57,7 @@ Use `locations!` to add spatial data to a `PopData` object.
 
 ### `locations!`
 ```julia
-locations!(data::PopData; long::Vector{Float64}, lat::Vector{Float64})
+locationdata!(data::PopData; longitude::Vector{Float64}, lattitude::Vector{Float64})
 ```
 Replaces existing `PopData` location data (longitude `long`, latitude `lat`).
 Takes **decimal degrees** as a `Vector` of any `AbstractFloat`.
@@ -72,14 +72,14 @@ Takes **decimal degrees** as a `Vector` of any `AbstractFloat`.
 ```
 ncats = @nancycats ;
 x = rand(237) ; y = rand(237)
-locations!(ncats, long = x, lat = y)
+locationdata!(ncats, longitude = x, lattitude = y)
 ```
 
 ----
 
 ### `locations!`
 ```julia
-locations!(data::PopData; long::Vector{String}, lat::Vector{String})
+locationdata!(data::PopData; longitude::Vector{String}, lattitude::Vector{String})
 ```
 Replaces existing `PopData` location data (longitude `long`, latitude `lat`). Takes
 **decimal minutes** format as a `Vector` of `String`. Recommended to use `CSV.read`
@@ -106,7 +106,7 @@ and use these as inputs into `locations!`
 ```
 ncats = @nancycats;
 x = fill("11 22.33W", 237) ; y = fill("-41 31.52", 237)
-locations!(ncats, long = x, lat = y)
+locationdata!(ncats, longitude = x, lattitude = y)
 ```
 
 

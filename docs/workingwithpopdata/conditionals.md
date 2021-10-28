@@ -26,7 +26,7 @@ of `true` or `false`. Returns `missing` if the genotype is `missing`.
 **Example**
 ```julia
 julia> cats = @nancycats ;
-julia> subset = cats.genodata.genotype[1:10]
+julia> subset = cats[1:10, :genotype]
 10-element Vector{Union{Missing, Tuple{Int16, Int16}}}:
  missing
  missing
@@ -43,17 +43,17 @@ julia> ishom(subset[3])
 false
 
 julia> ishom(subset)
-10-element Vector{Union{Missing, Bool}}:
- false
- false
- false
- false
- false
- false
-  true
- false
- false
-  true
+10-element Vector{Bool}:
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 0
+ 0
+ 1
 ```
 :::note using skipmissing
 If you want to avoid `missing` genotypes, you can use `skipmissing` to ignore them. This also works for `ishet`.
@@ -92,17 +92,17 @@ julia> ishom(subset[9], 135)
 false
 
 julia> ishom(subset, 135)
-10-element Vector{Union{Missing, Bool}}:
- false
- false
- false
- false
- false
- false
-  true
- false
- false
-  true
+10-element Vector{Bool}:
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 0
+ 0
+ 1
 ```
 
 
@@ -116,7 +116,7 @@ This is the exact opposite of `ishom`, returning `true` if the genotype (or geno
 **Example**
 ```julia
 julia> cats = @nancycats ;
-julia> subset = cats.genodata.genotype[1:10]
+julia> subset = cats[1:10, :genotype]
 10-element Vector{Union{Missing, Tuple{Int16, Int16}}}:
  missing
  missing
@@ -133,17 +133,17 @@ julia> ishet(subset[3])
 true
 
 julia> ishet(subset)
-10-element Vector{Union{Missing, Bool}}:
-  false
-  false
-  true
-  true
-  true
-  true
- false
-  true
-  true
- false
+10-element Vector{Bool}:
+ 0
+ 0
+ 1
+ 1
+ 1
+ 1
+ 0
+ 1
+ 1
+ 0
  ```
 
 We likewise have the option to check if a locus is heterozygous for a specific
@@ -167,18 +167,18 @@ false
 julia> ishet(subset[9], 135)
 true
 
-julia> ishom(subset, 135)
-10-element Vector{Union{Missing, Bool}}:
-  false
-  false
-  true
-  true
-  true
-  true
- false
-  true
- false
- false
+julia> ishet(subset, 135)
+10-element Vector{Bool}:
+ 0
+ 0
+ 1
+ 1
+ 1
+ 1
+ 0
+ 1
+ 0
+ 0
 ```
 
 ## Biallelic data

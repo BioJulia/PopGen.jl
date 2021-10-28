@@ -1,5 +1,5 @@
 ---
-id: julia_primer
+id: juliaprimer
 title: A quick Julia primer
 sidebar_label: A quick Julia primer
 ---

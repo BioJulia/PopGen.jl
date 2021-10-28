@@ -1,7 +1,7 @@
 ---
 id: structure
-title: Structure format
-sidebar_label: Structure format
+title: Structure
+sidebar_label: Structure
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -101,7 +101,7 @@ chestnuts = structure("castanea_dentata.str", faststructure = true)
 
 
 ## Writing to a Structure file
-All file writing options can be performed using `write_to()`, which calls `structure` when writing to a Structure/fastStructure file.
+All file writing options can be performed using `PopGen.write()`, which calls `structure` when writing to a Structure/fastStructure file.
 
 ```julia
 structure(data::PopData; filename::String, faststructure::Bool, delim::String)

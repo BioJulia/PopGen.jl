@@ -40,7 +40,7 @@ to observed $F_{ST}$ values.
 
 ## Pairwise FST
 ```julia
-pairwise_fst(data::PopData; method::String, iterations::Int64)
+pairwisefst(data::PopData; method::String, iterations::Int64)
 ```
 Calculate pairwise $F_{ST}$ between populations in a `PopData` object. Set
 `iterations` to a value greater than `0` to perform a one-tailed permutation
@@ -78,18 +78,17 @@ The returned object is a custom `PairwiseFST` type with the fields `results` (st
 ```
 julia> sharks = @gulfsharks ;
 
-julia> pairwise_fst(sharks, method = "WC84")
+julia> pairwisefst(sharks, method = "WC84")
 Pairwise FST: Weir & Cockerham
-                │ Cape Canaveral  Georgia   South Carolina  Florida Keys  Mideast Gulf  Northeast Gulf  Southeast Gulf 
-────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────
- Cape Canaveral │        0.0       0.0             0.0           0.0           0.0             0.0                 0.0
-        Georgia │        0.00081   0.0             0.0           0.0           0.0             0.0                 0.0
- South Carolina │       -0.0003   -0.00076         0.0           0.0           0.0             0.0                 0.0
-   Florida Keys │        0.00282   0.00202         0.00204       0.0           0.0             0.0                 0.0
-   Mideast Gulf │        0.00423   0.00354         0.00329       0.00042       0.0             0.0                 0.0
- Northeast Gulf │        0.00264   0.00147         0.00146      -7.0e-5       -0.00023         0.0                 0.0
- Southeast Gulf │        0.00312   0.00222         0.00191      -3.0e-5        0.00079         0.00118             0.0
-
+                CapeCanaveral  Georgia   SouthCarolina  FloridaKeys  MideastGulf  NortheastGulf  SoutheastGulf 
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ CapeCanaveral        0.0       0.0            0.0          0.0          0.0            0.0                0.0
+       Georgia        0.00081   0.0            0.0          0.0          0.0            0.0                0.0
+ SouthCarolina       -0.0003   -0.00076        0.0          0.0          0.0            0.0                0.0
+   FloridaKeys        0.00282   0.00202        0.00204      0.0          0.0            0.0                0.0
+   MideastGulf        0.00423   0.00354        0.00329      0.00042      0.0            0.0                0.0
+ NortheastGulf        0.00264   0.00147        0.00146     -7.0e-5      -0.00023        0.0                0.0
+ SoutheastGulf        0.00312   0.00222        0.00191     -3.0e-5       0.00079        0.00118            0.0
 ```
 
 </TabItem>
@@ -98,7 +97,7 @@ Pairwise FST: Weir & Cockerham
 ```julia
 julia> cats = @nancycats ;
 
-julia> pairwise_fst(cats, iterations = 500)
+julia> pairwisefst(cats, iterations = 500)
 
 Below diagonal: FST values | Above diagonal: P values
 Pairwise FST: Weir & Cockerham (with p-values)

@@ -42,12 +42,12 @@ module.exports = {
           position: 'left',
         },
         {
-          to: 'docs/getting_started/quickstart',
+          to: 'docs/gettingstarted/quickstart',
           label: 'Quickstart',
           position: 'left',
         },
         {
-          to: 'docs/getting_started/about',
+          to: 'docs/gettingstarted/about',
           label: 'About',
           position: 'left',
         },        
@@ -58,7 +58,7 @@ module.exports = {
         position: 'left',
         },
         {
-          to: 'docs/getting_started/community',
+          to: 'docs/gettingstarted/community',
           label: 'Get Involved',
           position: 'left',
         },

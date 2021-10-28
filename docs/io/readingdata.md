@@ -1,7 +1,7 @@
 ---
-id: file_import
-title: Reading in data
-sidebar_label: Reading in data
+id: readingdata
+title: Reading data
+sidebar_label: Reading data
 ---
 
 PopGen.jl (via PopGenCore.jl) provides a handful of file readers with which to create `PopData`. Each of the file types have their own file reader denoted simply by the file type:

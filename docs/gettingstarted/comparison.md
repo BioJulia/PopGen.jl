@@ -54,7 +54,7 @@ As a note, the reported benchmarks are being performed on a 64-bit Manjaro Linux
 
 ### Reading in data
 
-Since `gulfsharks` is shamelessly provided in PopGen.jl, we will just load it with `genepop()`.  If you would like to try this yourself in R, find the `gulfsharks.gen` file in the package repository under `/data/source/gulfsharks.gen`. Since the file importer now uses CSV.jl to read files, there is one step of the genepop parser that is multithreaded. However, the majority of the data parsing (formatting the raw data into a correct PopData structure) occurs using a single thread. This R benchmark will take a few minutes. Consider making some tea while you wait.
+Since `gulfsharks` is provided in PopGenCore.jl, we will just load it with `genepop()`.  If you would like to try this yourself in R, find the `gulfsharks.gen` file in the package repository under `/data/source/gulfsharks.gen`. Since the file importer now uses CSV.jl to read files, there is one step of the genepop parser that is multithreaded. However, the majority of the data parsing (formatting the raw data into a correct PopData structure) occurs using a single thread. This R benchmark will take a few minutes. Consider making some tea while you wait.
 
 <Tabs
   block={true}
@@ -313,4 +313,4 @@ Unit: seconds
 
 ![pairwise fst plot](/img/fstplot.png)
 
-On a single thread, pairwise FST in `PopGen.jl` is **~340x** faster than in `hierfstat`, and a whopping **665x** faster using 6 threads with the optimized matrix-based implementation in the `pca` branch. Daaaang!
+On a single thread, pairwise FST in `PopGen.jl` is **~340x** faster than in `hierfstat`, and a whopping **665x** faster using 6 threads with the optimized matrix-based implementation.

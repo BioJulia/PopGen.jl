@@ -33,9 +33,9 @@ read_from("juglans_nigra.vcf")
 
 ----
 
-### `write_to`
+### `PopGen.write`
 ```julia
-write_to(data::PopData; filename::String, kwargs...)
+PopGen.write(data::PopData; filename::String, kwargs...)
 ```
 Writes `PopData` to a specified file type inferred from the extension of `filename = ` (case insensitive). Additional keyword
 arguments `kwargs...` are specific to the intended file type, and are listed in the docstrings of the specific
@@ -52,5 +52,5 @@ to Genepop format, call up the docstring to `genepop` with `?genepop`.
 ```
 cats = @nancycats;
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);
-write_to(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
+PopGen.write(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "h")
 ```

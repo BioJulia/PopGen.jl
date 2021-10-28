@@ -1,7 +1,7 @@
 ---
 id: delimited
-title: Delimited format
-sidebar_label: Delimited format
+title: Delimited
+sidebar_label: Delimited
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -87,7 +87,7 @@ You can also use the command `csv()` synonymously with `delimited()`.
 :::
 
 ## Writing to a delimited file
-All file writing options can be performed using `write_to()`, which calls `delimited` when writing to a delimited file.
+All file writing options can be performed using `PopGen.write()`, which calls `delimited` when writing to a delimited file.
 ```julia
 delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide", miss::Int = 0)
 ```
@@ -107,7 +107,7 @@ Write PopData to a text-delimited file.
 ### Example
 ```julia
 cats = @nancycats;
-fewer_cats = omit(cats, names = samples(cats)[1:10]);
+fewer_cats = omit(cats, name = samples(cats)[1:10]);
 delimited(fewer_cats, filename = "filtered_nancycats.gen", digits = 3, format = "wide", delim = " ")
 ```
 

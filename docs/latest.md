@@ -79,7 +79,7 @@ sidebar_label: What's New
 ### v.0.5.1
 #### ✨✨ New features
 - `pairwise_fst` is now available for Weir & Cockerham (1984) and Nei (1987) methods
-  - check out the [benchmarks](/docs/getting_started/comparison)!
+  - check out the [benchmarks](/docs/gettingstarted/comparison)!
 - added `skipinf`, `skipnan`, and `skipinfnan` methods (unexported) to `Utils.jl`
 - dropped `safemean` because the skip___ methods are a lot faster and slimmer
 

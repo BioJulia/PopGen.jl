@@ -1,32 +1,36 @@
 module.exports = {
   "docs": {
     "Getting Started": [
-      "getting_started/install",
-      "getting_started/julia_primer",
-      "getting_started/tips",
-      "getting_started/comparison",
-      "getting_started/types",
-      "getting_started/other_types",
-      "getting_started/datasets"
+      "gettingstarted/install",
+      "gettingstarted/juliaprimer",
+      "gettingstarted/tips",
+      "gettingstarted/comparison",
+      "gettingstarted/popdata",
+      "gettingstarted/othertypes",
+      "gettingstarted/datasets"
     ],
     "File I/O": [
-      "io/file_import",
-      "io/file_write",
-      "io/delimited",
-      "io/genepop",
-      "io/structure",
-      "io/vcf",
+      "io/readingdata",
+      "io/writingdata",
+      {
+        "File Formats": [
+          "io/delimited",
+          "io/genepop",
+          "io/structure",
+          "io/vcf"
+        ]
+      },
     ],
     "Working with PopData": [
-      "popdata_basics/manipulate",
-      "popdata_basics/accessing",
-      "popdata_basics/add_info",
-      "popdata_basics/exclusion",
-      "popdata_basics/conditionals",
-      "popdata_basics/populations",
-      "popdata_basics/viewdata",
-      "popdata_basics/dataexploration",
-      "popdata_basics/indexing"
+      "workingwithpopdata/workingwithpopdata",
+      "workingwithpopdata/viewdata",
+      //"workingwithpopdata/add_info",
+      "workingwithpopdata/exclusion",
+      "workingwithpopdata/conditionals",
+      "workingwithpopdata/populationdata",
+      "workingwithpopdata/locationdata",
+      "workingwithpopdata/dataexploration",
+      "workingwithpopdata/advancedindexing"
     ],
     "Analyses":[
       "analyses/hardyweinberg",
@@ -35,7 +39,7 @@ module.exports = {
     ],
     "Simulations":[
       "simulations/simulate_samples",
-      "simulations/breeding_crosses",
+      "simulations/breedingcrosses",
       "simulations/sibship_simulations",
     ],    
     "API": [

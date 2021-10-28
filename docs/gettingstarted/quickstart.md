@@ -74,7 +74,7 @@ Explore PopData
 
 Manipulate PopData
 - populations!(PopData, ...) to rename populations
-- locations!(PopData, ...) to add geographical coordinates
+- locationdata!(PopData, ...) to add geographical coordinates
 - exclude!(PopData; kwargs...) to selectively remove data
 
 Analyses

@@ -37,7 +37,7 @@ Functions need to be sensible, both in what they do and how they do it. This mea
 </TabItem>
 <TabItem value="accessibility">
 
-Documentation is everything! Julia is a comparatively young language and we *want* you to be comfortable using PopGen.jl. That means investing **a lot** of time into writing thorough and visually pleasing documentation intended for users across a wide spectrum of proficiency. We also recognize that you (the reader) might not be very familiar with Julia, so we've written [a section](/getting_started/julia_primer.md) on clarifying some Julia concepts/conventions that will make reading this documentation a whole lot clearer.
+Documentation is everything! Julia is a comparatively young language and we *want* you to be comfortable using PopGen.jl. That means investing **a lot** of time into writing thorough and visually pleasing documentation intended for users across a wide spectrum of proficiency. We also recognize that you (the reader) might not be very familiar with Julia, so we've written [a section](/gettingstarted/juliaprimer.md) on clarifying some Julia concepts/conventions that will make reading this documentation a whole lot clearer.
 
 </TabItem>
 </Tabs>
@@ -46,7 +46,7 @@ Documentation is everything! Julia is a comparatively young language and we *wan
 
 ### Speed and syntax
 
-The speed can be comparable to C when coded using best practices. Also, has Python-like syntax with **optional** tabs. Not convinced? Check out our [comparison benchmarks](/getting_started/comparison.md). We are also fans of 1-indexing, but that's more of a perk.
+The speed can be comparable to C when coded using best practices. Also, has Python-like syntax with **optional** tabs. Not convinced? Check out our [comparison benchmarks](/gettingstarted/comparison.md). We are also fans of 1-indexing, but that's more of a perk.
 
 ### A modern language for modern problems
 
@@ -62,4 +62,4 @@ Like most Julia packages, PopGen.jl is written entirely in Julia, meaning the co
 
 ### Package manager
 
-It's just such a delight to use. [Installing PopGen.jl](/getting_started/install.md) should be simple, consistent, and effortless thanks to the brilliant built-in package manager in Julia. 
+It's just such a delight to use. [Installing PopGen.jl](/gettingstarted/install.md) should be simple, consistent, and effortless thanks to the brilliant built-in package manager in Julia. 

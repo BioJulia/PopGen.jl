@@ -1,5 +1,5 @@
 ---
-id: file_write
+id: writingdata
 title: Writing data to file
 sidebar_label: Writing data
 ---

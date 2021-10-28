@@ -394,12 +394,12 @@ julia> richness(cats, by = "population")
 </Tabs>
 
 ## Average Number of Alleles
-Similar to richness, if you wanted to know the average number of alleles per locus, use `allele_avg()`. Use `rounding = false` if you don't want the answer rounded to 4 decimal places.
+Similar to richness, if you wanted to know the average number of alleles per locus, use `alleleavg()`. Use `rounding = false` if you don't want the answer rounded to 4 decimal places.
 ```julia
-julia> allele_avg(@nancycats)
+julia> alleleavg(@nancycats)
 (mean = 12.0, stdev = 0.2668)
 
-julia> allele_avg(@nancycats, rounding = false)
+julia> alleleavg(@nancycats, rounding = false)
 (mean = 12.0, stdev = 0.2667968432263687)
 ```
 

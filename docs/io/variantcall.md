@@ -26,28 +26,30 @@ PopGen.jl provides the commands `vcf` and `bcf` to import a variant call format 
 ### Example
 
 ```julia
-using GeneticVariation
 cabbage = bcf("/home/data/nappa_cabbage.bcf", rename_loci = true, silent = true)
-
-using GZip
 potato = vcf("/home/data/russet_potatoes.vcf.gz", allow_monomorphic = true)
 ```
 
 ### Mixed-Ploidy data
 In the event your variant call file is for mixed-ploidy data (where ploidy is not the same across all samples, e.g. PoolSeq), you will need to perform an additional step after reading in your data as `PopData` to convert the `.genodata.genotype` column into a `GenoArray`:
-
 ```julia
 julia> mydata = bcf("path/to/file.bcf", silent = true, rename_loci = true) ;
 
 julia> mydata.genodata.genotype =  mydata.genodata.genotype |> Array{Union{Missing, NTuple}}
 ```
 
+:::caution WIP
+The extra step required by mixed-ploidy data is a work in progress. Feel free to submit a PR if you have ideas!
+:::
+
+
 ### Format
 Variant Call Format files follow a format standard, and while there is some wiggle-room for optional values, PopGen.jl only requires the core/mandatory components of a BCF/VCF, meaning problems should hopefully not arise regardless of which variant caller you are using (although we use `Freebayes` ourselves). Please open an issue if they do, or reach out to us on the community Slack.
 
 
 ### Allele encodings
-When converting to `PopData`, the nucleotides will be recoded according to this table:
+When converting to `PopData`, the nucleotides will be recoded according to the table below. Note that this system differs slightly from
+how PGDSpider2 recodes alleles (the 3 and 4 are switched).
 
 |    Base    |  A   |  T   |  C   |  G   |
 | :--------  | :--: | :--: | :--: | :--: |
@@ -58,7 +60,7 @@ Keep in mind, BCF/VCF files need to be filtered **before** importing them into P
 :::
 
 
-### What BCF/VCF files contain and lack
+### What BCF/VCF files contain
 
 Due to the nature of the file format, importing variant call files **will** provide:
 
@@ -67,12 +69,14 @@ Due to the nature of the file format, importing variant call files **will** prov
 - locus names
 - genotypes
 
-but they **will not** provide:
-
+### What BCF/VCF files lack
 - population information
 - geographical coordinate information
 
 This means you will need to add that information separately afterwards. Location data (which is *optional*) can be added to the `PopData` with the `locations!` command. Population names (*mandatory*) can be added using `populations!()`
 
 ## Acknowledgements
-The majority of the BCF/VCF reader is thanks to the tremendous efforts of the contributors involved with [GeneticVariation.jl](https://github.com/BioJulia/GeneticVariation.jl), and its successor [VariantCallFormat.jl](https://github.com/rasmushenningsson/VariantCallFormat.jl) which we use to parse files into `PopData` format. If you love the file importer, then give those folks your thanks. If something is wrong and/or you hate the importer, blame us first (and please [open up an issue](https://github.com/biojulia/PopGenCore.jl/issues) 😅).
+The heavy lifting of the BCF/VCF reader is thanks to the tremendous efforts of the contributors involved with 
+[GeneticVariation.jl](https://github.com/BioJulia/GeneticVariation.jl), and its successor [VariantCallFormat.jl](https://github.com/rasmushenningsson/VariantCallFormat.jl) 
+which we use to parse files into `PopData` format. More specifically, the two packages use a file parser created from [Automa.jl](https://github.com/BioJulia/Automa.jl). If you love the file importer, then give those folks your thanks. If something is wrong and/or you hate the importer, blame us 
+first (and please [open up an issue](https://github.com/biojulia/PopGenCore.jl/issues) 😅).

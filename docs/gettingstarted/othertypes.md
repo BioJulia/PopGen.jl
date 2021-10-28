@@ -1,5 +1,5 @@
 ---
-id: other_types
+id: othertypes
 title: Other data types
 sidebar_label: Other data types
 ---
@@ -18,7 +18,7 @@ An `NTuple` is itself an alias for a `Tuple{Vararg{}}` , but you can think of it
 #### SNP and Msat
 ```julia
 Snp::NTuple{N,Int8} where N
-Msat::NTuple{N,Int8} where N
+Msat::NTuple{N,Int16} where N
 ```
 These are convenience aliases for the two main kinds of NTuples of genotypes you will see.
 These are typically used internally.
