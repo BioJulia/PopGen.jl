@@ -15,12 +15,12 @@ any analyses present in PopGen.jl.
 locationdata(data::PopData)
 ```
 
-View location (if present) data in a `PopData`,  returning a table the longitude and latitude information in the `metadata`. 
+View location (if present) data in a `PopData`,  returning a table the longitude and lattitude information in the `metadata`. 
 
 ```julia
 julia> locationdata(sharks)
 212×2 SubDataFrame
- Row │ longitude  latitude 
+ Row │ longitude  lattitude 
      │ Float64    Float64  
 ─────┼─────────────────────
    1 │   28.3062  -80.5993

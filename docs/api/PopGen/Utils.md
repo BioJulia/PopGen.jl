@@ -107,7 +107,7 @@ julia> cats = @nancycats ;
 julia> cats_nometa = cats.genodata ;
 julia> cats_meta = generate_meta(cats_nometa)
 237×5 DataFrame
- Row │ name    population  ploidy  longitude  latitude 
+ Row │ name    population  ploidy  longitude  lattitude 
      │ String  String      Int8    Float32?   Float32? 
 ─────┼─────────────────────────────────────────────────
    1 │ N215    1                2   missing   missing  

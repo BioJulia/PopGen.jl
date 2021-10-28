@@ -45,7 +45,7 @@ Here is a look inside the `PopData` to verify everything looks as expected.
 ```
 julia> sims.sampleinfo
   1700×5 DataFrame
-  │ Row  │ name     │ population │ ploidy │ longitude │ latitude │
+  │ Row  │ name     │ population │ ploidy │ longitude │ lattitude │
   │      │ String   │ String     │ Int64  │ Missing   │ Missing  │
   ├──────┼──────────┼────────────┼────────┼───────────┼──────────┤
   │ 1    │ sim_1    │ 1          │ 2      │ missing   │ missing  │

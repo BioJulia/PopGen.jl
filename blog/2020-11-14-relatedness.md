@@ -185,7 +185,7 @@ Technically, we could merge all three results into a single `PopData`, but it wi
 ```
 julia> unrelated_sims.sampleinfo
 1000×5 DataFrame
-  Row │ name            population  ploidy  longitude  latitude 
+  Row │ name            population  ploidy  longitude  lattitude 
       │ String          String      Int64   Float32?   Float32? 
 ──────┼─────────────────────────────────────────────────────────
     1 │ sim1_un_off1    unrelated        2   missing   missing  

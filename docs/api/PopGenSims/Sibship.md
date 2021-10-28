@@ -83,10 +83,10 @@ PopData Object
   Loci: 9
   Populations: 1
   Longitude: absent
-  Latitude: absent
+  lattitude: absent
 
 julia> fullsib_sims.sampleinfo_df100×5 DataFrame
-│ Row │ name          │ population │ ploidy │ longitude │ latitude │
+│ Row │ name          │ population │ ploidy │ longitude │ lattitude │
 │     │ String        │ String     │ Int64  │ Float32?  │ Float32? │
 ├─────┼───────────────┼────────────┼────────┼───────────┼──────────┤
 │ 1   │ sim1_fs_off1  │ fullsib    │ 2      │ missing   │ missing  │
