@@ -29,7 +29,7 @@ in your file*
     1. sample name
     2. population name
     3. longitude
-    4. lattitude
+    4. latitude
     5. locus_1 genotypes
     6. locus_2 genotypes
     7. etc...

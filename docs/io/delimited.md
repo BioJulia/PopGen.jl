@@ -35,7 +35,7 @@ First row is column names, and they occur in this order:
 1. name
 2. population
 3. longitude
-4. lattitude
+4. latitude
 5. locus_1_name
 6. locus_2_name
 7. etc...
@@ -53,7 +53,7 @@ First row is column names, and they occur in this order:
 <TabItem value="csv">
 
 ```
-name,population,longitude,lattitude,Locus1,Locus2,Locus3
+name,population,longitude,latitude,Locus1,Locus2,Locus3
 sierra_01,mountain,11.11,-22.22,001001,-9,001001
 sierra_02,mountain,11.12,-22.21,001001,001001,001002
 snbarb_01,coast,,,001001,001001,001002
@@ -64,7 +64,7 @@ snbarb_03,coast,11.15,,001002,001001,001001
 </TabItem>
 <TabItem value="table">
 
-|name|population|longitude|lattitude|Locus1|Locus2|Locus3|
+|name|population|longitude|latitude|Locus1|Locus2|Locus3|
 |:--: |:--: |:--: |:--: |:--: |:--: |:--: |
 |sierra_01|mountain|11.11|-22.22|001001|-9|001001|
 |sierra_02|mountain|11.12|-22.21|001001|001001|001002|
@@ -98,7 +98,7 @@ Write PopData to a text-delimited file.
   - e.g. `digits = 3` will turn `(1, 2)` into `001002`
 - `format::String`: whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
   - `wide` : the standard-format CSV for importing into PopGen.jl (default)
-  - `long` : the `loci` table with `longitude` and `lattitude` columns added
+  - `long` : the `loci` table with `longitude` and `latitude` columns added
 - `delim::String`: delimiter to use for writing the file (default: `","`)
 - `miss::Integer`: how you would like missing values written 
     - `0` : As a genotype represented as a number of zeroes equal to `digits × ploidy` like `000000` (default) 

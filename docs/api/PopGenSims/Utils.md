@@ -26,7 +26,7 @@ PopData Object
   Loci: 9
   Populations: 17
   Longitude: absent
-  lattitude: absent
+  latitude: absent
 
 julia> purrfect_pairs = cross(cats, "N200", "N7", generation = "F1")
 PopData Object
@@ -36,7 +36,7 @@ PopData Object
   Loci: 9
   Populations: 1
   Longitude: absent
-  lattitude: absent
+  latitude: absent
 
 julia> append!(cats, purrfect_pairs)
 PopData Object
@@ -46,7 +46,7 @@ PopData Object
   Loci: 9
   Populations: 18
   Longitude: absent
-  lattitude: absent
+  latitude: absent
 ```
 ----
 ### `append`
@@ -69,7 +69,7 @@ PopData Object
   Loci: 9
   Populations: 17
   Longitude: absent
-  lattitude: absent
+  latitude: absent
 
 julia> purrfect_pairs = cross(cats, "N200", "N7", generation = "F1")
 PopData Object
@@ -79,7 +79,7 @@ PopData Object
   Loci: 9
   Populations: 1
   Longitude: absent
-  lattitude: absent
+  latitude: absent
 
 julia> merged_cats = append(cats, purrfect_pairs)
 PopData Object
@@ -89,7 +89,7 @@ PopData Object
   Loci: 9
   Populations: 18
   Longitude: absent
-  lattitude: absent
+  latitude: absent
 ```
 
 -----

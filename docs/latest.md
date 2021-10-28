@@ -10,7 +10,7 @@ sidebar_label: What's New
 - PopGen.jl reexports functions from PopGenCore.jl for familiar functionality
 - `.meta` and `.loci` have been renamed `.metadata` and `.genodata`
 - `.metadata` is no longer a DataFrame and instead a new `PopDataInfo` type
-- lattitude and longitude columns no longer mandatory and omitted in cases where not used
+- latitude and longitude columns no longer mandatory and omitted in cases where not used
 
 #### ⚡⚡ Improvements
 - PopData can be indexed like a DataFrame and it will return a brand new PopData!

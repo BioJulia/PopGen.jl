@@ -49,7 +49,7 @@ sample names if the metadata is not in the same order as samples appear in `PopD
 ```julia
 locationdata(data::PopData)
 ```
-View the longitude and lattitude data in a `PopData` object. Returns a table derived from the PopData. Changes made to this table will not alter the source `PopData` object.
+View the longitude and latitude data in a `PopData` object. Returns a table derived from the PopData. Changes made to this table will not alter the source `PopData` object.
 
 Use `locations!` to add spatial data to a `PopData` object.
 
@@ -57,9 +57,9 @@ Use `locations!` to add spatial data to a `PopData` object.
 
 ### `locations!`
 ```julia
-locationdata!(data::PopData; longitude::Vector{Float64}, lattitude::Vector{Float64})
+locationdata!(data::PopData; longitude::Vector{Float64}, latitude::Vector{Float64})
 ```
-Replaces existing `PopData` location data (longitude `long`, lattitude `lat`).
+Replaces existing `PopData` location data (longitude `long`, latitude `lat`).
 Takes **decimal degrees** as a `Vector` of any `AbstractFloat`.
 
 #### Formatting requirements
@@ -72,16 +72,16 @@ Takes **decimal degrees** as a `Vector` of any `AbstractFloat`.
 ```
 ncats = @nancycats ;
 x = rand(237) ; y = rand(237)
-locationdata!(ncats, longitude = x, lattitude = y)
+locationdata!(ncats, longitude = x, latitude = y)
 ```
 
 ----
 
 ### `locations!`
 ```julia
-locationdata!(data::PopData; longitude::Vector{String}, lattitude::Vector{String})
+locationdata!(data::PopData; longitude::Vector{String}, latitude::Vector{String})
 ```
-Replaces existing `PopData` location data (longitude `long`, lattitude `lat`). Takes
+Replaces existing `PopData` location data (longitude `long`, latitude `lat`). Takes
 **decimal minutes** format as a `Vector` of `String`. Recommended to use `CSV.read`
 from `CSV.jl` to import your spatial coordinates from a text file.
 
@@ -93,9 +93,9 @@ from `CSV.jl` to import your spatial coordinates from a text file.
 
 **NOTE**
 
-If you read in the coordinate data as 4 vectors (longitude degrees, longitude minutes, lattitude degrees, lattitude minutes),
+If you read in the coordinate data as 4 vectors (longitude degrees, longitude minutes, latitude degrees, latitude minutes),
 then the easiest course of action would be to merge them into two vectors of strings
-(one for longitude, one for lattitude):
+(one for longitude, one for latitude):
 ```
 long_string = string.(lat_deg, " ", lat_min)
 lat_string = string.(long_deg, " ", long_min)
@@ -106,7 +106,7 @@ and use these as inputs into `locations!`
 ```
 ncats = @nancycats;
 x = fill("11 22.33W", 237) ; y = fill("-41 31.52", 237)
-locationdata!(ncats, longitude = x, lattitude = y)
+locationdata!(ncats, longitude = x, latitude = y)
 ```
 
 

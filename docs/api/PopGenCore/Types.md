@@ -30,7 +30,7 @@ and instead should use the provided genepop, csv, or vcf file importers.
 - `population` ::String population names
 - `ploidy` ::Int8 ploidy in order of `ind`
 - `longitude` ::Float64 longitude values
-- `lattitude` ::Float64 lattitude values
+- `latitude` ::Float64 latitude values
 
 **`loci` ::DataFrame** Long-format table of sample genotype records
 

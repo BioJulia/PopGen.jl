@@ -182,7 +182,7 @@ Now we can combine them with `populations!` to rename the first 5 Cape Canaveral
 julia> populations!(sharks, ch_names, popnames)
 julia> sampleinfo(sharks)[1:6,:]
 6×5 DataFrame
- Row │ name     population     ploidy  longitude  lattitude 
+ Row │ name     population     ploidy  longitude  latitude 
      │ String7  String         Int8    Float64    Float64  
 ─────┼─────────────────────────────────────────────────────
    1 │ cc_001   North Cape          2    28.3062  -80.5993

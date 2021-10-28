@@ -43,6 +43,6 @@ julia> sharks = @gulfsharks
 PopData{Diploid, 2209 SNP loci}
   Samples: 212
   Populations: 7
-  Other Info: ["longitude", "lattitude"]
+  Other Info: ["longitude", "latitude"]
 ```
 
