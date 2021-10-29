@@ -7,14 +7,14 @@ Given a `GenoArray`, count the number of times `allele` appears in the
 heterozygous state.
 """
 function counthet(geno::T, allele::U) where T<:GenoArray where U<:Integer
-    mapreduce(i -> ishet(i, allele), +, skipmissing(geno))
+    mapreduce(i -> _ishet(i, allele), +, skipmissing(geno))
 end
 
 
 function counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
     tmp = skipmissing(geno)
     isempty(tmp) && return fill(0, length(allele))
-    map(_allele -> mapreduce(i -> ishet(i, _allele), +, tmp), allele)
+    map(_allele -> mapreduce(i -> _ishet(i, _allele), +, tmp), allele)
 end
 
 
@@ -67,12 +67,12 @@ end
 """
     _hetero_obs(data::T) where T <: GenoArray
 Returns observed heterozygosity as a mean of the number of heterozygous genotypes, defined
-as genotypes returning `true` for `ishet()`. This is numerically feasible because
+as genotypes returning `true` for `_ishet()`. This is numerically feasible because
 `true` values are mathematically represented as `1`, whereas `false` are represented
 as `0`.
 """
 @inline function _hetero_obs(data::T) where T <: GenoArray
-    adjusted_vector = ishet(data) |> skipmissing
+    adjusted_vector = _ishet(data) |> skipmissing
     isempty(adjusted_vector) ? missing : mean(adjusted_vector)
 end
 
