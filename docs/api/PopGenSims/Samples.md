@@ -81,4 +81,3 @@ julia> genodata(sims)
  15300 │ sim_1700  17          fca37   (208, 208)
                                 15291 rows omitted
 ```
-```
