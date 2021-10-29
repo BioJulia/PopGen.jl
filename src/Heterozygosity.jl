@@ -24,13 +24,13 @@ Given a `GenoArray`, count the number of times `allele` appears in the
 homozygous state.
 """
 function counthom(geno::T, allele::U) where T<:GenoArray where U <: Signed
-    mapreduce(i -> ishom(i, allele), +, skipmissing(geno))
+    mapreduce(i -> _ishom(i, allele), +, skipmissing(geno))
 end
 
 function counthom(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
     tmp = skipmissing(geno)
     isempty(tmp) && return fill(0, length(allele))
-    map(_allele -> mapreduce(i -> ishom(i, _allele), +, tmp), allele)
+    map(_allele -> mapreduce(i -> _ishom(i, _allele), +, tmp), allele)
 end
 
 """

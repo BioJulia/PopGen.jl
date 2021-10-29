@@ -39,17 +39,19 @@ module PopGen
 using Reexport
 using PopGenCore
 @reexport module PopGenCore
-    export PopData, PopDataInfo, GenoArray, Genotype, SNP, Msat, genodata, sampleinfo, locusinfo
+    export PopData, PopDataInfo, GenoArray, Genotype, SNP, Msat
+    export genodata, metadata, info
     export isbiallelic, ishom, ishet
     export delimited, csv, genepop, vcf, bcf, @nancycats, @gulfsharks
-    export sampleinfo, locusinfo, samplenames, loci
+    export sampleinfo, sampleinfo!, locusinfo, locusinfo!, samplenames, loci
     export copy, size, sort, dropmonomorphic, dropmonomorphic!
     export dropmultiallelic, dropmultiallelic!
-    export locations, locations!
+    export locationdata, locationdata!
     export locidataframe, locimatrix
-    export genotypes, genotypes, genotype
+    export genotypes, genotypes
     export populations, populations!
-    export exclude, remove, omit, exclude!, remove!, omit!, keep, keep!, filter, filter!
+    export exclude, remove, omit, exclude!, remove!, omit!, keep, keep!
+    export filter, filter!
 end
 @reexport import PopGenCore: read, write
 

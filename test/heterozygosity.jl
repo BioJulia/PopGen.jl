@@ -21,7 +21,7 @@ testarray = cats.genodata.genotype[1:10]
     end
         
     @testset "het obs/exp" begin
-        @test PopGen._hetero_obs(testarray) == 0.6
+        @test PopGen._hetero_obs(testarray) == 0.75
         @test PopGen._hetero_exp(testarray) == 0.6015625
     end
 
@@ -43,7 +43,7 @@ testarray = cats.genodata.genotype[1:10]
         tmp = heterozygosity(cats, by = "population")
         @test tmp isa DataFrame
         @test size(tmp) == (17,4)
-        @test samplehet(cats, "N215") == 1/3
+        @test samplehet(cats, "N215") == 3/8
         @test_throws ArgumentError samplehet(cats, "M115")
     end
 end
