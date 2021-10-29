@@ -8,7 +8,7 @@ sidebar_label: Iterators.jl
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### partitionarray
+### 🟪 partitionarray
 ```juia
 partitionarray(array::AbstractArray, steps::AbstractVector{<:Integer})
 ```

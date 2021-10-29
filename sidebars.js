@@ -47,9 +47,9 @@ module.exports = {
       {
         "PopGen":[
           "api/PopGen/dataexploration",
+          "api/PopGen/fstbylocus",
           "api/PopGen/fstglobal",
           "api/PopGen/fstpermutations",
-          "api/PopGen/fstbylocus",
           "api/PopGen/hardyweinberg",
           "api/PopGen/heterozygosity",
           "api/PopGen/pairwisefst",
@@ -62,19 +62,23 @@ module.exports = {
       {
         "PopGenCore":[
           "api/PopGenCore/allelefreq",
-          "api/PopGenCore/genofreq",
           "api/PopGenCore/conditionals",
           "api/PopGenCore/datasets",
           "api/PopGenCore/delimited",
           "api/PopGenCore/genepop",
-          "api/PopGenCore/iterators",
+          "api/PopGenCore/generalutils",
+          "api/PopGenCore/genofreq",
+          "api/PopGenCore/genotypeutils",
           "api/PopGenCore/ioutils",
+          "api/PopGenCore/iterators",
           "api/PopGenCore/manipulate",
+          "api/PopGenCore/mathutils",
+          "api/PopGenCore/missingutils",
           "api/PopGenCore/permutations",
+          "api/PopGenCore/popdatawrappers",
           "api/PopGenCore/read",
           "api/PopGenCore/structure",
           "api/PopGenCore/types",
-          "api/PopGenCore/popdatawrappers",
           "api/PopGenCore/variantcall",
         ]
       },

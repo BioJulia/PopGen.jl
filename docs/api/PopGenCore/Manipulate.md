@@ -238,7 +238,7 @@ keep!(cats, name = ["N100", "N102", "N211"])
 keep!(cats, locus = [:fca8, "fca37"], population = [7,8], name = samplenames(cats)[1:10])
 ```
 ----
-### 🟪🔵 keep!
+### 🟪🔵 keep
 ```julia
 keep(data::PopData, kwargs...)
 ```
