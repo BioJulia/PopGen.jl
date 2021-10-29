@@ -49,7 +49,7 @@ genofreq(cats, "fca8", population = true)
 ```
 
 ----
-
+### 🟪 genofreq_expected
 ```julia
 genofreq_expected(locus::T) where T<:GenotypeArray
 ```
@@ -58,7 +58,6 @@ observed allele frequencies.
 
 ----
 
-### 🟪 genofreq_expected
 ```julia
 genofreq_expected(data::PopData, locus::String; population::Bool = false)
 ```

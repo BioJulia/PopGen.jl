@@ -5,20 +5,21 @@ sidebar_label: Permutations.jl
 ---
 ## PopGenCore.jl/src/Permutations.jl
 ❗ => not exported | 
+🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### `permute_loci!`
+### 🟪 permuteloci!
 ```julia
-permute_loci!(data::PopData)
+permuteloci!(data::PopData)
 ```
 Edits `PopData` in place with loci permuted across populations within
 the `.genodata` dataframe.
 
 ----
 
-### `permute_samples!`
+### 🟪 permutesamples!
 ```julia
-permute_samples!(data::PopData; meta::Bool = false)
+permutesamples!(data::PopData; meta::Bool = false)
 ```
 Edits `PopData` in place with samples permuted across populations within
 the `.genodata` dataframe. Since performance is important for many permutations,
@@ -27,9 +28,9 @@ if you also require the `.sampleinfo` dataframe edited in place.
 
 ----
 
-### `permute_genotypes!`
+### 🟪 permutegenotypes!
 ```julia
-permute_genotypes!(data::PopData; by::String = "locus")
+permutegenotypes!(data::PopData; by::String = "locus")
 ```
 Edits `PopData` in place with genotypes permuted across individuals within
 the `.genodata` dataframe. Use `by = "population"` (or `"pop"`) to permute genotypes
@@ -37,12 +38,31 @@ within populations.
 
 ----
 
-### `permute_alleles!`
+### 🟪 permutealleles!
 ```julia
-permute_alleles!(data::PopData; ploidy::Union{Nothing, Int} = nothing, by::String = "locus")
+permutealleles!(data::PopData; ploidy::Union{Nothing, Int} = nothing, by::String = "locus")
 ```
 Edits `PopData` in place with alleles permuted and reconstructed into genotypes
 for each locus within the `.genodata` dataframe. Use `by = "population"` (or `"pop"`)
 to permute alleles within populations. If `ploidy` is not provided (default `ploidy = nothing`),
 then ploidy will be identified from the PopData. If performance is important,
 it would be best to identify ploidy in advance and set it to a specific integer.
+
+
+### 🟪 strictshuffle
+```julia
+strictshuffle(x::T) where T <: AbstractArray
+```
+Shuffle only the non-missing values of a Vector and return a copy of the vector,
+keeping the `missing` values at their original locations.
+Use `strictshuffle!` to edit in-place instead of returning a copy.
+
+----
+
+### 🟪 strictshuffle!
+```julia
+strictshuffle!(x::T) where T <: AbstractArray
+```
+Shuffle only the non-missing values of a Vector, keeping the
+`missing` values at their original locations. Use `strictshuffle`
+to return a copy instead of editing in-place.
