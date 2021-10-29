@@ -24,7 +24,7 @@ module.exports = {
     "Working with PopData": [
       "workingwithpopdata/workingwithpopdata",
       "workingwithpopdata/viewdata",
-      //"workingwithpopdata/add_info",
+      "workingwithpopdata/addingdata",
       "workingwithpopdata/exclusion",
       "workingwithpopdata/conditionals",
       "workingwithpopdata/populationdata",
