@@ -7,7 +7,7 @@ sidebar_label: FstPermutations.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 
-### `_fst_permutation`
+### ❗_fst_permutation
 ```julia
 _fst_permutation(population_1::T, population_2::T) where T<:AbstractMatrix
 ```
@@ -16,21 +16,21 @@ number of rows of the original matrices (i.e. population sizes).
 
 ----
 
-### `_permuted_Hudson`
+### ❗_permuted_Hudson
 ```julia
 _permuted_hudson(data::PopData, iterations::Int64)
 ```
 
 ----
 
-### `_permuted_Nei`
+### ❗_permuted_Nei
 ```julia
 _permuted_Nei(data::PopData, iterations::Int64)
 ```
 
 ----
 
-### `_permuted_WeirCockerham`
+### ❗_permuted_WeirCockerham
 ```julia
 _permuted_WeirCockerham(data::PopData, iterations::Int64)
 ```

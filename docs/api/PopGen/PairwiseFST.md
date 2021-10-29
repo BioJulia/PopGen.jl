@@ -8,14 +8,14 @@ sidebar_label: PairwiseFST.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 
-### `Base.show`
+### 🔵 Base.show
 ```julia
 Base.show(io::IO, data::PairwiseFST)
 ```
 
 -----
 
-### `pairwise_fst`
+### 🔵 pairwisefst
 ```julia
 pairwise_fst(data::PopData; method::String, iterations::Int64)
 ```

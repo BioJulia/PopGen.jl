@@ -7,7 +7,7 @@ sidebar_label: DataExploration.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 
-### `allelefreqtable`
+### 🔵 allelefreqtable
 ```julia
 allelefreqtable(data::PopData; by::String = "global")
 ```
@@ -52,7 +52,7 @@ julia> allelefreqtable(cats, by = "population")
 
 ----
 
-### `genofreqtable`
+### 🔵 genofreqtable
 ```julia
 genofreqtable(data::PopData; by::String = "global")
 ```
@@ -98,7 +98,7 @@ julia> genofreqtable(cats, by = "population")
 
 ----
 
-### `missingdata`
+### 🔵 missingdata
 ```julia
 missingdata(data::PopData; by::String = "sample")
 ```
@@ -117,7 +117,7 @@ missingdata(@gulfsharks, by = "pop")
 
 -----
 
-### `pairwiseidentical`
+### 🔵 pairwiseidentical
     pairwiseidentical(data::PopData)
 Return a table of the percent of identical genotypes at each locus between all pairs of all individuals in a PopData object.
 

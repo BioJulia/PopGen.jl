@@ -8,7 +8,7 @@ sidebar_label: RelatednessMoments.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 
-### `Blouin`
+### 🔵 Blouin
     Blouin(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Allele sharing index described by Blouin (1996)
 - Single Locus Equation: The number of alleles shared between individuals over ploidy.
@@ -23,7 +23,7 @@ Blouin, M. S., Parsons, M., Lacaille, V., & Lotz, S. (1996). Use of microsatelli
 
 ----
 
-### `LiHorvitz`
+### 🔵 LiHorvitz
     LiHorvitz(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Allele sharing index described by Li and Horvitz (1953)
 - Single Locus Equation: If all alleles are the same between individuals (eg. AA x AA) then 1.
@@ -38,7 +38,7 @@ Li, C. C., & Horvitz, D. G. (1953). Some methods of estimating the inbreeding co
 
 ----
 
-### `Loiselle`
+### 🔵 Loiselle
     Loiselle(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness using the estimator propsed by
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
@@ -56,7 +56,7 @@ Wang, J. (2017). Estimating pairwise relatedness in a small sample of individual
 
 ----
 
-### `Lynch`
+### 🔵 Lynch
     Lynch(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Allele sharing index described by Lynch (1988)
 - Single Locus Equation: If all alleles are the same between individuals (eg. AA x AA) then 1.
@@ -71,7 +71,7 @@ Lynch, M. (1988). Estimation of relatedness by DNA fingerprinting. Molecular bio
 
 ----
 
-### `LynchLi`
+### 🔵 LynchLi
     LynchLi(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness by Lynch (1988) & improved by Li et al. (1993).
 - Single Locus Equation:
@@ -87,7 +87,7 @@ Wang, J. (2017). Estimating pairwise relatedness in a small sample of individual
 
 ----
 
-### `LynchRitland`
+### 🔵 LynchRitland
     LynchRitland(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness by Lynch and Ritland (1999).
 - Single Locus Equation:
@@ -103,7 +103,7 @@ Wang, J. (2017). Estimating pairwise relatedness in a small sample of individual
 
 ----
 
-### `Moran`
+### 🔵 Moran
     Moran(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Reinterpretation of Moran's I (commonly used for spatial autocorrelation) to estimate genetic relatedness
 by Hardy and Vekemans (1999)
@@ -115,7 +115,7 @@ Hardy, O. J., & Vekemans, X. (1999). Isolation by distance in a continuous popul
 
 ----
 
-### `QuellerGoodnight`
+### 🔵 QuellerGoodnight
     QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness developed by Queller & Goodnight (1989).
 - Single Locus Equation:
@@ -132,7 +132,7 @@ Wang, J. (2017). Estimating pairwise relatedness in a small sample of individual
 
 ----
 
-### `Ritland`
+### 🔵 Ritland
     Ritland(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness proposed by Li and Horvitz (1953) and implemented/made popular by Ritland (1996).
 - Single Locus Equation:
@@ -148,7 +148,16 @@ Wang, J. (2017). Estimating pairwise relatedness in a small sample of individual
 
 ----
 
-### `Wang`
+### ❗_a_wang_base 
+```julia
+_a_wang_base(m::Int, alleles::Dict)
+```
+
+### ❗_a_wang 
+```julia
+_a_wang(N::Int, alleles::Dict)
+```
+### ❗Wang
     Wang(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 - Single Locus Equation:
@@ -157,3 +166,4 @@ Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 - Corrected for sampling bias in allele frequencies to get an unbiased estimator
 
 Wang, J. (2002). An estimator for pairwise relatedness using molecular markers. Genetics, 160(3), 1203-1215.
+

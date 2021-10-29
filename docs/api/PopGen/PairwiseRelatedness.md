@@ -7,58 +7,68 @@ sidebar_label: PairwiseRelatedness.jl
 ❗ => not exported | 
 🔵 => exported by PopGen.jl
 
-### `bootstrap_summary`
+### ❗_bootstrapsummary
 ```julia
-    bootstrap_summary(::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
+_bootstrapsummary(::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
 ```
 Return the mean, median, standard error, and quantiles (given by `witdth`) of relatedness resampling.
 
 
 ----
 
-### `bootstrap_genos_all`
-    bootstrap_genos_all(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
+### ❗_bootstrapgenos_all
+```julia
+_bootstrapgenos_all(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
+```
 Perform `iterations` number of bootstrap resampling iterations of all genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
 of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `relatedness_boot_all`.
 
 ----
 
-### `bootstrap_genos_nonmissing`
-    bootstrap_genos_nonmissing(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
+### ❗_bootstrapgenos_nonmissing
+```julia
+bootstrapgenos_nonmissing(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
+```
 Perform `iterations` number of bootstrap resampling iterations of only shared (nonmissing) genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
 of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `relatedness_boot_nonmissing`.
 
 
 ----
 
-### `relatedness_boot_all`
-    relatedness_boot_all(::PopData, sample_names::Vector{String}; method::Function, iterations::Int, interval::Tuple{Float64, Float64})
+### ❗_relatedness_boot_all
+```julia
+_relatedness_boot_all(::PopData, sample_names::Vector{String}; method::Function, iterations::Int, interval::Tuple{Float64, Float64})
+```
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `relatedness`.
 
 
 ----
 
-### `relatedness_boot_nonmissing`
-    relatedness_boot_nonmissing(::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64}) where F
+### ❗_relatedness_boot_nonmissing
+```julia
+_relatedness_boot_nonmissing(::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64}) where F
+```
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `relatedness`.
 
 
 ----
 
-### `relatedness_no_boot`
-    relatedness_no_boot(::PopData, sample_names::Vector{String}; method::F) where F
+### ❗_relatedness_noboot
+```julia
+_relatedness_noboot(::PopData, sample_names::Vector{String}; method::F) where F
+```
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. 
 This is an internal function with arguments provided by `relatedness`.
 
 
 ----
 
-### `relatedness`
-    # compare all samples
-    relatedness(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
-```
+### 🔵 relatedness
+```julia
+# compare all samples
+relatedness(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
 # to compare specific samples
 relatedness(::PopData, samples; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
 ```
@@ -161,3 +171,10 @@ julia> DataFrames.names(ans)
  "Moran_SE"
  "Moran_CI_95"
 ```
+
+### 🔵 merge_relatedness
+```julia
+merge_relatedness(data::NamedTuple)
+```
+A convenience function that takes the `NamedTuple` output from `relatedness` performed with bootstrapping
+and returns one large DataFrame.

@@ -47,8 +47,9 @@ module.exports = {
       {
         "PopGen":[
           "api/PopGen/dataexploration",
-          "api/PopGen/fstmethods",
+          "api/PopGen/fstglobal",
           "api/PopGen/fstpermutations",
+          "api/PopGen/fstbylocus",
           "api/PopGen/hardyweinberg",
           "api/PopGen/heterozygosity",
           "api/PopGen/pairwisefst",
