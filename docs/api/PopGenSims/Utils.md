@@ -7,7 +7,7 @@ sidebar_label: Utils.jl
 ❗ => not exported | 
 ⚫ => exported by PopGenSims.jl
 
-### `append!`
+### ⚫ append!
 ```julia
 append!(data::PopData, data2::PopData)
 ```
@@ -19,38 +19,24 @@ the two `PopData` objects do not have identical loci.
 **Example**
 ```
 julia> cats = @nancycats
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+PopData{Diploid, 9 Microsatellite Loci}
   Samples: 237
-  Loci: 9
   Populations: 17
-  Longitude: absent
-  latitude: absent
 
 julia> purrfect_pairs = cross(cats, "N200", "N7", generation = "F1")
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+PopData{Diploid, 9 Microsatellite Loci}
   Samples: 100
-  Loci: 9
   Populations: 1
-  Longitude: absent
-  latitude: absent
 
-julia> append!(cats, purrfect_pairs)
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+julia> append!(cats, purrfect_pairs);
+
+julia> cats
+PopData{Diploid, 9 Microsatellite Loci}
   Samples: 337
-  Loci: 9
   Populations: 18
-  Longitude: absent
-  latitude: absent
 ```
 ----
-### `append`
-
+### ⚫ append
 ```julia
 append(data::PopData, data2::PopData)
 ```
@@ -61,40 +47,32 @@ objects do not have identical loci.
 
 **Example**
 ```
-julia> cats = @nancycats
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+julia> cats = @nanycats
+PopData{Diploid, 9 Microsatellite Loci}
   Samples: 237
-  Loci: 9
   Populations: 17
-  Longitude: absent
-  latitude: absent
+
 
 julia> purrfect_pairs = cross(cats, "N200", "N7", generation = "F1")
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+PopData{Diploid, 9 Microsatellite Loci}
   Samples: 100
-  Loci: 9
   Populations: 1
-  Longitude: absent
-  latitude: absent
 
 julia> merged_cats = append(cats, purrfect_pairs)
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+PopData{Diploid, 9 Microsatellite Loci}
   Samples: 337
-  Loci: 9
   Populations: 18
-  Longitude: absent
-  latitude: absent
+```
+
+### ❗allele_pool
+```julia
+allele_pool(locus::T) where T <: GenoArray
+allele_pool(data::PopData)
 ```
 
 -----
 
-### `simulate_sample`
+### ❗simulate_sample
 ```julia
 simulate_sample(alleles::Dict{String,NTuple}, loc::Vector{String}; ploidy::Int)
 ```
@@ -117,3 +95,9 @@ julia> simulate_sample(alleles, loc, ploidy = 2)
  [91, 113]
  [208, 208]
 ```
+
+### ❗feature_req
+```julia
+feature_req
+```
+Returns the text: `"Please open an Issue or Pull Request on https://www.github.com/pdimens/PopGenSims.jl if you would like this feature implemented"`
