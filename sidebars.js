@@ -62,6 +62,7 @@ module.exports = {
       {
         "PopGenCore":[
           "api/PopGenCore/allelefreq",
+          "api/PopGenCore/genofreq",
           "api/PopGenCore/conditionals",
           "api/PopGenCore/datasets",
           "api/PopGenCore/delimited",

@@ -8,14 +8,14 @@ sidebar_label: VariantCall.jl
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### `openvcf`
+### ❗ openvcf
     openvcf(::String)
 Open VCF file (`.vcf(.gz)` or `.bcf(.gz)`) and return an `IO` stream in reading mode `"r"`.
 
 
 ----
 
-### `bcf`
+### 🟪 bcf
     bcf(infile::String; ; rename_loci::Bool, silent::Bool, allow_monomorphic::Bool)
 Load a BCF file into memory as a PopData object. Population information needs to be provided separately. 
 - `infile` : path to BCF file (can be gzipped)
@@ -39,7 +39,7 @@ julia> mydata.genodata.genotype =  mydata.genodata.genotype |> Array{Union{Missi
 ```
 ----
 
-### `vcf`
+### 🟪 vcf
     vcf(infile::String; ; rename_loci::Bool, silent::Bool, allow_monomorphic::Bool)
 Load a VCF file into memory as a PopData object. Population information needs to be provided separately. 
 - `infile` : path to VCF file (can be gzipped)

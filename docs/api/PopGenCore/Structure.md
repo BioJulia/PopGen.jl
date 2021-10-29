@@ -8,7 +8,7 @@ sidebar_label: Structure.jl
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### `phase_structure`
+### ❗phase_structure
 ```julia
 phase_structure(datatype::DataType, args...)
 ```
@@ -26,9 +26,9 @@ phase_structure(Int16, missing, missing)
 missing
 ```
 ----
-### `structure`
+### 🟪 structure
 ```julia
-    structure(infile::String; kwargs...)
+structure(infile::String; kwargs...)
 ```
 Load a Structure format file into memory as a PopData object.
 
@@ -87,13 +87,12 @@ chestnut_03	2	110	145	-9	0	92
 chestnut_03	2	110	148	66	1	-9
 ```
 
-#### Example
+**Example**
 ```
 walnuts = structure("juglans_nigra.str", extracols = 0, extrarows = 0)
 ```
 ----
 
-### `structure`
 ```julia
 structure(data::PopData; filename::String, faststructure::Bool, delim::String)
 ```
@@ -104,6 +103,7 @@ Write a `PopData` object to a Stucture format file
 - `delim` : a `String` of either `"tab"` or `"space"` indicating the delimiter (default: `"tab"`)
 - `faststructure`: true/false of whether the output should be formatted for fastStructure (default: `false`)
 
+**Example**
 ```
 cats = @nancycats;
 fewer_cats = omit(cats, name = samples(cats)[1:10]);

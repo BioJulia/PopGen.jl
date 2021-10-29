@@ -8,7 +8,7 @@ sidebar_label: Genepop.jl
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### `genepop`
+### 🟪 genepop
 ```julia
 genepop(infile::String; kwargs...)
 ```
@@ -53,7 +53,6 @@ waspsNY = genepop("wasp_hive.gen", digits = 3, popsep = "pop")
 
 ----
 
-### `genepop`
 ```julia
 genepop(data::PopData; filename::String = "output.gen", digits::Int = 3, format::String = "vertical")
 ```

@@ -8,7 +8,7 @@ sidebar_label: Delimited.jl
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### `delimited`
+### 🟪 delimited
 ```julia
 delimited(infile::String; delim::Union{Char,String,Regex} = "auto", digits::Int64 = 3, silent::Bool = false)
 ```
@@ -39,7 +39,8 @@ Missing genotypes can be formatted as all-zeros `000000`, left empty, or negativ
 ##### Location data
 If location data is missing for a sample (which is ok!), make sure the value is
 blank, otherwise there will be transcription errors! (look at line 3 in the example below)
-#### Example
+
+**Example**
 ```
 lizardsCA = delimited("CA_lizards.csv", digits = 3);
 ```
@@ -61,7 +62,6 @@ lizardsCA = delimited("CA_lizards.csv", digits = 3);
 
 ----
 
-### `delimtied`
 ```julia
 delimited(data::PopData; filename::String, delim::String = ",", digits::Integer = 3, format::String = "wide")
 ```
@@ -72,7 +72,7 @@ Write PopData to a text-delimited file.
 - `format` : a `String` indicating whether to output in`"wide"` or `"long"` (aka `"tidy"`) format 
 - `delim` : the `String` delimiter to use for writing the file. 
 
-#### Example
+**Example**
 ```julia
 cats = @nancycats;
 fewer_cats = omit_samples(cats, samples(cats)[1:10]);

@@ -8,7 +8,7 @@ sidebar_label: Datasets.jl
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### `dataset`
+### ❗`dataset`
 ```julia
 dataset(::String)
 ```
@@ -24,7 +24,7 @@ gsharks = dataset("sharks")
 
 ----
 
-### `@nancycats`
+### 🟪🔵 @nancycats
 ```julia
 @nancycats
 ```
@@ -39,7 +39,7 @@ ncats = @nancycats
 
 ----
 
-### `@gulfsharks`
+### 🟪🔵 @gulfsharks
 ```julia
 @gulfsharks
 ```
