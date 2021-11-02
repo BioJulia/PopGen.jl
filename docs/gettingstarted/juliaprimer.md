@@ -100,7 +100,7 @@ population(data::PopData; counts::Bool = false)
 ```
 
 - `data` is a positional argument of type `PopData` 
-- `counts` is a keyword argument of type `Bool` (Boolean) meaning it only takes `true` or `false` without quotes, and the default value is set to `false`
+- `counts` is a keyword argument (because of the semicolon, see below) of type `Bool` (Boolean) meaning it only takes `true` or `false` without quotes, and the default value is set to `false`
 
 ### Type Unions
 
