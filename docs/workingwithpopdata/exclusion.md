@@ -39,22 +39,16 @@ Integers work too if things are named `"1"`, `"2"`, etc.
 
 ``` julia
 julia> fewer_sharks = exclude(sharks, name = "cc_001")
-PopData Object
-  Marker: SNP
-  Ploidy: 2
+PopData{Diploid, 2209 SNP loci}
   Samples: 211
-  Loci: 2209
   Populations: 7
-  Coordinates: present
+  Other info: ["longitude", "latitude"]
 
 julia> lots_fewer_sharks = remove(sharks, name = ["cc_001", "cc_002", "cc_003"])
-PopData Object
-  Marker: SNP
-  Ploidy: 2
+PopData{Diploid, 2209 SNP loci}
   Samples: 209
-  Loci: 2209
   Populations: 7
-  Coordinates: present
+  Other info: ["longitude", "latitude"]
 ```
 
 </TabItem>
@@ -62,22 +56,16 @@ PopData Object
 
 ``` julia
 julia> fewer_shark_loci = exclude(sharks, locus = "contig_475")
-PopData Object
-  Marker: SNP
-  Ploidy: 2
+PopData{Diploid, 2208 SNP loci}
   Samples: 212
-  Loci: 2208
   Populations: 7
-  Coordinates: present
+  Other info: ["longitude", "latitude"]
 
 julia> lots_fewer_loci = remove(sharks, locus = ["contig_475", "contig_2784", "contig_8065"])
-PopData Object
-  Marker: SNP
-  Ploidy: 2
+PopData{Diploid, 2206 SNP loci}
   Samples: 212
-  Loci: 2206
   Populations: 7
-  Coordinates: present
+  Other info: ["longitude", "latitude"]
 ```
 
 </TabItem>
@@ -85,22 +73,16 @@ PopData Object
 
 ``` julia
 julia> fewer_shark_pops = exclude(sharks, population = "Georgia")
-PopData Object
-  Markers: SNP
-  Ploidy: 2
+PopData{Diploid, 2208 SNP loci}
   Samples: 182
-  Loci: 2209
   Populations: 6
-  Coordinates: present
+  Other info: ["longitude", "latitude"]
 
 julia> lots_fewer_pops = remove(sharks, population = ["Florida Keys", "Mideast Gulf"])
-PopData Object
-  Markers: SNP
-  Ploidy: 2
+PopData{Diploid, 2209 SNP loci}
   Samples: 119
-  Loci: 2209
   Populations: 5
-  Coordinates: present
+  Other info: ["longitude", "latitude"]
 ```
 
 </TabItem>
@@ -112,13 +94,10 @@ Notices:
   sample "mango_111" not found
   population "kiwi" not found
 
-PopData Object
-  Markers: SNP
-  Ploidy: 2
+PopData{Diploid, 2208 SNP loci}
   Samples: 190
-  Loci: 2208
   Populations: 6
-  Coordinates: present
+  Other info: ["longitude", "latitude"]
 ```
 
 </TabItem>
@@ -138,8 +117,7 @@ of `omit`, `remove`, and `exclude`.
 ```julia
 keep(data::PopData, kwargs...)
 ```
-Returns a new `PopData` object keeping only the occurrences of the specified keyword.
-Unlike `exclude()`, only one keyword can be used at a time. All values are 
+Returns a new `PopData` object keeping only the occurrences of the specified keyword. All values are 
 converted to `String` for filtering, so `Symbol` and numbers will also work.
 ### Keyword Arguments
 - `locus::Union{String, Vector{String}}`: locus or loci you want to keep in the `PopData`
@@ -156,43 +134,37 @@ keep(cats, locus = [:fca8, "fca37"])
 
 ## Remove monomorphic loci
 While included in the file parsers by default, you may want to do this manually with
-`drop_monomorphic`, which returns a new `PopData` object excluding any
-monomorphic loci. You can use the mutable version `drop_monomorphic!` to
+`dropmonomorphic`, which returns a new `PopData` object excluding any
+monomorphic loci. You can use the mutable version `dropmonomorphic!` to
 edit a `PopData` object in-place.
 ```julia
-drop_monomorphic(::PopData)
-drop_monomorphic!(::PopData)
+dropmonomorphic(::PopData)
+dropmonomorphic!(::PopData)
 ```
 
 ## Remove multiallelic markers
 If your data isn't biallelic, you may want to remove multi-allelic markers for
 certain analyses (for example, the Hudson pairwise FST method requires
-biallelic data). For that we have `drop_multiallelic`, which returns a new
-`PopData` object, and the mutable version `drop_multiallelic!`, which edits a `PopData` object in-place.
+biallelic data). For that we have `dropmultiallelic`, which returns a new
+`PopData` object, and the mutable version `dropmultiallelic!`, which edits a `PopData` object in-place.
 ```julia
-drop_multiallelic(::PopData)
-drop_multiallelic(::PopData)
+dropmultiallelic(::PopData)
+dropmultiallelic(::PopData)
 ```
 
 **Example**
 ```
 julia> sharks = @gulfsharks
-PopData Object
-  Markers: SNP
-  Ploidy: 2
+PopData{Diploid, 2209 SNP loci}
   Samples: 212
-  Loci: 2209
   Populations: 7
-  Coordinates: present
+  Other info: ["longitude", "latitude"]
 
 
-julia> drop_multiallelic(sharks)
+julia> dropmultiallelic(sharks)
 [ Info: Removing 258 multialleic loci
-PopData Object
-  Markers: SNP
-  Ploidy: 2
+PopData{Diploid, 1951 SNP loci}
   Samples: 212
-  Loci: 1951
   Populations: 7
-  Coordinates: present
+  Other info: ["longitude", "latitude"]
 ```
