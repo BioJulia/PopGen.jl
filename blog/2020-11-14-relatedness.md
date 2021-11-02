@@ -174,7 +174,7 @@ Technically, we could merge all three results into a single `PopData`, but it wi
 
 <Tabs
   block={true}
-  defaultValue=""
+  defaultValue={null}
   values={[
     { label: 'meta', value: 'meta', },
     { label: 'loci', value: 'loci', },
