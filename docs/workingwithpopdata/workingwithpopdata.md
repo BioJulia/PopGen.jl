@@ -28,6 +28,7 @@ julia> sharks = @gulfsharks ;
 #### [Adding Information](addingdata)
 #### [Data Exclusion](exclusion)
 #### [Conditionals and Logic](conditionals)
-#### [Location and Population Data](populations)
+#### [Population Data](populationdata)
+#### [Location Data](locationdata)
 #### [Data Exploration](dataexploration)
 #### [Advanced Indexing](advancedindexing)
