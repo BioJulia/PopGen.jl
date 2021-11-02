@@ -8,6 +8,7 @@ module.exports = {
   favicon: 'img/favicon.ico',
   organizationName: 'BioJulia', // Usually your GitHub org/user name.
   projectName: 'PopGen.jl', // Usually your repo name.
+  trailingSlash: false,
   themeConfig: {
     hideableSidebar: true,
     announcementBar: {

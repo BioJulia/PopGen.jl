@@ -25,7 +25,7 @@ julia> sharks = @gulfsharks ;
 
 ## Topics
 #### [Viewing Data](viewdata)
-#### [Adding Information](add_info)
+#### [Adding Information](addingdata)
 #### [Data Exclusion](exclusion)
 #### [Conditionals and Logic](conditionals)
 #### [Location and Population Data](populations)

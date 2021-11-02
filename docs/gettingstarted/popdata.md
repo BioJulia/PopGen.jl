@@ -42,11 +42,11 @@ The `metadata` component exists to
 3. provide flexibility in storing that information in wide format because storing it in long format would dramatically increase the size of `PopData` objects
 4. provide easy access to viewing sample or locus information
 
-See [accessing elements](../workingwithpopdata/accessingelements) for a closer look at accessing this
+See [accessing elements](/workingwithpopdata/accessingelements.md) for a closer look at accessing this
 information.
 ## Genodata
 
-The genotype information is stored in a separate table lovingly called `genodata`. This table is rather special in that it is stored in "long" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions. It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are each a special type of compressed vector from [PooledArrays.jl](https://github.com/JuliaData/PooledArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.genodata` can be directly accessed with `PopData.genodata.colname` where `PopData` is the name of your PopData object, and `colname` is one of `name, population, locus, genotype`. See [Advanced Indexing](../workingwithpopdata/advancedindexing) for a deeper
+The genotype information is stored in a separate table lovingly called `genodata`. This table is rather special in that it is stored in "long" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions. It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are each a special type of compressed vector from [PooledArrays.jl](https://github.com/JuliaData/PooledArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.genodata` can be directly accessed with `PopData.genodata.colname` where `PopData` is the name of your PopData object, and `colname` is one of `name, population, locus, genotype`. See [Advanced Indexing](/workingwithpopdata/advancedindexing.md) for a deeper
 dive into manipulating genodata.
 
 :::caution immutable genotypes
