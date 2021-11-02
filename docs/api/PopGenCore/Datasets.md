@@ -8,12 +8,12 @@ sidebar_label: Datasets.jl
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### ❗`dataset`
+### ❗dataset
 ```julia
 dataset(::String)
 ```
 Load an example dataset from either `"gulfsharks"` (SNP) or `"nancycats"` (microsatellite). Can also use `"sharks"` and `"cats"`
-as shorthands. Use `?nancycats` and `?gulfsharks` to learn more about
+as shorthands. Use `?@nancycats` and `?@gulfsharks` to learn more about
 these datasets.
 
 **Example**
