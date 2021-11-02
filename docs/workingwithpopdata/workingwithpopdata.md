@@ -6,8 +6,7 @@ sidebar_label: Working with PopData
 
 PopGen.jl includes basic commands to provide obvious methods to inspect and alter `PopData`. Using standard Julia conventions, only commands ending with a bang `!` are mutable, meaning they alter the input data. So, commands like `populations` will show you population information, whereas `populations!` will change that information in your `PopData`. The mutable commands here alter the data in your `PopData`, but not the source data (i.e. the files used to create the `PopData`). The "manipulation" commands were separated into smaller sections to make it less overwhelming, and using the `gulfsharks` data, you can explore each of the sections like a little tutorial. The sections don't follow any particular order, so feel free to jump around however you like. 
 
-:::caution accessing internal fields
-**TLDR: End-users (vs developers) shouldn't access PopData fields directly**
+:::caution TLDR: End-users (vs developers) shouldn't access PopData fields directly
 
 In earlier versions of PopGen.jl, you were encouraged to directly access the internal fields of PopData. After careful consideration
 and discussion with other users and developers, it's been decided that we should follow standard-ish convention and provide function

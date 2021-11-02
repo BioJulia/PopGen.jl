@@ -7,7 +7,9 @@ sidebar_label: PopGen.jl tips
 Here are some useful tips to getting comfortable with PopGen.jl.
 
 ### PopGen vs PopGenCore
-**TLDR: PopGen is for analyses, PopGenCore is for everything else**
+:::tip TLDR
+PopGen is for analyses, PopGenCore is for everything else
+:::
 
 PopGen.jl is now intended exclusively for population genetic analyses, and PopGenCore.jl is the "core" package
 where just about every utility lives relating to working with PopData that isn't an analysis. The recent split 
@@ -17,7 +19,9 @@ should be enough.
 
 
 ### Internal functions
-**TLDR: functions you aren't expected to use start with underscores `_`**
+:::tip TLDR
+functions you aren't expected to use start with underscores `_`
+:::
 
 It's pretty common to have a series of user-facing functions in a package (the ones that get exported)
 along with a series of unexported ones that are useful for development or are helper functions for the
@@ -26,7 +30,9 @@ exported ones. If you see a function that starts with an underscore, like `_adja
 not all of them have docstrings.
 
 ### Function names
-**TLDR: all user functions in PopGen.jl (not including PopGenCore.jl) are lowercase and use no underscores**
+:::tip TLDR
+all user functions in PopGen.jl (not including PopGenCore.jl) are lowercase and use no underscores
+:::
 
 In an effort to be consistent with the Julia language and just consistent overall, user-facing functions 
 are named with three main principals:
@@ -41,7 +47,9 @@ if you wanted to perform a pairwise FST, the function is called `pairwisefst` --
 that doesn't fit this mold, please submit a Pull Request!
 
 ### Argument names
-**TLDR: all user functions in PopGen.jl have descriptive keyword argument names**
+:::tip TLDR
+all user functions in PopGen.jl have descriptive keyword argument names
+:::
 
 This too is driven by frustration with the shortened and/or truncated keyword arguments of just about
 every R function. As if learning another language wasn't enough of a task, memorizing nonintuitive
