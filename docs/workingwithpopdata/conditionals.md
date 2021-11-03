@@ -21,7 +21,7 @@ ishom(locus::GenoArray)
 ```
 This will return `true` if a genotype is homozygous. The `GenoaArray` version
 just broadcasts it across all the genotypes in an array, returning a vector
-of `true` or `false`. Returns `missing` if the genotype is `missing`.
+of `true` or `false`.
 
 **Example**
 ```julia
@@ -111,7 +111,7 @@ julia> ishom(subset, 135)
 ishet(locus::Genotype)
 ishet(locus::GenoArray)
 ```
-This is the exact opposite of `ishom`, returning `true` if the genotype (or genotypes) is/are heterozygous. Returns `missing` if the genotype is `missing`.
+This is the exact opposite of `ishom`, returning `true` if the genotype (or genotypes) is/are heterozygous.
 
 **Example**
 ```julia
