@@ -9,9 +9,9 @@ These pages contains the APIs, or **A**pplication **P**rogramming **I**nterface,
 
 Each API page features icons indicating whether a function is exported by that package. You will see two icons next to functions that PopGen.jl reexports from PopGenCore.jl.
 Each page has a legend at the top for convenience. This is the icon system:
-1. an eye with a slash <Icon>visibility_off</Icon> indicates the function is not exported by any package
-    - functions beginning with underscores are never exported (always have eye-with-slash icon)
-3. a circle with three dots <Icon>group_work</Icon> indicates the function is exported by PopGenCore.jl
-4. an eye <Icon>visibility</Icon> indicates the function is exported by the package the function appears in (PopGen.jl, PopGenSims.jl). 
+1. <Icon>visibility_off</Icon> indicates the function is not exported by any package
+    - functions beginning with underscores always have <Icon>visibility_off</Icon>
+3. <Icon>group_work</Icon> indicates the function is exported by PopGenCore.jl
+4. <Icon>visibility</Icon> indicates the function is exported by the package the function appears in (PopGen.jl, PopGenSims.jl). 
     - this applies only to non-PopGenCore.jl packages
 
