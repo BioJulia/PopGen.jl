@@ -24,7 +24,7 @@ PopData{Diploid, 9 Microsatellite loci}
   Populations: 17
 ```
 
-Now that we have nancycats loaded in, we can use standard Julia accessor conventions to view the elements within our PopData. The DataFrames uses the convention `PopData.sampleinfo.colname` to directly access the columns we want.
+Now that we have nancycats loaded in, we can use standard Julia accessor conventions to view the elements within our PopData. The DataFrames uses the convention `dataframe.colname` to directly access the columns we want.
 
 ## The metadata (data about the data)
 Some critical information about the data is front-loaded into a PopData object to eliminate constantly getting these values in calculations.
@@ -128,7 +128,8 @@ julia> locusinfo(ncats)
 
 </TabItem>
 </Tabs>
---------------------
+
+-----
 
 ## The genotype table
 
