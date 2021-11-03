@@ -32,13 +32,13 @@ Return a vector of the unique populations.
 ``` julia
 julia> populations(sharks)
 7-element Array{String,1}:
- "Cape Canaveral"
+ "CapeCanaveral"
  "Georgia"
- "South Carolina"
- "Florida Keys"
- "Mideast Gulf"
- "Northeast Gulf"
- "Southeast Gulf"
+ "SouthCarolina"
+ "FloridaKeys"
+ "MideastGulf"
+ "NortheastGulf"
+ "SoutheastGulf"
 ```
 
 </TabItem>
