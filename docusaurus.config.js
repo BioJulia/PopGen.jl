@@ -17,7 +17,7 @@ module.exports = {
     announcementBar: {
       id: 'supportus',
       content:
-        '🔵 Like PopGen.jl? Give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/BioJulia/PopGen.jl">GitHub!</a>! 🟣',
+        '🔵 Like PopGen.jl? Give it a ⭐ on <a target="_blank" rel="noopener noreferrer" href="https://github.com/BioJulia/PopGen.jl">GitHub!</a>! 🟣',
     },
     prism: {
       //defaultLanguage: 'julia',
