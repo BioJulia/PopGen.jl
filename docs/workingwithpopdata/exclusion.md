@@ -78,7 +78,7 @@ PopData{Diploid, 2208 SNP loci}
   Populations: 6
   Other info: ["longitude", "latitude"]
 
-julia> lots_fewer_pops = remove(sharks, population = ["Florida Keys", "Mideast Gulf"])
+julia> lots_fewer_pops = remove(sharks, population = ["FloridaKeys", "MideastGulf"])
 PopData{Diploid, 2209 SNP loci}
   Samples: 119
   Populations: 5
@@ -89,7 +89,7 @@ PopData{Diploid, 2209 SNP loci}
 <TabItem value="c">
 
 ``` julia
-julia> tiny_shark = exclude(sharks, locus = "contig_475", name = ["cc_001", "neg_021", "mango_111"], population = ["Cape Canaveral", "kiwi"])
+julia> tiny_shark = exclude(sharks, locus = "contig_475", name = ["cc_001", "neg_021", "mango_111"], population = ["CapeCanaveral", "kiwi"])
 Notices:
   sample "mango_111" not found
   population "kiwi" not found
