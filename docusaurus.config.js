@@ -9,6 +9,9 @@ module.exports = {
   organizationName: 'BioJulia', // Usually your GitHub org/user name.
   projectName: 'PopGen.jl', // Usually your repo name.
   trailingSlash: false,
+  stylesheets: [
+    "https://fonts.googleapis.com/icon?family=Material+Icons",
+  ],
   themeConfig: {
     hideableSidebar: true,
     announcementBar: {
