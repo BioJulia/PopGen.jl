@@ -4,7 +4,7 @@ title: Conditionals and Logic
 sidebar_label: Conditionals
 ---
 
-Included in PopGen.jl are some functions to help discriminate your data a bit more. Like allℹ️ conditionals, these return `true` or `false` depending on the test.
+Included in PopGen.jl are some functions to help discriminate your data a bit more. Like all conditionalsℹ️, these return `true` or `false` depending on the test.
 
 :::note ℹ️ Missing values
 By Julia's design, conditionals on `missing` values return `missing`. For
