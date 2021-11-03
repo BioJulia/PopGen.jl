@@ -4,13 +4,13 @@ title: Conditionals and Logic
 sidebar_label: Conditionals
 ---
 
-Included in PopGen.jl are some functions to help discriminate your data a bit more. Like all⋆ conditionals, these return `true` or `false` depending on the test.
+Included in PopGen.jl are some functions to help discriminate your data a bit more. Like allℹ️ conditionals, these return `true` or `false` depending on the test.
 
-:::note Missing values
+:::note ℹ️ Missing values
 By Julia's design, conditionals on `missing` values return `missing`. For
 indexing and subsetting reasons, `ishom` and `ishet` return `false` on
 missing values, however unexported methods `_ishom` and `_ishet` return
-`missing` as per the standard design. These unexported methods are critical
+`missing` as per the standard convention. These unexported methods are critical
 for calculations where `missing` values should absolutely not be treated as `false`.
 :::
 
