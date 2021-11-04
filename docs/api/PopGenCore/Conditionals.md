@@ -4,7 +4,7 @@ title: Conditionals.jl
 sidebar_label: Conditionals.jl
 ---
 ## PopGenCore.jl/src/Conditionals.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 

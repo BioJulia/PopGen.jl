@@ -60,7 +60,7 @@ locationdata!(data::PopData; longitude::Vector{String}, latitude::Vector{String}
 
 - Coordinates as `String` separated by spaces (`"11 43 41"`) or colons (`"11:43:41"`)
 - Must use negative sign (`"-11 43.52"`) or single-letter cardinal direction (`"11 43.52W"`)
-- Missing data should be coded as the string `"missing"` (can be accomplished with `replace!()`)
+- Missing data should be coded as `missing` or the string `"missing"`
 - Can mix colons and spaces (although it's bad practice)
 
 If not already in decimal-minutes format, it would likely be most convenient if you imported your coordinate data as vectors of strings, which would look something like this:

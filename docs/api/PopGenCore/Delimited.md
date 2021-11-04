@@ -4,7 +4,7 @@ title: Delimited.jl
 sidebar_label: Delimited.jl
 ---
 ## PopGenCore.jl/src/io/Delimited.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 

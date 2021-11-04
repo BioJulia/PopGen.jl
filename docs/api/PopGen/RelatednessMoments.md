@@ -5,7 +5,7 @@ sidebar_label: RelatednessMoments.jl
 ---
 
 ## PopGen.jl/src/Relatedness/RelatednessMoments.jl
-❗ => not exported | 
+📦  => not exported | 
 🔵 => exported by PopGen.jl
 
 ### 🔵 Blouin
@@ -148,16 +148,16 @@ Wang, J. (2017). Estimating pairwise relatedness in a small sample of individual
 
 ----
 
-### ❗_a_wang_base 
+### 📦 _a_wang_base 
 ```julia
 _a_wang_base(m::Int, alleles::Dict)
 ```
 
-### ❗_a_wang 
+### 📦 _a_wang 
 ```julia
 _a_wang(N::Int, alleles::Dict)
 ```
-### ❗Wang
+### 📦 Wang
     Wang(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
 Calculates the moments based estimator of pairwise relatedness by Wang (2002).
 - Single Locus Equation:

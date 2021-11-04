@@ -4,10 +4,10 @@ title: HardyWeinberg.jl
 sidebar_label: HardyWeinberg.jl
 ---
 ## PopGen.jl/src/HardyWeinberg.jl
-❗ => not exported | 
+📦  => not exported | 
 🔵 => exported by PopGen.jl
 
-### ❗_chisqlocus
+### 📦 _chisqlocus
 ```julia
 _chisqlocus(locus::T) where T <: GenotypeArray
 ```

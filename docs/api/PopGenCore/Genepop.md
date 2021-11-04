@@ -4,7 +4,7 @@ title: Genepop.jl
 sidebar_label: Genepop.jl
 ---
 ## PopGenCore.jl/src/io/Genepop.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 

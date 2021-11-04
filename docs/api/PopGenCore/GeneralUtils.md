@@ -4,7 +4,7 @@ title: GeneralUtils.jl
 sidebar_label: GeneralUtils.jl
 ---
 ## PopGenCore.jl/src/Utils/GeneralUtils.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
@@ -80,7 +80,7 @@ dropmultiallelic!
 Edit a `PopData` object in place, removing loci that are not biallelic.
 
 ----
-### ❗truncatepath
+### 📦 truncatepath
 ```julia
 truncatepath(text::String)
 ```

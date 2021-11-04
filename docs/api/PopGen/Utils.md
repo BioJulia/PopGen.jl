@@ -5,15 +5,15 @@ sidebar_label: Utils.jl
 ---
 
 ## PopGen.jl/src/Utils.jl
-❗ => not exported | 
+📦  => not exported | 
 🔵 => exported by PopGen.jl
 
-### ❗_adjacency_matrix
+### 📦 _adjacency_matrix
 ```julia
 _adjacency_matrix(data::PopData)
 ```
 
-### ❗_p_adjust
+### 📦 _p_adjust
 ```julia
 _p_adjust(pvals::Vector{T}, method::String) where T <: Union{Missing, <:AbstractFloat}
 ```
@@ -38,7 +38,7 @@ julia> _p_adjust([0.1, 0.01, 0.005, 0.3], "bh")
 """
 
 
-### ❗feature_req
+### 📦 feature_req
 ```julia
 feature_req()
 ```

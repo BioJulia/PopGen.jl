@@ -4,7 +4,7 @@ title: MissingUtils.jl
 sidebar_label: MissingUtils.jl
 ---
 ## PopGenCore.jl/src/Utils/MissingUtils.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 

@@ -4,10 +4,10 @@ title: PairwiseRelatedness.jl
 sidebar_label: PairwiseRelatedness.jl
 ---
 ## PopGen.jl/src/Relatedness/PairwiseRelatedness.jl
-❗ => not exported | 
+📦  => not exported | 
 🔵 => exported by PopGen.jl
 
-### ❗_bootstrapsummary
+### 📦 _bootstrapsummary
 ```julia
 _bootstrapsummary(::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
 ```
@@ -16,7 +16,7 @@ Return the mean, median, standard error, and quantiles (given by `witdth`) of re
 
 ----
 
-### ❗_bootstrapgenos_all
+### 📦 _bootstrapgenos_all
 ```julia
 _bootstrapgenos_all(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
 ```
@@ -25,7 +25,7 @@ of the relatedness estimate given by method `method`. This is an internal functi
 
 ----
 
-### ❗_bootstrapgenos_nonmissing
+### 📦 _bootstrapgenos_nonmissing
 ```julia
 bootstrapgenos_nonmissing(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
 ```
@@ -35,7 +35,7 @@ of the relatedness estimate given by method `method`. This is an internal functi
 
 ----
 
-### ❗_relatedness_boot_all
+### 📦 _relatedness_boot_all
 ```julia
 _relatedness_boot_all(::PopData, sample_names::Vector{String}; method::Function, iterations::Int, interval::Tuple{Float64, Float64})
 ```
@@ -45,7 +45,7 @@ the `all` method, where resampling occurs over all loci. This is an internal fun
 
 ----
 
-### ❗_relatedness_boot_nonmissing
+### 📦 _relatedness_boot_nonmissing
 ```julia
 _relatedness_boot_nonmissing(::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64}) where F
 ```
@@ -55,7 +55,7 @@ the `nonmissing` method, where resampling occurs over only shared non-missing lo
 
 ----
 
-### ❗_relatedness_noboot
+### 📦 _relatedness_noboot
 ```julia
 _relatedness_noboot(::PopData, sample_names::Vector{String}; method::F) where F
 ```

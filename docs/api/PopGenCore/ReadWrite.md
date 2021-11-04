@@ -4,11 +4,11 @@ title: ReadWrite.jl
 sidebar_label: ReadWrite.jl
 ---
 ## PopGenCore.jl/src/io/ReadWrite.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### ❗read
+### 📦 read
 ```julia
 PopGen.read(infile::String; kwargs...)
 ```
@@ -36,7 +36,7 @@ PopGen.read("juglans_nigra.vcf")
 
 ----
 
-### ❗write
+### 📦 write
 ```julia
 PopGen.write(data::PopData, filename::String, kwargs...)
 PopGen.write(data::PopData; filename::String, kwargs...)

@@ -4,7 +4,7 @@ title: Iterators.jl
 sidebar_label: Iterators.jl
 ---
 ## PopGenCore.jl/src/Iterators.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 

@@ -4,11 +4,11 @@ title: Sibship.jl
 sidebar_label: Sibship.jl
 ---
 PopGenSims.jl/src/Sibship.jl
-❗ => not exported | 
-⚫ => exported by PopGenSims.jl
+📦  => not exported | 
+🟪 => exported by PopGenSims.jl
 
 
-### ❗_cross
+### 📦 _cross
 ```julia
 _cross(parent1::Vector{Vector{T}}, parent2::Vector{Vector{T}}) where T <: Signed
 ```
@@ -17,33 +17,33 @@ ploidy as `parent1`. This variant of `cross` is used internally for `simulate_si
 
 ----
 
-### ❗_parentoffspring
+### 📦 _parentoffspring
 ```julia
 parentoffspring(data::PopData; n::Int, ploidy::Int)
 ```
 
 ----
 
-### ❗fullsib
+### 📦 fullsib
 ```julia
 fullsib(data::PopData; n::Int, ploidy::Int)
 ```
 ----
 
-### ❗halfsib
+### 📦 halfsib
 ```julia
 halfsib(data::PopData; n::Int, ploidy::Int)
 ```
 ----
 
-### ❗unrelated
+### 📦 unrelated
 ```julia
 unrelated(data::PopData; n::Int, ploidy::Int)
 ```
 
 ----
 
-### ⚫ simulate_sibship
+### 🟪 simulate_sibship
 ```julia
 simulate_sibship(data::PopData; fullsib::Int, halfsib::Int, unrelated::Int, parentoffspring::Int, ploidy::Signed)
 ```

@@ -8,10 +8,10 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 <link rel="stylesheet" href={useBaseUrl("katex/katex.min.css")} />
 
 ## PopGen.jl/src/Heterozygosity.jl
-❗ => not exported | 
+📦  => not exported | 
 🔵 => exported by PopGen.jl
 
-### ❗counthet
+### 📦 counthet
 ```julia
 counthet(geno::T, allele::Int) where T<:GenoArray
 counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
@@ -20,7 +20,7 @@ Given a `GenoArray`, count the number of times `allele` appears in the
 heterozygous state.
 
 ----
-### ❗counthom
+### 📦 counthom
 ```julia
 counthom(geno::T, allele::Int) where T<:GenoArray
 counthom(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer
@@ -29,7 +29,7 @@ Given a `GenoArray`, count the number of times `allele` appears in the
 homozygous state.
 
 ----
-### ❗_genediversitynei87
+### 📦 _genediversitynei87
 ```julia
 _genediversitynei87(het_exp::T, het_obs::T, n::Union{Integer,T}; corr::Bool = true) where T<: AbstractFloat
 _genediversitynei87(het_exp::AbstractFloat, het_obs::Missing, n::Union{Integer,AbstractFloat}; corr::Bool = true)
@@ -51,7 +51,7 @@ Nei M. (1987) Molecular Evolutionary Genetics. Columbia University Press
 Use `corr = false` to ignore sample-size correction `* n/(n-1)`
 
 ----
-### ❗_hetero_obs
+### 📦 _hetero_obs
 ```julia
 _hetero_obs(data::T) where T <: GenoArray
 ```
@@ -61,7 +61,7 @@ as genotypes returning `true` for `_ishet()`. This is numerically feasible becau
 as `0`.
 
 ----
-### ❗_hetero_exp
+### 📦 _hetero_exp
 ```julia
 _hetero_exp(allele_freqs::Vector{T}) where T <: GenoArray
 ```

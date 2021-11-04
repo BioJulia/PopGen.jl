@@ -3,8 +3,10 @@ id: dataexploration
 title: DataExploration.jl
 sidebar_label: DataExploration.jl
 ---
+import Icon from "@material-ui/core/Icon";
+
 ## PopGen.jl/src/DataExplortation.jl
-❗ => not exported | 
+📦  => not exported | 
 🔵 => exported by PopGen.jl
 
 ### 🔵 allelefreqtable

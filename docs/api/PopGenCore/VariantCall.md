@@ -4,11 +4,11 @@ title: VariantCall.jl
 sidebar_label: VariantCall.jl
 ---
 ## PopGenCore.jl/src/io/VariantCall.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### ❗ openvcf
+### 📦  openvcf
     openvcf(::String)
 Open VCF file (`.vcf(.gz)` or `.bcf(.gz)`) and return an `IO` stream in reading mode `"r"`.
 

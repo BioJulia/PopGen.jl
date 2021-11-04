@@ -3,7 +3,7 @@ id: popdatawrappers
 title: PopDataWrappers.jl
 sidebar_label: PopDataWrappers.jl
 ---
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 

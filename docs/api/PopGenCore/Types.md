@@ -4,7 +4,7 @@ title: PopData.jl
 sidebar_label: PopData.jl
 ---
 ## PopGenCore.jl/src/PopData.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
@@ -85,7 +85,7 @@ SNP::DataType
 ```
 An alias for `NTuple{N, Int8}`
 
-### ❗_SNP
+### 📦 _SNP
 ```julia
 SNP(geno)
 ```
@@ -97,7 +97,7 @@ MSat::DataType
 ```
 An alias for `NTuple{N, Int16}`
 
-### ❗_MSat
+### 📦 _MSat
 ```julia
 _MSat(geno)
 ```
@@ -112,7 +112,7 @@ and `Genotype`, which itself is of type `NTuple{N, <:Integer} where N`.
 The definition as an `AbstractVector` adds flexibility for `SubArray`
 cases.
 
-### ❗_ploidy2text
+### 📦 _ploidy2text
 ```
 _ploidy2text(ploidy::Int8)
 _ploidy2text(ploidy::Vector{Int8})

@@ -4,11 +4,11 @@ title: Structure.jl
 sidebar_label: Structure.jl
 ---
 ## PopGenCore.jl/src/io/Structure.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### ❗phase_structure
+### 📦 phase_structure
 ```julia
 phase_structure(datatype::DataType, args...)
 ```

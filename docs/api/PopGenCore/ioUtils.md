@@ -4,11 +4,11 @@ title: ioUtils.jl
 sidebar_label: ioUtils.jl
 ---
 ## PopGenCore.jl/src/Utils/ioUtils.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
-### ❗isbinary
+### 📦 isbinary
 ```jula
 isbinary(filepath::String)
 ```

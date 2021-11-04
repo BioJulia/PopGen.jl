@@ -4,7 +4,7 @@ title: GenotypeUtils.jl
 sidebar_label: GenotypeUtils.jl
 ---
 ## PopGenCore.jl/src/Utils/GenotypeUtils.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 

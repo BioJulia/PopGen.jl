@@ -4,10 +4,10 @@ title: Samples.jl
 sidebar_label: Samples.jl
 ---
 PopGenSims.jl/src/Samples.jl
-❗ => not exported | 
-⚫ => exported by PopGenSims.jl
+📦  => not exported | 
+🟪 => exported by PopGenSims.jl
 
-### ❗sample_locus
+### 📦 sample_locus
 ```julia
 sample_locus(locus::Dict, n::Int, ploidy::Signed)
 ```
@@ -32,7 +32,7 @@ julia> sample_locus(d, 3, 3)
  (137, 135, 135)
 ```
 
-### ⚫ simulate
+### 🟪 simulate
     simulate(data::PopData; n::Int = 100)
 Simulate `n` number of individuals (default: `100`) per population using per-population
 allele frequencies derived from a `PopData` object. Returns a new `PopData` object.

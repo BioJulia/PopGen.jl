@@ -4,10 +4,10 @@ title: Cross.jl
 sidebar_label: Cross.jl
 ---
 ## PopGenSims.jl/src/Cross.jl
-❗ => not exported | 
-⚫ => exported by PopGenSims.jl
+📦  => not exported | 
+🟪 => exported by PopGenSims.jl
 
-### ❗sample_genotype
+### 📦 sample_genotype
 ```julia
 sample_genotype(geno::T, n_alleles::Int) where T<:Genotype
 ```
@@ -16,21 +16,21 @@ sample_genotype(geno::Missing, n_alleles::Int)
 ```
 ----
 
-### ❗haploid_cross!`
+### 📦 haploid_cross!`
 ```julia
 haploid_cross!(data::DataFrame, p1::T, p2::T; n::Int) where T <: GenoArray
 ```
 
 ----
 
-### ❗polyploid_cross!
+### 📦 polyploid_cross!
 ```julia
 polyploid_cross!(data::DataFrame, p1::T, p2::T; n::Int, ploidy::Int) where T <: GenoArray
  ```
 
 ----
     
-### ⚫ cross
+### 🟪 cross
 ```julia
 cross(data::PopData, parent1::String, parent2::String; n::Int = 100, generation::String = "F1")
 ```

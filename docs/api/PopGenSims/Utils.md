@@ -4,10 +4,10 @@ title: Utils.jl
 sidebar_label: Utils.jl
 ---
 ## PopGenSims.jl/src/Utils.jl
-❗ => not exported | 
-⚫ => exported by PopGenSims.jl
+📦  => not exported | 
+🟪 => exported by PopGenSims.jl
 
-### ⚫ append!
+### 🟪 append!
 ```julia
 append!(data::PopData, data2::PopData)
 ```
@@ -36,7 +36,7 @@ PopData{Diploid, 9 Microsatellite Loci}
   Populations: 18
 ```
 ----
-### ⚫ append
+### 🟪 append
 ```julia
 append(data::PopData, data2::PopData)
 ```
@@ -64,7 +64,7 @@ PopData{Diploid, 9 Microsatellite Loci}
   Populations: 18
 ```
 
-### ❗allele_pool
+### 📦 allele_pool
 ```julia
 allele_pool(locus::T) where T <: GenoArray
 allele_pool(data::PopData)
@@ -72,7 +72,7 @@ allele_pool(data::PopData)
 
 -----
 
-### ❗simulate_sample
+### 📦 simulate_sample
 ```julia
 simulate_sample(alleles::Dict{String,NTuple}, loc::Vector{String}; ploidy::Int)
 ```
@@ -96,7 +96,7 @@ julia> simulate_sample(alleles, loc, ploidy = 2)
  [208, 208]
 ```
 
-### ❗feature_req
+### 📦 feature_req
 ```julia
 feature_req
 ```

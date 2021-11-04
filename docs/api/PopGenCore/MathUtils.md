@@ -4,7 +4,7 @@ title: MathUtils.jl
 sidebar_label: MathUtils.jl
 ---
 ## PopGenCore.jl/src/Utils/MathUtils.jl
-❗ => not exported | 
+📦  => not exported | 
 🟪 => exported by PopGenCore.jl | 
 🔵 => exported by PopGen.jl
 
