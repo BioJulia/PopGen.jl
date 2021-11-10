@@ -60,6 +60,10 @@ function Home() {
       description="Population genetics in Julia <head />">
       <header className={classnames('hero hero--primary', styles.heroBanner)}>
         <div className="container">
+           <img
+            className={classnames(styles.heroBannerLogo, 'margin-vert--md')}
+            src={useBaseUrl('img/logo_icon.png')}
+          />
           <h1 className="hero__title">{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
           <div className={styles.buttons}>
