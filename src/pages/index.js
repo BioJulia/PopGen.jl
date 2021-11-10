@@ -62,10 +62,8 @@ function Home() {
         <div className="container">
            <img
             className={classnames(styles.heroBannerLogo, 'margin-vert--md')}
-            src={useBaseUrl('img/logo_icon.png')}
+            src={useBaseUrl('img/logo_banner.png')}
           />
-          <h1 className="hero__title">{siteConfig.title}</h1>
-          <p className="hero__subtitle">{siteConfig.tagline}</p>
           <div className={styles.buttons}>
             <Link
               className={classnames(

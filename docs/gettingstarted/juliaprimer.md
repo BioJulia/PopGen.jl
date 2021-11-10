@@ -12,6 +12,9 @@ There is nothing inherently special about this documentation relative to other d
 
 
 ## Using Julia
+:::tip TLDR
+Work with Julia using VSCode, Jupyter, Pluto.jl, command line
+:::
 
 Everyone has their own particular workflows, and if you're new to Julia, you might not have established one yet. Julia can be used rather comfortably using its built-in interpreter. For an RStudio-like experience, we recommend using the [VScode Julia extension](https://www.julia-vscode.org), but you can also use [Atom](https://junolab.org/) add-on). If you're already a fan of Jupyter notebooks (or [**nteract**](https://nteract.io/)), then all you need is to install the `IJulia` package in Julia and you have full Jupyter support for Julia! You can also use the new reactive notebooks provided by [Pluto.jl](https://github.com/fonsp/Pluto.jl).
 
@@ -20,6 +23,10 @@ If you didn't already know,  the name "Jupyter" is actually a concatenation of *
 :::
 
 ## First-time Performance
+:::tip TLDR
+Non standard-library packages (like this one) often have a bit of lag when running a function the first time.
+:::
+
 If you're migrating to Julia from Python or R (or Matlab, etc.), you'll think Julia is slow and laggy because loading packages and running stuff has a noticeable wait time (10-40sec). It's worth mentioning that this lag is "compilation overhead". What this means is, Julia tries to pre-compile as much code as possible (into optimized machine code) when running something or loading a package. This lag exists **only the first time** you run something. Every subsequent run of a function, even with different parameters, will be **substantially** faster, and in most cases instant. If you want to test this yourself, try to run a line of code twice with `@time` before the function and compare the results. Here's an example:
 ``` 
 julia> @time using PopGen
@@ -30,6 +37,9 @@ julia> @time using PopGen
 ```
 
 ## Semicolons
+:::tip TLDR
+Semicolons after a command suppress output, and between commands are like a "newline" for brevity.
+:::
 
 Semicolons will come up a lot in Julia, probably more than you would expect if you are migrating from another language.  They mean different things depending on where they are.
 
@@ -52,7 +62,6 @@ julia> x
 Julia will still process the command and assign `10 + 2` to `x`, but it won't show you the output. We sometimes include a semicolon after commands in these docs to mimic what the REPL output would look like without spitting back large volumes of text. **These semicolons are optional** 
 
 
-
 ### In between assignment commands
 
 If you see a semicolon in between two variable assignments or commands, like so:
@@ -71,6 +80,9 @@ julia> y = [3,4]
 We sometimes choose this writing format for very quick  and small assignments hoping to save some visual space. Use whichever method is most comfortable and sensible for you!
 
 ## Help mode
+:::tip TLDR
+Activate help mode (to read docstrings) with `?` on an empty line.
+:::
 
 To enter `help` mode in the REPL, simply press the question mark key `?` (shift + key) and you will notice a different prompt `help?>` for you to type in a function.
 
@@ -81,19 +93,23 @@ help?>population
 ```
 search: population populations population! populations!
 
-  population(data::PopData; listall::Bool = false)
+  population(data::PopData; counts::Bool = false)
 
 View unique population ID's and their counts in a `PopData`.
 
 
-- `listall = true` displays all samples and their `population` instead (default = `false`)
+- `counts = true` : displays the number of samples per population
 ```
 
 ## Type information
+:::tip TLDR
+Types have the format `variable::type` in function singatures. `<:` is a shorthand for "is a subtype of", and `{T} where T` is a shorthand for
+broadening or restricting type signatures. Unions allow for multiple types.
+:::
 
 Julia encourages strong typing of variables, and the functions in `PopGen` are no exception to this. However, to reduce the barrier of entry required to understand this documentation and the subsequent package, we have chosen to omit some of the `type` information from functions to reduce visual clutter for newer users. As experienced users already know, if you would like to see the explicit type information, you can look at the code on github, invoke the `help` system in the REPL (above), or search for a function in the Documentation pane in Juno. 
 
-You'll notice types follow a specific format, which is `object::type`. This format is a type declaration, so in the function `population`, which looks like: 
+You'll notice types follow a specific format, which is `variable::type`. This format is a type declaration, so in the function `population`, which looks like: 
 
 ```julia
 population(data::PopData; counts::Bool = false)
@@ -136,6 +152,9 @@ So, instead of writing `thing1::Float64, thing2::Float64, thing3::Float64`, we j
 
 
 ## Functions vs. Methods 
+:::tip TLDR
+A function is made up of mulitple methods. They all share the same name and differ in the input types/order. A MethodError means you're trying to use a known function but your inputs don't match any of its methods.
+:::
 
 As part of Julia's type-safe paradigm and multiple dispatch (see "ERROR: MethodError: no method matching" below), type specifications in functions often reduce runtime of functions, but also establish function identity. Multiple dispatch refers to several different functions having the same name, but employing different *methods* depending on the input. In Julia, it's easier to write a single function with multiple type-safe methods, rather than one mega-function that accepts any type and have a bunch of `if` statements that determines what the program does depending on the input. 
 
@@ -192,16 +211,10 @@ MethodError's can definitely get annoying, but they are more commonly the result
 
 
 ## Functions with and without keywords 
-
-Let's talk about semicolons some more.
-
-:::info TL;DR
-Reading these docs, pay attention to semicolons in the function argument lists.
-
+:::tip TLDR
 -  arguments before a semicolon have no keyword and follow an explicit order
 -  arguments after a semicolon have a keyword `argument = value` and their order doesn't matter
 -  `MethodError: no methods matching` is often a user error and not a bug, but if it is, please open an issue!
-
 :::
 
 Broadly speaking, there are two types of function declarations in Julia: ones with keywords and ones without keywords. The term "keywords" refers to an input argument that has the format `argument = value`. This format is present in many of the functions in this and other packages, however there are some specifics to understand when functions use keywords and when they don't. 

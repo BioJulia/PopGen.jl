@@ -10,16 +10,30 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  background-color: #f7f7f7;
 }
 
+html[data-theme='dark'] .heroBanner {
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background-color: #000000;
+}
+
+
 .heroBannerLogo {
-  max-width: 128px;
+  max-width: 900px;
 }
 
 @media screen and (max-width: 966px) {
   .heroBanner {
     padding: 2rem;
   }
+}
+
+.hero__subtitle{
+  --ifm-hero-text-color: #000000;
 }
 
 .buttons {
