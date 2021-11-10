@@ -10,7 +10,7 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  background-color: #f7f7f7;
+  background-color: #ffffff;
 }
 
 html[data-theme='dark'] .heroBanner {
