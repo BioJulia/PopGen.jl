@@ -23,7 +23,8 @@ html[data-theme='dark'] .heroBanner {
 
 
 .heroBannerLogo {
-  max-width: 900px;
+  max-width: 70%;
+  height: auto;
 }
 
 @media screen and (max-width: 966px) {
