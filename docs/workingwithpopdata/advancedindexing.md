@@ -85,9 +85,12 @@ julia> ncats[genodata(ncats).population .== "5", :name] |> unique
 
 ### Advanced conditional indexing
 Just like in `DataFrames.jl`, we can chain conditions with a broadcasted 
-"and" operator (`.&`) and really pull out information of interest. 
-Something to keep in mind is that each statement needs to be wrapped in
-parentheses.
+"and" operator (`.&`) and really pull out information of interest. This also works for a broadcasted
+"or" operator (`.|`). Something to keep in mind is that each statement needs to be wrapped in
+parentheses like:
+```julia
+popdata[(statement1) .& (statement2)]
+```
 
 Let's find all the samples in population `2` that are heterozygous for allele `133` in locus `fca8` and return just a dataframe.
 ```julia
