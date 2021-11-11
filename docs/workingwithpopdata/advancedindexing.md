@@ -92,7 +92,8 @@ parentheses like:
 popdata[(statement1) .& (statement2)]
 ```
 
-Let's find all the samples in population `2` that are heterozygous for allele `133` in locus `fca8` and return just a dataframe.
+Let's find all the samples in population `2` that are heterozygous for allele `133` in locus `fca8` and return just a dataframe. 
+Notice we are using the `ishet` method `ishet(genotype, allele)` and broadcasting it with `ishet.()` over an array of genotypes.
 ```julia
 julia> gd = genodata(ncats) ;
 julia> ncats[(gd.locus .== "fca8") .& (gd.population .== "2") .& (ishet.(gd.genotype, 133)), :]
