@@ -5,8 +5,6 @@ module.exports = {
       "gettingstarted/juliaprimer",
       "gettingstarted/tips",
       "gettingstarted/comparison",
-      "gettingstarted/popdata",
-      "gettingstarted/othertypes",
       "gettingstarted/datasets"
     ],
     "File I/O": [
@@ -22,6 +20,7 @@ module.exports = {
       },
     ],
     "Working with PopData": [
+      "workingwithpopdata/popdata",
       "workingwithpopdata/workingwithpopdata",
       "workingwithpopdata/viewdata",
       "workingwithpopdata/addingdata",
