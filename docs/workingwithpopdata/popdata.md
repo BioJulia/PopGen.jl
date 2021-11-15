@@ -84,7 +84,7 @@ As you can guess from the name, this Type wraps `Genotype` into a Vector, while 
 
 :::note why bother defining these aliases?
 Getting the most out of Julia and demonstrating good practices means making sure functions work on the things they're supposed to, and give informative error messages when the input isn't suitable for the function (a rare case of _wanting_ MethodErrors). Without these aliases, functions would either have vague definitions like `f(x,y,z) where x <: AbstractArray` and potentially cause errors, or overly complicated definitions like `f(x::AbstractVector{S},y,z) where {N, T<:Signed,S<:NTuple{N,T}}` and not be very legible. Instead, functions are written as `f(x,y,z) where x<:GenotypeArray`, and that seems like a good compromise of getting the latter while looking like the former.
-
+:::
 
 ------
 
