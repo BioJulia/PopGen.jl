@@ -90,6 +90,10 @@ There are a handful of methods to alter `PopData` population names depending on 
 populations!(data::PopData, rename::Dict)
 ```
 
+:::tip
+Recommended for renaming existing populations	
+:::
+
 Rename existing population ID's of `PopData` using a `Dict` of
 `population_name => replacement`.
 
@@ -119,7 +123,7 @@ julia> populations(sharks, counts = true)
 </TabItem>
 <TabItem value="vec">
 
-:::caution consider other methods
+:::caution not recommended
 These methods _are_ available, but the `Dict` method is recommended instead of (1) and the reassign-by-sample method is recommended
 instead of (2)
 :::
@@ -150,6 +154,10 @@ julia> populations(sharks, counts = true)
 
 </TabItem>
 <TabItem value="samp">
+
+:::tip
+Recommended for assigning population ID's for specific samples.	
+:::
 
 ```julia
 populations!(data::PopData, samples::Vector{String}, populations::Vector{String})
