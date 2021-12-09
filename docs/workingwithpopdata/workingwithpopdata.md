@@ -14,7 +14,6 @@ In earlier versions of PopGen.jl, you were encouraged to directly access the int
 and discussion with other users and developers, it's been decided that we should follow standard-ish convention and provide function
 wrappers to view PopData fields and discourage direct access (unless you're a developer). This decision is intended to limit unintentional
 errors, but also means a user has less to learn to get started.
-:::
 
 To follow along like a tutorial, load the `@gulfsharks` or `@nancycats` data in if you haven't already:
 
