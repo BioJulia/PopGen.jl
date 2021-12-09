@@ -9,6 +9,9 @@ module.exports = {
   organizationName: 'BioJulia', // Usually your GitHub org/user name.
   projectName: 'PopGen.jl', // Usually your repo name.
   trailingSlash: false,
+  plugins: [
+    'plugin-image-zoom'
+  ],
   stylesheets: [
     "https://fonts.googleapis.com/icon?family=Material+Icons",
   ],
@@ -19,6 +22,7 @@ module.exports = {
       content:
         '🔵 Like PopGen.jl? Give it a ⭐ on <a target="_blank" rel="noopener noreferrer" href="https://github.com/BioJulia/PopGen.jl">GitHub!</a>! 🟣',
     },
+    zoomSelector: '.markdown :not(em) > img',
     prism: {
       //defaultLanguage: 'julia',
       additionalLanguages: ['julia', 'r'],

@@ -25,7 +25,7 @@ mutable struct PopDataInfo
 end
 ```
 
-As you can see, a `PopData` is made up of two components, one called `metadata` for sample and locus information, and the other called `genodata` which includes genotype information. This structure allows for easy and convenient access to the fields using dot `.` accessors. Both `metadata` and `genodata` are specific in their structure, so here is an illustration to help you visualize a `PopData` object (feel free to open the image in another window and zoom in):
+As you can see, a `PopData` is made up of two components, one called `metadata` for sample and locus information, and the other called `genodata` which includes genotype information. This structure allows for easy and convenient access to the fields using dot `.` accessors. Both `metadata` and `genodata` are specific in their structure, so here is an illustration to help you visualize a `PopData` object:
 
 ![PopData](/img/popdata.png)
 
