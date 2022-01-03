@@ -7,7 +7,7 @@
     <link rel="alternate" href="https://BioJulia.net/PopGen.jl/blog"/>
     <subtitle>PopGen.jl Blog</subtitle>
     <icon>https://BioJulia.net/PopGen.jl/img/favicon.ico</icon>
-    <rights>Copyright © 2021 PopGen.jl</rights>
+    <rights>Copyright © 2022 PopGen.jl</rights>
     <entry>
         <title type="html"><![CDATA[A bit about FST]]></title>
         <id>fst</id>

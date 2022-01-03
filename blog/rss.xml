@@ -7,7 +7,7 @@
         <lastBuildDate>Sun, 04 Apr 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
-        <copyright>Copyright © 2021 PopGen.jl</copyright>
+        <copyright>Copyright © 2022 PopGen.jl</copyright>
         <item>
             <title><![CDATA[A bit about FST]]></title>
             <link>https://BioJulia.net/PopGen.jl/blog/fst</link>
