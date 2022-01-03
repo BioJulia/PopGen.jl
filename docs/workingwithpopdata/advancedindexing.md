@@ -62,7 +62,7 @@ PopData{Diploid, 9 Microsatellite loci}
   Populations: 5
 ```
 
-Maybe we just wanted to know the names of the samples in population `5`. Although for something like this you can just as well index the `sampleinfo` dataframe.
+Maybe we just wanted to know the names of the samples in population `5`. Although for something like this you can just as well index the `sampleinfo` dataframe. Note that we need to use `unique` here because the `genodata` table is in long-format, meaning there are as many occurances of each sample name as there are loci. 
 ```julia
 julia> ncats[genodata(ncats).population .== "5", :name] |> unique
 15-element Vector{InlineStrings.String7}:
