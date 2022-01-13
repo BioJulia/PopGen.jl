@@ -42,7 +42,7 @@ The `metadata` component exists to
 3. provide flexibility in storing that information in wide format because storing it in long format would dramatically increase the size of `PopData` objects
 4. provide easy access to viewing sample or locus information
 
-See [accessing elements](/workingwithpopdata/accessingelements.md) for a closer look at accessing this
+See [viewing data](/workingwithpopdata/accessingelements.md) for a closer look at accessing this
 information.
 ## Genodata
 
