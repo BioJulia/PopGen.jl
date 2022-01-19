@@ -30,9 +30,9 @@ module.exports = {
       darkTheme: require('prism-react-renderer/themes/oceanicNext'),
     },
     algolia: {
-      apiKey: 'f6d1b3005e55708c6b33b80157908b05',
+      apiKey: '0fe48b3e529dd3af5c37979964b2ef41',
       indexName: 'popgen_jl',
-      //appId: 'app-id', // Optional, if you run the DocSearch crawler on your own
+      appId: 'JASY30KF23', // Optional, if you run the DocSearch crawler on your own
       //algoliaOptions: {}, // Optional, if provided by Algolia
     },
     navbar: {
