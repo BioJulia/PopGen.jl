@@ -1,9 +1,7 @@
-export relatedness, merge_relatedness
-
 """
     _bootstrapsummary(::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
 
-Return the mean, median, standard error, and quantiles (given by `witdth`) of relatedness resampling.
+Return the mean, median, standard error, and quantiles (given by `witdth`) of kinship resampling.
 """
 @inline function _bootstrapsummary(boot_out::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
     all(ismissing.(boot_out)) == true && return missing, missing, missing, missing
@@ -20,8 +18,8 @@ end
 """
     _bootstrapgenos_all(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
 
-Perform `iterations` number of bootstrap resampling iterations of all genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
-of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `_relatedness_boot_all`.
+Perform `iterations` number of bootstrap resampling iterations of all genotypes between pair (`ind1` `ind2`). Returns a vector of length `iterations`
+of the kinship estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `_kinship_boot_all`.
 """
 @inline function _bootstrapgenos_all(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool, n::Int) where T <: GenoArray where U <: NamedTuple where F
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
@@ -45,7 +43,7 @@ end
     _bootstrapgenos_nonmissing(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
 
 Perform `iterations` number of bootstrap resampling iterations of only shared (nonmissing) genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
-of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `_relatedness_boot_nonmissing`.
+of the kinship estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `_kinship_boot_nonmissing`.
 """
 @inline function _bootstrapgenos_nonmissing(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool) where T <: GenoArray where U <: NamedTuple where F
     relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
@@ -65,12 +63,12 @@ end
 
 #FEATURE namedtuple output
 """
-    _relatedness_boot_all(::PopData, sample_names::Vector{String}; method::Function, iterations::Int, interval::Tuple{Float64, Float64})
+    _kinship_boot_all(::PopData, sample_names::Vector{String}; method::Function, iterations::Int, interval::Tuple{Float64, Float64})
 
-Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
-the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `relatedness`.
+Calculate pairwise kinship between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
+the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `kinship`.
 """
-function _relatedness_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
+function _kinship_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
@@ -128,12 +126,12 @@ end
 
 
 """
-    _relatedness_boot_nonmissing(::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64}) where F
+    _kinship_boot_nonmissing(::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64}) where F
 
-Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
-the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `relatedness`.
+Calculate pairwise kinship between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
+the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `kinship`.
 """
-function _relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
+function _kinship_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
@@ -190,12 +188,12 @@ function _relatedness_boot_nonmissing(data::PopData, sample_names::Vector{String
 end
 
 """
-    _relatedness_noboot(::PopData, sample_names::Vector{String}; method::F) where F
+    _kinship_noboot(::PopData, sample_names::Vector{String}; method::F) where F
 
-Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. 
-This is an internal function with arguments provided by `relatedness`.
+Calculate pairwise kinship between all combinations of the provided `sample_names` for each `method` provided. 
+This is an internal function with arguments provided by `kinship`.
 """
-function _relatedness_noboot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
+function _kinship_noboot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
     loci_names = Symbol.(loci(data))
     n_samples = data.metadata.samples
     uniq_pops = unique(data.metadata.sampleinfo.population)
@@ -234,18 +232,18 @@ end
 """
 ```
 # compare all samples
-relatedness(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
+kinship(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
 
 # to compare specific samples
-relatedness(::PopData, samples::Vector{String}; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
+kinship(::PopData, samples::Vector{String}; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
 ```
-Return a dataframe of pairwise relatedness estimates for all or select pairs of `samples` in a `PopData` object using 
+Return a dataframe of pairwise kinship estimates for all or select pairs of `samples` in a `PopData` object using 
 method(s) `F` where `F` is one or several of the methods listed below. If no bootstrapping is required, then the only 
 necessary keyword to provide is `method = ` and `inbreeding = ` for the `dyadicLikelihood` method (see examples below). 
 **Note:** samples must be diploid.
 
 ### Estimator methods
-The available estimators are listed below and are functions themselves. `relatedness` takes the
+The available estimators are listed below and are functions themselves. `kinship` takes the
 function names as arguments (**case sensitive**), therefore do not use quotes or colons
 in specifying the methods. Multiple methods can be supplied as a vector. All of these methods will tab-autocomplete.
 For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
@@ -262,7 +260,7 @@ For more information on a specific method, please see the respective docstring (
 
 
 ### Simulated siblingship comparison
-If validating the estimators using `PopGenSims.jl` to simulate sibship relationships, `relatedness`
+If validating the estimators using `PopGenSims.jl` to simulate sibship relationships, `kinship`
 will recognize `PopData` generated in that manner (the `population` column) and only compare siblingship
 pairs. 
 
@@ -276,7 +274,7 @@ set `iterations = n` where `n` is an integer greater than `0` (the default) corr
 of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%),
 however that can be changed by supplying the keyword `interval = (low, high)` where `low` and `high` are the intervals you want 
 (as `AbstractFloat`). Performing bootstrapping will return a NamedTuple of DataFrames, with each field in the NamedTuple
-corresponding to the estimator `Method` it describes, which can be merged into one large dataframe using `merge_relatedness()`.
+corresponding to the estimator `Method` it describes, which can be merged into one large dataframe using `mergekinship()`.
 
 #### Resampling methods
 There are two available resampling methods, `"all"` (default  & recommended) and `"nonmissing"`.
@@ -293,7 +291,7 @@ There are two available resampling methods, `"all"` (default  & recommended) and
 ```
 julia> cats = @nancycats;
 
-julia> relatedness(cats, method = Ritland)
+julia> kinship(cats, method = Ritland)
 27966×4 DataFrame
    Row │ sample_1  sample_2  n_loci  Ritland     
        │ String    String    Int64   Float64?    
@@ -309,7 +307,7 @@ julia> relatedness(cats, method = Ritland)
  27966 │ N289      N290           7   0.0511663
                                27958 rows omitted
 
-julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Loiselle])
+julia> kinship(cats, ["N7", "N111", "N115"], method = [Ritland, Loiselle])
 3×5 DataFrame
  Row │ sample_1  sample_2  n_loci  Ritland     Loiselle   
      │ String    String    Int64   Float64?    Float64?   
@@ -318,7 +316,7 @@ julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Loiselle])
    2 │ N7        N115           9  -0.0183925  -0.0428898
    3 │ N111      N115           9   0.0240152   0.13681
 
-julia> rel_out = relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975));
+julia> rel_out = kinship(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975));
 
 julia> rel_out.Loiselle
 3×8 DataFrame
@@ -331,7 +329,7 @@ julia> rel_out.Loiselle
 
 # merge results into one big dataframe
 
-julia> merge_relatedness(rel_out)
+julia> mergekinship(rel_out)
 3×13 DataFrame
  Row │ sample_1  sample_2  n_loci  Loiselle    Loiselle_mean  Loiselle_ ⋯ 
      │ String    String    Int64   Float64?    Float64?       Float64?  ⋯
@@ -342,8 +340,8 @@ julia> merge_relatedness(rel_out)
                                                         8 columns omitted
 ```
 """
-function relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
-    all(data.metadata[data.metadata.sampleinfo.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("Relatedness analyses currently only support diploid samples")
+function kinship(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
+    all(data.metadata[data.metadata.sampleinfo.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("kinship analyses currently only support diploid samples")
     errs = ""
     all_samples = samplenames(data)
     if sample_names != all_samples
@@ -355,33 +353,33 @@ function relatedness(data::PopData, sample_names::Vector{String}; method::F, ite
     end
     relate_mthds = [:QuellerGoodnight, :Ritland, :Lynch, :LynchLi, :LynchRitland, :Wang, :Loiselle, :Blouin, :Moran, :LiHorvitz, :dyadicLikelihood]
     [errs *= "$i is not a valid method\n" for i in Symbol.(method) if i ∉ relate_mthds]
-    errs != "" && throw(ArgumentError(errs * "Methods are case-sensitive. Please see the docstring (?relatedness) for additional help."))
+    errs != "" && throw(ArgumentError(errs * "Methods are case-sensitive. Please see the docstring (?kinship) for additional help."))
     if iterations > 0
         if resample == "all"
-            _relatedness_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
+            _kinship_boot_all(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
         elseif resample == "nonmissing"
-            _relatedness_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
+            _kinship_boot_nonmissing(data, sample_names, method = method, iterations = iterations, interval = interval, inbreeding = inbreeding)
         else
             throw(ArgumentError("Invalid resample method. Please choose from resample methods \"all\" or \"nonmissing\""))
         end
     else
-        _relatedness_noboot(data, sample_names, method = method, inbreeding = inbreeding)
+        _kinship_noboot(data, sample_names, method = method, inbreeding = inbreeding)
     end
 end
 
 
-function relatedness(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
+function kinship(data::PopData; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
     sample_names = samplenames(data) |> collect
-    relatedness(data, sample_names, method = method, iterations = iterations, interval = interval, resample = resample, inbreeding = inbreeding)
+    kinship(data, sample_names, method = method, iterations = iterations, interval = interval, resample = resample, inbreeding = inbreeding)
 end
 
 
 """
-    merge_relatedness(data::NamedTuple)
-A convenience function that takes the `NamedTuple` output from `relatedness` performed with bootstrapping
+    mergekinship(data::NamedTuple)
+A convenience function that takes the `NamedTuple` output from `kinship` performed with bootstrapping
 and returns one large DataFrame.
 """
-function merge_relatedness(data::NamedTuple)
+function mergekinship(data::NamedTuple)
     k = keys(data)
     k1 = k[1]
     outdf = deepcopy(data[Symbol(k1)])

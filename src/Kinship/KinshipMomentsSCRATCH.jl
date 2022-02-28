@@ -1,4 +1,4 @@
-export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran, Blouin, Loiselle #, Wang
+abstract type KinshipMethod end
 
 """
     Blouin(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
@@ -13,6 +13,7 @@ Allele sharing index described by Blouin (1996)
 
 Blouin, M. S., Parsons, M., Lacaille, V., & Lotz, S. (1996). Use of microsatellite loci to classify individuals by relatedness. Molecular ecology, 5(3), 393-401.
 """
+struct Blouin <:KinshipMethod end
 function Blouin(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
@@ -43,6 +44,7 @@ Allele sharing index described by Li and Horvitz (1953)
 
 Li, C. C., & Horvitz, D. G. (1953). Some methods of estimating the inbreeding coefficient. American journal of human genetics, 5(2), 107.
 """
+struct LiHorvitz <:KinshipMethod end
 function LiHorvitz(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
     isempty(locus_names) && return missing
 
@@ -74,20 +76,23 @@ Loiselle, B. A., Sork, V. L., Nason, J., & Graham, C. (1995). Spatial genetic st
 Heuertz, M., Vekemans, X., Hausman, J. F., Palada, M., & Hardy, O. J. (2003). Estimating seed vs. pollen dispersal from spatial genetic structure in the common ash. Molecular Ecology, 12(9), 2483-2495.
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 """
-function Loiselle(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
-    isempty(locus_names) && return missing
-    d_kw = Dict(kwargs...)
-    numerator1 = 0.0
-    denominator1 = 0.0
+struct Loiselle <:KinshipMethod
+    value::Float64
+    function Loiselle(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
+        isempty(locus_names) && return missing
+        d_kw = Dict(kwargs...)
+        numerator1 = 0.0
+        denominator1 = 0.0
 
-    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
-        for allele in keys(alleles[loc])
-            fq = alleles[loc][allele]
-            numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
-            denominator1 += fq * (1.0 - fq)
+        for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
+            for allele in keys(alleles[loc])
+                fq = alleles[loc][allele]
+                numerator1 += ((sum(gen1 .== allele) / 2.0) - fq) * ((sum(gen2 .== allele) / 2.0) - fq)
+                denominator1 += fq * (1.0 - fq)
+            end
         end
+        new(numerator1 / denominator1 + 2.0 / (2 * d_kw[:n_samples] - 1))
     end
-    return numerator1 / denominator1 + 2.0 / (2 * d_kw[:n_samples] - 1)
 end
 
 
@@ -104,20 +109,23 @@ Allele sharing index described by Lynch (1988)
 
 Lynch, M. (1988). Estimation of relatedness by DNA fingerprinting. Molecular biology and evolution, 5(5), 584-599.
 """
-function Lynch(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
-    isempty(locus_names) && return missing
-
-    Sxy = Vector{Float64}(undef, length(locus_names))
-    loc_id = 0
-
-    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
-        loc_id += 1
-        i,j = gen1
-        k,l = gen2
-
-        Sxy[loc_id] = ((i ∈ gen2) + (j ∈ gen2) + (k ∈ gen1) + (l ∈ gen1)) / 4
+struct Lynch <:KinshipMethod
+    value::Float64
+    function Lynch(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
+        isempty(locus_names) && return missing
+    
+        Sxy = Vector{Float64}(undef, length(locus_names))
+        loc_id = 0
+    
+        for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
+            loc_id += 1
+            i,j = gen1
+            k,l = gen2
+    
+            Sxy[loc_id] = ((i ∈ gen2) + (j ∈ gen2) + (k ∈ gen1) + (l ∈ gen1)) / 4
+        end
+        new(mean(Sxy))
     end
-    return mean(Sxy)
 end
 
 
@@ -134,26 +142,28 @@ See equations 13 - 16 in Wang (2017) for variant of estimator used
 Li, C. C., Weeks, D. E., & Chakravarti, A. (1993). Similarity of DNA fingerprints due to chance and relatedness. Human heredity, 43(1), 45-52.
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 """
-function LynchLi(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
-    isempty(locus_names) && return missing
+struct LynchLi <:KinshipMethod
+    value::Float64
+    function LynchLi(ind1::T, ind2::T, locus_names::Vector{Symbol}, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
+        isempty(locus_names) && return missing
 
-    numerator1 = 0.0
-    denominator1 = 0.0
+        numerator1 = 0.0
+        denominator1 = 0.0
 
-    for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
-        a,b = gen1
-        c,d = gen2
+        for (loc,gen1,gen2) in zip(locus_names, ind1, ind2)
+            a,b = gen1
+            c,d = gen2
 
-        Sxy = (0.5) * (((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (a == b))) + ((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (c == d))))
-        #TODO Change to unbiased formulation (eq 25)
-        S0 = 2.0 * sum(values(alleles[loc]) .^ 2) - sum(values(alleles[loc]) .^ 3)
+            Sxy = (0.5) * (((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (a == b))) + ((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (c == d))))
+            #TODO Change to unbiased formulation (eq 25)
+            S0 = 2.0 * sum(values(alleles[loc]) .^ 2) - sum(values(alleles[loc]) .^ 3)
 
-        numerator1 += Sxy - S0
-        denominator1 += 1.0 - S0
+            numerator1 += Sxy - S0
+            denominator1 += 1.0 - S0
+        end
+        new(numerator1 / denominator1)
     end
-    return numerator1 / denominator1
 end
-
 
 """
     LynchRitland(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)

@@ -1,5 +1,3 @@
-#export
-
 ## experimental and not exported or documented!
 function _adjacency_matrix(data::PopData)
     data_loci = groupby(data.genodata, :locus)

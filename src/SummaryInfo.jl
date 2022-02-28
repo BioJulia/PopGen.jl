@@ -1,5 +1,3 @@
-export alleleaverage, richness, summary, summarystats
-
 """
     alleleaverage(data::PopData; rounding::Bool = true)
 Returns a NamedTuple of the average number of alleles ('mean') and

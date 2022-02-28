@@ -149,7 +149,7 @@ end
 
 """
 dyadicLikelihood(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
-Calculates the maximum likelihood based relatedness using all available loci following following Milligan (2002)
+Calculates the maximum likelihood based kinship using all available loci following following Milligan (2002)
 
 -Single Locus Equation:
 -How to combine multiple loci: NA inherently multi-locus

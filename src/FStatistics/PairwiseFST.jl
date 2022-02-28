@@ -1,5 +1,3 @@
-export pairwisefst
-
 # generate a wrapper struct so we can nicely print the results
 struct PairwiseFST
     results::DataFrame

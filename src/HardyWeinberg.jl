@@ -1,5 +1,3 @@
-export hwetest, hwe
-
 """
     _chisqlocus(locus::T) where T <: GenoArray
 Calculate the chi square statistic and p-value for a locus

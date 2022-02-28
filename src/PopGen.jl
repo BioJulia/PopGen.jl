@@ -23,7 +23,7 @@ Documentation: https://biojulia.net/PopGen.jl/
 
 ## Analyses
 - `richness(PopData)` to calculate allelic richness
-- `relatedness(PopData, method = ...)` to get pairwise relatedness of individuals
+- `Kinship(PopData, method = ...)` to get pairwise Kinship of individuals
 - `summary(PopData)` to calculate F-statistics, heterozygosity, etc.
 - `hwetest(PopData)` to test for Hardy-Weinberg Equilibrium
 - `pairwisefst(PopData)` to calculate FST between pairs of populations
@@ -70,18 +70,33 @@ using MultipleTesting, StatsBase
 include("Utils.jl")
 # heterozygosity functions
 include("Heterozygosity.jl")
+export heterozygosity, samplehet
+
 # manipulation and exploration
 include("DataExploration.jl")
+export pairwiseidentical, missingdata, genofreqtable, allelefreqtable
+
 # summary information
 include("SummaryInfo.jl")
+export alleleaverage, richness, summary, summarystats
+
 #Analyses
 include("HardyWeinberg.jl")
+export hwetest, hwe
+
 include("FStatistics/FstGlobal.jl")
 include("FStatistics/FstByLocus.jl")
 include("FStatistics/PairwiseFST.jl")
+export pairwisefst
+
 include("FStatistics/FstPermutations.jl")
-include("Relatedness/PairwiseRelatedness.jl")
-include("Relatedness/RelatednessMoments.jl")
-include("Relatedness/RelatednessPostHocs.jl")
+include("Kinship/KinshipPairwise.jl")
+export kinship, mergeKinship
+
+include("Kinship/KinshipMoments.jl")
+export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran, Blouin, Loiselle #, Wang
+
+include("Kinship/KinshipPostHocs.jl")
+export kinshipposthoc
 
 end # module PopGen

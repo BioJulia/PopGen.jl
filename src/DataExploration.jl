@@ -1,6 +1,3 @@
-
-export pairwiseidentical, missingdata, genofreqtable, allelefreqtable
-
 """
     missingdata(data::PopData; by::String = "sample")
 Get missing genotype information in a `PopData`. Specify a mode of operation

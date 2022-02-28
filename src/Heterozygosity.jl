@@ -1,5 +1,3 @@
-export heterozygosity, samplehet
-
 """
     counthet(geno::T, allele::Int) where T<:GenoArray
     counthet(geno::T, allele::AbstractVector{U}) where T<:GenoArray where U<:Integer

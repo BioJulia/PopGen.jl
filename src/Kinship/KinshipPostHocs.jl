@@ -1,4 +1,4 @@
-export relatedness_posthoc
+export kinshipposthoc
 
 function sig_within(data::PopData, results::DataFrame, population::String, iterations::Int = 20000)
     # add extra columns of population names
@@ -9,7 +9,7 @@ function sig_within(data::PopData, results::DataFrame, population::String, itera
     tmp_res.groups = collect(zip(tmp_res.pop_1, tmp_res.pop_2))
     tmp_res.group = tmp_res.pop_1 .* tmp_res.pop_2
     select!(tmp_res, Not([:sample_1, :sample_2, :n_loci, :pop_1, :pop_2]))
-    size(tmp_res,1) == 0 && error("Samples in the relatedness results not found in the provided PopData.")
+    size(tmp_res,1) == 0 && error("Samples in the kinship results not found in the provided PopData.")
     estimators = Symbol.(names(tmp_res)[begin:end-2])
 
     # extract the values for within-population estimates
@@ -58,11 +58,11 @@ end
 
 
 """
-    relatedness_posthoc(::PopData, results::DataFrame; iterations::Int)
+    kinshipposthoc(::PopData, results::DataFrame; iterations::Int)
 
 Performs a posthoc analysis using the resulting DataFrame or NamedTuple
-from relatedness(). This analysis uses permutations to test if a population has
-significantly higher within-population relatedess than between-population relatedness.
+from kinship(). This analysis uses permutations to test if a population has
+significantly higher within-population kinship than between-population kinship.
 The `results` object must have been generated from the provided `PopData`. Use `iterations = `
 to specify the number of iterations for the permutation tests (default = `20000`). **Recommended**
 that you use `MultipleTesting.jl` to correct resulting P-values.
@@ -71,9 +71,9 @@ that you use `MultipleTesting.jl` to correct resulting P-values.
 ```
 julia> cats = @nancycats ;
 
-julia> rel_out = relatedness(cats, method = [Ritland, Moran], iterations = 100);
+julia> rel_out = kinship(cats, method = [Ritland, Moran], iterations = 100);
 
-julia> relatedness_posthoc(cats, rel_out)
+julia> kinshipposthoc(cats, rel_out)
 17x3 DataFrame
  Row │ population  Ritland_P  Moran_P
      │ String      Float64    Float64
@@ -97,7 +97,7 @@ julia> relatedness_posthoc(cats, rel_out)
   17 │ 17             5.0e-5   5.0e-5
 ```
 """
-function relatedness_posthoc(data::PopData, results::DataFrame; iterations::Int = 20000)
+function kinshipposthoc(data::PopData, results::DataFrame; iterations::Int = 20000)
     all_pops = unique(data.metadata.sampleinfo.population)
     estimators = Symbol.(names(results)[names(results) .∉ Ref(["sample_1", "sample_2", "n_loci"])] .* "_P")
     sigs = map(pop -> sig_within(data, results, pop, iterations), all_pops)
@@ -108,10 +108,10 @@ function relatedness_posthoc(data::PopData, results::DataFrame; iterations::Int 
     )
 end
 
-function relatedness_posthoc(data::PopData, results::NamedTuple; iterations::Int = 20000)
+function kinshipposthoc(data::PopData, results::NamedTuple; iterations::Int = 20000)
     estimators = keys(results)
     coeffs = [results[i][:, estimators[i]] for i in 1:length(estimators)]
     df = select(results[1], "sample_1", "sample_2", "n_loci")
     [df[:, estimators[i]] = coeffs[i] for i in 1:length(estimators)]
-    relatedness_posthoc(data, df, iterations = iterations)
+    kinshipposthoc(data, df, iterations = iterations)
 end
