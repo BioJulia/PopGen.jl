@@ -6,9 +6,12 @@ sidebar_label: Structure
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::info
+<details>
+<summary>Words of wisdom</summary>
+
 More often than not, your Structure file was created by a conversion from another format. While PopGen.jl offers a Structure file reader, we generally recommend using whatever previous format it was in because the Structure reader has more specific format requirements than the other readers, which can cause unneeded frustration. Additionally, fewer data conversions mean less chance of conversion errors occuring. 
-:::
+
+</details>
 
 ## Import a Structure file as `PopData`
 

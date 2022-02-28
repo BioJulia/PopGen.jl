@@ -55,10 +55,12 @@ how PGDSpider2 recodes alleles (the 3 and 4 are switched).
 | :--------  | :--: | :--: | :--: | :--: |
 | **Allele** |  1   |  2   |  3   |  4   |
 
-:::caution Filter files beforehand
-Keep in mind, BCF/VCF files need to be filtered **before** importing them into PopGen.jl. There is no and will be no VCF-filtering functionality to this package, as it is outside of the purpose of PopGen.jl. Refer to `vcftools`, `bcftools`, and `vcflib` to filter your sequence data. 
-:::
+<details>
+<summary>VCF Filtering</summary>
 
+Keep in mind, BCF/VCF files need to be filtered **before** importing them into PopGen.jl. There is no and will be no VCF-filtering functionality to this package, as it is outside of the purpose of PopGen.jl. Refer to `vcftools`, `bcftools`, and `vcflib` to filter your sequence data. 
+
+</details>
 
 ### What BCF/VCF files contain
 
