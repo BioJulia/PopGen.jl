@@ -13,7 +13,6 @@
     "@docusaurus/plugin-ideal-image": "2.0.0-beta.16",
     "@docusaurus/plugin-pwa": "2.0.0-beta.16",
     "@docusaurus/preset-classic": "^2.0.0-beta.16",
-    "@material-ui/core": "^4.12.3",
     "classnames": "^2.2.6",
     "clsx": "^1.1.1",
     "plugin-image-zoom": "github:ataft/plugin-image-zoom",

@@ -20,16 +20,16 @@ module.exports = {
       },
     ],
     "Working with PopData": [
-      "workingwithpopdata/popdata",
-      "workingwithpopdata/workingwithpopdata",
-      "workingwithpopdata/viewdata",
-      "workingwithpopdata/addingdata",
-      "workingwithpopdata/exclusion",
-      "workingwithpopdata/conditionals",
-      "workingwithpopdata/populationdata",
-      "workingwithpopdata/locationdata",
-      "workingwithpopdata/dataexploration",
-      "workingwithpopdata/advancedindexing"
+      "popdata/popdata",
+      "popdata/workingwithpopdata",
+      "popdata/viewdata",
+      "popdata/addingdata",
+      "popdata/exclusion",
+      "popdata/conditionals",
+      "popdata/populationdata",
+      "popdata/locationdata",
+      "popdata/dataexploration",
+      "popdata/advancedindexing"
     ],
     "Analyses":[
       "analyses/hardyweinberg",

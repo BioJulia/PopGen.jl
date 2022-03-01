@@ -24,11 +24,11 @@ julia> sharks = @gulfsharks ;
 ```
 
 ## Topics
-#### [Viewing Data](viewdata)
-#### [Adding Information](addingdata)
-#### [Data Exclusion](exclusion)
-#### [Conditionals and Logic](conditionals)
-#### [Population Data](populationdata)
-#### [Location Data](locationdata)
-#### [Data Exploration](dataexploration)
-#### [Advanced Indexing](advancedindexing)
+#### [Viewing Data](popdata/viewdata)
+#### [Adding Information](popdata/addingdata)
+#### [Data Exclusion](popdata/exclusion)
+#### [Conditionals and Logic](popdata/conditionals)
+#### [Population Data](popdata/populationdata)
+#### [Location Data](popdata/locationdata)
+#### [Data Exploration](popdata/dataexploration)
+#### [Advanced Indexing](popdata/advancedindexing)
