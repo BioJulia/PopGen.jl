@@ -72,11 +72,11 @@ function _kinship_boot_all(data::PopData, sample_names::Vector{T}; method::F, it
     loci_names = Symbol.(loci(data))
     uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
-        sample_pairs = simpairs(sample_names)
+        sample_pairs = simpairs(sample_names) |> collect
     else
-        sample_pairs = pairwisepairs(sample_names)
-    end    
-    n_pairs = length(collect(sample_pairs))
+        sample_pairs = pairwisepairs(sample_names) |> collect
+    end
+    n_pairs = length(sample_pairs)
     n_samples = data.metadata.samples
     allelefrequencies = allelefreq(data)
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
@@ -135,11 +135,11 @@ function _kinship_boot_nonmissing(data::PopData, sample_names::Vector{T}; method
     loci_names = Symbol.(loci(data))
     uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
-        sample_pairs = simpairs(sample_names)
+        sample_pairs = simpairs(sample_names) |> collect
     else
-        sample_pairs = pairwisepairs(sample_names)
+        sample_pairs = pairwisepairs(sample_names) |> collect
     end
-    n_pairs = length(collect(sample_pairs))
+    n_pairs = length(sample_pairs)
     n_samples = data.metadata.samples
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allelefrequencies = allelefreq(data)
@@ -198,11 +198,11 @@ function _kinship_noboot(data::PopData, sample_names::Vector{T}; method::F, inbr
     n_samples = data.metadata.samples
     uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
-        sample_pairs = simpairs(sample_names)
+        sample_pairs = simpairs(sample_names) |> collect
     else
-        sample_pairs = pairwisepairs(sample_names)
+        sample_pairs = pairwisepairs(sample_names) |> collect
     end
-    n_pairs = length(collect(sample_pairs))
+    n_pairs = length(sample_pairs)
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allelefrequencies = allelefreq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
