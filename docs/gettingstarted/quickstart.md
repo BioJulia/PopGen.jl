@@ -79,7 +79,7 @@ Manipulate PopData
 
 Analyses
 - richness(PopData) to calculate allelic richness
-- relatedness(PopData, method = ...) to get pairwise relatedness of individuals
+- kinship(PopData, method = ...) to get pairwise relatedness of individuals
 - summary(PopData) to calculate F-statistics, heterozygosity, etc.
 - hwetest(PopData) to test for Hardy-Weinberg Equilibrium
 - pairwisefst(PopData) to calculate FST between pairs of populations

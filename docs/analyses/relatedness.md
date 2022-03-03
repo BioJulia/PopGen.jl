@@ -40,7 +40,7 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
 <TabItem value="a">
 
 ```julia
-relatedness(data::PopData; method::F, iterations::Int64, interval::Tuple(Float64, Float64))
+kinship(data::PopData; method::F, iterations::Int64, interval::Tuple(Float64, Float64))
 ```
 Return a dataframe of pairwise relatedness estimates for all individuals in a `PopData` object using 
 method `F` (see below). To calculate means, median, standard error, and confidence intervals using bootstrapping,
@@ -60,7 +60,7 @@ of bootstrap iterations you wish to perform for each pair. The default confidenc
 ```
 julia> cats = @nancycats;
 
-julia> relatedness(cats, method = Ritland)
+julia> kinship(cats, method = Ritland)
 27966×4 DataFrame
     Row │ sample_1  sample_2  n_loci  Ritland
         │ String    String    Int64   Float64?
@@ -81,7 +81,7 @@ julia> relatedness(cats, method = Ritland)
 <TabItem value="s">
 
 ```julia
-relatedness(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64, interval::Tuple(Float64, Float64))
+kinship(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64, interval::Tuple(Float64, Float64))
 ```
 Return a dataframe of pairwise relatedness estimates for all pairs of the supplied sample names in a `PopData` object using 
 method `F` (see below). To calculate means, median, standard error, and confidence intervals using bootstrapping,
@@ -104,7 +104,7 @@ however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, h
 ```
 julia> cats = @nancycats;
 
-julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
+julia> kinship(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
 3×5 DataFrame
 │ Row │ sample_1 │ sample_2 │ n_loci │ Ritland    │ Wang      │
 │     │ String   │ String   │ Int64  │ Float64?   │ Float64?  │
@@ -114,7 +114,7 @@ julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
 │ 3   │ N111     │ N115     │ 9      │ 0.0240152  │ 0.183966  │
 
 
-julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975))
+julia> kinship(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975))
 3×13 DataFrame. Omitted printing of 7 columns
 │ Row │ sample_1 │ sample_2 │ n_loci │ Loiselle   │ Loiselle_mean │ Loiselle_median │
 │     │ String   │ String   │ Int64  │ Float64?   │ Float64?      │ Float64?        │
@@ -198,22 +198,22 @@ inputting them. For more information on a specific method, please see the respec
 
 ## Posthoc analyses
 There are several different kinds of things you can do with kinship information (e.g. network analysis), and one that's provided is lovingly
-called `relatedness_posthoc()`, which performs a permutation analysis to
+called `kinshipposthoc()`, which performs a permutation analysis to
 test if within-population relatedness is significantly greater than between-population relatedness for each population. We recommend that you
 correct for multiple testing using `MultipleTesting.jl`.
 
 ```julia
-relatedness_posthoc(data::PopData, results::Union{DataFrame, NamedTuple}; iterations::Int)
+kinshipposthoc(data::PopData, results::Union{DataFrame, NamedTuple}; iterations::Int)
 ```
 #### Arguments
 - `data` : A PopData object
-- `results` : the DataFrame or NamedTuple results from `relatedness()`
+- `results` : the DataFrame or NamedTuple results from `kinship()`
 
 #### Keyword Arguments
 - `iterations` : number of iterations for the permutation tests (default: `20000`)
 
 :::tip not a great name
-We admit "relatedness_posthoc" is not a great name for this function. Please
+We admit "kinshipposthoc" is not a great name for this function. Please
 contact us with better ideas! :grin:
 :::
 
@@ -221,9 +221,9 @@ contact us with better ideas! :grin:
 ```
 julia> cats = @nancycats ;
 
-julia> rel_out = relatedness(cats, method = [Ritland, Moran], iterations = 100);
+julia> rel_out = kinship(cats, method = [Ritland, Moran], iterations = 100);
 
-julia> relatedness_posthoc(cats, rel_out)
+julia> kinshipposthoc(cats, rel_out)
 17x3 DataFrame
  Row │ population  Ritland_P  Moran_P
      │ String      Float64    Float64

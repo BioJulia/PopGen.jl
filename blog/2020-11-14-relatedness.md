@@ -33,10 +33,10 @@ This seems pretty obvious, but it needs to be said. In order to do the analysis,
 ### 2. Bootstrap to calculate CI
 It would behoove us to bootstrap the loci in a pairwise comparison _n_ number of times so we can create a confidence interval for the relatedness estimates for each pair. This inflates the runtime of the analysis substantially, but it's a very useful method in making sense of our estimates. If one was to be conservative (and we generally are), then we would reject an estimate for a pair whose CI includes zero. In PopGen.jl, the estimates and bootstrapping are done all at once to minimize processing time, so the command for that would be
 ```julia
-julia> rel_out  = relatedness(cats, method = LynchLi, iterations = 1000)
+julia> rel_out  = kinship(cats, method = LynchLi, iterations = 1000)
 ```
-By default, the `relatedness` function uses a 95% CI (`interval = (0.025, 0.975)`), but you can change that with `interval = (low,high)` where `low` and `high` are decimals of your quantiles. 
-The `relatedness()` function returns a `NamedTuple` of dataframes whenever you are bootstrapping, where each element shares its name with the method used, so in this case, we can access our results with `rel_out.LynchLi`.
+By default, the `kinship` function uses a 95% CI (`interval = (0.025, 0.975)`), but you can change that with `interval = (low,high)` where `low` and `high` are decimals of your quantiles. 
+The `kinship()` function returns a `NamedTuple` of dataframes whenever you are bootstrapping, where each element shares its name with the method used, so in this case, we can access our results with `rel_out.LynchLi`.
 
 <Tabs
   block={true}
@@ -123,21 +123,16 @@ PopData{Diploid, 9 Microsatellite Loci}
 We can keep all three simulated relationships together, but it will be easier to explain things (for instructional purposes) if we don't, so let's split out each into its own PopData.
 
 ```julia
-fullsib = kin_sims[genodata(kin_sims).population .== "fullsib"] ;
-halfsib = kin_sims[genodata(kin_sims).population .== "halfsib"] ;
-unrelated = kin_sims[genodata(kin_sims).population .== "unrelated"] ;
+julia> fullsib = kin_sims[genodata(kin_sims).population .== "fullsib"] ;
+julia> halfsib = kin_sims[genodata(kin_sims).population .== "halfsib"] ;
+julia> unrelated = kin_sims[genodata(kin_sims).population .== "unrelated"] ;
 ```
 
 
 #### ii. get relatedness estimates for the simulated data
 Next, we want to get the relatedness estimate for each simulated pair of "known" sibship. We are only interested in the values for the simulated pairs and not samples across pairs. If you aren't sure why that is, think of it this way: we're trying to create a range of values where we can confidently say unknown things are full-sibs (or half-sib, etc.), so we want to know what range of values we get from a bunch of known fullsib pairs, not the unknown relationships of samples between pairs. 
 
-It would a nightmare to manually specify only 2 individuals at a time into `relatedness()`. Instead, the function has a shortcut built into it that will recognize the `population` names generated from `simulatekin` and only give you relatedness estimates for those pairs. So, we just need to run it once for each of our simulations, this time _without_ bootstrapping because we are only interested in the estimates. Make sure to use the same estimator! The run will be a lot faster this time because it only needs to calculate estimates for 500 pairs each time (our `n` from above) and without bootstrapping. When not bootstrapping, `relatedness()` returns a dataframe (versus a NamedTuple of dataframes).
-
-:::note sample names
-Please note that the naming convention for kinship simulations have changed between PopGenSims.jl versions. Nothing to be alarmed at
-if your simulations look a bit different!
-:::
+It would a nightmare to manually specify only 2 individuals at a time into `kinship()`. Instead, the function has a shortcut built into it that will recognize the `population` names generated from `simulatekin` and only give you relatedness estimates for those pairs. So, we just need to run it once for each of our simulations, this time _without_ bootstrapping because we are only interested in the estimates. Make sure to use the same estimator! The run will be a lot faster this time because it only needs to calculate estimates for 500 pairs each time (our `n` from above) and without bootstrapping. When not bootstrapping, `kinship()` returns a dataframe (versus a NamedTuple of dataframes).
 
 <Tabs
   block={true}
@@ -151,84 +146,57 @@ if your simulations look a bit different!
 <TabItem value="un">
 
 ```julia
-julia> un_sims_rel = relatedness(unrelated_sims, method = LynchLi)
+julia> un_sims_rel = kinship(unrelated_sims, method = LynchLi)
 500×4 DataFrame
- Row │ sample_1        sample_2        n_loci  LynchLi    
-     │ String          String          Int64   Float64?   
-─────┼────────────────────────────────────────────────────
-   1 │ sim100_un_off1  sim100_un_off2       9   0.0187624
-   2 │ sim101_un_off1  sim101_un_off2       9  -0.204246
-   3 │ sim102_un_off1  sim102_un_off2       9   0.0633641
-   4 │ sim103_un_off1  sim103_un_off2       9   0.241771
-   5 │ sim104_un_off1  sim104_un_off2       9  -0.338051
-   6 │ sim105_un_off1  sim105_un_off2       9   0.0187624
-   7 │ sim106_un_off1  sim106_un_off2       9  -0.29345
-   8 │ sim107_un_off1  sim107_un_off2       9   0.0633641
-  ⋮  │       ⋮               ⋮           ⋮         ⋮
- 494 │ sim94_un_off1   sim94_un_off2        9  -0.159644
- 495 │ sim95_un_off1   sim95_un_off2        9  -0.0704411
- 496 │ sim96_un_off1   sim96_un_off2        9   0.0633641
- 497 │ sim97_un_off1   sim97_un_off2        9   0.241771
- 498 │ sim98_un_off1   sim98_un_off2        9  -0.0704411
- 499 │ sim99_un_off1   sim99_un_off2        9   0.241771
- 500 │ sim9_un_off1    sim9_un_off2         9   0.197169
-                                          485 rows omitted
+ Row │ sample_1            sample_2            n_loci  LynchLi    
+     │ String              String              Int64   Float64?   
+─────┼────────────────────────────────────────────────────────────
+   1 │ sim001_unrelated_1  sim001_unrelated_2       9  -0.11419
+   2 │ sim002_unrelated_1  sim002_unrelated_2       9  -0.337028
+   3 │ sim003_unrelated_1  sim003_unrelated_2       9  -0.0696222
+  ⋮  │         ⋮                   ⋮             ⋮         ⋮
+ 498 │ sim498_unrelated_1  sim498_unrelated_2       9   0.019513
+ 499 │ sim499_unrelated_1  sim499_unrelated_2       9   0.019513
+ 500 │ sim500_unrelated_1  sim500_unrelated_2       9   0.019513
+                                                  494 rows omitted
 ```
 
 </TabItem>
 <TabItem value="h">
 
 ```julia
-julia> half_sims_rel = relatedness(halfsib_sims, method = LynchLi)
+julia> half_sims_rel = kinship(halfsib_sims, method = LynchLi)
 500×4 DataFrame
- Row │ sample_1        sample_2        n_loci  LynchLi    
-     │ String          String          Int64   Float64?   
-─────┼────────────────────────────────────────────────────
-   1 │ sim100_hs_off1  sim100_hs_off2       9   0.111231
-   2 │ sim101_hs_off1  sim101_hs_off2       9   0.111231
-   3 │ sim102_hs_off1  sim102_hs_off2       9   0.333423
-   4 │ sim103_hs_off1  sim103_hs_off2       9  -0.0220842
-   5 │ sim104_hs_off1  sim104_hs_off2       9   0.111231
-   6 │ sim105_hs_off1  sim105_hs_off2       9   0.244546
-   7 │ sim106_hs_off1  sim106_hs_off2       9   0.244546
-   8 │ sim107_hs_off1  sim107_hs_off2       9   0.377862
-  ⋮  │       ⋮               ⋮           ⋮         ⋮
- 494 │ sim94_hs_off1   sim94_hs_off2        9   0.200108
- 495 │ sim95_hs_off1   sim95_hs_off2        9   0.244546
- 496 │ sim96_hs_off1   sim96_hs_off2        9   0.0223543
- 497 │ sim97_hs_off1   sim97_hs_off2        9   0.200108
- 498 │ sim98_hs_off1   sim98_hs_off2        9   0.111231
- 499 │ sim99_hs_off1   sim99_hs_off2        9   0.333423
- 500 │ sim9_hs_off1    sim9_hs_off2         9   0.288985
-                                          485 rows omitted
+ Row │ sample_1          sample_2          n_loci  LynchLi    
+     │ String            String            Int64   Float64?   
+─────┼────────────────────────────────────────────────────────
+   1 │ sim001_halfsib_1  sim001_halfsib_2       9  -0.0182636
+   2 │ sim002_halfsib_1  sim002_halfsib_2       9   0.468732
+   3 │ sim003_halfsib_1  sim003_halfsib_2       9   0.291643
+  ⋮  │        ⋮                 ⋮            ⋮         ⋮
+ 498 │ sim498_halfsib_1  sim498_halfsib_2       9   0.42446
+ 499 │ sim499_halfsib_1  sim499_halfsib_2       9   0.513004
+ 500 │ sim500_halfsib_1  sim500_halfsib_2       9   0.0702811
+                                              494 rows omitted
 ```
 
 </TabItem>
 <TabItem value="f">
 
 ```julia
-julia> full_sims_rel = relatedness(fullsib_sims, method = LynchLi)
+julia> full_sims_rel = kinship(fullsib_sims, method = LynchLi)
 500×4 DataFrame
- Row │ sample_1        sample_2        n_loci  LynchLi   
-     │ String          String          Int64   Float64?  
-─────┼───────────────────────────────────────────────────
-   1 │ sim100_fs_off1  sim100_fs_off2       9  0.510483
-   2 │ sim101_fs_off1  sim101_fs_off2       9  0.465982
-   3 │ sim102_fs_off1  sim102_fs_off2       9  0.42148
-   4 │ sim103_fs_off1  sim103_fs_off2       9  0.376979
-   5 │ sim104_fs_off1  sim104_fs_off2       9  0.465982
-   6 │ sim105_fs_off1  sim105_fs_off2       9  0.688489
-   7 │ sim106_fs_off1  sim106_fs_off2       9  0.287976
-   8 │ sim107_fs_off1  sim107_fs_off2       9  0.599486
-  ⋮  │       ⋮               ⋮           ⋮         ⋮
- 494 │ sim94_fs_off1   sim94_fs_off2        9  0.688489
- 495 │ sim95_fs_off1   sim95_fs_off2        9  0.821994
- 496 │ sim96_fs_off1   sim96_fs_off2        9  0.554985
- 497 │ sim97_fs_off1   sim97_fs_off2        9  0.599486
- 498 │ sim98_fs_off1   sim98_fs_off2        9  0.554985
- 499 │ sim99_fs_off1   sim99_fs_off2        9  0.510483
- 500 │ sim9_fs_off1    sim9_fs_off2         9  0.376979
-                                         485 rows omitted
+ Row │ sample_1          sample_2          n_loci  LynchLi  
+     │ String            String            Int64   Float64? 
+─────┼──────────────────────────────────────────────────────
+   1 │ sim001_fullsib_1  sim001_fullsib_2       9  0.732808
+   2 │ sim002_fullsib_1  sim002_fullsib_2       9  0.599213
+   3 │ sim003_fullsib_1  sim003_fullsib_2       9  0.376553
+  ⋮  │        ⋮                 ⋮            ⋮        ⋮
+ 498 │ sim498_fullsib_1  sim498_fullsib_2       9  0.376553
+ 499 │ sim499_fullsib_1  sim499_fullsib_2       9  0.510149
+ 500 │ sim500_fullsib_1  sim500_fullsib_2       9  0.109361
+                                            494 rows omitted
 ```
 
 </TabItem>
@@ -251,7 +219,7 @@ julia> title!("relatedness estimates on simulated and real data")
 Hopefully by now you are starting to contextualize why we're doing all of this. The distributions generated from our simulated data are giving us a better indication of what "unrelated", "halfsib", and "fullsib" estimates look like in our data.
 
 #### iii. sibship intervals
-What we just did is create null distributions for each sibship relationship, so now all that's left is to get a confidence interval from each.
+What we just did is create null distributions for each sibship relationship, so now all that's left is to get a confidence interval from each. Keep in mind that your values will be a bit different due to the randomization involved with many of these steps.
 
 ```julia
 julia> unrelated_ci = quantile(un_sims_rel.LynchLi, (0.025, 0.975))

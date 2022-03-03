@@ -58,7 +58,7 @@ The returned object for `by = "global"` is a custom `PairwiseFST` type with the 
 - `method::String`: which $F_{ST}$ calculation method you would like to use
     - `"Hudson92"`: the [Hudson et al. (1992)](https://www.genetics.org/content/132/2/583) method (only for biallelic data)
     - `"WC84"`: the [Weir & Cockerham (1984)](https://www.jstor.org/stable/2408641?casa_token=_0gGbCbYpqMAAAAA:f9BvW9Xvx_8WaWSaRN4iqg0HB7KkaP21712ds28cTjhsvVQrYRTyHon7hKCcyHLcmTRA9H_1oM5iF3TZAl5xPm5gil2GmcGzHyEFFYAOl8pDVEBMQQ&seq=1#metadata_info_tab_contents) method (default)
-    - `"Nei87"`: [Nei's (1987)](https://books.google.com/books?hl=en&lr=&id=UhRSsLkjxDgC&oi=fnd&pg=PP11&ots=Qu7vO8EMmw&sig=T6cTISYEEm-hL8aWU8EgeGgzP5E#v=onepage&q&f=false) genetic distance method
+    - `"Nei87"`: [Nei (1987)](https://books.google.com/books?hl=en&lr=&id=UhRSsLkjxDgC&oi=fnd&pg=PP11&ots=Qu7vO8EMmw&sig=T6cTISYEEm-hL8aWU8EgeGgzP5E#v=onepage&q&f=false) genetic distance method
 - `by::String`: perfrom a `"global"` pairwise $F_{ST}$ or `"locus"`-by-locus (ignores significance testing)
 - `iterations::Int64`: the number of iterations for signficance testing (default: `0`)
 

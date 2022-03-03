@@ -68,9 +68,9 @@ This is an internal function with arguments provided by `relatedness`.
 ### 🔵 relatedness
 ```julia
 # compare all samples
-relatedness(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
+kinship(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
 # to compare specific samples
-relatedness(::PopData, samples; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
+kinship(::PopData, samples; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
 ```
 Return a dataframe of pairwise relatedness estimates for all or select pairs of `samples` in a `PopData` object using 
 method(s) `F` where `F` is one or several of the methods listed below. If no bootstrapping is required, then the only 
@@ -124,7 +124,7 @@ There are two available resampling methods, `"all"` (default  & recommended) and
 ```
 julia> cats = @nancycats;
 
-julia> relatedness(cats, method = Ritland)
+julia> kinship(cats, method = Ritland)
 27966×4 DataFrame
 │ Row   │ sample_1 │ sample_2 │ n_loci │ Ritland    │
 │       │ String   │ String   │ Int64  │ Float64?   │
@@ -137,7 +137,7 @@ julia> relatedness(cats, method = Ritland)
 │ 27965 │ N281     │ N290     │ 7      │ 0.104614   │
 │ 27966 │ N289     │ N290     │ 7      │ 0.0511663  │
 
-julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
+julia> kinship(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
 3×5 DataFrame
 │ Row │ sample_1 │ sample_2 │ n_loci │ Ritland    │ Wang      │
 │     │ String   │ String   │ Int64  │ Float64?   │ Float64?  │
@@ -146,7 +146,7 @@ julia> relatedness(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
 │ 2   │ N7       │ N115     │ 9      │ -0.0183925 │ 0.0024775 │
 │ 3   │ N111     │ N115     │ 9      │ 0.0240152  │ 0.183966  │
 
-julia> relatedness(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975))
+julia> kinship(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975))
 3×13 DataFrame. Omitted printing of 7 columns
 │ Row │ sample_1 │ sample_2 │ n_loci │ Loiselle   │ Loiselle_mean │ Loiselle_median │
 │     │ String   │ String   │ Int64  │ Float64?   │ Float64?      │ Float64?        │
@@ -174,7 +174,7 @@ julia> DataFrames.names(ans)
 
 ### 🔵 merge_relatedness
 ```julia
-merge_relatedness(data::NamedTuple)
+merge_kinship(data::NamedTuple)
 ```
 A convenience function that takes the `NamedTuple` output from `relatedness` performed with bootstrapping
 and returns one large DataFrame.
