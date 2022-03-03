@@ -1,5 +1,3 @@
-export kinshipposthoc
-
 function sig_within(data::PopData, results::DataFrame, population::String, iterations::Int = 20000)
     # add extra columns of population names
     pop_names = select(data.metadata, :name => :sample_1 ,:population => :pop_1)
