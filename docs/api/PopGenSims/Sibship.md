@@ -3,7 +3,7 @@ id: popgensims_sibship
 title: Sibship.jl
 sidebar_label: Sibship.jl
 ---
-PopGenSims.jl/src/Sibship.jl
+## PopGenSims.jl/src/Sibship.jl
 📦  => not exported | 
 🟪 => exported by PopGenSims.jl
 
@@ -13,7 +13,7 @@ PopGenSims.jl/src/Sibship.jl
 _cross(parent1::Vector{Vector{T}}, parent2::Vector{Vector{T}}) where T <: Signed
 ```
 Simulate a mating cross between two parents, generating one offspring with the same
-ploidy as `parent1`. This variant of `cross` is used internally for `simulate_sibship`.
+ploidy as `parent1`. This variant of `cross` is used internally for `simulatekin`.
 
 ----
 
@@ -43,9 +43,9 @@ unrelated(data::PopData; n::Int, ploidy::Int)
 
 ----
 
-### 🟪 simulate_sibship
+### 🟪 simulatekin
 ```julia
-simulate_sibship(data::PopData; fullsib::Int, halfsib::Int, unrelated::Int, parentoffspring::Int, ploidy::Signed)
+simulatekin(data::PopData; fullsib::Int, halfsib::Int, unrelated::Int, parentoffspring::Int, ploidy::Signed)
 ```
 Simulate mating crosses to generate sample pairs with any combination of the specified relationships, 
 returning a `PopData` object. The simulations will first generate parents of a given
@@ -85,7 +85,7 @@ there's a 50% chance parent_1 will give 2 alleles for every locus for that simul
 ```
 julia> cats = @nanycats ;
 
-julia> cat_sims = simulate_sibship(cats, fullsib = 10, halfsib = 50)
+julia> cat_sims = simulatekin(cats, fullsib = 10, halfsib = 50)
 PopData{Diploid, 9 Microsatellite loci}
   Samples: 120
   Populations: 2

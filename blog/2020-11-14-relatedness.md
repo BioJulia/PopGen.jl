@@ -115,7 +115,7 @@ The next set of steps seem like a lot more work, so allow me to explain. The est
 :::
 
 #### i. simulate known sibship pairs
-Next, we need to further contextualize what out estimates actually mean, and we need to devise a rigorous and defensible method to define the sibling-ship ("sibship") of a pair of samples as **unrelated**, **half-sibs**, or **full-sibs**. To do this, we're going to use PopGenSims.jl to simulate data based on the allele frequencies in our data. What `simulate_sibship` does is simulate individuals based on the allele frequencies in your `PopData`, then simulate offspring of a particular siblingship resulting from the "mating" of those individuals. For example, when you specify `"fullsib"`, it generates two offspring resulting from two parents, `n` number of times. We want to do this for each of the three kinds of sibships.
+Next, we need to further contextualize what out estimates actually mean, and we need to devise a rigorous and defensible method to define the sibling-ship ("sibship") of a pair of samples as **unrelated**, **half-sibs**, or **full-sibs**. To do this, we're going to use PopGenSims.jl to simulate data based on the allele frequencies in our data. What `simulatekin` does is simulate individuals based on the allele frequencies in your `PopData`, then simulate offspring of a particular siblingship resulting from the "mating" of those individuals. For example, when you specify `"fullsib"`, it generates two offspring resulting from two parents, `n` number of times. We want to do this for each of the three kinds of sibships.
 
 <Tabs
   block={true}
@@ -129,7 +129,7 @@ Next, we need to further contextualize what out estimates actually mean, and we 
 <TabItem value="un">
 
 ```julia
-julia> unrelated_sims = simulate_sibship(cats, n = 500, relationship= "unrelated")
+julia> unrelated_sims = simulatekin(cats, n = 500, relationship= "unrelated")
 PopData Object
   Markers: Microsatellite
   Ploidy: 2
@@ -143,7 +143,7 @@ PopData Object
 <TabItem value="h">
 
 ```julia
-julia> halfsib_sims = simulate_sibship(cats, n = 500, relationship= "halfsib")
+julia> halfsib_sims = simulatekin(cats, n = 500, relationship= "halfsib")
 PopData Object
   Markers: Microsatellite
   Ploidy: 2
@@ -157,7 +157,7 @@ PopData Object
 <TabItem value="f">
 
 ```julia
-julia> fullsib_sims = simulate_sibship(cats, n = 500, relationship= "fullsib")
+julia> fullsib_sims = simulatekin(cats, n = 500, relationship= "fullsib")
 PopData Object
   Markers: Microsatellite
   Ploidy: 2
@@ -260,7 +260,7 @@ julia> unrelated_sims.genodata
 #### ii. get relatedness estimates for the simulated data
 Next, we want to get the relatedness estimate for each simulated pair of "known" sibship. We are only interested in the values for the simulated pairs and not samples across pairs. If you aren't sure why that is, think of it this way: we're trying to create a range of values where we can confidently say unknown things are full-sibs (or half-sib, etc.), so we want to know what range of values we get from a bunch of known fullsib pairs, not the unknown relationships of samples between pairs. 
 
-It would a nightmare to manually specify only 2 individuals at a time into `relatedness()`. Instead, the function has a shortcut built into it that will recognize the `population` names generated from `simulate_sibship` and only give you relatedness estimates for those pairs. So, we just need to run it once for each of our simulations, this time _without_ bootstrapping because we are only interested in the estimates. Make sure to use the same estimator! The run will be a lot faster this time because it only needs to calculate estimates for 500 pairs each time (our `n` from above) and without bootstrapping. When not bootstrapping, `relatedness()` returns a dataframe (versus a NamedTuple of dataframes).
+It would a nightmare to manually specify only 2 individuals at a time into `relatedness()`. Instead, the function has a shortcut built into it that will recognize the `population` names generated from `simulatekin` and only give you relatedness estimates for those pairs. So, we just need to run it once for each of our simulations, this time _without_ bootstrapping because we are only interested in the estimates. Make sure to use the same estimator! The run will be a lot faster this time because it only needs to calculate estimates for 500 pairs each time (our `n` from above) and without bootstrapping. When not bootstrapping, `relatedness()` returns a dataframe (versus a NamedTuple of dataframes).
 
 <Tabs
   block={true}

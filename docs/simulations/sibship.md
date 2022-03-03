@@ -10,12 +10,12 @@ To perfom simulations, you will need add and import the package `PopGenSims.jl` 
 
 It's good practice to use your data to simulate sibling pairs and perform
 relatedness analyses on the simulations to understand the validity/strength 
-of relatedness estimators on your data. To do this, you can use `simulate_sibship`
+of relatedness estimators on your data. To do this, you can use `simulatekin`
 and specify the relationship you want to simulate and how many pairs to create for
 that relationship.
 
 ```julia
-simulate_sibship(data::PopData; fullsib::Int, halfsib::Int, unrelated::Int, parentoffspring::Int, ploidy::Int)
+simulatekin(data::PopData; fullsib::Int, halfsib::Int, unrelated::Int, parentoffspring::Int, ploidy::Int)
 ```
 
 This function will simulate mating crosses to generate sample pairs with any combination of
@@ -41,7 +41,7 @@ The relationship between the newly generated samples can be identified by:
 :::tip plugging into relatedness
 The `relatedness` function will recognize the population names output from simulating siblingship
 and only estimate relatedness for the appropriate pairs. If you need this functionality, you are
-strongly discouraged from manually editing the resulting `PopData` from `simulate_sibship`.
+strongly discouraged from manually editing the resulting `PopData` from `simulatekin`.
 :::
 
 ### Ploidy
@@ -63,7 +63,7 @@ there's a 50% chance parent_1 will give 2 alleles for every locus for that simul
 ```
 julia> cats = @nanycats ;
 
-julia> cat_sims = simulate_sibship(cats, fullsib = 10, halfsib = 50)
+julia> cat_sims = simulatekin(cats, fullsib = 10, halfsib = 50)
 PopData{Diploid, 9 Microsatellite loci}
   Samples: 120
   Populations: 2

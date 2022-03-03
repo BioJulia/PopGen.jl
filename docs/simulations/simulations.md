@@ -12,17 +12,34 @@ To perfom simulations, you will need add and import the package `PopGenSims.jl` 
 
 ## Simulate samples within populations
 ```julia
-simulate(data::PopData; n::Int = 100)
+simulate(data::PopData; n::Int)
+simulate(data::PopData; n::Dict{String,Int})
+simulate(data::PopData; scale::Int)
 ```
-If you want to generate simulated data of a certain number of individuals per population, you can do so with the `simulate()` function, which takes a `PopData` object and simulates `n` number of individuals per population using the allele frequencies of each population. This returns 
-new `PopData`. The simulated samples will have the naming convention `sim_#` where `#` is a number from 1:`n`. These simulations return samples with the same ploidy as the source `PopData`, but will **not** work on mixed-ploidy data. 
+Simulate data using per-population allele frequencies. The simulated samples will have the naming convention `sim_1...sim_#` where `#` is the total number of simulated samples in the new PopData.
+
+<Tabs
+  block={true}
+  defaultValue="f"
+  values={[
+    { label: 'fixed samples', value: 'f', },
+    { label: 'arbitrary samples', value: 'a', },
+    { label: 'proportional samples', value: 'p', },
+  ]
+}>
+<TabItem value="f">
+
+```julia
+simulate(data::PopData; n::Int)
+```
+If you want to simulate data with a fixed number of individuals per population, you can do so with `simulate(PopData, n = Int)`, which takes a `PopData` object and simulates `n` number of individuals per population. Returns a new PopData with samples having the same ploidy as the source `PopData`, but will **not** work on mixed-ploidy data. 
 
 In the example below, we simulate 100 individuals per
-population using the nancycats data, which has 17 populations, therefore the resulting `PopData` will have 1700 samples (100 samples x 17 populations)
+population using the nancycats data, which has 17 populations, therefore the resulting `PopData` will have 1700 samples (100 samples x 17 populations).
 
 **Example**
 ```julia
-cats = @nancycats;
+julia> cats = @nancycats;
 
 julia> sims = simulate(cats , n = 100)
 PopData{Diploid, 9 Microsatellite loci}
@@ -30,58 +47,45 @@ PopData{Diploid, 9 Microsatellite loci}
   Populations: 17
 ```
 
-Here is a look inside the `PopData` to verify everything looks as expected.
+</TabItem>
+<TabItem value="a">
 
-<Tabs
-  block={true}
-  defaultValue="s"
-  values={[
-    { label: 'sampleinfo', value: 's', },
-    { label: 'genodata', value: 'g', },
-  ]
-}>
-<TabItem value="s">
-
+```julia
+simulate(data::PopData; n::Dict{Population,Int})
 ```
-julia> sampleinfo(sims)
+If you want to simulate an arbitrary number of individuals for arbitrary populations, use `simulate(PopData, n = Dict{String, Int})`, which takes a `PopData` object and simulates samples within populations as specified in the input `Dict`. Returns a new PopData with samples having the same ploidy as the source `PopData`, but will **not** work on mixed-ploidy data.
 
-  1700×5 DataFrame
-  Row │ name      population  ploidy   
-      │ String    String      Int8      
-──────┼───────────────────────────────
-    1 │ sim_1     1                2    
-    2 │ sim_2     1                2    
-    3 │ sim_3     1                2    
-    4 │ sim_4     1                2    
-    5 │ sim_5     1                2    
-  ⋮   │    ⋮          ⋮         ⋮ 
- 1697 │ sim_1697  17               2  
- 1698 │ sim_1698  17               2  
- 1699 │ sim_1699  17               2  
- 1700 │ sim_1700  17               2  
-                                         1691 rows omitted 
+In the example below, we create a dictionary with the notation `Population => #samples` to simulate a specific number of samples for 3 particular populations. The resulting PopData will have 28 samples (5+3+20) across 3 populations ("1", "8", "11").
+
+```julia
+julia> cats = @nancycats;
+
+julia> simscheme = Dict("1" => 5, "8" => 3, "11" => 20) ;
+
+julia> simulate(cats, n = simscheme)
+PopData{Diploid, 9 Microsatellite loci}
+  Samples: 28
+  Populations: 3
 ```
 
 </TabItem>
-<TabItem value="g">
+<TabItem value="p">
 
+```julia
+simulate(data::PopData; n::Int)
 ```
-julia> genodata(sims)
-15300×4 DataFrame
-   Row │ name      population  locus   genotype   
-       │ String    String      String  Tuple…?    
-───────┼──────────────────────────────────────────
-     1 │ sim_1     1           fca8    (135, 143)
-     2 │ sim_1     1           fca23   (136, 146)
-     3 │ sim_1     1           fca43   (141, 145)
-     4 │ sim_1     1           fca45   (120, 126)
-     5 │ sim_1     1           fca77   (156, 156)
-   ⋮   │    ⋮          ⋮         ⋮         ⋮
- 15297 │ sim_1700  17          fca78   (150, 150)
- 15298 │ sim_1700  17          fca90   (197, 197)
- 15299 │ sim_1700  17          fca96   (113, 113)
- 15300 │ sim_1700  17          fca37   (208, 208)
-                                15291 rows omitted
+If you want to simulate data while keeping the proportion of individuals per population consistent with the source PopData, use `simulate(PopData, scale = Int)`, which takes a `PopData` object and simulates the same number of individuals per population multiplied by `scale` (i.e. if `scale=2`, there will be twice the number of simulated individuals compared to the original PopData). Returns a new PopData with samples having the same ploidy as the source `PopData`, but will **not** work on mixed-ploidy data. 
+
+In the example below, we simulate 3x the number of samples of the original nancycats data, which has 237 samples x 17 populations, therefore the resulting `PopData` will have 711 samples (237 samples x 3). In this example, each population will have 3x the number of samples as the original nancycats data.
+
+**Example**
+```julia
+julia> cats = @nancycats;
+
+julia> sims = simulate(cats , scale = 1)
+PopData{Diploid, 9 Microsatellite loci}
+  Samples: 711
+  Populations: 17
 ```
 
 </TabItem>

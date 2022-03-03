@@ -3,7 +3,7 @@ id: popgensims_samples
 title: Samples.jl
 sidebar_label: Samples.jl
 ---
-PopGenSims.jl/src/Samples.jl
+## PopGenSims.jl/src/Samples.jl
 📦  => not exported | 
 🟪 => exported by PopGenSims.jl
 
@@ -31,53 +31,72 @@ julia> sample_locus(d, 3, 3)
  (143, 135, 133)
  (137, 135, 135)
 ```
+-----
+
+### 📦 _simulatearbitrary
+```julia
+_simulatearbitrary(data::PopData, n::Dict{String, Int})
+```
+-----
+### 📦 _simulateflat
+```julia
+_simulateflat(data::PopData, n::Int)
+```
+-----
+
+### 📦 _simulatescale
+```julia
+_simulatescale(data::PopData, scale::Int)
+```
+-----
 
 ### 🟪 simulate
-    simulate(data::PopData; n::Int = 100)
-Simulate `n` number of individuals (default: `100`) per population using per-population
-allele frequencies derived from a `PopData` object. Returns a new `PopData` object.
+```julia
+simulate(data::PopData; n::Int)
+```
+Simulate `n` number of individuals per population using per-population
+allele frequencies derived from a `PopData` object. Returns a new `PopData` object with `n` * `n_populations` samples.
 
 **Example**
 ```julia
-cats = @nancycats;
+julia> cats = @nanycats;
 
-julia> sims = simulate(cats , n = 100)
+julia> sims = simulate(cats, n = 100)
 PopData{Diploid, 9 Microsatellite Loci}
   Samples: 1700
   Populations: 17
-  
-julia> sampleinfo(sims)
+```  
+----
 
-  1700×5 DataFrame
-  Row │ name      population  ploidy   
-      │ String    String      Int8      
-──────┼───────────────────────────────
-    1 │ sim_1     1                2    
-    2 │ sim_2     1                2    
-    3 │ sim_3     1                2    
-    4 │ sim_4     1                2    
-    5 │ sim_5     1                2    
-  ⋮   │    ⋮          ⋮         ⋮ 
- 1697 │ sim_1697  17               2  
- 1698 │ sim_1698  17               2  
- 1699 │ sim_1699  17               2  
- 1700 │ sim_1700  17               2  
-                                         1691 rows omitted
+```julia
+simulate(data::PopData; n::Dict{String, Int})
+```
+Simulate an arbitrary number of samples per populations specified in the Dict `n`, given by `Population => #samples`. Uses
+per-population allele frequencies derived from a `PopData` object. 
+```julia
+julia> cats = @nancycats;
 
-julia> genodata(sims)
-15300×4 DataFrame
-   Row │ name      population  locus   genotype   
-       │ String    String      String  Tuple…?    
-───────┼──────────────────────────────────────────
-     1 │ sim_1     1           fca8    (135, 143)
-     2 │ sim_1     1           fca23   (136, 146)
-     3 │ sim_1     1           fca43   (141, 145)
-     4 │ sim_1     1           fca45   (120, 126)
-     5 │ sim_1     1           fca77   (156, 156)
-   ⋮   │    ⋮          ⋮         ⋮         ⋮
- 15297 │ sim_1700  17          fca78   (150, 150)
- 15298 │ sim_1700  17          fca90   (197, 197)
- 15299 │ sim_1700  17          fca96   (113, 113)
- 15300 │ sim_1700  17          fca37   (208, 208)
-                                15291 rows omitted
+julia> simscheme = Dict("1" => 5, "8" => 3, "11" => 20) ;
+
+julia> simulate(cats, n = simscheme)
+PopData{Diploid, 9 Microsatellite loci}
+  Samples: 28
+  Populations: 3
+```
+----
+```julia
+simulate(data::PopData; scale::Int)
+```
+Simulate individuals per population in the same proportions they appear in the PopData
+using per-population allele frequencies. Simulation volume can be multiplied using `scale`,
+i.e. if you want to keep the same proportions but generate twice the number of samples, `scale`
+would be `2`. Returns a new `PopData` object with `n_samples` * `scale` samples.    
+
+```julia
+julia> cats = @nanycats;
+
+julia> sims_prop = simulate(cats, scale = 3)
+PopData{Diploid, 9 Microsatellite Loci}
+  Samples: 711
+  Populations: 17
 ```
