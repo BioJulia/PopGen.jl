@@ -17,13 +17,9 @@ In a population genetics study, you often need to identify if there are kin in y
 using PopGen, PopGenSims, StatsBase
 
 julia> cats = @nancycats
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
+PopData{Diploid, 9 Microsatellite Loci}
   Samples: 237
-  Loci: 9
   Populations: 17
-  Coordinates: absent
 ```
 
 ### Estimators
@@ -117,150 +113,31 @@ The next set of steps seem like a lot more work, so allow me to explain. The est
 #### i. simulate known sibship pairs
 Next, we need to further contextualize what out estimates actually mean, and we need to devise a rigorous and defensible method to define the sibling-ship ("sibship") of a pair of samples as **unrelated**, **half-sibs**, or **full-sibs**. To do this, we're going to use PopGenSims.jl to simulate data based on the allele frequencies in our data. What `simulatekin` does is simulate individuals based on the allele frequencies in your `PopData`, then simulate offspring of a particular siblingship resulting from the "mating" of those individuals. For example, when you specify `"fullsib"`, it generates two offspring resulting from two parents, `n` number of times. We want to do this for each of the three kinds of sibships.
 
-<Tabs
-  block={true}
-  defaultValue="un"
-  values={[
-    { label: 'simulate unrelated', value: 'un', },
-    { label: 'simulate halfsib', value: 'h', },
-    { label: 'simulate fullsib', value: 'f', },
-  ]
-}>
-<TabItem value="un">
+```julia
+julia> kin_sims = simulatekin(cats, fullsib = 500, halfsib = 500, unrelated = 500)
+PopData{Diploid, 9 Microsatellite Loci}
+  Samples: 3000
+  Populations: 3
+```
+
+We can keep all three simulated relationships together, but it will be easier to explain things (for instructional purposes) if we don't, so let's split out each into its own PopData.
 
 ```julia
-julia> unrelated_sims = simulatekin(cats, n = 500, relationship= "unrelated")
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
-  Samples: 1000
-  Loci: 9
-  Populations: 1
-  Coordinates: absent
+fullsib = kin_sims[genodata(kin_sims).population .== "fullsib"] ;
+halfsib = kin_sims[genodata(kin_sims).population .== "halfsib"] ;
+unrelated = kin_sims[genodata(kin_sims).population .== "unrelated"] ;
 ```
 
-</TabItem>
-<TabItem value="h">
-
-```julia
-julia> halfsib_sims = simulatekin(cats, n = 500, relationship= "halfsib")
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
-  Samples: 1000
-  Loci: 9
-  Populations: 1
-  Coordinates: absent
-```
-
-</TabItem>
-<TabItem value="f">
-
-```julia
-julia> fullsib_sims = simulatekin(cats, n = 500, relationship= "fullsib")
-PopData Object
-  Markers: Microsatellite
-  Ploidy: 2
-  Samples: 1000
-  Loci: 9
-  Populations: 1
-  Coordinates: absent
-```
-
-</TabItem>
-</Tabs>
-
-Technically, we could merge all three results into a single `PopData`, but it will be easier to explain things if we don't. Feel free to take a peep into the simulated data:
-
-<Tabs
-  block={true}
-  defaultValue={null}
-  values={[
-    { label: 'meta', value: 'meta', },
-    { label: 'loci', value: 'loci', },
-  ]
-}>
-<TabItem value="meta">
-
-```
-julia> unrelated_sims.sampleinfo
-1000×5 DataFrame
-  Row │ name            population  ploidy  longitude  latitude 
-      │ String          String      Int64   Float32?   Float32? 
-──────┼─────────────────────────────────────────────────────────
-    1 │ sim1_un_off1    unrelated        2   missing   missing  
-    2 │ sim1_un_off2    unrelated        2   missing   missing  
-    3 │ sim2_un_off1    unrelated        2   missing   missing  
-    4 │ sim2_un_off2    unrelated        2   missing   missing  
-    5 │ sim3_un_off1    unrelated        2   missing   missing  
-    6 │ sim3_un_off2    unrelated        2   missing   missing  
-    7 │ sim4_un_off1    unrelated        2   missing   missing  
-    8 │ sim4_un_off2    unrelated        2   missing   missing  
-    9 │ sim5_un_off1    unrelated        2   missing   missing  
-   10 │ sim5_un_off2    unrelated        2   missing   missing  
-   11 │ sim6_un_off1    unrelated        2   missing   missing  
-   12 │ sim6_un_off2    unrelated        2   missing   missing  
-  ⋮   │       ⋮             ⋮         ⋮         ⋮         ⋮
-  989 │ sim495_un_off1  unrelated        2   missing   missing  
-  990 │ sim495_un_off2  unrelated        2   missing   missing  
-  991 │ sim496_un_off1  unrelated        2   missing   missing  
-  992 │ sim496_un_off2  unrelated        2   missing   missing  
-  993 │ sim497_un_off1  unrelated        2   missing   missing  
-  994 │ sim497_un_off2  unrelated        2   missing   missing  
-  995 │ sim498_un_off1  unrelated        2   missing   missing  
-  996 │ sim498_un_off2  unrelated        2   missing   missing  
-  997 │ sim499_un_off1  unrelated        2   missing   missing  
-  998 │ sim499_un_off2  unrelated        2   missing   missing  
-  999 │ sim500_un_off1  unrelated        2   missing   missing  
- 1000 │ sim500_un_off2  unrelated        2   missing   missing  
-                                                976 rows omitted
-
-```
-
-</TabItem>
-<TabItem value="loci">
-
-```
-julia> unrelated_sims.genodata
-9000×4 DataFrame
-  Row │ name            population  locus   genotype   
-      │ String          String      String  Tuple…     
-──────┼────────────────────────────────────────────────
-    1 │ sim1_un_off1    unrelated   fca8    (135, 141)
-    2 │ sim1_un_off1    unrelated   fca23   (132, 132)
-    3 │ sim1_un_off1    unrelated   fca43   (143, 139)
-    4 │ sim1_un_off1    unrelated   fca45   (126, 116)
-    5 │ sim1_un_off1    unrelated   fca77   (154, 148)
-    6 │ sim1_un_off1    unrelated   fca78   (150, 142)
-    7 │ sim1_un_off1    unrelated   fca90   (199, 193)
-    8 │ sim1_un_off1    unrelated   fca96   (109, 91)
-    9 │ sim1_un_off1    unrelated   fca37   (208, 210)
-   10 │ sim1_un_off2    unrelated   fca8    (139, 123)
-   11 │ sim1_un_off2    unrelated   fca23   (140, 130)
-   12 │ sim1_un_off2    unrelated   fca43   (139, 141)
-  ⋮   │       ⋮             ⋮         ⋮         ⋮
- 8989 │ sim500_un_off1  unrelated   fca90   (199, 197)
- 8990 │ sim500_un_off1  unrelated   fca96   (105, 113)
- 8991 │ sim500_un_off1  unrelated   fca37   (208, 208)
- 8992 │ sim500_un_off2  unrelated   fca8    (135, 137)
- 8993 │ sim500_un_off2  unrelated   fca23   (136, 130)
- 8994 │ sim500_un_off2  unrelated   fca43   (139, 145)
- 8995 │ sim500_un_off2  unrelated   fca45   (120, 120)
- 8996 │ sim500_un_off2  unrelated   fca77   (150, 156)
- 8997 │ sim500_un_off2  unrelated   fca78   (142, 152)
- 8998 │ sim500_un_off2  unrelated   fca90   (189, 191)
- 8999 │ sim500_un_off2  unrelated   fca96   (113, 113)
- 9000 │ sim500_un_off2  unrelated   fca37   (208, 182)
-                                      8976 rows omitted
-```
-
-</TabItem>
-</Tabs>
 
 #### ii. get relatedness estimates for the simulated data
 Next, we want to get the relatedness estimate for each simulated pair of "known" sibship. We are only interested in the values for the simulated pairs and not samples across pairs. If you aren't sure why that is, think of it this way: we're trying to create a range of values where we can confidently say unknown things are full-sibs (or half-sib, etc.), so we want to know what range of values we get from a bunch of known fullsib pairs, not the unknown relationships of samples between pairs. 
 
 It would a nightmare to manually specify only 2 individuals at a time into `relatedness()`. Instead, the function has a shortcut built into it that will recognize the `population` names generated from `simulatekin` and only give you relatedness estimates for those pairs. So, we just need to run it once for each of our simulations, this time _without_ bootstrapping because we are only interested in the estimates. Make sure to use the same estimator! The run will be a lot faster this time because it only needs to calculate estimates for 500 pairs each time (our `n` from above) and without bootstrapping. When not bootstrapping, `relatedness()` returns a dataframe (versus a NamedTuple of dataframes).
+
+:::note sample names
+Please note that the naming convention for kinship simulations have changed between PopGenSims.jl versions. Nothing to be alarmed at
+if your simulations look a bit different!
+:::
 
 <Tabs
   block={true}
@@ -357,7 +234,7 @@ julia> full_sims_rel = relatedness(fullsib_sims, method = LynchLi)
 </TabItem>
 </Tabs>
 
-And if we wanted to plot out what that looks like (optional):
+And if we wanted to plot what that looks like (optional):
 ```julia
 using Plots, StatsPlots
 
