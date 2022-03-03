@@ -27,7 +27,7 @@ of the kinship estimate given by method `method`. This is an internal function w
     @sync for iter in 1:iterations
         Base.Threads.@spawn begin
             # bootstrap the indices
-            boot_idx = rand(Xoroshiro128Star(), 1:n_loc, n_loc)
+            boot_idx = rand(1:n_loc, n_loc)
             # sample the source vectors with the resampled/bootstrapped indices
             ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
             # get index for genotype appearing missing in at least one individual in the pair
@@ -51,7 +51,7 @@ of the kinship estimate given by method `method`. This is an internal function w
     @sync for iter in 1:iterations
         Base.Threads.@spawn begin
             # bootstrap the indices
-            boot_idx = rand(Xoroshiro128Star(), 1:n_loc, n_loc)
+            boot_idx = rand(1:n_loc, n_loc)
             # sample the source vectors with the resampled/bootstrapped indices
             ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
             # faster/cheaper n counting
@@ -68,7 +68,7 @@ end
 Calculate pairwise kinship between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `kinship`.
 """
-function _kinship_boot_all(data::PopData, sample_names::Vector{String}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
+function _kinship_boot_all(data::PopData, sample_names::Vector{T}; method::F, iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F where T<:AbstractString
     loci_names = Symbol.(loci(data))
     uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
@@ -76,7 +76,7 @@ function _kinship_boot_all(data::PopData, sample_names::Vector{String}; method::
     else
         sample_pairs = pairwisepairs(sample_names)
     end    
-    n_pairs = length(sample_pairs)
+    n_pairs = length(collect(sample_pairs))
     n_samples = data.metadata.samples
     allelefrequencies = allelefreq(data)
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
@@ -131,7 +131,7 @@ end
 Calculate pairwise kinship between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `kinship`.
 """
-function _kinship_boot_nonmissing(data::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
+function _kinship_boot_nonmissing(data::PopData, sample_names::Vector{T}; method::F, iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F where T<: AbstractString
     loci_names = Symbol.(loci(data))
     uniq_pops = unique(data.metadata.sampleinfo.population)
     if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
@@ -139,7 +139,7 @@ function _kinship_boot_nonmissing(data::PopData, sample_names::Vector{String}; m
     else
         sample_pairs = pairwisepairs(sample_names)
     end
-    n_pairs = length(sample_pairs)
+    n_pairs = length(collect(sample_pairs))
     n_samples = data.metadata.samples
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allelefrequencies = allelefreq(data)
@@ -193,7 +193,7 @@ end
 Calculate pairwise kinship between all combinations of the provided `sample_names` for each `method` provided. 
 This is an internal function with arguments provided by `kinship`.
 """
-function _kinship_noboot(data::PopData, sample_names::Vector{String}; method::F, inbreeding::Bool) where F
+function _kinship_noboot(data::PopData, sample_names::Vector{T}; method::F, inbreeding::Bool) where F where T <: AbstractString
     loci_names = Symbol.(loci(data))
     n_samples = data.metadata.samples
     uniq_pops = unique(data.metadata.sampleinfo.population)
@@ -202,7 +202,7 @@ function _kinship_noboot(data::PopData, sample_names::Vector{String}; method::F,
     else
         sample_pairs = pairwisepairs(sample_names)
     end
-    n_pairs = length(sample_pairs)
+    n_pairs = length(collect(sample_pairs))
     n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
     allelefrequencies = allelefreq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
@@ -340,10 +340,10 @@ julia> mergekinship(rel_out)
                                                         8 columns omitted
 ```
 """
-function kinship(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F
-    all(data.metadata[data.metadata.sampleinfo.name .∈ Ref(sample_names), :ploidy] .== 2) == false && error("kinship analyses currently only support diploid samples")
+function kinship(data::PopData, sample_names::Vector{T}; method::F, iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where F where T<:AbstractString
+    data.metadata.ploidy != 2 && error("kinship analyses currently only support diploid samples")
     errs = ""
-    all_samples = samplenames(data)
+    all_samples = string.(samplenames(data))
     if sample_names != all_samples
         [errs *= "$i," for i in sample_names if i ∉ all_samples]
         errs != "" && error("Samples not found in the PopData: " * errs)
