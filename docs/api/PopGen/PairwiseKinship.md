@@ -1,9 +1,9 @@
 ---
-id: pairwiserelatedness
-title: PairwiseRelatedness.jl
-sidebar_label: PairwiseRelatedness.jl
+id: pairwisekinship
+title: PairwiseKinship.jl
+sidebar_label: PairwiseKinship.jl
 ---
-## PopGen.jl/src/Relatedness/PairwiseRelatedness.jl
+## PopGen.jl/src/Kinship/PairwiseKinship.jl
 📦  => not exported | 
 🔵 => exported by PopGen.jl
 
@@ -35,9 +35,9 @@ of the relatedness estimate given by method `method`. This is an internal functi
 
 ----
 
-### 📦 _relatedness_boot_all
+### 📦 _kinship_boot_all
 ```julia
-_relatedness_boot_all(::PopData, sample_names::Vector{String}; method::Function, iterations::Int, interval::Tuple{Float64, Float64})
+_kinship_boot_all(::PopData, sample_names::Vector{String}; method::Function, iterations::Int, interval::Tuple{Float64, Float64})
 ```
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `relatedness`.
@@ -45,9 +45,9 @@ the `all` method, where resampling occurs over all loci. This is an internal fun
 
 ----
 
-### 📦 _relatedness_boot_nonmissing
+### 📦 _kinship_boot_nonmissing
 ```julia
-_relatedness_boot_nonmissing(::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64}) where F
+_kinship_boot_nonmissing(::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64}) where F
 ```
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
 the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `relatedness`.
@@ -55,9 +55,9 @@ the `nonmissing` method, where resampling occurs over only shared non-missing lo
 
 ----
 
-### 📦 _relatedness_noboot
+### 📦 _kinship_noboot
 ```julia
-_relatedness_noboot(::PopData, sample_names::Vector{String}; method::F) where F
+_kinship_noboot(::PopData, sample_names::Vector{String}; method::F) where F
 ```
 Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. 
 This is an internal function with arguments provided by `relatedness`.
@@ -65,7 +65,7 @@ This is an internal function with arguments provided by `relatedness`.
 
 ----
 
-### 🔵 relatedness
+### 🔵 kinship
 ```julia
 # compare all samples
 kinship(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
@@ -172,9 +172,9 @@ julia> DataFrames.names(ans)
  "Moran_CI_95"
 ```
 
-### 🔵 merge_relatedness
+### 🔵 merge_kinship
 ```julia
 merge_kinship(data::NamedTuple)
 ```
-A convenience function that takes the `NamedTuple` output from `relatedness` performed with bootstrapping
+A convenience function that takes the `NamedTuple` output from `kinship` performed with bootstrapping
 and returns one large DataFrame.

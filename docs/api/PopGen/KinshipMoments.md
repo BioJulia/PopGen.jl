@@ -1,10 +1,10 @@
 ---
-id: relatednessmoments
-title: RelatednessMoments.jl
-sidebar_label: RelatednessMoments.jl
+id: kinshipmoments
+title: KinshipMoments.jl
+sidebar_label: KinshipMoments.jl
 ---
 
-## PopGen.jl/src/Relatedness/RelatednessMoments.jl
+## PopGen.jl/src/Kinship/KinshipMoments.jl
 📦  => not exported | 
 🔵 => exported by PopGen.jl
 

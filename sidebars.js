@@ -52,8 +52,9 @@ module.exports = {
           "api/PopGen/hardyweinberg",
           "api/PopGen/heterozygosity",
           "api/PopGen/pairwisefst",
-          "api/PopGen/pairwiserelatedness",
-          "api/PopGen/relatednessmoments",
+          "api/PopGen/pairwisekinship",
+          "api/PopGen/kinshipmoments",
+          "api/PopGen/kinshipposthocs",
           "api/PopGen/summaryinfo",
           "api/PopGen/utils",
         ]
