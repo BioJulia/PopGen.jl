@@ -14,10 +14,9 @@ function dapc(data::PopData, labels::T = [nothing]; classes::Int64, nda::Int64 =
     end
 
     lablen = length(unique(labs))
-    classes > lablen && error("Number of classes ($classes) must be equal or fewer than number of unique labels ($lablen)")
+    classes < lablen && error("Number of classes ($classes) must be equal or fewer than number of unique labels ($lablen)")
     
     _pca = pca(data)
-    return _pca
     pca_mtx = permutedims(_pca.proj)
     ndakw = iszero(nda) ? min(size(pca_mtx, 1), size(pca_mtx,2) - 1) : nda
     MultivariateStats.fit(MulticlassLDA, classes, pca_mtx, labs, outdim = ndakw, covestimator_between= covestimator_between, covestimator_within = covestimator_within)

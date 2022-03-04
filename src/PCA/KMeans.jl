@@ -18,7 +18,7 @@ end
     kmeans(data::PopData; krange::Vector{Int64}, iterations::Int64 = 100)
     kmeans(data::PopData; krange::UnitRange{Int64}, iterations::Int64 = 100)
 
-Perform Kmeans clustering (using Kmeans++) on a `PopData` object. Returns a `KMeansResults`
+Perform PCA-based Kmeans clustering (using Kmeans++) on a `PopData` object. Returns a `KMeansResults`
 object storing the results of each `Clustering.kmeans()` run across a range of K values (`krange`, default: 2:nsamples/10).
 Use the keyword argument `iterations` (default: 100) to set the maximum number of iterations allowed to
 achieve convergence. Interally, kmeans clustering is performed on the principal components of the scaled allele frequencies matrix, where `missing` values are replaced by the global mean allele frequency.
