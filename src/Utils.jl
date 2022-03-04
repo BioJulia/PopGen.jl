@@ -62,7 +62,8 @@ end
 Relable a vector of strings into integers as though it is factors.
 This is useful for reclassifying e.g. population names as integers. 
 """
-_relabel(arr::Vector{T}) where T<:AbstractString = findfirst.(isequal.(arr), Ref(unique(arr)))
-
+function _relabel(arr::AbstractVector{T}) where T<:AbstractString
+    findfirst.(isequal.(arr), Ref(unique(arr)))
+end
 
 feature_req() = "\nPlease open an Issue or Pull Request on https://www.github.com/biojulia/PopGen.jl if you would like this feature implemented"
