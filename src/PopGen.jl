@@ -6,8 +6,8 @@ Documentation: https://biojulia.net/PopGen.jl/
 \nA few things things you can do to get started:
 
 ## Import Data
-- `PopGen.read(filename; kwargs...)`
-- `genepop(infile; kwargs...)`  or similar file-specific importer
+- `PopGen.read(filename, kwargs...)`
+- `genepop(infile, kwargs...)`  or similar file-specific importer
 - use available `@gulfsharks` or `@nancycats` datasets
 
 ## Explore PopData
@@ -19,7 +19,7 @@ Documentation: https://biojulia.net/PopGen.jl/
 ## Manipulate PopData
 - `populations!(PopData, ...)` to rename populations
 - `locations!(PopData, ...)` to add geographical coordinates
-- `exclude!(PopData; kwargs...)` to selectively remove data
+- `exclude!(PopData, kwargs...)` to selectively remove data
 
 ## Analyses
 - `richness(PopData)` to calculate allelic richness
@@ -59,6 +59,8 @@ using Distributions, DataFrames, PooledArrays
 using Random: shuffle
 using ProgressMeter
 using MultipleTesting, StatsBase
+using Clustering: kmeans
+using MultivariateStats
 
 
 #   o O       o O       o O       o O       o O
@@ -98,5 +100,7 @@ export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran
 
 include("Kinship/KinshipPostHocs.jl")
 export kinshipposthoc
+
+include("PCA/AlleleMatrices.jl")
 
 end # module PopGen
