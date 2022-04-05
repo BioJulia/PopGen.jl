@@ -76,43 +76,58 @@ function _allelematrix(data::PopData; by::String = "frequency", missings::String
     end
 end
 
+function countset(query,reference)
+    @inbounds [count(==(x), query, init = Int8(0)) for x in reference]
+end
+
+function countset(query::Missing,reference)
+    fill(Int8(-1), length(reference))
+end
+
 """
     _countmatrix(data::PopData)
 Create a matrix of allele count per genotype where rows are samples
 and columns are the occurence count of an allele for that locus in that sample.
-This is differentiated from `allele_countmatrix` by preserving missing values as
-`missing`
+Missing values are preserved as `-1`.
 """
 function _countmatrix(data::PopData)
-    geno_mtx = locimatrix(data)
-    n_samples, n_loci = size(data)
-    keytype = eltype(data.genodata.genotype |> eltype |> nonmissingtype)
-    # create a vector of empty dicts
-    @inbounds all_alleles = [Dict{keytype, Vector{Union{Missing,Int8}}}() for i in 1:n_loci]
-    # fill the dicts with keys for every allele for that locus, and the values are a vector of zeros
-    @inbounds for (i,j) in enumerate(eachcol(geno_mtx))
-       [get!(all_alleles[i], k, zeros(Int8, n_samples)) for k in uniquealleles(j)]
-    end
-    # for every sample row
-    @inbounds for (idx,sample_row) in enumerate(eachrow(geno_mtx))
-        # for each nonmissing genotype in that sample
-        @inbounds for (loc_idx, geno) in enumerate(sample_row)
-            # if the genotype is missing, fill in missing for all alleles of that locus
-            if ismissing(geno) 
-                @inbounds [all_alleles[loc_idx][i][idx] = missing for i in keys(all_alleles[loc_idx])] 
-                continue
-            else
-                # otherwise, if genotype is present
-                @inbounds @simd for allele in geno
-                    # +1 to its counter
-                    @inbounds all_alleles[loc_idx][allele][idx] += Int8(1)
-                end
-            end
-        end
-    end
-    # concatenate the alleles into a matrix and those into one big matrix
-    return reduce(hcat, [reduce(hcat, values(sort(i))) for i in all_alleles])
+    gmtx = locimatrix(data)
+    allalleles = Tuple(sort.(unique(Base.Iterators.flatten(unique(skipmissing(i)))) for i in eachcol(gmtx)))
+    mapreduce(hcat, eachrow(gmtx)) do smple
+        collect(Base.Iterators.flatten(Base.Iterators.flatten([countset.(smple, allalleles)])))
+    end |> permutedims
 end
+
+#function _countmatrix(data::PopData)
+#geno_mtx = locimatrix(data)
+#n_samples, n_loci = size(data)
+#    keytype = eltype(data.genodata.genotype |> eltype |> nonmissingtype)
+#    # create a vector of empty dicts
+#    @inbounds all_alleles = [Dict{keytype, Vector{Union{Missing,Int8}}}() for i in 1:n_loci]
+#    # fill the dicts with keys for every allele for that locus, and the values are a vector of zeros
+#    @inbounds for (i,j) in enumerate(eachcol(geno_mtx))
+#       [get!(all_alleles[i], k, zeros(Int8, n_samples)) for k in uniquealleles(j)]
+#    end
+#    # for every sample row
+#    @inbounds for (idx,sample_row) in enumerate(eachrow(geno_mtx))
+#        # for each nonmissing genotype in that sample
+#        @inbounds for (loc_idx, geno) in enumerate(sample_row)
+#            # if the genotype is missing, fill in missing for all alleles of that locus
+#            if ismissing(geno) 
+#                @inbounds [all_alleles[loc_idx][i][idx] = missing for i in keys(all_alleles[loc_idx])] 
+#                continue
+#            else
+#                # otherwise, if genotype is present
+#                @inbounds @simd for allele in geno
+#                    # +1 to its counter
+#                    @inbounds all_alleles[loc_idx][allele][idx] += Int8(1)
+#                end
+#            end
+#        end
+#    end
+#    # concatenate the alleles into a matrix and those into one big matrix
+#    return reduce(hcat, [reduce(hcat, values(sort(i))) for i in all_alleles])
+#end
 
 
 """
@@ -122,11 +137,8 @@ and columns are the frequency of an allele for that locus in that sample.
 Missing values are replaced by zeros.
 """
 function _freqmatrix_zero(data::PopData)
-    counts = _countmatrix(data)
-    # replace occurences of missing with 0
-    @inbounds counts[findall(ismissing, counts)] .= 0
     # divide each row (sample) by the ploidy of that sample
-    return counts ./ data.sampleinfo.ploidy
+    replace(_countmatrix(data), -1 => 0) ./ data.sampleinfo.ploidy
 end
 
 """
@@ -136,20 +148,12 @@ and columns are the frequency of an allele for that locus in that sample.
 Missing values are replaced by the global mean allele frequency.
 """
 function _freqmatrix_mean(data::PopData)
-    counts = Matrix{Union{Missing, Float64}}(_countmatrix(data))
-    # get the mean for each allele for each locus
-    # iterate over rows (samples)
-    @inbounds for (_sample,_counts) in enumerate(eachrow(counts))
-        countidx = findall(!ismissing, _counts)
-        # divide non-missing values in the row by the sample's ploidy and replace the original values
-        #@inbounds _counts[countidx] /= data.sampleinfo.ploidy[_sample]
-        @inbounds _counts[countidx] .= _counts[countidx] ./ data.sampleinfo.ploidy[_sample]
+    counts = @inbounds _countmatrix(data) ./ data.sampleinfo.ploidy
+    map(eachcol(counts)) do alcol
+        colmean = mean([x for x in alcol if x >= 0])
+        replace!(x -> x < 0 ? colmean : x, alcol)
     end
-    # fill in missing values with the means
-    @inbounds for _allele in eachcol(counts)
-        @inbounds _allele[findall(ismissing, _allele)] .= mean(skipmissing(_allele))
-    end
-    return Matrix{Float64}(counts)
+    return counts
 end
 
 """
@@ -159,14 +163,16 @@ and columns are the frequency of an allele for that locus in that sample.
 Missing values are kept as `missing`.
 """
 function _freqmatrix_missing(data::PopData)
-    counts = Matrix{Union{Missing, Float64}}(_countmatrix(data))
-    # iterate over rows (samples)
-    @inbounds for (_sample,_counts) in enumerate(eachrow(counts))
-        countidx = findall(!ismissing, _counts)
-        # divide non-missing values in the row by the sample's ploidy and replace the original values
-        @inbounds _counts[countidx] .= _counts[countidx] ./ data.sampleinfo.ploidy[_sample]
-    end
-    return counts
+    replace(_countmatrix(data), -1 => missing) ./ data.sampleinfo.ploidy
+   #
+   #counts = Matrix{Union{Missing, Float64}}(_countmatrix(data))
+   ## iterate over rows (samples)
+   #@inbounds for (_sample,_counts) in enumerate(eachrow(counts))
+   #    countidx = findall(!ismissing, _counts)
+   #    # divide non-missing values in the row by the sample's ploidy and replace the original values
+   #    @inbounds _counts[countidx] .= _counts[countidx] ./ data.sampleinfo.ploidy[_sample]
+   #end
+   #return counts
 end
 
 
