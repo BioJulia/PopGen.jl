@@ -20,6 +20,8 @@ sidebar_label: What's New
 #### 🐛🐛 Bug fixes
 - none, I think
 
+-------------
+
 ## v0.7
 ### v0.7.0
 #### ⚠️⚠️ Breaking Changes
@@ -44,6 +46,7 @@ sidebar_label: What's New
 #### 🐛🐛 Bug fixes
 - super slow structure io on larger files
 
+---------------
 
 ## v.0.6
 ### v.0.6.5

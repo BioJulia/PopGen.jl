@@ -12,8 +12,7 @@ The genotypes are processed into a matrix of (rows: samples, cols: allele freque
 For datasets greater than 10 loci, we recommend appending a semicolon to the end of the function call to suppress output to the REPL. ([issue #186](https://github.com/JuliaStats/MultivariateStats.jl/issues/186))
 :::
 
-### `pca`
-
+### Principal Component Anaylsis
 ```julia
 pca(::PopData; maxpc::Int = 0, method::Symbol = :svd, missings::String = "mean", pratio::Float64 = 0.99, center::Bool = false, scale::Bool = true)
 ```
@@ -24,7 +23,7 @@ Perform a Principal Component Analysis on a PopData object. Returns an indexible
     - `:cov`: based on covariance matrix decomposition
     - `:svd`: based on Singular Value Decomposition of the input data
 - `maxpc::Int`: The maximum number of principal components to retain (default: 0 = `(min(d, ncol-1))`)
-- `missings::String`: How to treat missing genotypes in the allele frequency matrix (default: `mean`)
+- `missings::String`: How to treat missing genotypes in the allele frequency matrix (default: `"mean"`)
     - `"mean"`: replace `missing` values with the mean frequency for that allele in that locus
     - `"missing"`: keep `missing` values as they are
     - `"zero"`: replace `missing` values with `0`
@@ -50,7 +49,7 @@ julia> pca_cats.proj       # the projection matrix
  -0.0950973   0.0163225    0.00588324   …   0.0256939    0.0831163     0.00374728   
  -0.0843321  -0.0082427   -0.0309442        0.00382228   0.0179109     0.0217293
 
-julia> pca_cats.prinvars  # the principal variances
+julia> pca_cats.prinvars   # the principal variances
 40-element Vector{Float64}:
  20.906886724195086
   8.015966142401036

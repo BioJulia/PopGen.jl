@@ -9,7 +9,7 @@ One way to accomplish this is with K-means clustering, an unsupervised clusterin
 PopGen.jl implementation of K-means clustering uses the K-means ++ algorithm ([Arthur & Vassilvitskii 2007](http://ilpubs.stanford.edu:8090/778/1/2006-13.pdf)) under the hood, as implemented in `Clustering.jl` ([link](https://github.com/JuliaStats/Clustering.jl)).
 
 
-### `kmeans`
+### K-means clustering
 ```julia
 # krange as a vector : [1,3,6,7]
 kmeans(data::PopData; krange::Vector{Int64}, iterations::Int64 = 100)
