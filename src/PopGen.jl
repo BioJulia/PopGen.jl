@@ -6,8 +6,8 @@ Documentation: https://biojulia.net/PopGen.jl/
 \nA few things things you can do to get started:
 
 ## Import Data
-- `PopGen.read(filename; kwargs...)`
-- `genepop(infile; kwargs...)`  or similar file-specific importer
+- `PopGen.read(filename, kwargs...)`
+- `genepop(infile, kwargs...)`  or similar file-specific importer
 - use available `@gulfsharks` or `@nancycats` datasets
 
 ## Explore PopData
@@ -19,7 +19,7 @@ Documentation: https://biojulia.net/PopGen.jl/
 ## Manipulate PopData
 - `populations!(PopData, ...)` to rename populations
 - `locations!(PopData, ...)` to add geographical coordinates
-- `exclude!(PopData; kwargs...)` to selectively remove data
+- `exclude!(PopData, kwargs...)` to selectively remove data
 
 ## Analyses
 - `richness(PopData)` to calculate allelic richness
@@ -27,6 +27,7 @@ Documentation: https://biojulia.net/PopGen.jl/
 - `summary(PopData)` to calculate F-statistics, heterozygosity, etc.
 - `hwetest(PopData)` to test for Hardy-Weinberg Equilibrium
 - `pairwisefst(PopData)` to calculate FST between pairs of populations
+- `kmeans(PopData, 2:k)` to perform Kmeans++ clustering
 """
 module PopGen
 
@@ -59,6 +60,8 @@ using Distributions, DataFrames, PooledArrays
 using Random: shuffle
 using ProgressMeter
 using MultipleTesting, StatsBase
+import Clustering: kmeans
+import MultivariateStats: fit, PCA
 
 
 #   o O       o O       o O       o O       o O
@@ -68,6 +71,8 @@ using MultipleTesting, StatsBase
 #   O o       O o       O o       O o       O o
 
 include("Utils.jl")
+include("AlleleMatrices.jl")
+
 # heterozygosity functions
 include("Heterozygosity.jl")
 export heterozygosity, samplehet
@@ -98,5 +103,11 @@ export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran
 
 include("Kinship/KinshipPostHocs.jl")
 export kinshipposthoc
+
+include("KMeans.jl")
+export kmeans
+
+include("PCA.jl")
+export pca
 
 end # module PopGen
