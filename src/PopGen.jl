@@ -104,7 +104,7 @@ export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran
 include("Kinship/KinshipPostHocs.jl")
 export kinshipposthoc
 
-include("Kmeans.jl")
+include("KMeans.jl")
 export kmeans
 
 include("PCA.jl")
