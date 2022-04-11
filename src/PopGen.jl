@@ -27,6 +27,7 @@ Documentation: https://biojulia.net/PopGen.jl/
 - `summary(PopData)` to calculate F-statistics, heterozygosity, etc.
 - `hwetest(PopData)` to test for Hardy-Weinberg Equilibrium
 - `pairwisefst(PopData)` to calculate FST between pairs of populations
+- `kmeans(PopData, 2:k)` to perform Kmeans++ clustering
 """
 module PopGen
 
@@ -59,8 +60,8 @@ using Distributions, DataFrames, PooledArrays
 using Random: shuffle
 using ProgressMeter
 using MultipleTesting, StatsBase
-using Clustering: kmeans
-using MultivariateStats
+import Clustering: kmeans
+import MultivariateStats: fit, PCA
 
 
 #   o O       o O       o O       o O       o O
@@ -70,6 +71,8 @@ using MultivariateStats
 #   O o       O o       O o       O o       O o
 
 include("Utils.jl")
+include("AlleleMatrices.jl")
+
 # heterozygosity functions
 include("Heterozygosity.jl")
 export heterozygosity, samplehet
@@ -101,6 +104,10 @@ export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran
 include("Kinship/KinshipPostHocs.jl")
 export kinshipposthoc
 
-include("PCA/AlleleMatrices.jl")
+include("Kmeans.jl")
+export kmeans
+
+include("PCA.jl")
+export pca
 
 end # module PopGen
