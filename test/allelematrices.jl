@@ -21,8 +21,8 @@ cats = @nancycats ;
         @test all(a .== b) == false
         @test all(a .== c) == false
         @test all(a .== d) == false
-        @test all(b .== c) == false
-        @test all(b .== d) == false
+        @test all(b .=== c) == false
+        @test all(b .=== d) == false
         @test all(c .== d) == false
     end
 end
