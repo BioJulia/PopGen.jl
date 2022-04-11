@@ -1,7 +1,7 @@
 name = "PopGen"
 uuid = "af524d12-c74b-11e9-22a8-3b091653023f"
 authors = ["Pavel Dimens", "Jason Selwyn"]
-version = "0.7.1"
+version = "0.8.0"
 
 [deps]
 Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
@@ -26,7 +26,7 @@ PopGenCore = "0.5.1"
 ProgressMeter = "1.4"
 Reexport = "1"
 StatsBase = "0.33"
-julia = "1.5"
+julia = "1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
