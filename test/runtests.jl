@@ -9,7 +9,10 @@ all_tests = [
     "dataexploration.jl",
     "summaryinfo.jl",
     "heterozygosity.jl",
-    "hardyweinberg.jl"
+    "hardyweinberg.jl",
+    "allelematrices.jl",
+    "kmeans.jl",
+    "pca.jl"
 ]
 
 println("Running tests:")
