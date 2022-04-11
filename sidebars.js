@@ -33,8 +33,10 @@ module.exports = {
     ],
     "Analyses":[
       "analyses/hardyweinberg",
+      "analyses/kmeans",
+      "analyses/fstatistics",
+      "analyses/pca",
       "analyses/relatedness",
-      "analyses/fstatistics"
     ],
     "Simulations":[
       "simulations/simulate_samples",
