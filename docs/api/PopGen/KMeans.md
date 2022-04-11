@@ -19,8 +19,9 @@ struct KMeansResults
 
 ----
 ### 🔵 show
+```julia
 Base.show(io::IO, data::KMeansResults)
-
+```
 
 ----
 ### 🔵 kmeans
