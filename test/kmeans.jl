@@ -14,7 +14,7 @@ cats = @nancycats;
     @test kmeans(cats, krange = 2:5, iterations = 30) isa PopGen.KMeansResults
     @test kmeans(cats, krange = [2,3,4], iterations = 30) isa PopGen.KMeansResults
     tmp = kmeans(cats, krange = 2:5, iterations = 30)
-    @test size(tmp.assignments) = (237,5)
+    @test size(tmp.assignments) == (237,5)
     end
 end
 
