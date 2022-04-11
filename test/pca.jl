@@ -12,7 +12,7 @@ cats = @nancycats;
         @test size(pca(cats, maxpc = 25).proj) == (237,25)
         @test size(pca(cats, maxpc = 25, center = true).proj) == (237,25)
         @test size(pca(cats, maxpc = 25, scale = false).proj) == (237,25)
-        @test size(pca(cats, pratio = 0.7).proj) == (237,17)
+        @test size(pca(cats, pratio = 0.7).proj) == (237,39)
     end
 end
 

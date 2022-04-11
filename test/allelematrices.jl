@@ -15,8 +15,8 @@ cats = @nancycats ;
         @test size(PopGen._allelematrix(cats, center = true)) == (237, 108)
         @test PopGen._allelematrix(cats, scale = true) != PopGen._allelematrix(cats, center = true)
         @test PopGen._allelematrix(cats, by = "count") != PopGen._allelematrix(cats)
-        @test PopGen._allelematrix(cats, missings = "missing") != PopGen._allelematrix(cats, missings = zero)
-        @test PopGen._allelematrix(cats, missings = zero) != PopGen._allelematrix(cats)
+        @test PopGen._allelematrix(cats, missings = "missing") != PopGen._allelematrix(cats, missings = "zero")
+        @test PopGen._allelematrix(cats, missings = "zero") != PopGen._allelematrix(cats)
     end
 end
 
