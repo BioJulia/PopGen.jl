@@ -47,12 +47,15 @@ module.exports = {
       "api/api",
       {
         "PopGen":[
+          "api/PopGen/allelematrices",
           "api/PopGen/dataexploration",
           "api/PopGen/fstbylocus",
           "api/PopGen/fstglobal",
           "api/PopGen/fstpermutations",
           "api/PopGen/hardyweinberg",
           "api/PopGen/heterozygosity",
+          "api/PopGen/kmeans",
+          "api/PopGen/pca",
           "api/PopGen/pairwisefst",
           "api/PopGen/pairwisekinship",
           "api/PopGen/kinshipmoments",
