@@ -3,6 +3,23 @@ id: latest
 title: What's New
 sidebar_label: What's New
 ---
+## v0.8
+### v0.8.0
+#### ⚠️⚠️ Breaking Changes
+- dropped support for Julia <v1.6
+  - new `count` methods we use aren't supported by previous versions
+
+#### ✨✨ New Things
+- k-means clustering using Kmeans++ via `kmeans()`
+- Principcal Component Analysis via `pca()`
+- Jason and Pavel both completed their doctorates!
+
+#### ⚡⚡ Improvements
+- allele matrix creation methods (internal) have >50% fewer LOC and are >2x faster!
+
+#### 🐛🐛 Bug fixes
+- none, I think
+
 ## v0.7
 ### v0.7.0
 #### ⚠️⚠️ Breaking Changes
