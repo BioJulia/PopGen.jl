@@ -1,20 +1,4 @@
-#struct ClusteringResults
-#    method::String
-#    assignments::DataFrame
-#    costs::DataFrame
-#    other::DataFrame
-#    centers::NamedTuple
-#end
-
-#function Base.show(io::IO, data::ClusteringResults)
-#    printstyled(io, "$(data.method) Clustering Results\n", bold = true)
-#    println(io, "  K values:          " * join(string.(data.other.k), ", "))
-#    println(io, "  Iterations per K:  " * join(string.(data.other.iterations), ", "))
-#    println(io, "  Convergence per K: " * join(replace(x -> x == "true" ? "T" : "F", string.(data.other.converged)), ", "))
-#    println(io, "  Total Cost per K:  " * join(string.(round.(data.other.totalcost, digits = 3)), ", "))
-#    println(io, "\n  Available fields to inspect: assignments, costs, centers, other")
-#end
-
+#TODO add precompile statements
 
 """
     kmeans(data::PopData; k::Int64, iterations::Int64 = 100, matrixtype::Symbol = :pca)
@@ -44,28 +28,11 @@ function kmeans(data::PopData; k::Int64, iterations::Int64 = 100, matrixtype::Sy
         _allelematrix(data, center = false, scale = true) :
         throw(ArgumentError("matrixtype :$matrixtype invalid, choose between :pca or :freq"))
     kmeans(mtx, k, maxiter = iterations)
-    #idx = 1:length(out)
-    #assn = DataFrame([getproperty(out[i], :assignments) for i in idx], Symbol.(krange))
-    #insertcols!(assn, 1, :name => unique(data.genodata.name))
-    #centers = NamedTuple{Tuple(Symbol.(krange))}(Tuple(getproperty(out[i], :centers) for i in idx))
-    #costs = DataFrame([getproperty(out[i], :costs) for i in idx], Symbol.(krange))
-    #insertcols!(costs, 1, :name => assn.name)
-    #other = 
-    #    DataFrame(
-    #        :k => krange,
-    #        :iterations => [getproperty(out[i], :iterations) for i in idx],
-    #        :converged => [getproperty(out[i], :converged) for i in idx],
-    #        :totalcost => [getproperty(out[i], :totalcost) for i in idx],
-    #        :counts => [getproperty(out[i], :counts) for i in idx],
-    #        :wcounts => [getproperty(out[i], :wcounts) for i in idx],
-    #        :cweights => [getproperty(out[i], :cweights) for i in idx]
-    #    )
-    #ClusteringResults("K-means++", assn, costs, other, centers)
 end
 
 
 """
-    kmedoids(data::PopData; krange::Int64, iterations::Int64 = 100, distance::PreMetric = euclidean, matrixtype::Symbol = :pca)
+    kmedoids(data::PopData; k::Int64, iterations::Int64 = 100, distance::PreMetric = euclidean, matrixtype::Symbol = :pca)
 
 Perform Kmedoids clustering on a `PopData` object. Returns a `KmedoidsResult`
 object. Use the keyword argument `iterations` (default: 100) to set the maximum number of iterations allowed to
@@ -167,7 +134,7 @@ function fuzzycmeans(data::PopData; c::Int64, fuzziness::Int64 = 2, iterations::
 end
 
 """
-    dbscan(data::PopData; radius::Float64, minpoints::Int64 = 2, distance::PreMetric = euclidean, matrixtype::Symbol = :pca)
+    dbscan(::PopData; radius::Float64, minpoints::Int64 = 2, distance::PreMetric = euclidean, matrixtype::Symbol = :pca)
 
 An expansion of `Clustering.dbscan` (from Clustering.jl) to perform Density-based Spatial Clustering of Applications with Noise (DBSCAN)
 on a PopData object. This is a convenience method which converts the `PopData` object to either an allele frequency or PCA matrix, and performs
@@ -189,4 +156,30 @@ function dbscan(data::PopData; radius::Float64, minpoints::Int64 = 2, distance::
         pairwise(distance, _allelematrix(data, center = false, scale = true), dims = 1) : 
         throw(ArgumentError("matrixtype :$matrixtype invalid, choose between :pca or :freq"))
     dbscan(mtx, radius, minpoints)
+end
+
+"""
+```julia
+cluster(::PopData, method::Function ; kwargs)
+```
+A convenience wrapper to perform clustering on a `PopData` object determined by a designated `method` (see below). The
+chosen method must also be supplied with the appropriate keyword arguments for that method. For more information on 
+a specific method, see its docstring with `?methodname`
+
+**Clustering Methods**
+- `kmeans`: K-means++ clustering
+  - kwargs: `k`, `iterations`, `matrixtype`
+- `kmedoids`: K-medoids clustering
+  - kwargs: `k`, `iterations`, `distance`, `matrixtype`
+- `hclust`: Hierarchical clustering
+  - kwargs: `linkage`, `branchorder`, `distance`, `matrixtype`
+- `fuzzycmeans`: Fuzzy C-means lustering
+  - kwargs: `c`, `fuzziness`, `iterations`, `matrixtype`
+- `dbscan`: Density-based Spatial Clustering of Applications with Noise (DBSCAN)
+  - kwargs: `radius`, `minpoints`, `distance`, `matrixtype`
+"""
+function cluster(data::PopData, method::Function ; kwargs...)
+  methodlist = [:kmeans, :kmedoids, :hclust, :fuzzycmeans, :dbscan]
+  Symbol(method) ∉ methodlist && throw(ArgumentError("$method (2nd positional argument) is not a valid method. See `?cluster` for more information."))
+  method(data; kwargs...)
 end
