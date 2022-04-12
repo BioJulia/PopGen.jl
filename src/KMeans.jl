@@ -1,12 +1,13 @@
-struct KMeansResults
+struct ClusteringResults
+    method::String
     assignments::DataFrame
     costs::DataFrame
     other::DataFrame
     centers::NamedTuple
 end
 
-function Base.show(io::IO, data::KMeansResults)
-    printstyled(io, "K-Means(++) Clustering Results\n", bold = true)
+function Base.show(io::IO, data::ClusteringResults)
+    printstyled(io, "$(data.method) Clustering Results\n", bold = true)
     println(io, "  K values:          " * join(string.(data.other.k), ", "))
     println(io, "  Iterations per K:  " * join(string.(data.other.iterations), ", "))
     println(io, "  Convergence per K: " * join(replace(x -> x == "true" ? "T" : "F", string.(data.other.converged)), ", "))
@@ -59,11 +60,11 @@ julia> km.assignments
                                          226 rows omitted
 ```
 """
-function kmeans(data::PopData; krange::Union{UnitRange{Int64},Vector{Int64}} = 2:(size(data)[1] ÷ 10), iterations::Int64 = 100)
+function kmeans(data::PopData; krange::Union{UnitRange{Int64},Vector{Int64}}, iterations::Int64 = 100)
     kmeans(data, krange, iterations)
 end
 
-function kmeans(data::PopData, krange::Union{UnitRange{Int64},Vector{Int64}} = 2:(size(data)[1] ÷ 10), iterations::Int64 = 100)
+function kmeans(data::PopData, krange::Union{UnitRange{Int64},Vector{Int64}}, iterations::Int64 = 100)
     pc = pca(data, center = false, scale = true).proj |> permutedims
     out = map(i -> kmeans(pc, i, maxiter = iterations), krange)
     idx = 1:length(out)
@@ -71,6 +72,7 @@ function kmeans(data::PopData, krange::Union{UnitRange{Int64},Vector{Int64}} = 2
     insertcols!(assn, 1, :name => unique(data.genodata.name))
     centers = NamedTuple{Tuple(Symbol.(krange))}(Tuple(getproperty(out[i], :centers) for i in idx))
     costs = DataFrame([getproperty(out[i], :costs) for i in idx], Symbol.(krange))
+    insertcols!(costs, 1, :name => assn.name)
     other = 
         DataFrame(
             :k => krange,
@@ -81,5 +83,27 @@ function kmeans(data::PopData, krange::Union{UnitRange{Int64},Vector{Int64}} = 2
             :wcounts => [getproperty(out[i], :wcounts) for i in idx],
             :cweights => [getproperty(out[i], :cweights) for i in idx]
         )
-    KMeansResults(assn, costs, other, centers)
+    ClusteringResults("K-means++", assn, costs, other, centers)
+end
+
+function kmedoids(data::PopData, krange::Union{UnitRange{Int64},Vector{Int64}}, iterations::Int64 = 100)
+        pc = pca(data, center = false, scale = true).proj |> permutedims
+        distmtx = pairwise(euclidean, pc, dims = 2)
+        out = map(i -> kmedoids(distmtx, i, maxiter = iterations), krange)
+        idx = 1:length(out)
+        assn = DataFrame([getproperty(out[i], :assignments) for i in idx], Symbol.(krange))
+        insertcols!(assn, 1, :name => unique(data.genodata.name))
+        centers = NamedTuple{Tuple(Symbol.(krange))}(Tuple(getproperty(out[i], :medoids) for i in idx))
+        costs = DataFrame([getproperty(out[i], :costs) for i in idx], Symbol.(krange))
+        insertcols!(costs, 1, :name => assn.name)
+        other = 
+            DataFrame(
+                :k => krange,
+                :iterations => [getproperty(out[i], :iterations) for i in idx],
+                :converged => [getproperty(out[i], :converged) for i in idx],
+                :medoids => [getproperty(out[i], :medoids) for i in idx],
+                :totalcost => [getproperty(out[i], :totalcost) for i in idx],
+                :counts => [getproperty(out[i], :counts) for i in idx]
+            )
+        ClusteringResults("K-medoids", assn, costs, other, centers)
 end
