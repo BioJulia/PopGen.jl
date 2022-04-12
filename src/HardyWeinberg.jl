@@ -43,7 +43,6 @@ adjustment method for multiple testing.
 `hwetest(@gulfsharks, correction = "bh")` \n
 `hwetest(@gulfsharks, by = "population", correction = "bh")` \n
 
-
 ### `correction` methods (case insensitive)
 - `"bonferroni"` : Bonferroni adjustment
 - `"holm"` : Holm adjustment
