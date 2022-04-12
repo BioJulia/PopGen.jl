@@ -19,7 +19,7 @@
 """
     kmeans(data::PopData; k::Int64, iterations::Int64 = 100, matrixtype::Symbol = :pca)
     
-Perform Kmeans clustering (using Kmeans++) on a `PopData` object. Returns a `ClusteringResults`
+Perform Kmeans clustering (using Kmeans++) on a `PopData` object. Returns a `KmeansResult`
 object. Use the keyword argument `iterations` (default: 100) to set the maximum number of iterations allowed to
 achieve convergence. Interally, kmeans clustering is performed on either the principal components of the scaled allele frequencies,
 or just the scaled allele frequencies themselves. In both cases, `missing` values are replaced by the global mean allele frequency.
@@ -67,7 +67,7 @@ end
 """
     kmedoids(data::PopData; krange::Int64, iterations::Int64 = 100, distance::PreMetric = euclidean, matrixtype::Symbol = :pca)
 
-Perform Kmedoids clustering on a `PopData` object. Returns a `ClusteringResults`
+Perform Kmedoids clustering on a `PopData` object. Returns a `KmedoidsResult`
 object. Use the keyword argument `iterations` (default: 100) to set the maximum number of iterations allowed to
 achieve convergence. Interally, kmeans clustering is performed on either the principal components of the scaled allele frequencies,
 or just the scaled allele frequencies themselves. In both cases, `missing` values are replaced by the global mean allele frequency.
