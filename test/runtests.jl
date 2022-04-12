@@ -11,7 +11,7 @@ all_tests = [
     "heterozygosity.jl",
     "hardyweinberg.jl",
     "allelematrices.jl",
-    "kmeans.jl",
+    "clustering.jl",
     "pca.jl"
 ]
 
