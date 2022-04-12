@@ -57,7 +57,7 @@ end
 @reexport import PopGenCore: read, write
 
 using Distributions, DataFrames, PooledArrays
-using Distances: pairwise, euclidean
+using Distances
 using Random: shuffle
 using ProgressMeter
 using MultipleTesting, StatsBase
