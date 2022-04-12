@@ -57,10 +57,11 @@ end
 @reexport import PopGenCore: read, write
 
 using Distributions, DataFrames, PooledArrays
+using Distances: pairwise, euclidean
 using Random: shuffle
 using ProgressMeter
 using MultipleTesting, StatsBase
-import Clustering: kmeans
+import Clustering: kmeans, kmedoids, hclust, Hclust, cutree, fuzzy_cmeans, dbscan
 import MultivariateStats: fit, PCA
 
 
@@ -104,8 +105,8 @@ export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran
 include("Kinship/KinshipPostHocs.jl")
 export kinshipposthoc
 
-include("KMeans.jl")
-export kmeans
+include("Clustering.jl")
+export kmeans, kmedoids, hclust, cutree, fuzzycmeans, dbscan
 
 include("PCA.jl")
 export pca
