@@ -106,7 +106,7 @@ include("Kinship/KinshipPostHocs.jl")
 export kinshipposthoc
 
 include("Clustering.jl")
-export kmeans, kmedoids, hclust, cutree, fuzzycmeans, dbscan
+export cluster, kmeans, kmedoids, hclust, cutree, fuzzycmeans, dbscan
 
 include("PCA.jl")
 export pca
