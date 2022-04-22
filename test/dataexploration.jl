@@ -17,11 +17,11 @@ cats = @nancycats;
 
     @testset "pairwise identical" begin
         pw_i = pairwiseidentical(cats)
-        @test pw_i isa DataFrame
-        @test size(pw_i) == (27966, 4)
+        @test pw_i isa AbstractMatrix
+        @test size(pw_i) == (237, 237)
         pw_i_2 = pairwiseidentical(cats, cats.sampleinfo.name[1:10])
-        @test pw_i_2 isa DataFrame
-        @test size(pw_i_2) == (45, 4)
+        @test pw_i_2 isa AbstractMatrix
+        @test size(pw_i_2) == (10, 10)
     end
 
     @testset "frequency tables" begin
