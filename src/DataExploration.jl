@@ -119,7 +119,7 @@ function pairwiseidentical(data::PopData, sample_names::Vector{T}) where T<:Abst
     perc_ident_vec = Vector{Float64}(undef, n)
     n_vec = Vector{Int}(undef, n)
     popdata_idx = groupby(data.genodata, :name)
-    p = Progress(n, dt = 1, color = :blue)
+    p = Progress(n, dt = 1, color = :blue, output = stderr, enabled = !is_logging(stderr))
     @inbounds @sync for i in 1:n
         Base.Threads.@spawn begin
             @inbounds geno_1 = popdata_idx[(sample_pairs[i][1],)].genotype

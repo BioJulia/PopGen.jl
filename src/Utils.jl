@@ -67,3 +67,9 @@ function _relabel(arr::AbstractVector{T}) where T<:AbstractString
 end
 
 feature_req() = "\nPlease open an Issue or Pull Request on https://www.github.com/biojulia/PopGen.jl if you would like this feature implemented"
+
+"""
+    _is_logging(io)
+Returns `false` if in a normal session, `true` if in a CI/HPC environment 
+"""
+_is_logging(io) = isa(io, Base.TTY) == false || (get(ENV, "CI", nothing) == "true")
