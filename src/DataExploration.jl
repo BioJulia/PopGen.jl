@@ -42,41 +42,51 @@ missingdata(@gulfsharks, by = "pop")
     end
 end
 
+
+function _pwiseidenticalhelper(x::T,y::U)::Float64 where T<:AbstractArray where U<:AbstractArray
+    mean(skipmissing(x .== y))
+end
+
 """
     pairwiseidentical(data::PopData)
-Return a table of the percent of identical genotypes at each locus between all pairs of individuals.
+Return a pairwise matrix of the percent of identical genotypes at each locus between all pairs of individuals.
 
 ### Example:
 ```
 julia> cats = @nancycats ;
 
 julia> pairwiseidentical(cats)
-27966×4 DataFrame
-   Row │ sample_1  sample_2  identical  n     
-       │ String    String    Float64    Int64 
-───────┼──────────────────────────────────────
-     1 │ N215      N216           0.5       8
-     2 │ N215      N217           0.25      8
-     3 │ N215      N218           0.38      8
-     4 │ N215      N219           0.38      8
-   ⋮   │    ⋮         ⋮          ⋮        ⋮
- 27963 │ N297      N290           0.29      7
- 27964 │ N281      N289           0.25      8
- 27965 │ N281      N290           0.43      7
- 27966 │ N289      N290           0.14      7
-                            27958 rows omitted
+237×237 Named Matrix{Float64}
+A ╲ B │     N215      N216  …      N289      N290
+──────┼──────────────────────────────────────────
+N215  │      1.0       0.5  …  0.142857  0.166667
+N216  │      0.5       1.0     0.142857  0.166667
+N217  │     0.25     0.125        0.125  0.142857
+N218  │    0.375      0.25         0.25  0.142857
+N219  │    0.375     0.375         0.25  0.142857
+⋮              ⋮         ⋮  ⋱         ⋮         ⋮
+N296  │      0.5  0.333333          0.0       0.0
+N297  │ 0.166667  0.166667     0.428571  0.285714
+N281  │ 0.142857  0.142857         0.25  0.428571
+N289  │ 0.142857  0.142857          1.0  0.142857
+N290  │ 0.166667  0.166667  …  0.142857       1.0
 ```
 
 """
 function pairwiseidentical(data::PopData)
-    sample_names = collect(samplenames(data))
-    pairwiseidentical(data, sample_names)
+    locmtx = locimatrix(data)
+    ids = unique(data.genodata.name)
+    vecs = [i for i in eachrow(locmtx)]
+    out = NamedArray(_pwiseidenticalhelper.(vecs, permutedims(vecs)))
+    setnames!(out, String.(ids),1)
+    setnames!(out, String.(ids),2)
+    return out
 end
 
 """
     pairwiseidentical(data::PopData, sample_names::Vector{String})
-Return a table of the percent of identical genotypes at each locus
-between all pairs of provided `sample_names`.
+Return a pairwise matrix of the percent of identical genotypes at 
+each nonmissing locus between all pairs of provided `sample_names`.
 
 ### Example:
 ```
@@ -91,49 +101,29 @@ julia> interesting_cats = samplenames(cats)[1:5]
  "N219"
 
 julia> pairwiseidentical(cats, interesting_cats)
-10×4 DataFrame
- Row │ sample_1  sample_2  identical  n     
-     │ String    String    Float64    Int64 
-─────┼──────────────────────────────────────
-   1 │ N215      N216           0.5       8 
-   2 │ N215      N217           0.25      8 
-   3 │ N215      N218           0.38      8 
-   4 │ N215      N219           0.38      8 
-   5 │ N216      N217           0.12      8 
-   6 │ N216      N218           0.25      8 
-   7 │ N216      N219           0.38      8 
-   8 │ N217      N218           0.0       9 
-   9 │ N217      N219           0.11      9 
-  10 │ N218      N219           0.33      9 
+5×5 Named Matrix{Float64}
+A ╲ B │     N217      N218      N219      N220      N221
+──────┼─────────────────────────────────────────────────
+N217  │      1.0       0.0  0.111111  0.222222  0.111111
+N218  │      0.0       1.0  0.333333  0.111111  0.444444
+N219  │ 0.111111  0.333333       1.0  0.111111  0.333333
+N220  │ 0.222222  0.111111  0.111111       1.0  0.222222
+N221  │ 0.111111  0.444444  0.333333  0.222222       1.0
 ```
 """
 function pairwiseidentical(data::PopData, sample_names::Vector{T}) where T<:AbstractString
-    errs = ""
-    all_samples = samplenames(data)
-    if sample_names != all_samples
-        [errs *= "\n  $i" for i in sample_names if i ∉ all_samples]
-        errs != "" && error("Samples not found in the PopData: " * errs)
+    all_samples = unique(data.genodata.name)
+    missingsamples = setdiff(sample_names, all_samples)
+    if !isempty(missingsamples)
+        throw(ArgumentError("Samples not found in the PopData:\n  " * join(missingsamples, "\n  ")))
     end
-    sample_pairs = collect(pairwisepairs(sample_names))
-    n = length(sample_pairs)
-    perc_ident_vec = Vector{Float64}(undef, n)
-    n_vec = Vector{Int}(undef, n)
-    popdata_idx = groupby(data.genodata, :name)
-    p = Progress(n, dt = 1, color = :blue, output = stderr, enabled = !_is_logging(stderr))
-    @inbounds @sync for i in 1:n
-        Base.Threads.@spawn begin
-            @inbounds geno_1 = popdata_idx[(sample_pairs[i][1],)].genotype
-            @inbounds geno_2 = popdata_idx[(sample_pairs[i][2],)].genotype
-            len_1 = nonmissing(geno_1)
-            len_2 = nonmissing(geno_2)
-            shared_geno = minimum([len_1, len_2])
-            shared = sum(skipmissing(geno_1 .== geno_2))
-            @inbounds perc_ident_vec[i] = round(shared/shared_geno, digits = 2)
-            @inbounds n_vec[i] = shared_geno
-            next!(p)
-        end
-    end
-    DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :identical => perc_ident_vec, :n => n_vec)
+    sampidx = [findfirst(==(i), all_samples) for i in sample_names]
+    locmtx = locimatrix(data)
+    vecs = [locmtx[i,:] for i in sampidx]
+    out = NamedArray(_pwiseidenticalhelper.(vecs, permutedims(vecs)))
+    setnames!(out, string.(sample_names),1)
+    setnames!(out, string.(sample_names),2)
+    return out
 end
 
 """

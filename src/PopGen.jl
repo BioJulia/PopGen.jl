@@ -56,7 +56,7 @@ using PopGenCore
 end
 @reexport import PopGenCore: read, write
 
-using Distributions, DataFrames, PooledArrays
+using Distributions, DataFrames, PooledArrays NamedArrays
 using Distances
 using Random: shuffle
 using ProgressMeter
