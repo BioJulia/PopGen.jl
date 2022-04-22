@@ -112,12 +112,13 @@ N221  │ 0.111111  0.444444  0.333333  0.222222       1.0
 ```
 """
 function pairwiseidentical(data::PopData, sample_names::Vector{T}) where T<:AbstractString
-    all_samples = unique(data.genodata.name)
+    all_samples = samplenames(data)
     missingsamples = setdiff(sample_names, all_samples)
     if !isempty(missingsamples)
         throw(ArgumentError("Samples not found in the PopData:\n  " * join(missingsamples, "\n  ")))
     end
-    sampidx = [findfirst(==(i), all_samples) for i in sample_names]
+    # [findfirst(==(i), all_samples) for i in sample_names]
+    sampidx = indexin(sample_names, all_samples)
     locmtx = locimatrix(data)
     vecs = [locmtx[i,:] for i in sampidx]
     out = NamedArray(_pwiseidenticalhelper.(vecs, permutedims(vecs)))
