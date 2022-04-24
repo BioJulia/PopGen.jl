@@ -1,385 +1,174 @@
-"""
-    _bootstrapsummary(::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
-
-Return the mean, median, standard error, and quantiles (given by `witdth`) of kinship resampling.
-"""
-@inline function _bootstrapsummary(boot_out::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
-    all(ismissing.(boot_out)) == true && return missing, missing, missing, missing
-    boot_skipmissing = collect(skipmissing(boot_out))
-    n_nonmiss = length(boot_skipmissing)
-    Mean = mean(boot_skipmissing)
-    Median = median(boot_skipmissing)
-    SE = sqrt(sum((boot_skipmissing - (boot_skipmissing / n_nonmiss)).^2) / (n_nonmiss - 1))
-    quants = quantile(boot_skipmissing, width)
-
-    return Mean, Median, SE, quants
-end
-
-"""
-    _bootstrapgenos_all(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
-
-Perform `iterations` number of bootstrap resampling iterations of all genotypes between pair (`ind1` `ind2`). Returns a vector of length `iterations`
-of the kinship estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `_kinship_boot_all`.
-"""
-@inline function _bootstrapgenos_all(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool, n::Int) where T <: GenoArray where U <: NamedTuple where F
-    relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
-    n_loc = length(locus_names)
-    @sync for iter in 1:iterations
-        Base.Threads.@spawn begin
-            # bootstrap the indices
-            boot_idx = rand(Xoroshiro128Star(), 1:n_loc, n_loc)
-            # sample the source vectors with the resampled/bootstrapped indices
-            ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
-            # get index for genotype appearing missing in at least one individual in the pair
-            keep_idx = nonmissings(ind1_boot, ind2_boot)
-            relate_vec_boot[iter] = method(ind1_boot[keep_idx], ind2_boot[keep_idx], loc_boot[keep_idx], alleles, loc_n = n_per_loci[keep_idx], n_samples = n_loc, inbreeding = inbreeding)
-        end
-    end
-    return relate_vec_boot
-end
-
-
-"""
-    _bootstrapgenos_nonmissing(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
-
-Perform `iterations` number of bootstrap resampling iterations of only shared (nonmissing) genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
-of the kinship estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `_kinship_boot_nonmissing`.
-"""
-@inline function _bootstrapgenos_nonmissing(ind1::T, ind2::T, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::U; method::F, iterations::Int, inbreeding::Bool) where T <: GenoArray where U <: NamedTuple where F
-    relate_vec_boot = Vector{Union{Missing,Float64}}(undef, iterations)
-    n_loc = length(locus_names)
-    @sync for iter in 1:iterations
-        Base.Threads.@spawn begin
-            # bootstrap the indices
-            boot_idx = rand(Xoroshiro128Star(), 1:n_loc, n_loc)
-            # sample the source vectors with the resampled/bootstrapped indices
-            ind1_boot, ind2_boot, loc_boot, n_per_loci = map(i -> getindex(i, boot_idx), [ind1, ind2, locus_names, n_per_loc])
-            # faster/cheaper n counting
-            relate_vec_boot[iter] = method(ind1_boot, ind2_boot, loc_boot, alleles, loc_n = n_per_loci, n_samples = n_loc, inbreeding = inbreeding)
-        end
-    end
-    return relate_vec_boot
-end
-
-#FEATURE namedtuple output
-"""
-    _kinship_boot_all(::PopData, sample_names::Vector{String}, method::KinshipMethod; iterations::Int, interval::Tuple{Float64, Float64})
-
-Calculate pairwise kinship between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
-the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `kinship`.
-"""
-function _kinship_boot_all(data::PopData, sample_names::Vector{String}, method::KinshipMethod; iterations::Int = 100, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
-    loci_names = Symbol.(loci(data))
-    uniq_pops = unique(data.metadata.sampleinfo.population)
-    if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
-        sample_pairs = simpairs(sample_names)
+function kinship_noboot(data::PopData; method::Function, kwargs...)
+    locmtx = locimatrix(data)
+    ids = samplenames(data)
+    vecs = [i for i in eachrow(locmtx)]
+    if Symbol(method) ∈ [:Blouin, :LiHorvitz, :Lynch]
+        out = NamedArray(method.(vecs, permutedims(vecs)))
+    elseif Symbol(method) ∈ [:Loiselle, :LynchLi, :LynchRitland, :Moran, :QuellerGoodnight, :Ritland]
+        allelefrequencies = allelefreq(data)
+        out = NamedArray(method.(vecs, permutedims(vecs), Ref(allelefrequencies), n_samples = length(ids)))
     else
-        sample_pairs = pairwisepairs(sample_names)
-    end    
-    n_pairs = length(sample_pairs)
-    n_samples = data.metadata.samples
-    allelefrequencies = allelefreq(data)
-    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
-    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
-    boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
-    boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, n_pairs), 1:length(method))
-    shared_loci = Vector{Int}(undef, n_pairs)
-    p = Progress(n_pairs*length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
-    popdata_idx = groupby(data.genodata, :name)
-    @inbounds for i in 1:n_pairs
-        @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
-        @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
-        # get index for genotype appearing missing in at least one individual in the pair
-        keep_idx = nonmissings(geno1, geno2)
-        # generate nonmissing genotype data 
-        gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
-        @inbounds shared_loci[i] = length(keep_idx)
-        @sync @inbounds for (j, mthd) in enumerate(method)
-            Base.Threads.@spawn begin
-                @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allelefrequencies, loc_n = n_per_loci, n_samples = n_samples, inbreeding = inbreeding)
-                boot_out = _bootstrapgenos_all(geno1, geno2, loci_names, n_per_loci, allelefrequencies, method = mthd, iterations = iterations, inbreeding = inbreeding, n = j+1)
-                @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = _bootstrapsummary(boot_out, interval)
-                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * " of " * "$(n_pairs)" * ")"
-                ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
-            end
-        end
+        throw(ArgumentError("Method $method is not a valid method. See ?kinship for a list of options."))
+    
     end
-    method_colnames = [Symbol("$i") for i in method]
-    boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
-    boot_median_colnames = [Symbol("$i"*"_median") for i in method]
-    boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
-    CI_percent = convert(Int64, round(interval[2] - interval[1], digits = 2) * 100)
-    boot_CI_colnames = [Symbol("$i"*"_CI_"*"$CI_percent") for i in method]
+    setnames!(out, String.(ids),1)
+    setnames!(out, String.(ids),2)
+    return out
+end 
 
-    out_dfs = map(method_colnames) do mthod
-        DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
-    end
-    @inbounds for (i, mth) in enumerate(method_colnames)
-        out_dfs[i][:, mth] = relate_vecs[i]
-        out_dfs[i][:, boot_mean_colnames[i]] = boot_means[i]
-        out_dfs[i][:, boot_median_colnames[i]] = boot_medians[i]
-        out_dfs[i][:, boot_se_colnames[i]] = boot_ses[i]
-        out_dfs[i][:, boot_CI_colnames[i]] = boot_CI[i]
-    end
-    return (; (method_colnames .=> out_dfs)...)
+_Blouin(geno1::NTuple{2,T}, geno2::NTuple{2,T}) where T<:Union{Int16, Int8} = @inbounds ((geno1[1] ∈ geno2) & (geno2[1] ∈ geno1)) + ((geno1[2] ∈ geno2) & (geno2[2] ∈ geno1))
+_Blouin(geno1::Missing, geno2::Genotype) = missing
+_Blouin(geno1::Genotype, geno2::Missing) = missing
+_Blouin(geno1::Missing, geno2::Missing) = missing
+Blouin(ind1::GenoArray, ind2::GenoArray)::Float64 = @inbounds mean(skipmissing(_Blouin.(ind1, ind2) ./ 2))
+
+# TODO check math, diagonal should = 1
+_LiHorvitz(geno1::NTuple{2,T}, geno2::NTuple{2,T}) where T<:Union{Int16, Int8} = sum(geno1 .∈ collect(geno2)')
+_LiHorvitz(geno1::Missing, geno2::Genotype) = missing
+_LiHorvitz(geno1::Genotype, geno2::Missing) = missing
+_LiHorvitz(geno1::Missing, geno2::Missing) = missing
+LiHorvitz(ind1::GenoArray, ind2::GenoArray)::Float64 = @inbounds mean(skipmissing(_LiHorvitz.(ind1, ind2) ./4))
+
+_Lynch(geno1::NTuple{2,T}, geno2::NTuple{2,T}) where T<:Union{Int16, Int8} = @inbounds ((geno1[1] ∈ geno2) + (geno1[2] ∈ geno2) + (geno2[1] ∈ geno1) + (geno2[2] ∈ geno1))
+_Lynch(geno1::Missing, geno2::Genotype) = missing
+_Lynch(geno1::Genotype, geno2::Missing) = missing
+_Lynch(geno1::Missing, geno2::Missing) = missing
+Lynch(ind1::GenoArray, ind2::GenoArray)::Float64 = @inbounds mean(skipmissing(_Lynch.(ind1, ind2) ./ 4))
+
+
+function _Loiselle(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{IntT, Float64}) where T<:Union{Int16, Int8}
+    @inbounds sum(skipmissing([((sum(geno1 .== allele) / 2.0) - frqdict[allele]) * ((sum(geno2 .== allele) / 2.0) - frqdict[allele]) for allele in keys(frqdict)]))
+end
+_Loiselle(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
+_Loiselle(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
+_Loiselle(geno1::Missing, geno2::Missing, frqdict::Dict) = missing
+function Loiselle(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: NamedTuple
+    kw = Dict(kwargs)
+    frqdict = collect(allelefrq)
+    num = _Loiselle.(ind1, ind2, frqdict)
+    denom = [sum(values(frqs) .* (1 .- values(frqs))) for frqs in frqdict]
+    return sum(skipmissing(num)) / sum(skipmissing(denom)) + 2.0 / (2 * kw[:n_samples] - 1)
 end
 
 
-"""
-    _kinship_boot_nonmissing(::PopData, sample_names::Vector{String}, method::KinshipMethod; iterations::Int, interval::Tuple{Float64, Float64}) where F
-
-Calculate pairwise kinship between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
-the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `kinship`.
-"""
-function _kinship_boot_nonmissing(data::PopData, sample_names::Vector{String}, method::KinshipMethod; iterations::Int, interval::Tuple{Float64, Float64} = (0.025, 0.975), inbreeding::Bool) where F
-    loci_names = Symbol.(loci(data))
-    uniq_pops = unique(data.metadata.sampleinfo.population)
-    if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
-        sample_pairs = simpairs(sample_names)
-    else
-        sample_pairs = pairwisepairs(sample_names)
-    end
-    n_pairs = length(sample_pairs)
-    n_samples = data.metadata.samples
-    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
-    allelefrequencies = allelefreq(data)
-    relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
-    boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
-    boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, n_pairs), 1:length(method))
-    shared_loci = Vector{Int}(undef, n_pairs)
-    p = Progress(n_pairs * length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
-    popdata_idx = groupby(data.genodata, :name)
-    @inbounds for i in 1:n_pairs
-        @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
-        @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
-        # get index for genotype appearing missing in at least one individual in the pair
-        keep_idx = nonmissings(geno1, geno2)
-        # generate nonmissing genotype data 
-        gen1, gen2, loc, n_per_loc = (i[keep_idx] for i in (geno1, geno2, loci_names, n_per_loci))
-        @inbounds shared_loci[i] = length(keep_idx)
-        @inbounds @sync for (j, mthd) in enumerate(method)
-            Base.Threads.@spawn begin
-                @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allelefrequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
-                boot_out = _bootstrapgenos_nonmissing(gen1, gen2, loc, n_per_loc, allelefrequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
-                @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = _bootstrapsummary(boot_out, interval)
-                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * " of " * "$n_pairs" * ")"
-                ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
-            end
-        end
-    end
-    method_colnames = [Symbol("$i") for i in method]
-    boot_mean_colnames = [Symbol("$i"*"_mean") for i in method]
-    boot_median_colnames = [Symbol("$i"*"_median") for i in method]
-    boot_se_colnames = [Symbol("$i"*"_SE") for i in method]
-    CI_percent = convert(Int64, round(interval[2] - interval[1], digits = 2) * 100)
-    boot_CI_colnames = [Symbol("$i"*"_CI_"*"$CI_percent") for i in method]
-
-    out_dfs = map(method_colnames) do mthod
-        DataFrame(:sample_1 => map(i -> i[1], sample_pairs), :sample_2 => map(i -> i[2], sample_pairs), :n_loci => shared_loci)
-    end
-    @inbounds for (i, mth) in enumerate(method_colnames)
-        out_df[:, mth] = relate_vecs[i]
-        out_df[:, boot_mean_colnames[i]] = boot_means[i]
-        out_df[:, boot_median_colnames[i]] = boot_medians[i]
-        out_df[:, boot_se_colnames[i]] = boot_ses[i]
-        out_df[:, boot_CI_colnames[i]] = boot_CI[i]
-    end
-    return (; (method_colnames .=> out_dfs)...)
+function _LynchLi(geno1::NTuple{2,T}, geno2::NTuple{2,T}) where T<:Union{Int16, Int8}
+    a,b = geno1 ; c,d = geno2
+    0.5 * (((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (a == b))) + ((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (c == d))))
 end
-
-"""
-    _kinship_noboot(::PopData, sample_names::Vector{String}; method::F) where F
-
-Calculate pairwise kinship between all combinations of the provided `sample_names` for each `method` provided. 
-This is an internal function with arguments provided by `kinship`.
-"""
-function _kinship_noboot2(data::PopData, sample_names::Vector{String}, method::T, inbreeding::Bool) where T<:KinshipMethod
-    loci_names = Symbol.(loci(data))
-    n_samples = data.metadata.samples
-    uniq_pops = unique(data.metadata.sampleinfo.population)
-    if first(uniq_pops) ∈ ["fullsib", "halfsib", "unrelated", "parent_offspring"]
-        sample_pairs = simpairs(sample_names) |> collect
-    else
-        sample_pairs = pairwisepairs(sample_names) |> collect
-    end
-    n_pairs = length(sample_pairs)
-    relate_vec = Vector{Union{Missing,Float64}}(undef, n_pairs)
-    n_per_loci = DataFrames.combine(groupby(data.genodata, :locus), :genotype => nonmissing => :n)[:, :n]
-    allelefrequencies = allelefreq(data)
-    shared_loci = Vector{Int}(undef, n_pairs)
-    #p = Progress(n_pairs, dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
-    popdata_idx = groupby(data.genodata, :name)
-    @inbounds @sync for i in 1:n_pairs
-        Base.Threads.@spawn begin
-            @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
-            @inbounds geno2 = popdata_idx[(sample_pairs[i][2],)].genotype
-            keep_idx = nonmissings(geno1, geno2)
-            @inbounds shared_loci[i] = length(keep_idx)
-            relate_vec[i] = method(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allelefrequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding)
-            #pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * " of " * "$(n_pairs)" * ")"
-            #ProgressMeter.next!(p; showvalues = [(:Pair, pair_text)])
-            end
-    end
-    out_df = DataFrame(:sample_1 => getindex.(sample_pairs, 1), :sample_2 => getindex.(sample_pairs, 2), :n_loci => shared_loci)
-    out_df[:, Symbol(method)] = relate_vec
-    return out_df
+_LynchLi(geno1::Missing, geno2::Genotype) = missing
+_LynchLi(geno1::Genotype, geno2::Missing) = missing
+_LynchLi(geno1::Missing, geno2::Missing) = missing
+function LynchLi(ind1::T, ind2::T, alleles::U; kwargs...) where T <: GenoArray where U <: NamedTuple
+    Sxy = _LynchLi.(ind1, ind2)
+    #TODO Change to unbiased formulation (eq 25)
+    S0 = @inbounds [2.0 * sum(values(loc) .^ 2) - sum(values(loc) .^ 3) for loc in alleles]
+    return @inbounds sum(skipmissing(Sxy .- S0)) / sum(1.0 .- S0)
 end
 
 
-"""
-```
-# compare all samples
-kinship(::PopData, method::KinshipMethod ; iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
+function _LynchRitland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+    a,b = geno1
+    c,d = geno2
+    fq_a, fq_b, fq_c, fq_d = map(i -> frqdict[i], (a,b,c,d))
+    n1 = fq_a * ((b == c) + (b == d)) + fq_b * ((a == c) + (a == d)) - 4.0 * fq_a * fq_b
+    n2 = fq_c * ((d == a) + (d == b)) + fq_d * ((c == a) + (c == b)) - 4.0 * fq_c * fq_d
+    d1 = 2.0 * (1.0 + (a == b)) * (fq_a + fq_b) - 8.0 * fq_a * fq_b
+    d2 = 2.0 * (1.0 + (c == d)) * (fq_c + fq_d) - 8.0 * fq_c * fq_d
+    WL1 = ((1 + (a == b)) * (fq_a + fq_b) - 4 * fq_a * fq_b) / (2 * fq_a * fq_b)
+    WL2 = ((1 + (c == d)) * (fq_c + fq_d) - 4 * fq_c * fq_d) / (2 * fq_c * fq_d)
+    numer = ((n1 / d1) * WL1 + (n2 / d2) * WL2)
+    denom = WL1 + WL2
+    return (numer, denom)
+end
+_LynchRitland(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
+_LynchRitland(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
+_LynchRitland(geno1::Missing, geno2::Missing , frqdict::Dict) = missing
 
-# to compare specific samples
-kinship(::PopData, samples::Vector{String}; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
-```
-Return a dataframe of pairwise kinship estimates for all or select pairs of `samples` in a `PopData` object using 
-method(s) `F` where `F` is one or several of the methods listed below. If no bootstrapping is required, then the only 
-necessary keyword to provide is `method = ` and `inbreeding = ` for the `dyadicLikelihood` method (see examples below). 
-**Note:** samples must be diploid.
+function LynchRitland(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: NamedTuple
+    frqdict = collect(allelefrq)
+    numdenom = _LynchRitland.(ind1, ind2, frqdict)
+    numer = sum(getindex.(skipmissing(numdenom), 1))
+    denom = sum(getindex.(skipmissing(numdenom), 2))
+    return numer / (denom ./ 2.0)
+end
 
-### Estimator methods
-The available estimators are listed below and are functions themselves. `kinship` takes the
-function names as arguments (**case sensitive**), therefore do not use quotes or colons
-in specifying the methods. Multiple methods can be supplied as a vector. All of these methods will tab-autocomplete.
-For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
-
-- `Blouin`
-- `LiHorvitz`
-- `Loiselle`
-- `Lynch`
-- `LynchLi`
-- `LynchRitland`
-- `Moran`
-- `QuellerGoodnight`
-- `Ritland`
-
-
-### Simulated siblingship comparison
-If validating the estimators using `PopGenSims.jl` to simulate sibship relationships, `kinship`
-will recognize `PopData` generated in that manner (the `population` column) and only compare siblingship
-pairs. 
-
-### Inbreeding
-Use the `inbreeding` keyword to specify whether to allow inbreeding (`true`) or not (`false`, default).
-This is only relevant for the `dyadicLikelihood` method (not yet released)
-
-### Bootstrapping
-To calculate means, medians, standard errors, and confidence intervals using bootstrapping,
-set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
-of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%),
-however that can be changed by supplying the keyword `interval = (low, high)` where `low` and `high` are the intervals you want 
-(as `AbstractFloat`). Performing bootstrapping will return a NamedTuple of DataFrames, with each field in the NamedTuple
-corresponding to the estimator `Method` it describes, which can be merged into one large dataframe using `mergekinship()`.
-
-#### Resampling methods
-There are two available resampling methods, `"all"` (default  & recommended) and `"nonmissing"`.
-- `"all"` : resamples all loci for a pair of individuals and then drops missing loci between them
-    - speed: slower
-    - pro: better resampling variation
-    - con: by chance some iterations may have a lot of missing loci that have to be dropped
-- `"nonmissing"` : resamples only the shared non-missing loci between the pair
-    - speed: faster
-    - pro: every iteration guarantees the same number of loci compared between the pair
-    - con: too-tight confidence intervals due to less possible variation
-
-**Examples**
-```
-julia> cats = @nancycats;
-
-julia> kinship(cats, method = Ritland)
-27966×4 DataFrame
-   Row │ sample_1  sample_2  n_loci  Ritland     
-       │ String    String    Int64   Float64?    
-───────┼─────────────────────────────────────────
-     1 │ N215      N216           8   0.258824
-     2 │ N215      N217           8   0.193238
-     3 │ N215      N218           8   0.127497
-     4 │ N215      N219           8   0.0453471
-   ⋮   │    ⋮         ⋮        ⋮          ⋮
- 27963 │ N297      N290           7   0.189647
- 27964 │ N281      N289           8   0.0892068
- 27965 │ N281      N290           7   0.104614
- 27966 │ N289      N290           7   0.0511663
-                               27958 rows omitted
-
-julia> kinship(cats, ["N7", "N111", "N115"], method = [Ritland, Loiselle])
-3×5 DataFrame
- Row │ sample_1  sample_2  n_loci  Ritland     Loiselle   
-     │ String    String    Int64   Float64?    Float64?   
-─────┼────────────────────────────────────────────────────
-   1 │ N7        N111           9  -0.129432   -0.101618
-   2 │ N7        N115           9  -0.0183925  -0.0428898
-   3 │ N111      N115           9   0.0240152   0.13681
-
-julia> rel_out = kinship(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975));
-
-julia> rel_out.Loiselle
-3×8 DataFrame
- Row │ sample_1  sample_2  n_loci  Loiselle    Loiselle_mean  Loiselle_median  Loiselle_SE  Loiselle_CI_95
-     │ String    String    Int64   Float64?    Float64?       Float64?         Float64?     Tuple…?
-─────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-   1 │ N7        N111           9  -0.101618       0.0164593        0.0168983    0.0511942  (-0.0670707, 0.104008)
-   2 │ N7        N115           9  -0.0428898      0.0771664        0.0880589    0.0982462  (-0.0428068, 0.183625)
-   3 │ N111      N115           9   0.13681        0.255124         0.24991      0.267319   (0.103864, 0.421979)
-
-# merge results into one big dataframe
-
-julia> mergekinship(rel_out)
-3×13 DataFrame
- Row │ sample_1  sample_2  n_loci  Loiselle    Loiselle_mean  Loiselle_ ⋯ 
-     │ String    String    Int64   Float64?    Float64?       Float64?  ⋯
-─────┼───────────────────────────────────────────────────────────────────
-   1 │ N7        N111           9  -0.101618       0.0164593        0.0 ⋯
-   2 │ N7        N115           9  -0.0428898      0.0771664        0.0  
-   3 │ N111      N115           9   0.13681        0.255124         0.2  
-                                                        8 columns omitted
-```
-"""
-function kinship2(data::PopData, sample_names::Vector{String}, method::T; iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where T<:KinshipMethod
-    data.metadata.ploidy == 2 || error("kinship analyses currently only support diploid samples")
-    errs = ""
-    all_samples = samplenames(data)
-    if sample_names != all_samples
-        [errs *= "$i," for i in sample_names if i ∉ all_samples]
-        errs != "" && error("Samples not found in the PopData: " * errs)
+function _Moran(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+    num = 0.0 ; denom = 0.0
+    for allele in keys(frqdict)
+        fq = frqdict[allele]
+        num += ((sum(geno1 .== allele) / 2.0) - fq) * ((sum(geno2 .== allele) / 2.0) - fq)
+        denom += (((sum(geno1 .== allele) / 2.0) - fq)^2 + ((sum(geno2 .== allele) / 2.0) - fq)^2) / 2.0
     end
-     if iterations > 0
-        if resample == "all"
-            _kinship_boot_all(data, sample_names, method, iterations = iterations, interval = interval, inbreeding = inbreeding)
-        elseif resample == "nonmissing"
-            _kinship_boot_nonmissing(data, sample_names, method, iterations = iterations, interval = interval, inbreeding = inbreeding)
-        else
-            throw(ArgumentError("Invalid resample method. Please choose from resample methods \"all\" or \"nonmissing\""))
-        end
-    else
-        _kinship_noboot2(data, sample_names, method, inbreeding)
-    end
+    return (num, denom)
+end
+_Moran(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
+_Moran(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
+_Moran(geno1::Missing, geno2::Missing , frqdict::Dict) = missing
+
+function Moran(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: NamedTuple
+    #TODO NEED TO CHECK TO CONFIRM EQUATIONS
+    frqdict = collect(allelefrq)
+    numdenom = _Moran.(ind1, ind2, frqdict)
+    numer = sum(getindex.(skipmissing(numdenom), 1))
+    denom = sum(getindex.(skipmissing(numdenom), 2))
+    return numer/denom
 end
 
 
-function kinship2(data::PopData, method::T; iterations::Int64 = 0, interval::Tuple{Float64, Float64} = (0.025, 0.975), resample::String = "all", inbreeding::Bool = false) where T <:KinshipMethod
-    sample_names = string.(samplenames(data))
-    kinship2(data, sample_names, method, iterations = iterations, interval = interval, resample = resample, inbreeding = inbreeding)
+function _QuellerGoodnight(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+    a,b = geno1
+    c,d = geno2
+    ident = ((a == c) + (a == d) + (b == c) + (b == d))
+    fq_a, fq_b, fq_c, fq_d = map(i -> frqdict[i], (a,b,c,d))
+
+    num1 = ident - 2.0 * (fq_a + fq_b)
+    num2 = ident - 2.0 * (fq_c + fq_d)
+
+    denom1 = (2.0 * (1.0 + (a==b) - fq_a - fq_b))
+    denom2 = (2.0 * (1.0 + (c==d) - fq_c - fq_d))
+    return (num1, num2, denom1, denom2)
+end
+_QuellerGoodnight(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
+_QuellerGoodnight(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
+_QuellerGoodnight(geno1::Missing, geno2::Missing , frqdict::Dict) = missing
+
+function QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: NamedTuple
+    frqdict = collect(allelefrq)
+    numdenom = _QuellerGoodnight.(ind1, ind2, frqdict)
+    numer1 = sum(getindex.(skipmissing(numdenom), 1))
+    numer2 = sum(getindex.(skipmissing(numdenom), 2))
+    denom1 = sum(getindex.(skipmissing(numdenom), 3))
+    denom2 = sum(getindex.(skipmissing(numdenom), 4))
+    return (numer1/denom1 + numer2/denom2)/2.0
 end
 
 
-"""
-    mergekinship(data::NamedTuple)
-A convenience function that takes the `NamedTuple` output from `kinship` performed with bootstrapping
-and returns one large DataFrame.
-"""
-function mergekinship(data::NamedTuple)
-    k = keys(data)
-    k1 = k[1]
-    outdf = deepcopy(data[Symbol(k1)])
-    for key in k[2:end]
-        outdf = innerjoin(
-            outdf,
-            select(data[Symbol(key)], Not(:n_loci)),
-            on = [:sample_1, :sample_2]
-        )
+function _Ritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+    a,b = geno1
+    c,d = geno2
+    alle = (a,b,c,d)
+    A = length(frqdict) - 1
+    R = 0.0
+    for i in unique(alle)
+        # Individual locus relatedness value (eq 7 in paper)
+        R += sum(i .== alle) / (4.0 * frqdict[i])
+        #R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4.0 * alleles[loc][i]))
     end
-    return outdf
+    R = (2.0 / A) * (R - 1.0)
+    # numerator for weighted combination of loci
+    num = (R * A)
+    # denominator for weighted combination of loci
+    denom = A
+    return (num, denom)
+end
+_Ritland(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
+_Ritland(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
+_Ritland(geno1::Missing, geno2::Missing , frqdict::Dict) = missing
+
+function Ritland(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: NamedTuple
+    frqdict = collect(allelefrq)
+    numdenom = _Ritland.(ind1, ind2, frqdict)
+    numer = sum(getindex.(skipmissing(numdenom), 1))
+    denom = sum(getindex.(skipmissing(numdenom), 2))
+    return numer / denom
 end
