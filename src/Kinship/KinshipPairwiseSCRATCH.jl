@@ -10,7 +10,9 @@ function kinship_noboot(data::PopData; method::Function, kwargs...)
             @inbounds v1 = view(locmtx,i,:)
             @inbounds for j in i+1:n
                 @inbounds v2 = view(locmtx,j,:)
-                @inbounds result[i,j] = method(v1, v2)
+                est = method(v1, v2)
+                @inbounds result[i,j] = est
+                @inbounds result[j,i] = est
             end
         end
     elseif Symbol(method) ∈ [:Loiselle, :Loiselle2, :LynchLi, :LynchRitland, :Moran, :QuellerGoodnight, :Ritland]
@@ -19,7 +21,9 @@ function kinship_noboot(data::PopData; method::Function, kwargs...)
             @inbounds v1 = view(locmtx,i,:)
             @inbounds for j in i+1:n
                 @inbounds v2 = view(locmtx,j,:)
-                @inbounds result[i,j] = method(v1, v2, allelefrequencies, n_samples = n)
+                est = method(v1, v2, allelefrequencies, n_samples = n)
+                @inbounds result[i,j] = est
+                @inbounds result[j,i] = est
             end
         end
     else
@@ -28,12 +32,9 @@ function kinship_noboot(data::PopData; method::Function, kwargs...)
     return result
 end 
 
-function _Blouin(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8} 
+function _blouin(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8} 
     @inbounds ((geno1[1] ∈ geno2) & (geno2[1] ∈ geno1)) + ((geno1[2] ∈ geno2) & (geno2[2] ∈ geno1))
 end
-_Blouin(geno1::Missing, geno2::Genotype) = missing
-_Blouin(geno1::Genotype, geno2::Missing) = missing
-_Blouin(geno1::Missing, geno2::Missing) = missing
 function Blouin(ind1::GenoArray, ind2::GenoArray)::Float64
     l = length(ind1)
     res = 0.0
@@ -44,7 +45,7 @@ function Blouin(ind1::GenoArray, ind2::GenoArray)::Float64
         if (i1 === missing) | (i2 === missing)
             continue
         else
-            res += _Blouin(i1, i2)
+            res += _blouin(i1, i2)
             n += 1
         end
     end
@@ -52,12 +53,9 @@ function Blouin(ind1::GenoArray, ind2::GenoArray)::Float64
 end
 
 # TODO check math, should diag = 1?
-function _LiHorvitz(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8}
+function _lihorvitz(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8}
     @inbounds (geno1[1] == geno2[1]) + (geno1[1] == geno2[2]) + (geno1[2] == geno2[1]) + (geno1[2] == geno2[2]) 
 end
-_LiHorvitz(geno1::Missing, geno2::Genotype) = missing
-_LiHorvitz(geno1::Genotype, geno2::Missing) = missing
-_LiHorvitz(geno1::Missing, geno2::Missing) = missing
 function LiHorvitz(ind1::GenoArray, ind2::GenoArray)::Float64
     l = length(ind1)
     res = 0.0
@@ -68,19 +66,16 @@ function LiHorvitz(ind1::GenoArray, ind2::GenoArray)::Float64
         if (i1 === missing) | (i2 === missing)
             continue
         else
-            res += _LiHorvitz(i1, i2)
+            res += _lihorvitz(i1, i2)
             n += 1
         end
     end
     res / n / 4.0
 end
 
-function _Lynch(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8}
+function _lynch(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8}
     @inbounds ((geno1[1] ∈ geno2) + (geno1[2] ∈ geno2) + (geno2[1] ∈ geno1) + (geno2[2] ∈ geno1))
 end
-_Lynch(geno1::Missing, geno2::Genotype) = missing
-_Lynch(geno1::Genotype, geno2::Missing) = missing
-_Lynch(geno1::Missing, geno2::Missing) = missing
 function Lynch(ind1::GenoArray, ind2::GenoArray)::Float64
     l = length(ind1)
     res = 0.0
@@ -91,35 +86,29 @@ function Lynch(ind1::GenoArray, ind2::GenoArray)::Float64
         if (i1 === missing) | (i2 === missing)
             continue
         else
-            res += _Lynch(i1, i2)
+            res += _lynch(i1, i2)
             n += 1
         end
     end
     res / n / 4.0
 end
 
+
 function _loiselle_num(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64})::Float64 where T<:Union{Int16, Int8}
-    res = 0.0
-    @inbounds for (allele,frq) in pairs(frqdict) 
-        @inbounds res += ((((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) - frq) * ((((geno2[1] == allele) + (geno2[2] == allele)) / 2.0) - frq)     
+    sum(pairs(frqdict)) do (allele, frq)
+        ((((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) - frq) * ((((geno2[1] == allele) + (geno2[2] == allele)) / 2.0) - frq)     
     end
-    return res
 end
-_loiselle_num(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
-_loiselle_num(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
-_loiselle_num(geno1::Missing, geno2::Missing, frqdict::Dict) = missing
 function _loiselle_denom(freqs)::Float64
-    res = 0.0
-    for i in freqs
-        res += i * (1-i)
+    sum(freqs) do fq
+        fq * (1.0-fq)
     end
-    return res
 end
 function Loiselle(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
     l = length(ind1)
     numer = 0.0
     denom = 0.0
-    n = 0
+    #n = 0
     @inbounds for i in 1:l
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
@@ -130,7 +119,7 @@ function Loiselle(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) whe
             fq = values(frqs)
             numer += _loiselle_num(i1, i2, frqs)
             @inbounds denom += _loiselle_denom(fq)
-            n += 1
+            #n += 1
         end
     end
     numer / denom + 2.0 / (2.0 * kwargs[:n_samples] - 1.0)
@@ -141,9 +130,6 @@ function _lynchli(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Unio
     a,b = geno1 ; c,d = geno2
     0.5 * (((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (a == b))) + ((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (c == d))))
 end
-_lynchli(geno1::Missing, geno2::Genotype) = missing
-_lynchli(geno1::Genotype, geno2::Missing) = missing
-_lynchli(geno1::Missing, geno2::Missing) = missing
 function _lynchliS0(alleles)::Float64
     res1 = 0.0
     res2 = 0.0
@@ -173,24 +159,23 @@ function LynchLi(ind1::T, ind2::T, alleles::U; kwargs...) where T <: GenoArray w
 end
 
 
-function _LynchRitland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+function _lynchritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     a,b = geno1
     c,d = geno2
-    fq_a, fq_b, fq_c, fq_d = @inbounds map(i -> frqdict[i],  (a,b,c,d))
+    fq_a = frqdict[a]
+    fq_b = frqdict[b]
+    fq_c = frqdict[c]
+    fq_d = frqdict[d]
     n1 = fq_a * ((b == c) + (b == d)) + fq_b * ((a == c) + (a == d)) - 4.0 * fq_a * fq_b
     n2 = fq_c * ((d == a) + (d == b)) + fq_d * ((c == a) + (c == b)) - 4.0 * fq_c * fq_d
     d1 = 2.0 * (1.0 + (a == b)) * (fq_a + fq_b) - 8.0 * fq_a * fq_b
     d2 = 2.0 * (1.0 + (c == d)) * (fq_c + fq_d) - 8.0 * fq_c * fq_d
-    WL1 = ((1 + (a == b)) * (fq_a + fq_b) - 4 * fq_a * fq_b) / (2 * fq_a * fq_b)
-    WL2 = ((1 + (c == d)) * (fq_c + fq_d) - 4 * fq_c * fq_d) / (2 * fq_c * fq_d)
+    WL1 = ((1.0 + (a == b)) * (fq_a + fq_b) - 4.0 * fq_a * fq_b) / (2.0 * fq_a * fq_b)
+    WL2 = ((1.0 + (c == d)) * (fq_c + fq_d) - 4.0 * fq_c * fq_d) / (2.0 * fq_c * fq_d)
     numer = ((n1 / d1) * WL1 + (n2 / d2) * WL2)
     denom = WL1 + WL2
     return (numer, denom)
 end
-_LynchRitland(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
-_LynchRitland(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
-_LynchRitland(geno1::Missing, geno2::Missing , frqdict::Dict) = missing
-
 function LynchRitland(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
     numer = 0.0
     denom = 0.0
@@ -201,7 +186,7 @@ function LynchRitland(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...)
         if (i1 === missing) | (i2 === missing)
             continue
         else
-            n, d = _LynchRitland(i1, i2, freqs)
+            n, d = _lynchritland(i1, i2, freqs)
             numer += n
             denom += d
         end
@@ -210,7 +195,7 @@ function LynchRitland(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...)
 end
 
 # FIX _MORAN MATH
-function _Moran(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+function _moran(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     num = 0.0 ; denom = 0.0
     @inbounds for (allele, fq) in pairs(frqdict)
         num += (((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) * (((geno2[1] == allele) + (geno2[2] == allele)) / 2.0)
@@ -220,10 +205,6 @@ function _Moran(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64
     end
     return (num, denom)
 end
-_Moran(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
-_Moran(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
-_Moran(geno1::Missing, geno2::Missing , frqdict::Dict) = missing
-
 function Moran(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
     numer = 0.0
@@ -235,23 +216,23 @@ function Moran(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where 
         if (i1 === missing) | (i2 === missing)
             continue
         else
-            n, d = _Moran(i1, i2, freqs)
+            n, d = _moran(i1, i2, freqs)
             numer += n
             denom += d
         end
     end    
-    #numdenom = skipmissing(_Moran.(ind1, ind2, allelefrq))
-    #numer = sum(getindex.(numdenom, 1))
-    #denom = sum(getindex.(numdenom, 2))
     return numer/(denom / 2.0)
 end
 
 
-function _QuellerGoodnight(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+function _quellergoodnight(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     a,b = geno1
     c,d = geno2
     ident = ((a == c) + (a == d) + (b == c) + (b == d))
-    fq_a, fq_b, fq_c, fq_d = map(i -> frqdict[i], (a,b,c,d))
+    fq_a = frqdict[a]
+    fq_b = frqdict[b]
+    fq_c = frqdict[c]
+    fq_d = frqdict[d]
 
     num1 = ident - 2.0 * (fq_a + fq_b)
     num2 = ident - 2.0 * (fq_c + fq_d)
@@ -260,16 +241,25 @@ function _QuellerGoodnight(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict
     denom2 = (2.0 * (1.0 + (c==d) - fq_c - fq_d))
     return (num1, num2, denom1, denom2)
 end
-_QuellerGoodnight(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
-_QuellerGoodnight(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
-_QuellerGoodnight(geno1::Missing, geno2::Missing , frqdict::Dict) = missing
-
 function QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
-    numdenom = skipmissing(_QuellerGoodnight.(ind1, ind2, allelefrq))
-    numer1 = sum(getindex.(numdenom, 1))
-    numer2 = sum(getindex.(numdenom, 2))
-    denom1 = sum(getindex.(numdenom, 3))
-    denom2 = sum(getindex.(numdenom, 4))
+    numer1 = 0.0
+    denom1 = 0.0
+    numer2 = 0.0
+    denom2 = 0.0
+    @inbounds for i in 1:length(ind1)
+        @inbounds i1 = ind1[i]
+        @inbounds i2 = ind2[i]
+        @inbounds freqs = allelefrq[i]
+        if (i1 === missing) | (i2 === missing)
+            continue
+        else
+            @inbounds n1, n2, d1, d2 = _quellergoodnight(i1, i2, freqs)
+            numer1 += n1
+            denom1 += d1
+            numer2 += n2
+            denom2 += d2
+        end
+    end    
     return (numer1/denom1 + numer2/denom2)/2.0
 end
 
@@ -277,29 +267,29 @@ end
 function _Ritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     a,b = geno1
     c,d = geno2
-    alle = (a,b,c,d)
-    A = length(frqdict) - 1
+    A = length(frqdict) - 1.0
     R = 0.0
-    for i in unique(alle)
-        # Individual locus relatedness value (eq 7 in paper)
-        R += sum(i .== alle) / (4.0 * frqdict[i])
-        #R += ((((a == i) + (b == i)) * ((c == i) + (d == i))) / (4.0 * alleles[loc][i]))
+    for (allele, frq) in pairs(frqdict)
+        R += ((((a == allele) + (b == allele)) * ((c == allele) + (d == allele))) / (4.0 * frq))
     end
-    R = (2.0 / A) * (R - 1.0)
-    # numerator for weighted combination of loci
-    num = (R * A)
-    # denominator for weighted combination of loci
-    denom = A
-    return (num, denom)
+    R = ((2.0 / A) * (R - 1.0)) * A
+    return (R, A)
 end
-_Ritland(geno1::Missing, geno2::Genotype, frqdict::Dict) = missing
-_Ritland(geno1::Genotype, geno2::Missing, frqdict::Dict) = missing
-_Ritland(geno1::Missing, geno2::Missing , frqdict::Dict) = missing
-
 function Ritland(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
-    numdenom = skipmissing(_Ritland.(ind1, ind2, allelefrq))
-    numer = sum(getindex.(numdenom, 1))
-    denom = sum(getindex.(numdenom, 2))
+    numer = 0.0
+    denom = 0.0
+    @inbounds for i in 1:length(ind1)
+        @inbounds i1 = ind1[i]
+        @inbounds i2 = ind2[i]
+        @inbounds freqs = allelefrq[i]
+        if (i1 === missing) | (i2 === missing)
+            continue
+        else
+            n, d = _ritland(i1, i2, freqs)
+            numer += n
+            denom += d
+        end
+    end    
     return numer / denom
 end
 
