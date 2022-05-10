@@ -81,7 +81,7 @@ Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
 @inline function _hetero_exp(data::T) where T <: GenoArray
-    all(ismissing.(data)) == true ? missing : 1.0 - mapreduce(i -> i^2, + , allelefreq_vec(data))
+    isallmissing(data) == true ? missing : 1.0 - mapreduce(i -> i^2, + , allelefreq_vec(data))
 end
 
 

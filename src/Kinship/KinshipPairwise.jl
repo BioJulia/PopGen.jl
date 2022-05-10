@@ -4,7 +4,7 @@
 Return the mean, median, standard error, and quantiles (given by `witdth`) of kinship resampling.
 """
 @inline function _bootstrapsummary(boot_out::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
-    all(ismissing.(boot_out)) == true && return missing, missing, missing, missing
+    isallmissing(boot_out) == true && return missing, missing, missing, missing
     boot_skipmissing = collect(skipmissing(boot_out))
     n_nonmiss = length(boot_skipmissing)
     Mean = mean(boot_skipmissing)

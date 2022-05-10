@@ -325,31 +325,10 @@ julia> kinshiptotable(a)
 ```
 """
 function kinshiptotable(kinshipresults::T) where T<:NamedMatrix
-    size(kinshipresults,1) == size(kinshipresults,2) || throw(DimensionMismatch("The input matrix must be symmetrical, but has size $(size(kinshipresults))"))
-    ids = names(kinshipresults)[1]
     n = size(kinshipresults,1)
+    n == size(kinshipresults,2) || throw(DimensionMismatch("The input matrix must be symmetrical, but has size $(size(kinshipresults))"))
+    ids = names(kinshipresults)[1]
     vals = [kinshipresults[i, j] for i in 1:n-1 for j in i+1:n]
     idpairs = collect(pairwisepairs(ids))
     DataFrame(:sample1 => first.(idpairs), :sample2 => getindex.(idpairs, 2), :kinship => vals)
-end
-
-
-#TODO move to popgencore or remove
-function allelefreqtuple(data::PopData)
-    Tuple(DataFrames.combine(
-        groupby(data.genodata, :locus),
-        :genotype => allelefreq => :frq
-        )[:, :frq]
-    )
-end
-
-
-
-function _Loiselle2(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64})::Float64 where T<:Union{Int16, Int8}
-    res = sum(values(frqdict).^2)
-    for allele in unique([geno1[1], geno1[2], geno2[1], geno2[2]])
-      frq = frqdict[allele]
-      res += ((((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) - frq) * ((((geno2[1] == allele) + (geno2[2] == allele)) / 2.0) - frq) - frq^2
-    end
-    return res
 end
