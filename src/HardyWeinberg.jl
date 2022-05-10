@@ -11,15 +11,13 @@ function _chisqlocus(locus::T) where T <: GenoArray
     observed = genocount_observed(locus)
 
     chisq_stat = expected
-    @inbounds for genotype in keys(expected)
+    @inbounds for (genotype, freq) in expected
         o = get(observed, genotype, 0)
-        e = get(expected, genotype, 0)
-        chisq_stat[genotype] = (o - e)^2 / e
+        e = freq
+        @inbounds chisq_stat[genotype] = (o - e)^2 / e
     end
-    chisq_stat = values(chisq_stat) |> sum
-    n_geno_exp = length(expected)
-    n_alleles = length(uniquealleles(locus))
-    df = n_geno_exp - n_alleles
+    chisq_stat = sum(values(chisq_stat))
+    df = length(expected) - allelecount(locus)
 
     if df > 0
         chisq_dist = Distributions.Chisq(df)
