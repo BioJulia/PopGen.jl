@@ -12,7 +12,7 @@ function _chisqlocus(locus::T) where T <: GenoArray
 
     chisq_stat = expected
     @inbounds for (genotype, freq) in expected
-        o = get(observed, genotype, 0)
+        o = get(observed, genotype, 0.0)
         e = freq
         @inbounds chisq_stat[genotype] = (o - e)^2 / e
     end
@@ -55,25 +55,17 @@ adjustment method for multiple testing.
 """
 @inline function hwetest(data::PopData; by::String = "locus", correction::String = "none")
     if by == "locus"
-        tmp =DataFrames.combine(
+        out_table =DataFrames.combine(
             groupby(data.genodata, :locus),
             :genotype => _chisqlocus => :chisq
         )
-        out_table = select(tmp, :locus, 
-            :chisq => (i -> getindex.(i, 1)) => :chisq, 
-            :chisq => (i -> getindex.(i, 2)) => :df, 
-            :chisq => (i -> getindex.(i, 3)) => :P 
-        )
+        DataFrames.select!(out_table, :locus, :chisq => [:chisq, :df, :P])
     else
         tmp =DataFrames.combine(
             groupby(data.genodata, [:locus, :population]),
             :genotype => _chisqlocus => :chisq
         )
-        out_table = select(tmp, :locus, :population, 
-            :chisq => (i -> getindex.(i, 1)) => :chisq, 
-            :chisq => (i -> getindex.(i, 2)) => :df, 
-            :chisq => (i -> getindex.(i, 3)) => :P 
-        )
+        out_table = select!(tmp, :locus, :population, :chisq => [:chisq, :df, :P])
     end
     if correction == "none"
         return out_table
