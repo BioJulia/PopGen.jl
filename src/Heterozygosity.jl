@@ -70,10 +70,16 @@ as genotypes returning `true` for `_ishet()`. This is numerically feasible becau
 as `0`.
 """
 @inline function _hetero_obs(data::T) where T <: GenoArray
-    adjusted_vector = _ishet(data) |> skipmissing
-    isempty(adjusted_vector) ? missing : mean(adjusted_vector)
+    skipm = skipmissing(data)
+    isempty(skipm) && return missing
+    h = 0
+    n = 0.0
+    for i in skipm
+        h += _ishet(i)
+        n += 1.0
+    end
+    h / n
 end
-
 
 """
     _hetero_exp(allele_freqs::Vector{T}) where T <: GenoArray
@@ -81,7 +87,13 @@ Returns the expected heterozygosity of an array of genotypes,
 calculated as 1 - sum of the squared allele frequencies.
 """
 @inline function _hetero_exp(data::T) where T <: GenoArray
-    isallmissing(data) == true ? missing : 1.0 - mapreduce(i -> i^2, + , allelefreq_vec(data))
+    frq = allelefreq(data)
+    isempty(frq) && return missing
+    exp = 0.0
+    @inbounds for i in values(frq)
+        exp += i^2
+    end
+    1.0 - exp
 end
 
 
