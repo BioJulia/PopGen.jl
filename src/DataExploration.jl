@@ -16,35 +16,29 @@ missingdata(@gulfsharks, by = "pop")
 """
 @inline function missingdata(data::PopData; by::String = "sample")
     if by ∈ ["sample", "individual"]
-        DataFrames.combine(
-            DataFrames.groupby(data.genodata, :name),
-            :genotype => (i -> count(ismissing, i)) => :missing
-        )
+        gdf = DataFrames.groupby(data.genodata, :name)
     elseif by ∈ ["pop", "population"]
-                DataFrames.combine(
-            DataFrames.groupby(data.genodata, :population),
-            :genotype => (i -> count(ismissing, i)) => :missing
-        )
+        gdf = DataFrames.groupby(data.genodata, :population)
     elseif by ∈ ["locus", "loci"]
-        DataFrames.combine(
-            DataFrames.groupby(data.genodata, :locus),
-            :genotype => (i -> count(ismissing, i)) => :missing
-        )
-
+        gdf = DataFrames.groupby(data.genodata, :locus)
     elseif by ∈ ["detailed", "full"]
-        DataFrames.combine(
-            DataFrames.groupby(data.genodata, [:locus, :population]),
-            :genotype => (i -> count(ismissing, i)) => :missing
-        )
+        gdf = DataFrames.groupby(data.genodata, [:locus, :population])
     else
-        @error "Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"
-        missingdata(data)
+        throw(ArgumentError("Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"))
     end
+    return DataFrames.combine(gdf, :genotype => (i -> count(ismissing, i)) => :missing)
 end
 
 
 function _pwiseidenticalhelper(x::T,y::U)::Float64 where T<:AbstractArray where U<:AbstractArray
-    mean(skipmissing(x .== y))
+    μsum = 0
+    l = 0
+    for i in 1:length(x)
+        eq = x[i] == y[i]
+        μsum += eq === missing ? 0 : eq
+        l += eq === missing ? 0 : 1
+    end
+    return μsum / l
 end
 
 """
@@ -75,12 +69,25 @@ N290  │ 0.166667  0.166667  …  0.142857       1.0
 """
 function pairwiseidentical(data::PopData)
     locmtx = locimatrix(data)
-    ids = unique(data.genodata.name)
-    vecs = [i for i in eachrow(locmtx)]
-    out = NamedArray(_pwiseidenticalhelper.(vecs, permutedims(vecs)))
-    setnames!(out, String.(ids),1)
-    setnames!(out, String.(ids),2)
-    return out
+    ids = samplenames(data)
+    n = length(ids)
+    result = NamedArray(zeros(Float64, n, n))
+    setnames!(result, String.(ids),1)
+    setnames!(result, String.(ids),2)
+    @inbounds for i in 1:n-1
+        @inbounds v1 = view(locmtx,i,:)
+        @inbounds for j in i+1:n
+            @inbounds v2 = view(locmtx,j,:)
+            res = _pwiseidenticalhelper(v1, v2)
+            @inbounds result[i,j] = res
+            @inbounds result[j,i] = res
+        end
+    end
+    # fill in diagonal
+    for i in 1:n
+        @inbounds result[i,i] = 1.0
+    end
+    return result
 end
 
 """
@@ -117,14 +124,26 @@ function pairwiseidentical(data::PopData, sample_names::Vector{T}) where T<:Abst
     if !isempty(missingsamples)
         throw(ArgumentError("Samples not found in the PopData:\n  " * join(missingsamples, "\n  ")))
     end
-    # [findfirst(==(i), all_samples) for i in sample_names]
     sampidx = indexin(sample_names, all_samples)
     locmtx = locimatrix(data)
-    vecs = [locmtx[i,:] for i in sampidx]
-    out = NamedArray(_pwiseidenticalhelper.(vecs, permutedims(vecs)))
-    setnames!(out, string.(sample_names),1)
-    setnames!(out, string.(sample_names),2)
-    return out
+    n = length(sampidx)
+    result = NamedArray(zeros(Float64, n, n))
+    setnames!(result, sample_names,1)
+    setnames!(result, sample_names,2)
+    @inbounds for i in 1:n-1
+        @inbounds v1 = view(locmtx,sampidx[i],:)
+        @inbounds for j in i+1:n
+            @inbounds v2 = view(locmtx,sampidx[j],:)
+            res = _pwiseidenticalhelper(v1, v2)
+            @inbounds result[i,j] = res
+            @inbounds result[j,i] = res
+        end
+    end
+    # fill in diagonal
+    for i in 1:n
+        @inbounds result[i,i] = 1.0
+    end
+    return result
 end
 
 """

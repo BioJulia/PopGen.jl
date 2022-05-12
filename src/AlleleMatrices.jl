@@ -76,13 +76,33 @@ function _allelematrix(data::PopData; by::String = "frequency", missings::String
     end
 end
 
-function _countset(query,reference)
-    @inbounds [count(==(x), query, init = Int8(0)) for x in reference]
+#=
+function _countset(query::Genotype,reference::Vector{T}) where T<:Union{Int8, Int16}
+    @inbounds [count(==(x), query, init = T(0)) for x in reference]
 end
 
-function _countset(query::Missing,reference)
-    fill(Int8(-1), length(reference))
+function _countset(query::Missing, reference)
+    fill(eltype(reference)(-1), length(reference))
 end
+=#
+
+function _setcounts(q, r)
+    l = 0
+    @inbounds for i in r
+        l += length(i)
+    end
+    cnt = Vector{eltype(eltype(r))}(undef, l)
+    idx = 0
+    @inbounds for (i,j) in enumerate(r)
+        @inbounds geno = q[i]
+        @inbounds @simd for h in j 
+            idx += 1
+            @inbounds cnt[idx] = geno === missing ? -1 : count(==(h), geno)
+        end
+    end
+    return cnt
+end
+
 
 """
     _countmatrix(data::PopData)
@@ -92,9 +112,11 @@ Missing values are preserved as `-1`.
 """
 function _countmatrix(data::PopData)
     gmtx = locimatrix(data)
-    allalleles = Tuple(sort.(unique(Base.Iterators.flatten(unique(skipmissing(i)))) for i in eachcol(gmtx)))
+    allalleles = Tuple(uniquealleles(i) for i in eachcol(gmtx))
+    #return allalleles
     mapreduce(hcat, eachrow(gmtx)) do smple
-        collect(Base.Iterators.flatten(Base.Iterators.flatten([_countset.(smple, allalleles)])))
+        _setcounts(smple, allalleles)
+        #[j for i in _countset.(smple, allalleles) for j in i]
     end |> permutedims
 end
 
@@ -107,7 +129,9 @@ Missing values are replaced by zeros.
 """
 function _freqmatrix_zero(data::PopData)
     # divide each row (sample) by the ploidy of that sample
-    replace(_countmatrix(data), -1 => 0) ./ data.sampleinfo.ploidy
+    out = _countmatrix(data)
+    replace!(out, -1 => 0)
+    out ./ data.sampleinfo.ploidy
 end
 
 """
@@ -132,7 +156,9 @@ and columns are the frequency of an allele for that locus in that sample.
 Missing values are kept as `missing`.
 """
 function _freqmatrix_missing(data::PopData)
-    replace(_countmatrix(data), -1 => missing) ./ data.sampleinfo.ploidy
+    out = _countmatrix(data)
+    replace!(out, -1 => missing)
+    out ./ data.sampleinfo.ploidy
 end
 
 
