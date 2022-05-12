@@ -22,18 +22,16 @@ locus by population.
 """
 function richness(data::PopData; by::String = "locus")
     if by == "locus"
-        DataFrames.combine(
-            groupby(data.genodata, :locus),
-            :genotype => (geno -> length(uniquealleles(geno))) => :richness
-        )
+        grp = groupby(data.genodata, :locus)
     elseif by == "population"
-        DataFrames.combine(
-            groupby(data.genodata, [:locus, :population]),
-            :genotype => (geno -> length(uniquealleles(geno))) => :richness
-        )
+        grp = groupby(data.genodata, [:locus, :population])
     else
         throw(ArgumentError("Please use by = \"locus\" (default) or \"population\""))
     end
+    DataFrames.combine(
+        grp,
+        :genotype => (geno -> length(uniquealleles(geno))) => :richness
+    )
 end
 
 
