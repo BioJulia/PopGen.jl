@@ -11,8 +11,7 @@ function kinship_noboot(data::PopData; method::Function, kwargs...)
             @inbounds for j in i+1:n
                 @inbounds v2 = view(locmtx,j,:)
                 est = method(v1, v2)
-                @inbounds result[i,j] = est
-                @inbounds result[j,i] = est
+                @inbounds result[j,i] = result[i,j] = est
             end
         end
     elseif Symbol(method) ∈ [:Loiselle, :Loiselle2, :LynchLi, :LynchRitland, :Moran, :QuellerGoodnight, :Ritland]
@@ -22,8 +21,7 @@ function kinship_noboot(data::PopData; method::Function, kwargs...)
             @inbounds for j in i+1:n
                 @inbounds v2 = view(locmtx,j,:)
                 est = method(v1, v2, allelefrequencies, n_samples = n)
-                @inbounds result[i,j] = est
-                @inbounds result[j,i] = est
+                @inbounds result[j,i] = result[i,j] = est
             end
         end
     else
@@ -31,6 +29,74 @@ function kinship_noboot(data::PopData; method::Function, kwargs...)
     end
     return result
 end 
+
+@inline function _bootstrapsummary(boot_out::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
+    isallmissing(boot_out) == true && return missing, missing, missing, missing
+    boot_skipmissing = collect(skipmissing(boot_out))
+    n_nonmiss = length(boot_skipmissing)
+    Mean = mean(boot_skipmissing)
+    Median = median(boot_skipmissing)
+    SE = sqrt(sum((boot_skipmissing - (boot_skipmissing / n_nonmiss)).^2) / (n_nonmiss - 1))
+    quants = quantile(boot_skipmissing, width)
+
+    return Mean, Median, SE, quants
+end
+
+function kinship_boot(data::PopData; method::Function, iterations::Int, kwargs...)
+    locmtx = locimatrix(data)
+    ids = samplenames(data)
+    n = length(ids)
+    nloc = size(locmtx, 2)
+    idxrange = 1:nloc
+    result = NamedArray(zeros(Float64, n, n))
+    setnames!(result, String.(ids),1)
+    setnames!(result, String.(ids),2)
+    #result = Matrix{Float64}(undef, n,n)
+    bresult = Matrix{Float64}(undef, n,n)
+    #b_μ = similar(result)
+    b_med = similar(bresult)
+    b_σ =similar(bresult)
+    #b_ci = similar(bresult)
+    #if Symbol(method) ∈ [:Blouin, :LiHorvitz, :Lynch]
+    @inbounds @sync for i in 1:n-1
+        Base.Threads.@spawn begin
+            boot_idx = Vector{Int64}(undef, nloc)
+            @inbounds v1 = view(locmtx,i,:)
+            @inbounds for j in i+1:n
+                @inbounds v2 = view(locmtx,j,:)
+                est = method(v1, v2)
+                @inbounds result[j,i] = result[i,j] = est
+                #bt_est = 0.0
+                bt_est = Vector{Union{Missing, Float64}}(undef, iterations)
+                @inbounds for bt_idx in eachindex(bt_est) #1:iterations
+                    @inbounds boot_idx .= rand(idxrange, nloc)
+                    v1b = @inbounds view(locmtx,i,boot_idx)
+                    v2b = @inbounds view(locmtx, j, boot_idx)
+                    @inbounds bt_est[bt_idx] = method(v1b, v2b) #/ iterations
+                end
+                skipm = skipmissing(bt_est)
+                # mean
+                μ_bt = mean(skipm)
+                @inbounds bresult[i,j] = μ_bt
+                # median
+                @inbounds b_med[i,j] = median(skipm)
+                # Stdev
+                @inbounds b_σ[i,j] = std(skipm, mean = μ_bt)
+            end
+        end
+    end
+    out = kinshiptotable(result, Symbol(method))
+    insertcols!(out, :bootmean => uppertri2vec(bresult), :median => uppertri2vec(b_med), :std => uppertri2vec(b_σ))
+    return out    
+    #return result, bresult
+end
+
+
+
+
+########  Estimator Methods ###########
+
+
 
 function _blouin(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8} 
     @inbounds ((geno1[1] ∈ geno2) & (geno2[1] ∈ geno1)) + ((geno1[2] ∈ geno2) & (geno2[2] ∈ geno1))
@@ -324,11 +390,29 @@ julia> kinshiptotable(a)
                       22353 rows omitted
 ```
 """
-function kinshiptotable(kinshipresults::T) where T<:NamedMatrix
+function kinshiptotable(kinshipresults::T, mthd::Symbol) where T<:NamedMatrix
     n = size(kinshipresults,1)
     n == size(kinshipresults,2) || throw(DimensionMismatch("The input matrix must be symmetrical, but has size $(size(kinshipresults))"))
     ids = names(kinshipresults)[1]
-    vals = [kinshipresults[i, j] for i in 1:n-1 for j in i+1:n]
-    idpairs = collect(pairwisepairs(ids))
-    DataFrame(:sample1 => first.(idpairs), :sample2 => getindex.(idpairs, 2), :kinship => vals)
+    vals = uppertri2vec(kinshipresults)
+    idpairs = pairwisepairs(ids)
+    DataFrame(:sample1 => first.(idpairs), :sample2 => getindex.(idpairs, 2), mthd => vals)
+end
+
+function uppertri2vec(x, diag::Bool = false)
+    n = size(x,1)
+    if !diag
+        [x[i, j] for i in 1:n-1 for j in i+1:n]
+    else
+        [x[i, j] for i in 1:n-1 for j in i:n]
+    end
+end
+
+function lowertri2vec(x, diag::Bool = false)
+    n = size(x,1)
+    if !diag
+        [x[j,i] for i in 1:n-1 for j in i+1:n]
+    else
+        [x[j,i] for i in 1:n-1 for j in i:n]
+    end
 end
