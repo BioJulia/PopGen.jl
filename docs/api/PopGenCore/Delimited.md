@@ -75,6 +75,6 @@ Write PopData to a text-delimited file.
 **Example**
 ```julia
 cats = @nancycats;
-fewer_cats = omit_samples(cats, samples(cats)[1:10]);
+fewer_cats = omit_samplenames(cats, samplenames(cats)[1:10]);
 delimited(fewer_cats, filename = "filtered_nancycats.csv", digits = 3, format = "wide", delim = " ")
 ```

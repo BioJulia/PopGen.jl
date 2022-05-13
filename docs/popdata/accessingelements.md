@@ -176,7 +176,7 @@ samplenames(data::PopData)
 ```
 View individual/sample names in a `PopData`. 
 ``` julia
-julia> samples(sharks)
+julia> samplenames(sharks)
 212-element Array{String,1}:
  "cc_001" 
  "cc_002" 

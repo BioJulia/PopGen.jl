@@ -151,7 +151,7 @@ between all pairs of provided `sample_names`.
 ```julia
 julia> cats = @nancycats;
 
-julia> interesting_cats = samples(cats)[1:5]
+julia> interesting_cats = samplenames(cats)[1:5]
 5-element Array{String,1}:
  "N215"
  "N216"

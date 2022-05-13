@@ -167,7 +167,7 @@ could use some optimizations. More help is always welcomed! Our wishlist also in
 ```julia
 julia> cats = @nancycats;
 
-julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = Ritland)
+julia> cat_kin = relatendess(cats, samplenames(cats)[1:10], method = Ritland)
 ```
 
 </TabItem>
@@ -176,7 +176,7 @@ julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = Ritland)
 ```julia
 julia> cats = @nancycats;
 
-julia> cat_kin = relatendess(cats, samples(cats)[1:10], method = [Moran, QuellerGoodnight])
+julia> cat_kin = relatendess(cats, samplenames(cats)[1:10], method = [Moran, QuellerGoodnight])
 ```
 
 </TabItem>
