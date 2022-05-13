@@ -199,7 +199,7 @@ Stacktrace:
  [1] top-level scope at none:0
 ```
 
-This error is telling us "there is no such function called `add`, who's inputs are an `Integer` followed by a `String`". But, it does offer us some alternatives, like the two `add` functions we created earlier.
+This error is telling us "there is no such method called `add`, who's inputs are an `Integer` followed by a `String`". But, it does offer us some alternatives, like the two `add` methods we created earlier.
 
 The functions within `PopGen` are almost always explicitly typed, so if you are getting the `MethodError: no method matching` error, then you are inputting the incorrect types into the function, or perhaps your inputs for the arguments are in the wrong order (see "Functions with and without keywords" below).
 
