@@ -78,8 +78,9 @@ If you plan on extending PopGen.jl, here are some useful tips we learned the har
     - But if they are small or simple enough, can still be faster and more efficient than allocating Arrays
 - Sometimes `Base` (or others) don't have the performance you need
     - There's no harm in writing a small helper function if it's an improvement
-- Incrementing a variable inside a loop with `+=` or similar (example 1) is **a lot** more performant that doing so with a list comprehension (example 2), even though it requires more lines of code
- ```julia
+- Incrementing a variable inside a loop with `+=` or similar (example 1) is **a lot** more performant that doing so with a list comprehension (example 2), even though it requires more lines of code.
+
+```julia
 # example 1: Incrementing inside for loop
 # performant
 n = 0
