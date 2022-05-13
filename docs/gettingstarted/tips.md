@@ -39,6 +39,7 @@ are named with three main principals:
 1. as verbose of a name as is reasonable
 2. no underscores between words
 3. all lowercase, always, unless it's a DataType
+    - or method keyword option (like the `kinship` or `kmeans` series)
 
 These decisions are because of years-long frustration with the swirling chaos that is R function names.
 Where it is possible and reasonable to do so, function names are verbose and descriptive. For example,
