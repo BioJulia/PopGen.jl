@@ -30,17 +30,8 @@ function kinship_noboot(data::PopData; method::Function, kwargs...)
     return result
 end 
 
-@inline function _bootstrapsummary(boot_out::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
-    isallmissing(boot_out) == true && return missing, missing, missing, missing
-    boot_skipmissing = collect(skipmissing(boot_out))
-    n_nonmiss = length(boot_skipmissing)
-    Mean = mean(boot_skipmissing)
-    Median = median(boot_skipmissing)
-    SE = sqrt(sum((boot_skipmissing - (boot_skipmissing / n_nonmiss)).^2) / (n_nonmiss - 1))
-    quants = quantile(boot_skipmissing, width)
-
-    return Mean, Median, SE, quants
-end
+using OnlineStats
+using Term.progress
 
 function kinship_boot(data::PopData; method::Function, iterations::Int, kwargs...)
     locmtx = locimatrix(data)
@@ -51,47 +42,48 @@ function kinship_boot(data::PopData; method::Function, iterations::Int, kwargs..
     result = NamedArray(zeros(Float64, n, n))
     setnames!(result, String.(ids),1)
     setnames!(result, String.(ids),2)
-    #result = Matrix{Float64}(undef, n,n)
     bresult = Matrix{Float64}(undef, n,n)
-    #b_μ = similar(result)
-    b_med = similar(bresult)
-    b_σ =similar(bresult)
-    #b_ci = similar(bresult)
+    b_sdev = similar(bresult)
+    b_ci = Matrix{Vector{Float64}}(undef, n,n)
     #if Symbol(method) ∈ [:Blouin, :LiHorvitz, :Lynch]
-    @inbounds @sync for i in 1:n-1
+    pbar = ProgressBar(refresh_rate=30)
+    samplejob = addjob!(pbar, N = n)
+    job = addjob!(pbar; N= Int64((n * (n-1))/2))
+    start!(pbar)
+    @inbounds @sync  for i in 1:n-1
         Base.Threads.@spawn begin
-            boot_idx = Vector{Int64}(undef, nloc)
             @inbounds v1 = view(locmtx,i,:)
             @inbounds for j in i+1:n
+                boot_idx = Vector{Int64}(undef, nloc)
                 @inbounds v2 = view(locmtx,j,:)
                 est = method(v1, v2)
                 @inbounds result[j,i] = result[i,j] = est
-                #bt_est = 0.0
-                bt_est = Vector{Union{Missing, Float64}}(undef, iterations)
-                @inbounds for bt_idx in eachindex(bt_est) #1:iterations
+                bootstats = Series(Variance(), Quantile([0.025, 0.975]))
+                @inbounds for bt_idx in 1:iterations
                     @inbounds boot_idx .= rand(idxrange, nloc)
-                    v1b = @inbounds view(locmtx,i,boot_idx)
+                    v1b = @inbounds view(locmtx, i,boot_idx)
                     v2b = @inbounds view(locmtx, j, boot_idx)
-                    @inbounds bt_est[bt_idx] = method(v1b, v2b) #/ iterations
+                    b_est = method(v1b, v2b)
+                    isnan(b_est) ? continue : fit!(bootstats, b_est)
                 end
-                skipm = skipmissing(bt_est)
-                # mean
-                μ_bt = mean(skipm)
-                @inbounds bresult[i,j] = μ_bt
+                @inbounds bresult[i,j] = bootstats.stats[1].μ
                 # median
-                @inbounds b_med[i,j] = median(skipm)
+                @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
                 # Stdev
-                @inbounds b_σ[i,j] = std(skipm, mean = μ_bt)
+                @inbounds b_ci[i,j] = value(bootstats.stats[2])
+                progress.update!(job)
             end
+            progress.update!(samplejob)
         end
     end
+    stop!(pbar)
+    ci = uppertri2vec(b_ci)
+    cilow = getindex.(ci, 1)
+    cihi = getindex.(ci,2)
     out = kinshiptotable(result, Symbol(method))
-    insertcols!(out, :bootmean => uppertri2vec(bresult), :median => uppertri2vec(b_med), :std => uppertri2vec(b_σ))
+    insertcols!(out, :bootmean => uppertri2vec(bresult), :std => uppertri2vec(b_sdev), :CIlower => cilow, :CLupper => cihi)
     return out    
-    #return result, bresult
 end
-
-
 
 
 ########  Estimator Methods ###########
@@ -115,7 +107,7 @@ function Blouin(ind1::GenoArray, ind2::GenoArray)::Float64
             n += 1
         end
     end
-    res / n / 2.0
+    return res / n / 2.0
 end
 
 # TODO check math, should diag = 1?
