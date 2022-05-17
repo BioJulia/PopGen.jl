@@ -26,7 +26,9 @@ function _permuted_Hudson(data::PopData, iterations::Int64)
     n_loci = data.metadata.loci
     results = zeros(npops, npops)
     perm_vector = zeros(iterations-1)
-    p = Progress(sum(1:(npops - 1)) * (iterations - 1), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
+    pbar = ProgressBar(;refresh_rate=90, transient = true)
+    job = addjob!(pbar; description= "Hudson FST: ", N = Int64((npops * (npops-1))/2))
+    start!(pbar)
     @inbounds for i in 2:npops
         pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
         n_pop1 = size(pop1, 1)
@@ -39,14 +41,14 @@ function _permuted_Hudson(data::PopData, iterations::Int64)
                 Base.Threads.@spawn begin
                     perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
                     @inbounds perm_vector[iter] = _hudson_fst(perm_p1, perm_p2)
-                    pops_text = string(pops[i]) * " & " * string(pops[j])
-                    ProgressMeter.next!(p; showvalues = [(:Populations, pops_text), (:Iteration, "$iter")])
                 end
             end
             @inbounds results[i,j] = fst_val
             @inbounds results[j,i] = (sum(fst_val .<= perm_vector) + 1) / iterations
+            progress.update!(job)
         end
     end
+    stop!(pbar)
     println("Below diagonal: FST values | Above diagonal: P values")
     return PairwiseFST(DataFrame(results, Symbol.(pops)), "Hudson et al. 1992 (with p-values)")
 end
@@ -59,7 +61,9 @@ function _permuted_Nei(data::PopData, iterations::Int64)
     n_loci = data.metadata.loci
     results = zeros(npops, npops)
     perm_vector = zeros(iterations-1)
-    p = Progress(sum(1:(npops - 1)) * (iterations - 1), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
+    pbar = ProgressBar(;refresh_rate=90, transient = true)
+    job = addjob!(pbar; description= "Nei FST: ", N = Int64((npops * (npops-1))/2))
+    start!(pbar)
     @inbounds for i in 2:npops
         pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
         n_pop1 = size(pop1, 1)
@@ -72,14 +76,14 @@ function _permuted_Nei(data::PopData, iterations::Int64)
                 Base.Threads.@spawn begin
                     perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
                     @inbounds perm_vector[iter] = _nei_fst(perm_p1, perm_p2)
-                    pops_text = string(pops[i]) * " & " * string(pops[j])
-                    ProgressMeter.next!(p; showvalues = [(:Populations, pops_text), (:Iteration, "$iter")])
                 end
             end
             @inbounds results[i,j] = fst_val
             @inbounds results[j,i] = (sum(fst_val .<= perm_vector) + 1) / iterations
+            progress.update!(job)
         end
     end
+    stop!(pbar)
     println("Below diagonal: FST values | Above diagonal: P values")
     return PairwiseFST(DataFrame(results, Symbol.(pops)), "Nei 1987 (with p-values)")
 end
@@ -92,7 +96,9 @@ function _permuted_WeirCockerham(data::PopData, iterations::Int64)
     n_loci = data.metadata.loci
     results = zeros(npops, npops)
     perm_vector = zeros(iterations-1)
-    p = Progress(sum(1:(npops - 1)) * (iterations - 1), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
+    pbar = ProgressBar(;refresh_rate=90, transient = true)
+    job = addjob!(pbar; description= "WierCockerham FST: ", N = Int64((npops * (npops-1))/2))
+    start!(pbar)
     @inbounds for i in 2:npops
         pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
         n_pop1 = size(pop1, 1)
@@ -105,14 +111,14 @@ function _permuted_WeirCockerham(data::PopData, iterations::Int64)
                 Base.Threads.@spawn begin
                     perm_p1, perm_p2 = _fst_permutation(merged, n_pop1, n_pop2)
                     @inbounds perm_vector[iter] = _weircockerham_fst(perm_p1, perm_p2)
-                    pops_text = string(pops[i]) * " & " * string(pops[j])
-                    ProgressMeter.next!(p; showvalues = [(:Populations, pops_text), (:Iteration, "$iter")])
                 end
             end
             @inbounds results[i,j] = fst_val
             @inbounds results[j,i] = (sum(fst_val .<= perm_vector) + 1) / iterations
+            progress.update!(job)
         end
     end
+    stop!(pbar)
     println("Below diagonal: FST values | Above diagonal: P values")
     return PairwiseFST(DataFrame(results, Symbol.(pops)), "Weir & Cockerham (with p-values)")
 end
