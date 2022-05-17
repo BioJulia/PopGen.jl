@@ -59,7 +59,8 @@ end
 using Distributions, DataFrames, PooledArrays, NamedArrays
 using Distances
 using Random: shuffle
-using ProgressMeter
+using OnlineStats
+using Term.progress
 using MultipleTesting, StatsBase
 import Clustering: kmeans, kmedoids, hclust, Hclust, cutree, fuzzy_cmeans, dbscan
 import MultivariateStats: fit, PCA

@@ -1,65 +1,93 @@
-function kinship_noboot(data::PopData; method::Function, kwargs...)
+function kinship_new(data::PopData; method::Function, iterations::Int = 0, interval::Vector{Float64} = [0.025, 0.975])
+    # sanity checks
+    data.metadata.ploidy != 2 && error("kinship analyses currently only support diploid samples")
+    length(interval) != 2 && throw(ArgumentError("Keyword argument \`interval\` must be a vector with 2 elements."))
+    
+    if (iterations == 0) && (Symbol(method) ∈ [:Blouin, :LiHorvitz, :Lynch])
+        _kinship_noboot_nofreq(data, method)
+    elseif (iterations == 0) && (Symbol(method) ∈ [:Loiselle, :LynchLi, :LynchRitland, :Moran, :QuellerGoodnight, :Ritland])
+        _kinship_noboot_freq(data, method)
+    elseif (iterations > 0) && (Symbol(method) ∈ [:Blouin, :LiHorvitz, :Lynch])
+        _kinship_boot_nofreq(data, method, iterations, interval)
+    elseif (iterations > 0) && (Symbol(method) ∈ [:Loiselle, :LynchLi, :LynchRitland, :Moran, :QuellerGoodnight, :Ritland])
+        _kinship_boot_freq(data, method, iterations, interval)
+    else
+        throw(ArgumentError("Invalid method provided: $method. See the docstring \`?kinship\` for usage information."))
+    end
+end
+
+
+### Internal implementations ###
+
+#### Non-Bootstrapped ####
+# Returns a NamedMatrix
+function _kinship_noboot_nofreq(data::PopData, method::Function)
     locmtx = locimatrix(data)
     ids = samplenames(data)
     n = length(ids)
-    result = NamedArray(zeros(Float64, n, n))
+    result = NamedArray{Float64}(n, n)
     setnames!(result, String.(ids),1)
     setnames!(result, String.(ids),2)
-    if Symbol(method) ∈ [:Blouin, :LiHorvitz, :Lynch]
-        @inbounds for i in 1:n-1
-            @inbounds v1 = view(locmtx,i,:)
-            @inbounds for j in i+1:n
-                @inbounds v2 = view(locmtx,j,:)
-                est = method(v1, v2)
-                @inbounds result[j,i] = result[i,j] = est
-            end
+    @inbounds for i in 1:n-1
+        @inbounds v1 = view(locmtx,i,:)
+        @inbounds for j in i+1:n
+            @inbounds v2 = view(locmtx,j,:)
+            est = method(v1, v2)
+            @inbounds result[j,i] = result[i,j] = est
         end
-    elseif Symbol(method) ∈ [:Loiselle, :Loiselle2, :LynchLi, :LynchRitland, :Moran, :QuellerGoodnight, :Ritland]
-        allelefrequencies = @inbounds (allelefreq(i) for i in eachcol(locmtx)) |> Tuple
-        @inbounds for i in 1:n-1
-            @inbounds v1 = view(locmtx,i,:)
-            @inbounds for j in i+1:n
-                @inbounds v2 = view(locmtx,j,:)
-                est = method(v1, v2, allelefrequencies, n_samples = n)
-                @inbounds result[j,i] = result[i,j] = est
-            end
-        end
-    else
-        throw(ArgumentError("Method $method is not a valid method. See ?kinship for a list of options."))    
     end
     return result
 end 
 
-using OnlineStats
-using Term.progress
+function _kinship_noboot_freq(data::PopData, method::Function)
+    locmtx = locimatrix(data)
+    ids = samplenames(data)
+    n = length(ids)
+    result = NamedArray{Float64}(n, n)
+    setnames!(result, String.(ids),1)
+    setnames!(result, String.(ids),2)
+    allelefrequencies = @inbounds Tuple(allelefreq(i) for i in eachcol(locmtx))
+    @inbounds for i in 1:n-1
+        @inbounds v1 = view(locmtx,i,:)
+        @inbounds for j in i+1:n
+            @inbounds v2 = view(locmtx,j,:)
+            @inbounds result[j,i] = result[i,j] = method(v1, v2, allelefrequencies, n_samples = n)
+        end
+    end
+    return result
+end 
 
-function kinship_boot(data::PopData; method::Function, iterations::Int, kwargs...)
+#### Bootstrapped ####
+# Returns a DataFrame
+# Includes a progress bar from Term.jl
+# Uses OnlineStats.jl to calculate mean/variance/CI without additional allocations
+function _kinship_boot_nofreq(data::PopData, method::Function, iterations::Int, interval::Vector{Float64} = [0.025, 0.975])
     locmtx = locimatrix(data)
     ids = samplenames(data)
     n = length(ids)
     nloc = size(locmtx, 2)
     idxrange = 1:nloc
-    result = NamedArray(zeros(Float64, n, n))
+    result = NamedArray{Float64}(n, n)
     setnames!(result, String.(ids),1)
     setnames!(result, String.(ids),2)
     bresult = Matrix{Float64}(undef, n,n)
     b_sdev = similar(bresult)
     b_ci = Matrix{Vector{Float64}}(undef, n,n)
-    #if Symbol(method) ∈ [:Blouin, :LiHorvitz, :Lynch]
-    pbar = ProgressBar(refresh_rate=30)
-    samplejob = addjob!(pbar, N = n)
-    job = addjob!(pbar; N= Int64((n * (n-1))/2))
+    pbar = ProgressBar(;refresh_rate=90, transient = true)
+    job = addjob!(pbar; description= "Kinship: ", N= Int64((n * (n-1))/2))
     start!(pbar)
-    @inbounds @sync  for i in 1:n-1
+    @inbounds @sync for i in 1:n-1
         Base.Threads.@spawn begin
             @inbounds v1 = view(locmtx,i,:)
+            boot_idx = Vector{Int64}(undef, nloc)
+            sizehint!(boot_idx, nloc)
             @inbounds for j in i+1:n
-                boot_idx = Vector{Int64}(undef, nloc)
                 @inbounds v2 = view(locmtx,j,:)
-                est = method(v1, v2)
-                @inbounds result[j,i] = result[i,j] = est
-                bootstats = Series(Variance(), Quantile([0.025, 0.975]))
-                @inbounds for bt_idx in 1:iterations
+                @inbounds result[j,i] = result[i,j] = method(v1, v2)
+                bootstats = Series(Variance(), Quantile(interval))
+                k = 1
+                while k <= iterations
+                    k += 1
                     @inbounds boot_idx .= rand(idxrange, nloc)
                     v1b = @inbounds view(locmtx, i,boot_idx)
                     v2b = @inbounds view(locmtx, j, boot_idx)
@@ -67,13 +95,10 @@ function kinship_boot(data::PopData; method::Function, iterations::Int, kwargs..
                     isnan(b_est) ? continue : fit!(bootstats, b_est)
                 end
                 @inbounds bresult[i,j] = bootstats.stats[1].μ
-                # median
                 @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
-                # Stdev
                 @inbounds b_ci[i,j] = value(bootstats.stats[2])
                 progress.update!(job)
             end
-            progress.update!(samplejob)
         end
     end
     stop!(pbar)
@@ -81,23 +106,69 @@ function kinship_boot(data::PopData; method::Function, iterations::Int, kwargs..
     cilow = getindex.(ci, 1)
     cihi = getindex.(ci,2)
     out = kinshiptotable(result, Symbol(method))
-    insertcols!(out, :bootmean => uppertri2vec(bresult), :std => uppertri2vec(b_sdev), :CIlower => cilow, :CLupper => cihi)
+    insertcols!(out, :bootmean => uppertri2vec(bresult), :std => uppertri2vec(b_sdev), :CI_lower => cilow, :CI_upper => cihi)
     return out    
 end
 
+function _kinship_boot_freq(data::PopData, method::Function, iterations::Int, interval::Vector{Float64} = [0.025, 0.975])
+    locmtx = locimatrix(data)
+    ids = samplenames(data)
+    n = length(ids)
+    nloc = size(locmtx, 2)
+    idxrange = 1:nloc
+    result = NamedArray{Float64}(n, n)
+    setnames!(result, String.(ids),1)
+    setnames!(result, String.(ids),2)
+    bresult = Matrix{Float64}(undef, n,n)
+    b_sdev = similar(bresult)
+    b_ci = Matrix{Vector{Float64}}(undef, n,n)
+    pbar = ProgressBar(;refresh_rate=90, transient = true)
+    job = addjob!(pbar; description= "Kinship: ", N= Int64((n * (n-1))/2))
+    start!(pbar)
+    allelefrequencies = @inbounds Tuple(allelefreq(i) for i in eachcol(locmtx))
+    @inbounds @sync for i in 1:n-1
+        Base.Threads.@spawn begin
+            @inbounds v1 = view(locmtx,i,:)
+            boot_idx = Vector{Int64}(undef, nloc)
+            sizehint!(boot_idx, nloc)
+            @inbounds for j in i+1:n
+                @inbounds v2 = view(locmtx,j,:)
+                @inbounds result[j,i] = result[i,j] = method(v1, v2, allelefrequencies, n_samples = n)
+                bootstats = Series(Variance(), Quantile(interval))
+                k = 1
+                while k <= iterations
+                    k += 1
+                    @inbounds boot_idx .= rand(idxrange, nloc)
+                    v1b = @inbounds view(locmtx, i,boot_idx)
+                    v2b = @inbounds view(locmtx, j, boot_idx)
+                    b_est = method(v1b, v2b, allelefrequencies, n_samples = n)
+                    isnan(b_est) ? continue : fit!(bootstats, b_est)
+                end
+                @inbounds bresult[i,j] = bootstats.stats[1].μ
+                @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
+                @inbounds b_ci[i,j] = value(bootstats.stats[2])
+                progress.update!(job)
+            end
+        end
+    end
+    stop!(pbar)
+    ci = uppertri2vec(b_ci)
+    cilow = getindex.(ci, 1)
+    cihi = getindex.(ci,2)
+    out = kinshiptotable(result, Symbol(method))
+    insertcols!(out, :bootmean => uppertri2vec(bresult), :std => uppertri2vec(b_sdev), :CI_lower => cilow, :CI_upper => cihi)
+    return out    
+end
 
-########  Estimator Methods ###########
-
-
+########  Moments-based Estimator Methods ###########
 
 function _blouin(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8} 
     @inbounds ((geno1[1] ∈ geno2) & (geno2[1] ∈ geno1)) + ((geno1[2] ∈ geno2) & (geno2[2] ∈ geno1))
 end
 function Blouin(ind1::GenoArray, ind2::GenoArray)::Float64
-    l = length(ind1)
     res = 0.0
     n = 0
-    @inbounds for i in 1:l
+    @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         if (i1 === missing) | (i2 === missing)
@@ -115,10 +186,9 @@ function _lihorvitz(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Un
     @inbounds (geno1[1] == geno2[1]) + (geno1[1] == geno2[2]) + (geno1[2] == geno2[1]) + (geno1[2] == geno2[2]) 
 end
 function LiHorvitz(ind1::GenoArray, ind2::GenoArray)::Float64
-    l = length(ind1)
     res = 0.0
     n = 0
-    @inbounds for i in 1:l
+    @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         if (i1 === missing) | (i2 === missing)
@@ -135,10 +205,9 @@ function _lynch(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{
     @inbounds ((geno1[1] ∈ geno2) + (geno1[2] ∈ geno2) + (geno2[1] ∈ geno1) + (geno2[2] ∈ geno1))
 end
 function Lynch(ind1::GenoArray, ind2::GenoArray)::Float64
-    l = length(ind1)
     res = 0.0
     n = 0
-    @inbounds for i in 1:l
+    @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         if (i1 === missing) | (i2 === missing)
@@ -154,7 +223,7 @@ end
 
 function _loiselle_num(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64})::Float64 where T<:Union{Int16, Int8}
     sum(pairs(frqdict)) do (allele, frq)
-        ((((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) - frq) * ((((geno2[1] == allele) + (geno2[2] == allele)) / 2.0) - frq)     
+        @inbounds ((((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) - frq) * ((((geno2[1] == allele) + (geno2[2] == allele)) / 2.0) - frq)     
     end
 end
 function _loiselle_denom(freqs)::Float64
@@ -163,11 +232,9 @@ function _loiselle_denom(freqs)::Float64
     end
 end
 function Loiselle(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
-    l = length(ind1)
     numer = 0.0
     denom = 0.0
-    #n = 0
-    @inbounds for i in 1:l
+    @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         if (i1 === missing) | (i2 === missing)
@@ -177,7 +244,6 @@ function Loiselle(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) whe
             fq = values(frqs)
             numer += _loiselle_num(i1, i2, frqs)
             @inbounds denom += _loiselle_denom(fq)
-            #n += 1
         end
     end
     numer / denom + 2.0 / (2.0 * kwargs[:n_samples] - 1.0)
@@ -191,7 +257,7 @@ end
 function _lynchliS0(alleles)::Float64
     res1 = 0.0
     res2 = 0.0
-    for i in alleles
+    @inbounds for i in alleles
         res1 += i^2
         res2 += i^3
     end
@@ -201,7 +267,7 @@ function LynchLi(ind1::T, ind2::T, alleles::U; kwargs...) where T <: GenoArray w
     #TODO Change to unbiased formulation (eq 25)
     Sxy = 0.0
     S0 = 0.0
-    @inbounds for i in 1:length(ind1)
+    @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         @inbounds loc = values(alleles[i])
@@ -237,7 +303,7 @@ end
 function LynchRitland(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
     numer = 0.0
     denom = 0.0
-    @inbounds for i in 1:length(ind1)
+    @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         @inbounds freqs = allelefrq[i]
@@ -255,7 +321,7 @@ end
 # FIX _MORAN MATH
 function _moran(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     num = 0.0 ; denom = 0.0
-    @inbounds for (allele, fq) in pairs(frqdict)
+    @inbounds for (allele, fq) in frqdict
         num += (((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) * (((geno2[1] == allele) + (geno2[2] == allele)) / 2.0)
         #num += @inbounds ((sum(geno1 .== allele) / 2.0) - fq) * ((sum(geno2 .== allele) / 2.0) - fq)
         denom += ((((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) - fq)^2 + ((((geno2[1] == allele) + (geno2[2] == allele)) / 2.0) - fq)^2
@@ -267,7 +333,7 @@ function Moran(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where 
     #TODO NEED TO CHECK TO CONFIRM EQUATIONS
     numer = 0.0
     denom = 0.0
-    @inbounds for i in 1:length(ind1)
+    @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         @inbounds freqs = allelefrq[i]
@@ -304,7 +370,7 @@ function QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs
     denom1 = 0.0
     numer2 = 0.0
     denom2 = 0.0
-    @inbounds for i in 1:length(ind1)
+    @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         @inbounds freqs = allelefrq[i]
@@ -327,7 +393,7 @@ function _Ritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float
     c,d = geno2
     A = length(frqdict) - 1.0
     R = 0.0
-    for (allele, frq) in pairs(frqdict)
+    for (allele, frq) in frqdict
         R += ((((a == allele) + (b == allele)) * ((c == allele) + (d == allele))) / (4.0 * frq))
     end
     R = ((2.0 / A) * (R - 1.0)) * A
@@ -336,7 +402,7 @@ end
 function Ritland(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
     numer = 0.0
     denom = 0.0
-    @inbounds for i in 1:length(ind1)
+    @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         @inbounds freqs = allelefrq[i]
@@ -353,16 +419,19 @@ end
 
 
 """
-    kinshiptotable(kinshipresults::T) where T<:NamedMatrix
-Converts the `NamedMatrix` result from the `kinship()` function into a `DataFrame`.
+    kinshiptotable(kinshipresults::T, methd::Symbol) where T<:NamedMatrix
+Converts the `NamedMatrix` result from the non-bootstrapped `kinship()` results into a `DataFrame`.
+The second positonal argument (`methd`) is the name of the value column (default: `kinship`). For
+better analysis workflow, it would be useful to specify the method for this column, to
+keep track of which estimator was used (e.g., `Blouin`, `LynchLi`, etc.)
 
 **Example**
 ```julia`
 julia> cats = @nancycats ; kin = kinship(cats, method = Moran) ;
 
-julia> kinshiptotable(a)
+julia> kinshiptotable(kin, :Moran)
 22366×3 DataFrame
-   Row │ sample1  sample2  kinship      
+   Row │ sample1  sample2  Moran      
        │ String   String   Float64      
 ───────┼────────────────────────────────
      1 │ cc_001   cc_002    0.00688008
@@ -382,15 +451,17 @@ julia> kinshiptotable(a)
                       22353 rows omitted
 ```
 """
-function kinshiptotable(kinshipresults::T, mthd::Symbol) where T<:NamedMatrix
+function kinshiptotable(kinshipresults::T, mthd::Symbol=:nothing) where T<:NamedMatrix
     n = size(kinshipresults,1)
     n == size(kinshipresults,2) || throw(DimensionMismatch("The input matrix must be symmetrical, but has size $(size(kinshipresults))"))
     ids = names(kinshipresults)[1]
     vals = uppertri2vec(kinshipresults)
     idpairs = pairwisepairs(ids)
-    DataFrame(:sample1 => first.(idpairs), :sample2 => getindex.(idpairs, 2), mthd => vals)
+    meth = mthd == :nothing ? :kinship : mthd 
+    DataFrame(:sample1 => first.(idpairs), :sample2 => getindex.(idpairs, 2), meth => vals)
 end
 
+## moved to PopGenCore, deprected on next PopGenCore release##
 function uppertri2vec(x, diag::Bool = false)
     n = size(x,1)
     if !diag
@@ -408,3 +479,4 @@ function lowertri2vec(x, diag::Bool = false)
         [x[j,i] for i in 1:n-1 for j in i:n]
     end
 end
+##

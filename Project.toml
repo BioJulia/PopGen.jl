@@ -1,7 +1,7 @@
 name = "PopGen"
 uuid = "af524d12-c74b-11e9-22a8-3b091653023f"
 authors = ["Pavel Dimens", "Jason Selwyn"]
-version = "0.9.0"
+version = "0.9.0-DEV"
 
 [deps]
 Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
@@ -11,12 +11,13 @@ Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 MultipleTesting = "f8716d33-7c4a-5097-896f-ce0ecbd3ef6b"
 MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 NamedArrays = "86f7a689-2022-50b4-a561-43c23ac3c673"
+OnlineStats = "a15396b6-48d5-5d58-9928-6d29437db91e"
 PooledArrays = "2dfb63ee-cc39-5dd5-95bd-886bf059d720"
 PopGenCore = "45b36091-5ef7-4b08-b448-aaf24c763a14"
-ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+Term = "22787eb5-b846-44ae-b979-8e399b8463ab"
 
 [compat]
 Clustering = "0.14"
@@ -27,7 +28,7 @@ MultipleTesting = "0.5"
 MultivariateStats = "0.9.1"
 NamedArrays = "0.9"
 PooledArrays = "1.1"
-PopGenCore = "0.5.1"
+PopGenCore = "0.5, 0.6"
 ProgressMeter = "1.4"
 Reexport = "1"
 StatsBase = "0.33"
