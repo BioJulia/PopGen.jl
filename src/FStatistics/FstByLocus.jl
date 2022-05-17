@@ -1,23 +1,26 @@
-function _pairwise_Hudson_lxl(data::PopData)
-    !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
+function _hudson_fst_lxl(data::PopData)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     nloci = data.metadata.loci
     locnames = loci(data)
     allpairs = pairwisepairs(pops)
-    npairs = length(collect(allpairs))
+    npops = length(pops)
+    npairs = (npops * (npops-1) / 2) |> Int64
     results = Vector{Vector{Float64}}(undef, npairs)
-    p1 = repeat(getindex.(allpairs,1), inner = nloci)
-    p2 = repeat(getindex.(allpairs,2), inner = nloci)
-    locs = repeat(locnames, outer = npairs)
+    p1 = PooledArray(repeat(getindex.(allpairs,1), inner = nloci), compress = true)
+    p2 = PooledArray(repeat(getindex.(allpairs,2), inner = nloci), compress = true)
+    locs = PooledArray(repeat(locnames, outer = npairs), compress = true)
     @inbounds @sync for (i,j) in enumerate(allpairs)
         Base.Threads.@spawn begin
-            pop1 = reshape(idx_pdata[(population = j[1],)].genotype, :, nloci)
-            pop2 = reshape(idx_pdata[(population = j[2],)].genotype, :, nloci)
-            results[i] = _hudson_fst_lxl(pop1, pop2)
+            @inbounds pop1 = reshape(idx_pdata[(population = j[1],)].genotype, :, nloci)
+            @inbounds pop2 = reshape(idx_pdata[(population = j[2],)].genotype, :, nloci)
+            @inbounds results[i] = _hudson_fst_lxl(pop1, pop2)
         end
     end
-    return DataFrame(:pop1 => PooledArray(p1, compress = true), :pop2 => PooledArray(p2, compress = true),:locus => PooledArray(locs, compress = true) ,:fst => reduce(vcat, results))
+    return PairwiseFST(
+        DataFrame(:population1 => p1, :population2 => p2,:locus => locs, :fst => reduce(vcat, results)),
+        "Hudson estimator"
+    )
 end
 
 function _hudson_fst_lxl(population_1::T, population_2::T) where T<:AbstractMatrix
@@ -56,17 +59,18 @@ function _nei_fst_lxl(population_1::T, population_2::T) where T<:AbstractMatrix
     round.(skipinfnan(DST′) ./ skipinfnan(HT′), digits = 5)
 end
 
-function _pairwise_Nei_lxl(data::PopData)
+function _nei_fst_lxl(data::PopData)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
+    npops = length(pops)
     nloci = data.metadata.loci
     locnames = loci(data)
     allpairs = pairwisepairs(pops)
-    npairs = length(collect(allpairs))
+    npairs = Int64(npops * (npops-1) / 2)
     results = Vector{Vector{Float64}}(undef, npairs)
-    p1 = repeat(getindex.(allpairs,1), inner = nloci)
-    p2 = repeat(getindex.(allpairs,2), inner = nloci)
-    locs = repeat(locnames, outer = npairs)
+    p1 = PooledArray(repeat(getindex.(allpairs,1), inner = nloci), compress = true)
+    p2 = PooledArray(repeat(getindex.(allpairs,2), inner = nloci), compress = true)
+    locs = PooledArray(repeat(locnames, outer = npairs), compress = true)
     @inbounds @sync for (i,j) in enumerate(allpairs)
         Base.Threads.@spawn begin
             pop1 = reshape(idx_pdata[(population = j[1],)].genotype, :, nloci)
@@ -74,5 +78,8 @@ function _pairwise_Nei_lxl(data::PopData)
             results[i] = _nei_fst_lxl(pop1, pop2)
         end
     end
-    return DataFrame(:pop1 => PooledArray(p1, compress = true), :pop2 => PooledArray(p2, compress = true),:locus => PooledArray(locs, compress = true) ,:fst => reduce(vcat, results))
+    return PairwiseFST(
+        DataFrame(:population1 => p1, :population2 => p2,:locus => locs, :fst => reduce(vcat, results)),
+        "Nei estimator"
+    )
 end
