@@ -49,7 +49,7 @@ wc = pairwise_fst(data, method = WeirCockerham)
 wc_sig = pairwise_fst(data, iterations = 1000)
 ```
 """
-function pairwisefst(data::PopData; method::Function = Hudson, by::String = "global", iterations::Int64 = 0)
+function pairwisefst(data::PopData; method::Function = WeirCockerham, by::String = "global", iterations::Int64 = 0)
     # sanity checks
     mth = Symbol(method)
     if mth ∉ [:Hudson, :Nei, :WeirCockerham]

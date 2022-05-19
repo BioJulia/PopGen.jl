@@ -1,16 +1,15 @@
 function Hudson(data::PopData)
-    !isbiallelic(data) && throw(error("Data must be biallelic to use the Hudson estimator"))
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci
-    results = zeros(npops, npops)
+    results = zeros(Float64, npops, npops)
     @sync for i in 2:npops
         Base.Threads.@spawn begin
             for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
-                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
-                results[i,j] = _hudsonfst(pop1,pop2)
+                @inbounds pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                @inbounds pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                @inbounds results[i,j] = Hudson(pop1,pop2)
            end
         end
     end
@@ -18,27 +17,32 @@ function Hudson(data::PopData)
 end
 
 # helper function to do the math for Hudson FST on a locus
-function _hudsonfst(pop1::T, pop2::T) where T<:GenoArray
+function Hudson(pop1::T, pop2::T) where T<:GenoArray
     p1_frq = allelefreq(pop1)
     p2_frq = allelefreq(pop2)
-    # find the shared allele(s) and choose one of them to be "P"
-    # this is a safeguard if one population is completely homozygous for an allele
-    p_allele = intersect(keys(p1_frq), keys(p2_frq)) |> first
-    p1 = p1_frq[p_allele]
+    # find the first allele and assume it's "p"
+    p_allele = first(keys(p1_frq))
+    p1 = get(p1_frq, p_allele, 0.0)
     q1 = 1.0 - p1
-    p2 = p2_frq[p_allele]
+    p2 = get(p2_frq, p_allele, 0.0)
     q2 = 1.0 - p2 
     # degrees of freedom is the number of loci - 1
-    df1 = (count(!ismissing, pop1) * 2) - 1
-    df2 = (count(!ismissing, pop2) * 2) - 1
+    df1 = (nonmissing(pop1) * 2.0) - 1.0
+    df2 = (nonmissing(pop2) * 2.0) - 1.0
     numerator = (p1 - p2)^2 - (p1*q1/df1) - (p2*q2/df2)
     denominator = (p1*q2) + (p2*q1)
     return numerator/denominator
 end
 
-function _hudsonfst(population_1::T, population_2::T) where T<:AbstractMatrix
-    fst_perloc = @views [_hudsonfst(population_1[:,i], population_2[:,i]) for i in 1:size(population_1,2)]
-    return mean(skipmissing(skipinfnan(fst_perloc)))
+function Hudson(population_1::T, population_2::T) where T<:AbstractMatrix
+    tot = 0.0
+    n = 0.0
+    for i in 1:size(population_1, 2)
+        fst = _hudsonfst(view(population_1,:,i), view(population_2,:,i))
+        tot += !isnan(fst) && !ismissing(fst) ? fst : continue 
+        n += 1.0
+    end
+    return tot/n
 end
 
 
@@ -80,12 +84,12 @@ function Nei(data::PopData)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci
-    results = zeros(npops, npops)
+    results = zeros(Float64, npops, npops)
     @inbounds @sync for i in 2:npops
         Base.Threads.@spawn begin
             @inbounds for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
-                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                @inbounds pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                @inbounds pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
                 @inbounds results[i,j] = Nei(pop1,pop2)
            end
         end
@@ -193,13 +197,13 @@ function WeirCockerham(data::PopData)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci
-    results = zeros(npops, npops)
+    results = zeros(Float64, npops, npops)
     @sync for i in 2:npops
         Base.Threads.@spawn begin
             for j in 1:(i-1)
-                pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
-                pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
-                results[i,j] = _weircockerham_fst(pop1,pop2)
+                @inbounds pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
+                @inbounds pop2 = reshape(idx_pdata[j].genotype, :, n_loci)
+                @inbounds results[i,j] = WeirCockerham(pop1,pop2)
            end
         end
     end
