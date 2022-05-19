@@ -38,7 +38,7 @@ function Hudson(population_1::T, population_2::T) where T<:AbstractMatrix
     tot = 0.0
     n = 0.0
     for i in 1:size(population_1, 2)
-        fst = _hudsonfst(view(population_1,:,i), view(population_2,:,i))
+        fst = Hudson(view(population_1,:,i), view(population_2,:,i))
         tot += !isnan(fst) && !ismissing(fst) ? fst : continue 
         n += 1.0
     end
@@ -48,35 +48,42 @@ end
 
 ## Nei 1987 FST ##
 function Nei(population_1::T, population_2::T) where T<:AbstractMatrix
-    n =  hcat(map(nonmissing, eachcol(population_1)), map(nonmissing, eachcol(population_2)))
-    # number of populations represented per locus
-    n_pop_per_loc = map(countnonzeros, eachrow(n)) 
-    # corrected n for population size
-    corr_n_per_loc = n_pop_per_loc ./ map(reciprocalsum, eachrow(n))
-    # observed heterozygosity
-    het_obs_p1 = map(_hetero_obs, eachcol(population_1))
-    het_obs_p2 = map(_hetero_obs, eachcol(population_2))
-    # expected heterozygosity
-    het_exp_p1 = map(_hetero_exp, eachcol(population_1))
-    het_exp_p2 = map(_hetero_exp, eachcol(population_2))
-    # genic diversity for population 1 and 2
-    p1_nei = _genediversitynei87.(het_exp_p1, het_obs_p1, corr_n_per_loc)
-    p2_nei = _genediversitynei87.(het_exp_p2, het_obs_p2, corr_n_per_loc)
-    # mean genic diversity
-    HS = map(i -> mean(skipmissing(i)), zip(p1_nei, p2_nei))
-    # allele freqs for population 1 and 2
-    alle_freq_p1 = map(allelefreq, eachcol(population_1))
-    alle_freq_p2 = map(allelefreq, eachcol(population_2))
-    # sum of the squared average allele frequencies
-    avg_freq = avg_allelefreq.(zip(alle_freq_p1, alle_freq_p2),2) .|> values .|> sum
-    # average observed heterozygosity per locus
-    Het_obs = map(i -> mean(skipmissing(i)), zip(het_obs_p1, het_obs_p2))
-
-    Ht = @inbounds 1.0 .- avg_freq .+ (HS ./ corr_n_per_loc ./ n_pop_per_loc) - (Het_obs ./ 2.0 ./ corr_n_per_loc ./ n_pop_per_loc)
-    DST = @inbounds Ht .- HS
-    DST′ = @inbounds n_pop_per_loc ./ (n_pop_per_loc .- 1) .* DST
-    HT′ = @inbounds HS .+ DST′
-    round(mean(skipinfnan(DST′)) / mean(skipinfnan(HT′)), digits = 5)
+    DSTtot = 0.0
+    HTtot = 0.0
+    Ntot = 0.0
+    for (i,p1) in enumerate(eachcol(population_1))
+        p2 = view(population_2, :, i)
+        n1 = nonmissing(p1)
+        n2 = nonmissing(p2)
+        # number of populations represented per locus
+        n_pop_per_loc = Float64((n1 > 0) + (n2 > 0))
+        n_pop_per_loc < 2.0 && continue
+        # corrected n for population size
+        corr_n_per_loc = n_pop_per_loc / (reciprocal(n1) + reciprocal(n2))
+        # observed heterozygosity
+        het_obs_p1 = _hetero_obs(p1)
+        het_obs_p2 = _hetero_obs(p2)
+        # expected heterozygosity
+        het_exp_p1 = _hetero_exp(p1)
+        het_exp_p2 = _hetero_exp(p2)
+        # genic diversity for population 1 and 2
+        p1_nei = _genediversitynei87(het_exp_p1, het_obs_p1, corr_n_per_loc)
+        p2_nei = _genediversitynei87(het_exp_p2, het_obs_p2, corr_n_per_loc)
+        # mean genic diversity
+        HS = (p1_nei + p2_nei) / n_pop_per_loc
+        alle_freq_p1 = allelefreq(p1)
+        alle_freq_p2 = allelefreq(p2)
+        avg_freq = sum(values(avg_allelefreq([alle_freq_p1, alle_freq_p2],2)))
+        Het_obs = (het_obs_p1 + het_obs_p2) / n_pop_per_loc
+        Ht = 1.0 - avg_freq + (HS / corr_n_per_loc / n_pop_per_loc) - (Het_obs / 2.0 / corr_n_per_loc / n_pop_per_loc)
+        DST = 2 * (Ht - HS)
+        DST′ = DST * (n_pop_per_loc - 1)
+        HT′ = HS + DST′
+        DSTtot += DST′
+        HTtot += HT′
+        Ntot += 1.0
+    end
+    return round((DSTtot/Ntot) / (HTtot/Ntot), digits = 5) 
 end
 
 function Nei(data::PopData)
@@ -84,7 +91,7 @@ function Nei(data::PopData)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
     n_loci = data.metadata.loci
-    results = zeros(Float64, npops, npops)
+    results = zeros(Union{Missing,Float64}, npops, npops)
     @inbounds @sync for i in 2:npops
         Base.Threads.@spawn begin
             @inbounds for j in 1:(i-1)
