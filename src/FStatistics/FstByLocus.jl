@@ -4,7 +4,7 @@ function _hudson_fst_lxl(data::PopData)
     nloci = data.metadata.loci
     locnames = loci(data)
     allpairs = pairwisepairs(pops)
-    npops = length(pops)
+    npops = data.metadata.populations
     npairs = Int64(npops * (npops-1) / 2)
     results = Vector{Vector{Union{Missing, Float64}}}(undef, npairs)
     p1 = PooledArray(repeat(getindex.(allpairs,1), inner = nloci), compress = true)
