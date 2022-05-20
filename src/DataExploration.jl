@@ -128,8 +128,9 @@ function pairwiseidentical(data::PopData, sample_names::Vector{T}) where T<:Abst
     locmtx = locimatrix(data)
     n = length(sampidx)
     result = NamedArray(zeros(Float64, n, n))
-    setnames!(result, sample_names,1)
-    setnames!(result, sample_names,2)
+    s_names = T == String ? sample_names : string.(sample_names)
+    setnames!(result, s_names,1)
+    setnames!(result, s_names,2)
     @inbounds for i in 1:n-1
         @inbounds v1 = view(locmtx,sampidx[i],:)
         @inbounds for j in i+1:n
