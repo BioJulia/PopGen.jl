@@ -6,10 +6,8 @@ Returns a tuple with chi-square statistic, degrees of freedom, and p-value
 function _chisqlocus(locus::T) where T <: GenoArray
     ## Get expected number of genotypes in a locus
     expected = genocount_expected(locus)
-
     ## Get observed number of genotypes in a locus
     observed = genocount_observed(locus)
-
     chisq_stat = expected
     @inbounds for (genotype, freq) in expected
         o = get(observed, genotype, 0.0)
@@ -18,13 +16,7 @@ function _chisqlocus(locus::T) where T <: GenoArray
     end
     chisq_stat = sum(values(chisq_stat))
     df = length(expected) - allelecount(locus)
-
-    if df > 0
-        chisq_dist = Distributions.Chisq(df)
-        p_val = 1.0 - Distributions.cdf(chisq_dist, chisq_stat)
-    else
-        p_val = missing
-    end
+    p_val = df > 0 ? 1.0 - Distributions.cdf(Distributions.Chisq(df), chisq_stat) : missing
     return (chisq_stat, df, p_val)
 end
 
