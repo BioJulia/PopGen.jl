@@ -73,7 +73,6 @@ import MultivariateStats: fit, PCA
 #   O o       O o       O o       O o       O o
 
 include("Utils.jl")
-include("AlleleMatrices.jl")
 
 # heterozygosity functions
 include("Heterozygosity.jl")

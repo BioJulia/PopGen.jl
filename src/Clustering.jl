@@ -25,7 +25,7 @@ julia> km = kmeans(cats, k = 2)
 function kmeans(data::PopData; k::Int64, iterations::Int64 = 100, matrixtype::Symbol = :pca)
     mtx = matrixtype == :pca ?
         pca(data, center = false, scale = true).proj |> permutedims : matrixtype == :freq ?
-        _allelematrix(data, center = false, scale = true) :
+        allelematrix(data, center = false, scale = true) :
         throw(ArgumentError("matrixtype :$matrixtype invalid, choose between :pca or :freq"))
     kmeans(mtx, k, maxiter = iterations)
 end
@@ -51,7 +51,7 @@ or just the scaled allele frequencies themselves. In both cases, `missing` value
 function kmedoids(data::PopData; k::Int64, iterations::Int64 = 100, distance::PreMetric = euclidean, matrixtype::Symbol = :pca)
     mtx = matrixtype == :pca ?
         pairwise(distance, pca(data, center = false, scale = true).proj |> permutedims, dims = 2) : matrixtype == :freq ?
-        pairwise(distance, _allelematrix(data, center = false, scale = true), dims = 1) : 
+        pairwise(distance, allelematrix(data, center = false, scale = true), dims = 1) : 
         throw(ArgumentError("matrixtype :$matrixtype invalid, choose between :pca or :freq"))
     kmedoids(mtx, k, maxiter = iterations)
 end
@@ -84,7 +84,7 @@ clustering on that distance matrix. Returns an `Hclust` object, which contains m
 function hclust(data::PopData; linkage::Symbol = :single, branchorder::Symbol = :r, distance::PreMetric = euclidean, matrixtype::Symbol = :pca)
     mtx = matrixtype == :pca ?
         pairwise(distance, pca(data, center = false, scale = true).proj |> permutedims, dims = 2) : matrixtype == :freq ?
-        pairwise(distance, _allelematrix(data, center = false, scale = true), dims = 1) : 
+        pairwise(distance, allelematrix(data, center = false, scale = true), dims = 1) : 
         throw(ArgumentError("matrixtype :$matrixtype invalid, choose between :pca or :freq"))
     hclust(mtx, linkage = linkage, branchorder = branchorder)
 end
@@ -128,7 +128,7 @@ clustering on the Euclidean distance matrix of that. Returns a `FuzzyCMeansResul
 function fuzzycmeans(data::PopData; c::Int64, fuzziness::Int64 = 2, iterations::Int64 = 100, matrixtype::Symbol = :pca)
     mtx = matrixtype == :pca ?
         pca(data, center = false, scale = true).proj |> permutedims : matrixtype == :freq ?
-        _allelematrix(data, center = false, scale = true) :
+        allelematrix(data, center = false, scale = true) :
         throw(ArgumentError("matrixtype :$matrixtype invalid, choose between :pca or :freq"))
     fuzzy_cmeans(mtx, c, fuzziness, maxiter = iterations)
 end
@@ -153,7 +153,7 @@ DBSCAN clustering on the distance matrix of that. Returns a `DbscanResult` objec
 function dbscan(data::PopData; radius::Float64, minpoints::Int64 = 2, distance::PreMetric = euclidean, matrixtype::Symbol = :pca)
     mtx = matrixtype == :pca ?
         pairwise(distance, pca(data, center = false, scale = true).proj |> permutedims, dims = 2) : matrixtype == :freq ?
-        pairwise(distance, _allelematrix(data, center = false, scale = true), dims = 1) : 
+        pairwise(distance, allelematrix(data, center = false, scale = true), dims = 1) : 
         throw(ArgumentError("matrixtype :$matrixtype invalid, choose between :pca or :freq"))
     dbscan(mtx, radius, minpoints)
 end
