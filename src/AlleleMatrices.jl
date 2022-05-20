@@ -156,7 +156,7 @@ and columns are the frequency of an allele for that locus in that sample.
 Missing values are kept as `missing`.
 """
 function _freqmatrix_missing(data::PopData)
-    out = _countmatrix(data)
+    out = allowmissing(_countmatrix(data))
     replace!(out, -1 => missing)
     out ./ data.sampleinfo.ploidy
 end
