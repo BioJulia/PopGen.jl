@@ -31,6 +31,7 @@ OnlineStats = "1"
 PooledArrays = "1.1"
 PopGenCore = "0.5, 0.6"
 Reexport = "1"
+StatsBase = "0.33"
 Term = "0.3"
 julia = "1.6"
 
