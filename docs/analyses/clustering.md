@@ -1,13 +1,44 @@
 ---
-id: kmeans
-title: K-Means Clustering
-sidebar_label: K-Means Clustering
+id: clustering
+title: Clustering
+sidebar_label: Clustering
 ---
 
-Usually the beginning of a study without prior population information requires guesstimating the number of clusters present in the data.
-One way to accomplish this is with K-means clustering, an unsupervised clustering algorithm that clusters data based on similarity. The
-PopGen.jl implementation of K-means clustering uses the K-means ++ algorithm ([Arthur & Vassilvitskii 2007](http://ilpubs.stanford.edu:8090/778/1/2006-13.pdf)) under the hood, as implemented in `Clustering.jl` ([link](https://github.com/JuliaStats/Clustering.jl)).
+Usually the beginning of a study without prior population information requires guesstimating the number of clusters present in the data. This can be accomplished
+using a number of methods, like K-means, K-mediods, Fuzzy-C Means, etc. PopGen.jl
+extends the clustering algorithms available in `Clustering.jl` ([link](https://github.com/JuliaStats/Clustering.jl)) to work directly with PopData objects.
 
+## cluster
+All of the clustering methods implemented in PopGen.jl (read below) can be accessed using a single function `cluster`.
+```julia
+cluster(::PopData, method::Function ; kwargs...)
+```
+A convenience wrapper to perform clustering on a `PopData` object determined by a designated `method`. The
+chosen method must also be supplied with the appropriate keyword arguments for that method. For more information on 
+a specific method, read more below or see its docstring in a Julia session with `?methodname` (e.g., `?kmediods`)
+
+### Clustering Methods
+- `kmeans`: K-means++ clustering
+  - kwargs: `k`, `iterations`, `matrixtype`
+- `kmedoids`: K-medoids clustering
+  - kwargs: `k`, `iterations`, `distance`, `matrixtype`
+- `hclust`: Hierarchical clustering
+  - kwargs: `linkage`, `branchorder`, `distance`, `matrixtype`
+- `fuzzycmeans`: Fuzzy C-means lustering
+  - kwargs: `c`, `fuzziness`, `iterations`, `matrixtype`
+- `dbscan`: Density-based Spatial Clustering of Applications with Noise (DBSCAN)
+  - kwargs: `radius`, `minpoints`, `distance`, `matrixtype`
+
+#### Examples
+```julia
+
+
+
+
+## Clustering Methods
+
+### K-means clustering
+K-means clustering is an unsupervised clustering algorithm that clusters data based on similarity. The Clustering.jl/PopGen.jl implementation of K-means clustering uses the K-means ++ algorithm ([Arthur & Vassilvitskii 2007](http://ilpubs.stanford.edu:8090/778/1/2006-13.pdf)).
 
 ### K-means clustering
 ```julia

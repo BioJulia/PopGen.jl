@@ -1,6 +1,6 @@
 {
   "name": "pop-gen-jl",
-  "version": "0.7.0",
+  "version": "0.9.0",
   "private": true,
   "scripts": {
     "start": "docusaurus start",
@@ -9,10 +9,10 @@
     "deploy": "docusaurus deploy"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-beta.16",
-    "@docusaurus/plugin-ideal-image": "2.0.0-beta.16",
-    "@docusaurus/plugin-pwa": "2.0.0-beta.16",
-    "@docusaurus/preset-classic": "^2.0.0-beta.16",
+    "@docusaurus/core": "^2.0.0-beta.20",
+    "@docusaurus/plugin-ideal-image": "^2.0.0-beta.20",
+    "@docusaurus/plugin-pwa": "^2.0.0-beta.16",
+    "@docusaurus/preset-classic": "^2.0.0-beta.20",
     "classnames": "^2.2.6",
     "clsx": "^1.1.1",
     "plugin-image-zoom": "github:ataft/plugin-image-zoom",

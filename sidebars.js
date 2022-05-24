@@ -33,7 +33,7 @@ module.exports = {
     ],
     "Analyses":[
       "analyses/hardyweinberg",
-      "analyses/kmeans",
+      "analyses/clustering",
       "analyses/fstatistics",
       "analyses/pca",
       "analyses/relatedness",
