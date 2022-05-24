@@ -27,7 +27,7 @@ Documentation: https://biojulia.net/PopGen.jl/
 - `summary(PopData)` to calculate F-statistics, heterozygosity, etc.
 - `hwetest(PopData)` to test for Hardy-Weinberg Equilibrium
 - `pairwisefst(PopData)` to calculate FST between pairs of populations
-- `kmeans(PopData, 2:k)` to perform Kmeans++ clustering
+- `cluster(PopData, kmeans, k = 3)` to perform Kmeans++ clustering
 """
 module PopGen
 
