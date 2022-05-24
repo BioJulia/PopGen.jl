@@ -28,6 +28,9 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
 ::: 
 
 ## Calculate Relatedness
+There are two main methods of calculating pairwise relatedness, an all x all comparison of an entire PopData object or an all x all comparison
+for a subset of individuals in a PopData object. Regardless of which you prefer, they can be perfomed without bootstrapping, returning a
+`NamedMatrix`, or with bootstrapping, returning a `DataFrame`. **Neither method estimates self-relatedness, so the diagonals of the NamedMatrix should be ignored.** The resulting `NamedMatrix` can be converted to a `DataFrame` using `kinshiptotable()`.
 
 <Tabs
   block={true}
@@ -40,20 +43,20 @@ see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.11
 <TabItem value="a">
 
 ```julia
-kinship(data::PopData; method::F, iterations::Int64, interval::Tuple(Float64, Float64))
+kinship(data::PopData; kwargs...)
 ```
-Return a dataframe of pairwise relatedness estimates for all individuals in a `PopData` object using 
-method `F` (see below). To calculate means, median, standard error, and confidence intervals using bootstrapping,
+Calculate pairwise relatedness estimates for all individuals in a `PopData` object using 
+the specified `method` (see below). Returns a `NamedMatrix` if not performing bootstrapping, otherwise returns a `DataFrame` (since bootstrapping provides more output information). To calculate means, median, standard error, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
-of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%), however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`. **Note:** samples must be diploid.
+of bootstrap iterations you wish to perform for each pair. The default confidence interval is `[0.0275, 0.975]` (i.e. 95%), however that can be changed by supplying a `Vector{Float64}` of `[low, high]` to the keyword `interval`. **Note:** samples must be diploid.
 
 #### Arguments
 - `data` : A PopData object
 
 #### Keyword Arguments
-- `method` : A method function (see below)
-- `iterations` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
-- `interval` : A Tuple of (low, high) indicating the confidence intervals you would like for bootstrapping (default: `(0.275, 0.975)`, i.e. 95%)
+- `method::Function` : A method function (see below)
+- `iterations::Int64` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
+- `interval::Vector{Float64}` : A Vector of [low, high] indicating the confidence intervals you would like for bootstrapping (default: `[0.275, 0.975]`, i.e. 95%)
 
 <Tabs
   block={true}
@@ -65,53 +68,44 @@ of bootstrap iterations you wish to perform for each pair. The default confidenc
 }>
 <TabItem value="wo">
 
-```
-julia> cats = @nancycats ; kin = kinship(cats, method = Moran) ;
-22366×3 DataFrame
-   Row │ sample1  sample2  Moran      
-       │ String   String   Float64      
-───────┼────────────────────────────────
-     1 │ cc_001   cc_002    0.00688008
-     2 │ cc_001   cc_003   -0.0286812
-     3 │ cc_001   cc_005   -0.000749142
-     4 │ cc_001   cc_007    0.0516361
-     5 │ cc_001   cc_008    0.0261128
-     6 │ cc_001   cc_009   -0.00187027
-     7 │ cc_001   cc_010    0.0182852
-   ⋮   │    ⋮        ⋮          ⋮
- 22361 │ seg_028  seg_029  -0.0472928
- 22362 │ seg_028  seg_030  -0.0172853
- 22363 │ seg_028  seg_031  -0.00240921
- 22364 │ seg_029  seg_030  -0.0278483
- 22365 │ seg_029  seg_031   0.0297876
- 22366 │ seg_030  seg_031  -0.0371295
-                      22353 rows omitted
+```julia
+julia> cats = @nancycats ; 
+
+julia> kin = kinship(cats, method = Moran)
+237×237 Named Matrix{Float64}
+A ╲ B │         N215          N216  …          N289          N290
+──────┼──────────────────────────────────────────────────────────
+N215  │ 8.13724e-316       1.62338  …       1.04589       1.15351
+N216  │      1.62338       0.29485         0.957724        1.1637
+N217  │     0.673577      0.587163         0.547427      0.709887
+N218  │     0.896935       0.72942         0.919448      0.791255
+⋮                  ⋮             ⋮  ⋱             ⋮             ⋮
+N297  │     0.757915      0.858834          1.15432        1.2677
+N281  │     0.686057      0.604236         0.942749       1.08762
+N289  │      1.04589      0.957724              0.0         1.104
+N290  │      1.15351        1.1637  …         1.104           0.0
 ```
 
 </TabItem>
 <TabItem value="b">
 
-```
-julia> cats = @nancycats ; kin = kinship(cats, method = Moran) ;
-22366×3 DataFrame
-   Row │ sample1  sample2  Moran      
-       │ String   String   Float64      
-───────┼────────────────────────────────
-     1 │ cc_001   cc_002    0.00688008
-     2 │ cc_001   cc_003   -0.0286812
-     3 │ cc_001   cc_005   -0.000749142
-     4 │ cc_001   cc_007    0.0516361
-     5 │ cc_001   cc_008    0.0261128
-     6 │ cc_001   cc_009   -0.00187027
-     7 │ cc_001   cc_010    0.0182852
-   ⋮   │    ⋮        ⋮          ⋮
- 22361 │ seg_028  seg_029  -0.0472928
- 22362 │ seg_028  seg_030  -0.0172853
- 22363 │ seg_028  seg_031  -0.00240921
- 22364 │ seg_029  seg_030  -0.0278483
- 22365 │ seg_029  seg_031   0.0297876
- 22366 │ seg_030  seg_031  -0.0371295
-                      22353 rows omitted
+```julia
+julia> cats = @nancycats ; 
+
+julia> kinship_new(cats, method = Moran, iterations = 100)
+27966×7 DataFrame
+   Row │ sample1  sample2  Moran     bootmean  std       CI_lower      CI_upper 
+       │ String   String   Float64   Float64   Float64   Float64       Float64  
+───────┼────────────────────────────────────────────────────────────────────────
+     1 │ N215     N216     1.62338   0.376626  0.27286    0.00274863   0.916719
+     2 │ N215     N217     0.673577  0.202888  0.20094    0.00105976   0.59871
+     3 │ N215     N218     0.896935  0.206272  0.232048   7.58373e-5   0.786113
+     4 │ N215     N219     0.988931  0.236503  0.221345  -0.00053018   0.718204
+   ⋮   │    ⋮        ⋮        ⋮         ⋮         ⋮           ⋮           ⋮
+ 27964 │ N281     N289     0.942749  0.220475  0.200358   0.001656     0.799307
+ 27965 │ N281     N290     1.08762   0.285053  0.289967   0.000299019  1.09343
+ 27966 │ N289     N290     1.104     0.277445  0.235519   0.00186445   0.858206
+                                                              27959 rows omitted
 ```
 
 </TabItem>
@@ -121,13 +115,13 @@ julia> cats = @nancycats ; kin = kinship(cats, method = Moran) ;
 <TabItem value="s">
 
 ```julia
-kinship(data::PopData, sample_names::Vector{String}; method::F, iterations::Int64, interval::Tuple(Float64, Float64))
+kinship(data::PopData, sample_names::Vector{AbstractString}; kwargs...)
 ```
-Return a dataframe of pairwise relatedness estimates for all pairs of the supplied sample names in a `PopData` object using 
-method `F` (see below). To calculate means, median, standard error, and confidence intervals using bootstrapping,
+Calculate pairwise relatedness estimates for all pairs of the supplied sample names in a `PopData` object using 
+the specified `method` (see below). Returns a `NamedMatrix` if not performing bootstrapping, otherwise returns a `DataFrame` (since bootstrapping provides more output information). To calculate means, median, standard error, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
-of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.275, 0.975)` (i.e. 95%),
-however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, high)` to the keyword `interval`.
+of bootstrap iterations you wish to perform for each pair. The default confidence interval is `[0.0275, 0.975]` (i.e. 95%),
+however that can be changed by supplying a `Vector{Float64}` of `[low, high]` to the keyword `interval`.
 **Note:** samples must be diploid.
 
 #### Arguments
@@ -135,10 +129,10 @@ however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, h
 - `sample_names` : A list of samples names to calculate relatedness for
 
 #### Keyword Arguments
-- `method` : A method function or vector of method functions (see below)
-- `iterations` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
-- `interval` : A Tuple of (low, high) indicating the confidence intervals you would like for bootstrapping (default: `(0.275, 0.975)`, i.e. 95%)
-- `inbreeding` : true/false of whether to consider inbreeding in the calculations (default: `false`). Only used in `dyadML`
+- `method::Function` : A method function or vector of method functions (see below)
+- `iterations::Int64` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
+- `interval::Vector{Float64}` : A Vector of [low, high] indicating the confidence intervals you would like for bootstrapping (default: `[0.0275, 0.975]`, i.e. 95%)
+
 
 <Tabs
   block={true}
@@ -150,53 +144,45 @@ however that can be changed by supplying a `Tuple{Float64, Float64}` of `(low, h
 }>
 <TabItem value="wo">
 
-```
-julia> cats = @nancycats ; kin = kinship(cats, method = Moran) ;
-22366×3 DataFrame
-   Row │ sample1  sample2  Moran      
-       │ String   String   Float64      
-───────┼────────────────────────────────
-     1 │ cc_001   cc_002    0.00688008
-     2 │ cc_001   cc_003   -0.0286812
-     3 │ cc_001   cc_005   -0.000749142
-     4 │ cc_001   cc_007    0.0516361
-     5 │ cc_001   cc_008    0.0261128
-     6 │ cc_001   cc_009   -0.00187027
-     7 │ cc_001   cc_010    0.0182852
-   ⋮   │    ⋮        ⋮          ⋮
- 22361 │ seg_028  seg_029  -0.0472928
- 22362 │ seg_028  seg_030  -0.0172853
- 22363 │ seg_028  seg_031  -0.00240921
- 22364 │ seg_029  seg_030  -0.0278483
- 22365 │ seg_029  seg_031   0.0297876
- 22366 │ seg_030  seg_031  -0.0371295
-                      22353 rows omitted
+```julia
+julia> cats = @nancycats ; 
+
+julia> kin = kinship(cats, samplenames(cats)[1:10], method = Moran) ;
+10×10 Named Matrix{Float64}
+A ╲ B │         N215          N216  …          N223          N224
+──────┼──────────────────────────────────────────────────────────
+N215  │     5.0e-323       2.40275  …       1.28205      0.793651
+N216  │      2.40275      5.0e-324          1.16525       1.03383
+N217  │     0.860832      0.755287         0.938453      0.543519
+N218  │      1.17754      0.967118         0.824974       1.00656
+N219  │      1.36268       1.80995         0.760537       0.96706
+N220  │      1.47059       1.84275         0.735041       1.39631
+N221  │      2.03837       1.96335          1.11537       1.14702
+N222  │     0.657895      0.804829          0.78841      0.905063
+N223  │      1.28205       1.16525         5.0e-324      0.654129
+N224  │     0.793651       1.03383  …      0.654129  6.93947e-310
 ```
 
 </TabItem>
 <TabItem value="b">
 
-```
-julia> cats = @nancycats ; kin = kinship(cats, method = Moran) ;
-22366×3 DataFrame
-   Row │ sample1  sample2  Moran      
-       │ String   String   Float64      
-───────┼────────────────────────────────
-     1 │ cc_001   cc_002    0.00688008
-     2 │ cc_001   cc_003   -0.0286812
-     3 │ cc_001   cc_005   -0.000749142
-     4 │ cc_001   cc_007    0.0516361
-     5 │ cc_001   cc_008    0.0261128
-     6 │ cc_001   cc_009   -0.00187027
-     7 │ cc_001   cc_010    0.0182852
-   ⋮   │    ⋮        ⋮          ⋮
- 22361 │ seg_028  seg_029  -0.0472928
- 22362 │ seg_028  seg_030  -0.0172853
- 22363 │ seg_028  seg_031  -0.00240921
- 22364 │ seg_029  seg_030  -0.0278483
- 22365 │ seg_029  seg_031   0.0297876
- 22366 │ seg_030  seg_031  -0.0371295
-                      22353 rows omitted
+```julia
+julia> cats = @nancycats ; 
+
+julia> kin = kinship(cats, samplenames(cats)[1:10], method = Moran, iteratons = 100)
+45×7 DataFrame
+ Row │ sample1  sample2  Moran     bootmean   std       CI_lower      CI_upper 
+     │ String   String   Float64   Float64    Float64   Float64       Float64  
+─────┼─────────────────────────────────────────────────────────────────────────
+   1 │ N215     N216     2.40275   0.166804   0.192498  -0.00103402   0.558154
+   2 │ N215     N217     0.860832  0.132997   0.157386   0.00079658   0.500806
+   3 │ N215     N218     1.17754   0.138991   0.193997   0.00178298   0.620476
+   4 │ N215     N219     1.36268   0.118936   0.169152   0.000739799  0.527514
+  ⋮  │    ⋮        ⋮        ⋮          ⋮         ⋮           ⋮           ⋮
+  43 │ N222     N223     0.78841   0.0947265  0.1087    -0.000671851  0.316755
+  44 │ N222     N224     0.905063  0.121569   0.125794   0.000570054  0.387836
+  45 │ N223     N224     0.654129  0.0729529  0.121482   0.00105724   0.403654
+                                                                38 rows omitted
 ```
 
 </TabItem>
@@ -206,9 +192,14 @@ julia> cats = @nancycats ; kin = kinship(cats, method = Moran) ;
 </Tabs>
 
 ### Methods
-There are several estimators available and are listed below. `relatedness` takes the
+There are several estimators available and are listed below. `kinship` takes the
 function names as arguments (**case sensitive**), therefore do not use quotes or colons
-in specifying the methods. Methods can be supplied as a vector. 
+in specifying the methods.
+
+:::tip autocompletion
+Since the methods correspond to function names, they will tab-autocomplete when 
+inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
+:::
 
 | Method | Type | Method Call |
 |:----|:-----|:-----|
@@ -224,14 +215,9 @@ in specifying the methods. Methods can be supplied as a vector.
 | [Milligan 2003](https://pubmed.ncbi.nlm.nih.gov/12663552/) "DyadML" | maximum-likelihood | incomplete* |
 | [Wang 2002](https://www.genetics.org/content/160/3/1203.short) | moments-based | incomplete* |
 
-:::note *more relatedness
-Contact us or submit a pull request if you're interested in contributing to the relatedness methods. DyadML and Wang (2002) estimators are currently incomplete and the others
+:::note *more kinship estimators
+Contact us or submit a pull request if you're interested in contributing to the kinship methods. DyadML and Wang (2002) estimators are currently incomplete and the others
 could use some optimizations. More help is always welcomed! Our wishlist also includes the KING method :smile:
-:::
-
-:::tip autocompletion
-Since the methods correspond to function names, they will tab-autocomplete when 
-inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
 :::
 
 ## Posthoc analyses
