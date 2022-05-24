@@ -8,15 +8,14 @@ sidebar_label: AlleleFreq.jl
 |:---:|:---:|:---:|
 ### 🟪 allelefreq
 ```julia
-allelefreq(allele::Int, genos::GenoArray)
+allelefreq(genos::GenoArray, allele::Int)
 ```
 Return the frequency of a specific `allele` from a vector of Genotypes `genos`.
 
 **Example**
 ```
-using DataFramesMeta
 ncats = @nancycats;
-ncats_sub @where(ncats.genodata, :locus .== "fca8", :genotype .!== missing)
+ncats_sub = ncats[(ncats.genodata.locus .== "fca8") .& (ncats.genodata.genotype .!== missing)] 
 pop_grp = groupby(ncats_sub, :population)
 DataFrames.combine(pop_grp, :genotype => (geno -> allelefreq(137, geno)) => :freq_137)
 ```

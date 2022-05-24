@@ -45,7 +45,7 @@ julia> pairwisepairs(colors) |> collect
 ----
 ### 🟪 simpairs
 ```julia
-_simpairs(data::Vector{String})
+simpairs(data::Vector{String})
 ```
 Takes a Vector of sample names and returns a Tuple of sample pairs, grouped by simulation
 number. This is an internal function used for isolating sibship pairs from simulated shipship
@@ -53,7 +53,7 @@ pairs (via `PopGenSims.jl`) to perform `relatedness` estimates only on those pai
 **Example**
 ```julia
 julia> a = ["sim1_off1", "sim1_off2", "sim2_off1", "sim2_off2"] ;
-julia> _simpairs(a)
+julia> simpairs(a)
 ("sim1_off1", "sim1_off2")
 ("sim2_off1", "sim2_off2")
 ```

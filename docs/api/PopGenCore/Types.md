@@ -13,6 +13,8 @@ PopObj::AbstractType
 ```
 Generic AbstractType for use in PopGen.jl
 
+----
+
 ### 🟪🔵 PopDataInfo
 ```
 mutable struct PopDataInfo
@@ -32,6 +34,8 @@ about the `PopData` for easy access.
 PopDataInfo(genodf::DataFrame)
 ```
 constructor format using just the genodata dataframe
+
+----
 
 ### 🟪🔵 PopData
 ```
@@ -59,6 +63,8 @@ and instead should use the provided file importers and utilities.
 ```PopData(data::DataFrame)```
 Contructor using just a `genodata` dataframe.
 
+----
+
 ### 🟪🔵 PopDataInfo!
 ```julia
 PopDataInfo!(data::PopData)
@@ -70,6 +76,8 @@ PopDataInfo!(popdatainfo::PopDataInfo, genodata::DataFrame)
 ```
 Method to update preexisting PopDataInfo with new genodata, useful for getindex and creating new PopData from that
 
+----
+
 ### 🟪🔵 Genotype
 ```julia
 Genotype::DataType
@@ -78,11 +86,15 @@ For convenience purposes, an alias for `NTuple{N, <:Signed} where N`, which is
 the type describing individual genotypes in PopData. Specifically, there exist
 `SNP` as an alias for `NTuple{N, Int8}` and `MSat` for `NTuple{N, Int16}`
 
+----
+
 ### 🟪🔵 SNP
 ```julia
 SNP::DataType
 ```
 An alias for `NTuple{N, Int8}`
+
+----
 
 ### 📦 _SNP
 ```julia
@@ -90,17 +102,23 @@ SNP(geno)
 ```
 Contstructor for `SNP`
 
+----
+
 ### 🟪🔵 MSat
 ```julia
 MSat::DataType
 ```
 An alias for `NTuple{N, Int16}`
 
+----
+
 ### 📦 _MSat
 ```julia
 _MSat(geno)
 ```
 Constructor for `MSat`
+
+----
 
 ### 🟪🔵 GenoArray
 ```julia
@@ -111,11 +129,15 @@ and `Genotype`, which itself is of type `NTuple{N, <:Integer} where N`.
 The definition as an `AbstractVector` adds flexibility for `SubArray`
 cases.
 
+----
+
 ### 📦 _ploidy2text
 ```
 _ploidy2text(ploidy::Int8)
 _ploidy2text(ploidy::Vector{Int8})
 ```
+
+----
 
 ### 🟪🔵 Base.show
 ```julia
@@ -123,12 +145,16 @@ Base.show(io::IO, data::PopData)
 Base.show(io::IO, data::PopDataInfo)
 ```
 
+----
+
 ### 🟪🔵 Base.getindex
 ```julia
 Base.getindex(data::PopData, idx::Symbol)
 Base.getindex(data::PopData, args)
 Base.getindex(data::PopData, expression, cols)
 ```
+
+----
 
 ### 🟪🔵 Base.getproperty
 ```julia

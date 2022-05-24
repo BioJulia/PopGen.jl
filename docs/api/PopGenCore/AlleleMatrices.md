@@ -4,7 +4,7 @@ title: AlleleMatrices.jl
 sidebar_label: AlleleMatrices.jl
 ---
 
-## PopGen.jl/src/AlleleMatrices.jl
+## PopGenCore.jl/src/AlleleMatrices.jl
 | 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
 |:---:|:---:|:---:|
 
@@ -94,7 +94,7 @@ Missing values are replaced by the global mean allele frequency.
 
 ### 🟪 freqmatrix_missing
 """
-    _freqmatrix_missing(data::PopData)
+    freqmatrix_missing(data::PopData)
 Create a matrix of allele frequencies per genotype where rows are samples
 and columns are the frequency of an allele for that locus in that sample.
 Missing values are kept as `missing`.
@@ -104,7 +104,7 @@ Missing values are kept as `missing`.
 
 ### 🟪 freqmatrix_scale
 """
-    _freqmatrix_scale(freqs::Matrix{Float32}, scale::Bool = true, center::Bool = true)
+    freqmatrix_scale(freqs::Matrix{Float32}, scale::Bool = true, center::Bool = true)
 Returns a Z-score scaled matrix of allele frequencies where rows are samples 
 and columns are the frequency of an allele for that locus in that sample.
 - `scale`: a 'Bool' of whether to z-score scale allele frequencies (default: `false`)

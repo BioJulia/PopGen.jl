@@ -13,6 +13,8 @@ isbinary(filepath::String)
 ```
 Returns `true` if the `filepath` is a binary file. 
 
+----
+
 ### 🟪 findploidy
 ```julia
 findploidy(genotypes::T) where T<:AbstractVector
@@ -20,6 +22,8 @@ findploidy(genotypes::T) where T<:AbstractVector
 Used internally in the `genepop` and `delimited` file parsers to scan the genotypes
 of a sample and return the ploidy of the first non-missing locus.
 
+
+----
 
 ### 🟪 phase
 ```julia
@@ -38,6 +42,8 @@ map(i -> phase(i, Int16, 3), ["112131", "211112", "001003", "516500"])
 # or #
 [phase(i, Int8, 2) for i in ["0101", "0103", "0202", "0103"]]
 ```
+
+----
 
 ### 🟪 unphase
 ```julia

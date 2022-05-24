@@ -53,7 +53,7 @@ module.exports = {
           "api/PopGen/fstpermutations",
           "api/PopGen/hardyweinberg",
           "api/PopGen/heterozygosity",
-          "api/PopGen/kmeans",
+          "api/PopGen/clustering",
           "api/PopGen/pca",
           "api/PopGen/pairwisefst",
           "api/PopGen/pairwisekinship",
