@@ -16,6 +16,23 @@ function kinship_new(data::PopData; method::Function, iterations::Int = 0, inter
     end
 end
 
+function kinship_new(data::PopData, samplenames::AbstractVector{T}; method::Function, iterations::Int = 0, interval::Vector{Float64} = [0.025, 0.975]) where T<:AbstractString
+    # sanity checks
+    data.metadata.ploidy != 2 && error("kinship analyses currently only support diploid samples")
+    length(interval) != 2 && throw(ArgumentError("Keyword argument \`interval\` must be a vector with 2 elements."))
+    newdata = data[data.genodata.name .∈ Ref(samplenames)]
+    if (iterations == 0) && (Symbol(method) ∈ [:Blouin, :LiHorvitz, :Lynch])
+        _kinship_noboot_nofreq(newdata, method)
+    elseif (iterations == 0) && (Symbol(method) ∈ [:Loiselle, :LynchLi, :LynchRitland, :Moran, :QuellerGoodnight, :Ritland])
+        _kinship_noboot_freq(newdata, method)
+    elseif (iterations > 0) && (Symbol(method) ∈ [:Blouin, :LiHorvitz, :Lynch])
+        _kinship_boot_nofreq(newdata, method, iterations, interval)
+    elseif (iterations > 0) && (Symbol(method) ∈ [:Loiselle, :LynchLi, :LynchRitland, :Moran, :QuellerGoodnight, :Ritland])
+        _kinship_boot_freq(newdata, method, iterations, interval)
+    else
+        throw(ArgumentError("Invalid method provided: $method. See the docstring \`?kinship\` for usage information."))
+    end
+end
 
 ### Internal implementations ###
 
@@ -461,22 +478,5 @@ function kinshiptotable(kinshipresults::T, mthd::Symbol=:nothing) where T<:Named
     DataFrame(:sample1 => first.(idpairs), :sample2 => getindex.(idpairs, 2), meth => vals)
 end
 
-## moved to PopGenCore, deprected on next PopGenCore release##
-function uppertri2vec(x, diag::Bool = false)
-    n = size(x,1)
-    if !diag
-        [x[i, j] for i in 1:n-1 for j in i+1:n]
-    else
-        [x[i, j] for i in 1:n-1 for j in i:n]
-    end
-end
 
-function lowertri2vec(x, diag::Bool = false)
-    n = size(x,1)
-    if !diag
-        [x[j,i] for i in 1:n-1 for j in i+1:n]
-    else
-        [x[j,i] for i in 1:n-1 for j in i:n]
-    end
-end
-##
+#TODO update kinshipposthoc for this new interface
