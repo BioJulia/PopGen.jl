@@ -39,6 +39,7 @@ are named with three main principals:
 1. as verbose of a name as is reasonable
 2. no underscores between words
 3. all lowercase, always, unless it's a DataType
+    - or method keyword option (like the `kinship` or series)
 
 These decisions are because of years-long frustration with the swirling chaos that is R function names.
 Where it is possible and reasonable to do so, function names are verbose and descriptive. For example,
@@ -56,3 +57,39 @@ every R function. As if learning another language wasn't enough of a task, memor
 keywords is a completely unneccessary stumbling block. To the best of our abilities, we try to name
 keywords using _entire_ words, and hopefully words that are intuitive if you were just trying to guess
 before calling up the docstring. 
+
+### Dev tips
+:::tip TLDR
+- Avoid allocations when possible
+- First drafts don't need to be efficient or performant
+- When in doubt, roll your own helper functions
+:::
+
+If you plan on extending PopGen.jl, here are some useful tips we learned the hard way:
+- Most basic (non-mathematic) or fundamental operations live in PopGenCore.jl
+- Math fundementals and allele/genotype matrix operations live in PopGen.jl
+- It's ok to write something functional but not efficient. Things we can always be improved later!
+- Allocations are the enemy
+    - Ignore this recommendation if the goal is a first draft or proof of concept
+    - Creating Arrays is costly and that cost scales **tremendously** with core operations
+    - If the goal is to be performant, aim for as few allocations as possible
+    - Embrace loops
+- `if` statements inside loops slow them down
+    - But if they are small or simple enough, can still be faster and more efficient than allocating Arrays
+- Sometimes `Base` (or others) don't have the performance you need
+    - There's no harm in writing a small helper function if it's an improvement
+- Incrementing a variable inside a loop with `+=` or similar (example 1) is **a lot** more performant that doing so with a list comprehension (example 2), even though it requires more lines of code.
+
+```julia
+# example 1: Incrementing inside for loop
+# performant
+n = 0
+for i in 1:something
+    n += 1
+end
+
+# example 2: Incrementing inside list comprehension 
+# not performant
+n = 0
+[n+= 1 for i:something]
+```

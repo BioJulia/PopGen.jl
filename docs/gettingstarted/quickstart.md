@@ -69,7 +69,7 @@ Import Data
 Explore PopData
 - populations(PopData) to view population information
 - loci(PopData) to view locus names
-- samples(PopData) to view sample names
+- samplenames(PopData) to view sample names
 - missing(PopData, by = ...) to view missing information
 
 Manipulate PopData
