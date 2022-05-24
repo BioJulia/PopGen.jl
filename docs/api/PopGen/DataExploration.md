@@ -119,38 +119,40 @@ missingdata(@gulfsharks, by = "pop")
 -----
 
 ### 🔵 pairwiseidentical
-    pairwiseidentical(data::PopData)
-Return a table of the percent of identical genotypes at each locus between all pairs of all individuals in a PopData object.
+```julia
+pairwiseidentical(data::PopData)
+```
+Return a pairwise matrix of the percent of identical genotypes at each locus between all pairs of individuals.
 
 **Example**
-```julia
-julia> cats = @nancycats;
-
+```
+julia> cats = @nancycats ;
 julia> pairwiseidentical(cats)
-27966×4 DataFrame
-   Row │ sample_1  sample_2  identical  n     
-       │ String    String    Float64    Int64 
-───────┼──────────────────────────────────────
-     1 │ N215      N216           0.5       8
-     2 │ N215      N217           0.25      8
-     3 │ N215      N218           0.38      8
-     4 │ N215      N219           0.38      8
-   ⋮   │    ⋮         ⋮          ⋮        ⋮
- 27963 │ N297      N290           0.29      7
- 27964 │ N281      N289           0.25      8
- 27965 │ N281      N290           0.43      7
- 27966 │ N289      N290           0.14      7
-                            27958 rows omitted
+237×237 Named Matrix{Float64}
+A ╲ B │     N215      N216  …      N289      N290
+──────┼──────────────────────────────────────────
+N215  │      1.0       0.5  …  0.142857  0.166667
+N216  │      0.5       1.0     0.142857  0.166667
+N217  │     0.25     0.125        0.125  0.142857
+N218  │    0.375      0.25         0.25  0.142857
+N219  │    0.375     0.375         0.25  0.142857
+⋮              ⋮         ⋮  ⋱         ⋮         ⋮
+N296  │      0.5  0.333333          0.0       0.0
+N297  │ 0.166667  0.166667     0.428571  0.285714
+N281  │ 0.142857  0.142857         0.25  0.428571
+N289  │ 0.142857  0.142857          1.0  0.142857
+N290  │ 0.166667  0.166667  …  0.142857       1.0
 ```
 
-    pairwiseidentical(data::PopData, sample_names::Vector{String})
-Return a table of the percent of identical genotypes at each locus
-between all pairs of provided `sample_names`.
+```julia
+pairwiseidentical(data::PopData, sample_names::Vector{String})
+```
+Return a pairwise matrix of the percent of identical genotypes at 
+each nonmissing locus between all pairs of provided `sample_names`.
 
 **Example**
 ```julia
-julia> cats = @nancycats;
-
+julia> cats = @nancycats ;
 julia> interesting_cats = samplenames(cats)[1:5]
 5-element Array{String,1}:
  "N215"
@@ -158,20 +160,14 @@ julia> interesting_cats = samplenames(cats)[1:5]
  "N217"
  "N218"
  "N219"
-
+ 
 julia> pairwiseidentical(cats, interesting_cats)
-10×4 DataFrame
- Row │ sample_1  sample_2  identical  n     
-     │ String    String    Float64    Int64 
-─────┼──────────────────────────────────────
-   1 │ N215      N216           0.5       8 
-   2 │ N215      N217           0.25      8 
-   3 │ N215      N218           0.38      8 
-   4 │ N215      N219           0.38      8 
-   5 │ N216      N217           0.12      8 
-   6 │ N216      N218           0.25      8 
-   7 │ N216      N219           0.38      8 
-   8 │ N217      N218           0.0       9 
-   9 │ N217      N219           0.11      9 
-  10 │ N218      N219           0.33      9 
+5×5 Named Matrix{Float64}
+A ╲ B │     N217      N218      N219      N220      N221
+──────┼─────────────────────────────────────────────────
+N217  │      1.0       0.0  0.111111  0.222222  0.111111
+N218  │      0.0       1.0  0.333333  0.111111  0.444444
+N219  │ 0.111111  0.333333       1.0  0.111111  0.333333
+N220  │ 0.222222  0.111111  0.111111       1.0  0.222222
+N221  │ 0.111111  0.444444  0.333333  0.222222       1.0
 ```

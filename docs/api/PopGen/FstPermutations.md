@@ -14,23 +14,9 @@ _fst_permutation(population_1::T, population_2::T) where T<:AbstractMatrix
 Returns two matrices with rows (samples) shuffled between them. Respects the
 number of rows of the original matrices (i.e. population sizes).
 
-----
-
-### 📦 _permuted_Hudson
 ```julia
-_permuted_hudson(data::PopData, iterations::Int64)
+_fst_permution(data::PopData, method::Function, iterations::Int64)
 ```
-
-----
-
-### 📦 _permuted_Nei
-```julia
-_permuted_Nei(data::PopData, iterations::Int64)
-```
-
-----
-
-### 📦 _permuted_WeirCockerham
-```julia
-_permuted_WeirCockerham(data::PopData, iterations::Int64)
-```
+Returns a `PairwiseFST` object containing a dataframe of Pairwise FST calculations. The contained
+dataframe has FST values below the diagonal and P values above it. This method is used internally
+and wrapped by the public API provided in `pairwisefst()`.
