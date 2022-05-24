@@ -4,8 +4,8 @@ title: Utils.jl
 sidebar_label: Utils.jl
 ---
 ## PopGenSims.jl/src/Utils.jl
-📦  => not exported | 
-🟪 => exported by PopGenSims.jl
+| 📦  not exported | 🟪  exported by PopGenSims.jl |
+|:---:|:---:|
 
 ### 🟪 append!
 ```julia

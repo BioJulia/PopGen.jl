@@ -4,9 +4,8 @@ title: ioUtils.jl
 sidebar_label: ioUtils.jl
 ---
 ## PopGenCore.jl/src/Utils/ioUtils.jl
-📦  => not exported | 
-🟪 => exported by PopGenCore.jl | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
 ### 📦 isbinary
 ```jula

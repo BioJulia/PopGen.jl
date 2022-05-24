@@ -4,8 +4,8 @@ title: HardyWeinberg.jl
 sidebar_label: HardyWeinberg.jl
 ---
 ## PopGen.jl/src/HardyWeinberg.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 📦 _chisqlocus
 ```julia

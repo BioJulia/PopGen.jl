@@ -47,7 +47,6 @@ module.exports = {
       "api/api",
       {
         "PopGen":[
-          "api/PopGen/allelematrices",
           "api/PopGen/dataexploration",
           "api/PopGen/fstbylocus",
           "api/PopGen/fstglobal",
@@ -67,6 +66,7 @@ module.exports = {
       {
         "PopGenCore":[
           "api/PopGenCore/allelefreq",
+          "api/PopGenCore/allelematrices",
           "api/PopGenCore/conditionals",
           "api/PopGenCore/datasets",
           "api/PopGenCore/delimited",

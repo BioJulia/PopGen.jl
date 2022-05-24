@@ -4,9 +4,8 @@ title: VariantCall.jl
 sidebar_label: VariantCall.jl
 ---
 ## PopGenCore.jl/src/io/VariantCall.jl
-📦  => not exported | 
-🟪 => exported by PopGenCore.jl | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
 ### 📦  openvcf
     openvcf(::String)

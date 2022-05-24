@@ -5,8 +5,8 @@ sidebar_label: DataExploration.jl
 ---
 
 ## PopGen.jl/src/DataExplortation.jl
-📦 => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 🔵 allelefreqtable
 ```julia

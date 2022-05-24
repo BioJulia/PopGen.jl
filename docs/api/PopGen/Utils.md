@@ -5,8 +5,8 @@ sidebar_label: Utils.jl
 ---
 
 ## PopGen.jl/src/Utils.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 📦 _adjacency_matrix
 ```julia

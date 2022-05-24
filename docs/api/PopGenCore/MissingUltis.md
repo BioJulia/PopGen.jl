@@ -4,9 +4,8 @@ title: MissingUtils.jl
 sidebar_label: MissingUtils.jl
 ---
 ## PopGenCore.jl/src/Utils/MissingUtils.jl
-📦  => not exported | 
-🟪 => exported by PopGenCore.jl | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
 
 ### 🟪 nonmissing

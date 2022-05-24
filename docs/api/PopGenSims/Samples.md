@@ -4,8 +4,8 @@ title: Samples.jl
 sidebar_label: Samples.jl
 ---
 ## PopGenSims.jl/src/Samples.jl
-📦  => not exported | 
-🟪 => exported by PopGenSims.jl
+| 📦  not exported | 🟪  exported by PopGenSims.jl |
+|:---:|:---:|
 
 ### 📦 sample_locus
 ```julia

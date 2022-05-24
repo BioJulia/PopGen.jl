@@ -4,9 +4,8 @@ title: Permutations.jl
 sidebar_label: Permutations.jl
 ---
 ## PopGenCore.jl/src/Permutations.jl
-📦  => not exported | 
-🟪 => exported by PopGenCore.jl | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
 ### 🟪 permuteloci!
 ```julia

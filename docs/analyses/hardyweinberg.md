@@ -206,3 +206,10 @@ julia> ncats_hwe |> @vlplot(:rect, :locus, :population, color=:P_bonferroni)
 ```
 ![hwe_test](/img/hwe_test.png)
 
+
+
+
+---------------------
+## Acknowledgements
+While most of the arithmetic for the Hardy-Weinberg test is written by us, we rely on the
+Chi-Squared distribution and probability density function provided by [Distributions.jl](https://github.com/JuliaStats/Distributions.jl). 

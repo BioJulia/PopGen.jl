@@ -4,8 +4,8 @@ title: KinshipPostHocs.jl
 sidebar_label: KinshipPostHocs.jl
 ---
 ## PopGen.jl/src/Kinship/KinshipPostHocs.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 📦 sig_within
 ```julia

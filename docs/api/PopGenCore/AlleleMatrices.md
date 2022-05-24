@@ -5,10 +5,10 @@ sidebar_label: AlleleMatrices.jl
 ---
 
 ## PopGen.jl/src/AlleleMatrices.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
-### 📦 _allelematrix
+### 🟪 allelematrix
 ```julia
 _allelematrix(data::PopData; by::String = "count", missings = "mean", scale = false, center = false)
 ```
@@ -27,30 +27,30 @@ compute allele frequencies regardless of the `by` keyword.
 - `center`: a `Bool` of whether to center the allele frequencies (default: 'false')
 
 **Example**
-```
+```julia
 julia> cats = @nancycats ;
-julia> frq = _allelematrix(cats) ;  frq[1:5,1:6]
+julia> frq = allelematrix(cats) ;  frq[1:5,1:6]
 5×6 Matrix{Union{Missing, Int8}}:
   missing   missing   missing   missing   missing   missing
   missing   missing   missing   missing   missing   missing
  0         0         0         0         0         0
  0         0         0         0         0         0
  0         0         0         0         0         0
-julia> frq = _allelematrix(cats, by = "frequency") ;  frq[1:5,1:6]
+julia> frq = allelematrix(cats, by = "frequency") ;  frq[1:5,1:6]
 5×6 Matrix{Union{Missing, Float32}}:
  0.00460829  0.00460829  0.0276498  0.133641  0.00460829  0.0921659
  0.00460829  0.00460829  0.0276498  0.133641  0.00460829  0.0921659
  0.0         0.0         0.0        0.0       0.0         0.0
  0.0         0.0         0.0        0.0       0.0         0.0
  0.0         0.0         0.0        0.0       0.0         0.0
- julia> frq = _allelematrix(cats, by = "frequency", missings = "zero") ;  frq[1:5,1:6]
+ julia> frq = allelematrix(cats, by = "frequency", missings = "zero") ;  frq[1:5,1:6]
  5×6 Matrix{Float64}:
  0.0  0.0  0.0  0.0  0.0  0.0
  0.0  0.0  0.0  0.0  0.0  0.0
  0.0  0.0  0.0  0.0  0.0  0.0
  0.0  0.0  0.0  0.0  0.0  0.0
  0.0  0.0  0.0  0.0  0.0  0.0
- julia> frq = _allelematrix(cats, missings = "mean", scale = true, center = true) ;  frq[1:5,1:6]
+ julia> frq = allelematrix(cats, missings = "mean", scale = true, center = true) ;  frq[1:5,1:6]
  5×6 Matrix{Float32}:
   7.17017f-9   7.17017f-9   0.0        0.0        7.17017f-9   0.0
   7.17017f-9   7.17017f-9   0.0        0.0        7.17017f-9   0.0
@@ -61,21 +61,10 @@ julia> frq = _allelematrix(cats, by = "frequency") ;  frq[1:5,1:6]
 
 ----
 
-### 📦 _countset
-```julia
-_countset(query,reference)
-```
-Count the number of times each element in iterable `query` occurs in iterable/set `reference`
-```julia
-_countset(query::Missing,reference)
-````
-Returns `missing`
 
-----
-
-### 📦 _countmatrix
+### 🟪 countmatrix
 """
-    _countmatrix(data::PopData)
+    countmatrix(data::PopData)
 Create a matrix of allele count per genotype where rows are samples
 and columns are the occurence count of an allele for that locus in that sample.
 Missing values are preserved as `-1`.
@@ -83,9 +72,9 @@ Missing values are preserved as `-1`.
  
 ----
 
-### 📦 _freqmatrix_zero
+### 🟪 freqmatrix_zero
 """
-    _freqmatrix_zero(data::PopData)
+    freqmatrix_zero(data::PopData)
 Create a matrix of allele frequencies per genotype where rows are samples
 and columns are the frequency of an allele for that locus in that sample.
 Missing values are replaced by zeros.
@@ -93,9 +82,9 @@ Missing values are replaced by zeros.
     
 ----
 
-### 📦 _freqmatrix_mean
+### 🟪 freqmatrix_mean
 """
-    _freqmatrix_mean(data::PopData)
+    freqmatrix_mean(data::PopData)
 Create a matrix of allele frequencies per genotype where rows are samples
 and columns are the frequency of an allele for that locus in that sample.
 Missing values are replaced by the global mean allele frequency.
@@ -103,7 +92,7 @@ Missing values are replaced by the global mean allele frequency.
 
 ----
 
-### 📦 _freqmatrix_missing
+### 🟪 freqmatrix_missing
 """
     _freqmatrix_missing(data::PopData)
 Create a matrix of allele frequencies per genotype where rows are samples
@@ -113,7 +102,7 @@ Missing values are kept as `missing`.
 
 ----
 
-### 📦 _freqmatrix_scale
+### 🟪 freqmatrix_scale
 """
     _freqmatrix_scale(freqs::Matrix{Float32}, scale::Bool = true, center::Bool = true)
 Returns a Z-score scaled matrix of allele frequencies where rows are samples 

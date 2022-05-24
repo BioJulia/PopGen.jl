@@ -16,7 +16,10 @@ module.exports = {
     "https://fonts.googleapis.com/icon?family=Material+Icons",
   ],
   themeConfig: {
-    hideableSidebar: true,
+    docs : {
+      sidebar: {
+        hideable: true,
+    }},
     announcementBar: {
       id: 'supportus',
       content:

@@ -4,8 +4,8 @@ title: FstPermutations.jl
 sidebar_label: FstPermutations.jl
 ---
 ## PopGen.jl/src/FStatistics/FstPermutations.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 📦 _fst_permutation
 ```julia

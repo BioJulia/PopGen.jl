@@ -4,8 +4,8 @@ title: FstGlobal.jl
 sidebar_label: FstGlobal.jl
 ---
 ## PopGen.jl/src/FStatistics/FstGlobal.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 📦 _pairwise_Hudson
 ```julia

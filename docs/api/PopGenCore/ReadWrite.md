@@ -4,9 +4,8 @@ title: ReadWrite.jl
 sidebar_label: ReadWrite.jl
 ---
 ## PopGenCore.jl/src/io/ReadWrite.jl
-📦  => not exported | 
-🟪 => exported by PopGenCore.jl | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
 ### 📦 read
 ```julia

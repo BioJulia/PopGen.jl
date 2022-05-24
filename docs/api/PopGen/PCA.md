@@ -5,8 +5,8 @@ sidebar_label: PCA.jl
 ---
 
 ## PopGen.jl/src/PCA.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 🔵 pca
 ```julia

@@ -5,8 +5,8 @@ sidebar_label: KinshipMoments.jl
 ---
 
 ## PopGen.jl/src/Kinship/KinshipMoments.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 🔵 Blouin
     Blouin(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)

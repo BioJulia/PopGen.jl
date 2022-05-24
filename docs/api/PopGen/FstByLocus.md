@@ -4,8 +4,8 @@ title: FstByLocus.jl
 sidebar_label: FstByLocus.jl
 ---
 ## PopGen.jl/src/FStatistics/FstByLocus.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 📦 _pairwise_Hudson_lxl
 ```julia

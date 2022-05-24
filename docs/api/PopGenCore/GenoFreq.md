@@ -4,9 +4,8 @@ title: GenoFreq.jl
 sidebar_label: GenoFreq.jl
 ---
 ## PopGenCore.jl/src/GenoFreq.jl
-📦  => not exported | 
-🟪 => exported by PopGenCore.jl | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
 ### 🟪 genocount_observed
 ```julia

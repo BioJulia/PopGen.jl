@@ -4,9 +4,8 @@ title: MathUtils.jl
 sidebar_label: MathUtils.jl
 ---
 ## PopGenCore.jl/src/Utils/MathUtils.jl
-📦  => not exported | 
-🟪 => exported by PopGenCore.jl | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
 ### 🟪 countnonzeros
 ```julia

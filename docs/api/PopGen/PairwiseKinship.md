@@ -4,8 +4,8 @@ title: PairwiseKinship.jl
 sidebar_label: PairwiseKinship.jl
 ---
 ## PopGen.jl/src/Kinship/PairwiseKinship.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 📦 _bootstrapsummary
 ```julia

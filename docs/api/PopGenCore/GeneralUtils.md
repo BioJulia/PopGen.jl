@@ -4,9 +4,8 @@ title: GeneralUtils.jl
 sidebar_label: GeneralUtils.jl
 ---
 ## PopGenCore.jl/src/Utils/GeneralUtils.jl
-📦  => not exported | 
-🟪 => exported by PopGenCore.jl | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
 ### 🟪🔵 Base.copy
 ```julia

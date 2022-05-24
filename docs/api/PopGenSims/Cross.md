@@ -4,8 +4,8 @@ title: Cross.jl
 sidebar_label: Cross.jl
 ---
 ## PopGenSims.jl/src/Cross.jl
-📦  => not exported | 
-🟪 => exported by PopGenSims.jl
+| 📦  not exported | 🟪  exported by PopGenSims.jl |
+|:---:|:---:|
 
 ### 📦 sample_genotype
 ```julia

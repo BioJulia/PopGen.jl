@@ -249,4 +249,4 @@ julia> kinshipposthoc(cats, rel_out)
 
 ---------------------
 ## Acknowledgements
-The relatedness methods were dutifully written and verified against R analogues by Jason Selwyn. These anaylses can take a while, especially if performing bootstrapping; we provide a progress bar via `ProgressMeter.jl` so you can move on and focus on other things in the meantime. 
+The relatedness methods were dutifully written and verified against R analogues by Jason Selwyn. These anaylses can take a while, especially if performing bootstrapping; we provide a progress bar via [Term.jl](https://github.com/FedeClaudi/Term.jl) so you can move on and focus on other things in the meantime. 

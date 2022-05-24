@@ -5,8 +5,8 @@ sidebar_label: KMeans.jl
 ---
 
 ## PopGen.jl/src/KMeans.jl
-📦  => not exported | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🔵  exported by PopGen.jl |
+|:---:|:---:|
 
 ### 📦 KMeansResults
 ```julia

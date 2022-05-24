@@ -5,7 +5,7 @@ sidebar_label: Principal Component Analysis
 ---
 
 A common way to analyze genetic data is dimensionality reduction, and PopGen.jl provides `pca()` to perform a Pricipal Component Analysis. This
-function wraps `fit(PCA, ...)` from `MultivariateStats.jl` ([link](https://github.com/JuliaStats/MultivariateStats.jl)) to be used on `PopData` objects.
+function wraps `fit(PCA, ...)` from ([MultivariateStats.jl](https://github.com/JuliaStats/MultivariateStats.jl)) to be used on `PopData` objects.
 The genotypes are processed into a matrix of (rows: samples, cols: allele frequencies), giving you the option of how to manage `missing` data, and the PCA is performed on this allele-frequency matrix. 
 
 :::tip suppressing output
@@ -61,3 +61,7 @@ julia> pca_cats.prinvars   # the principal variances
   2.5912046561168447
   2.5000331618590637
 ```
+
+---------------------
+## Acknowledgements
+The PCA method is an extension of the hyper-fast methods written in [MultivariateStats.jl](https://github.com/JuliaStats/MultivariateStats.jl). The centering and scaling are also outsourced to the methods present in [StatsBase.jl](https://github.com/JuliaStats/StatsBase.jl). A lot of clever package authors and contributors in this ecosystem!

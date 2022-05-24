@@ -4,9 +4,8 @@ title: PopData.jl
 sidebar_label: PopData.jl
 ---
 ## PopGenCore.jl/src/PopData.jl
-📦  => not exported | 
-🟪 => exported by PopGenCore.jl | 
-🔵 => exported by PopGen.jl
+| 📦  not exported | 🟪  exported by PopGenCore.jl | 🔵  exported by PopGen.jl |
+|:---:|:---:|:---:|
 
 ### 🟪🔵 PopObj
 ```Julia
