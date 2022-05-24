@@ -40,26 +40,26 @@ to observed $F_{ST}$ values.
 
 ## Pairwise FST
 ```julia
-pairwisefst(data::PopData; method::String, by::String = "global", iterations::Int64)
+pairwisefst(data::PopData; method::Function, by::String = "global", iterations::Int64)
 ```
 Calculate pairwise $F_{ST}$ between populations in a `PopData` object. Set `iterations` 
 to a value greater than `0` to perform a single-tailed permutation test to obtain
 P-values of statistical significance. Use `by = "locus"` to perform a locus-by-locus FST for
-population pairs (iterations and significance testing ignored). 
+population pairs (iterations and significance testing ignored). `WeirCockerham is not yet implmented for by-locus $F_{ST}$. 
 
 :::note custom output type
-The returned object for `by = "global"` is a custom `PairwiseFST` type with the fields `results` (stores the dataframe of $F_{ST}$ values) and `method` (a string of which method was used to calculate it). This was done to define a custom `show` method to make the results a little nicer, and so you never lose track of which method was used for the calculation. If you want to access the dataframe directly, you will need to do so with `varname.results` where `varname` is whatever you named the output.  
+The returned object for is a custom `PairwiseFST` type with the fields `results` (stores the dataframe of $F_{ST}$ values) and `method` (a string of which method was used to calculate it). This was done to define a custom `show` method to make the results a little nicer, and so you never lose track of which method was used for the calculation. If you want to access the dataframe directly, you will need to do so with `varname.results` where `varname` is whatever you named the output.  
 :::
 
 ### Arguments
 - `data::PopData`: a PopData object you wish to perform the calculation on
 
 ### Keyword Arguments
-- `method::String`: which $F_{ST}$ calculation method you would like to use
-    - `"Hudson92"`: the [Hudson et al. (1992)](https://www.genetics.org/content/132/2/583) method (only for biallelic data)
-    - `"WC84"`: the [Weir & Cockerham (1984)](https://www.jstor.org/stable/2408641?casa_token=_0gGbCbYpqMAAAAA:f9BvW9Xvx_8WaWSaRN4iqg0HB7KkaP21712ds28cTjhsvVQrYRTyHon7hKCcyHLcmTRA9H_1oM5iF3TZAl5xPm5gil2GmcGzHyEFFYAOl8pDVEBMQQ&seq=1#metadata_info_tab_contents) method (default)
-    - `"Nei87"`: [Nei (1987)](https://books.google.com/books?hl=en&lr=&id=UhRSsLkjxDgC&oi=fnd&pg=PP11&ots=Qu7vO8EMmw&sig=T6cTISYEEm-hL8aWU8EgeGgzP5E#v=onepage&q&f=false) genetic distance method
-- `by::String`: perfrom a `"global"` pairwise $F_{ST}$ or `"locus"`-by-locus (ignores significance testing)
+- `method::Function`: which $F_{ST}$ calculation method you would like to use
+    - `Hudson`: the [Hudson et al. (1992)](https://www.genetics.org/content/132/2/583) method (only for biallelic data)
+    - `WeirCockerham`: the [Weir & Cockerham (1984)](https://www.jstor.org/stable/2408641?casa_token=_0gGbCbYpqMAAAAA:f9BvW9Xvx_8WaWSaRN4iqg0HB7KkaP21712ds28cTjhsvVQrYRTyHon7hKCcyHLcmTRA9H_1oM5iF3TZAl5xPm5gil2GmcGzHyEFFYAOl8pDVEBMQQ&seq=1#metadata_info_tab_contents) method (default)
+    - `Nei`: [Nei (1987)](https://books.google.com/books?hl=en&lr=&id=UhRSsLkjxDgC&oi=fnd&pg=PP11&ots=Qu7vO8EMmw&sig=T6cTISYEEm-hL8aWU8EgeGgzP5E#v=onepage&q&f=false) genetic distance method
+- `by::String`: perfrom a `"global"` pairwise $F_{ST}$ or `"locus"` for locus-by-locus (ignores significance testing)
 - `iterations::Int64`: the number of iterations for signficance testing (default: `0`)
 
 **Examples**
@@ -78,8 +78,8 @@ The returned object for `by = "global"` is a custom `PairwiseFST` type with the 
 ```julia
 julia> sharks = @gulfsharks ;
 
-julia> pairwisefst(sharks, method = "WC84")
-Pairwise FST: Weir & Cockerham
+julia> pairwisefst(sharks, method = WeirCockerham)
+Pairwise FST: WeirCockerham
                 CapeCanaveral  Georgia   SouthCarolina  FloridaKeys  MideastGulf  NortheastGulf  SoutheastGulf 
 ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
  CapeCanaveral        0.0       0.0            0.0          0.0          0.0            0.0                0.0
@@ -100,7 +100,7 @@ julia> sharks = @gulfsharks ;
 julia> pairwisefst(sharks, iterations = 100)
 
 Below diagonal: FST values | Above diagonal: P values
-Pairwise FST: Weir & Cockerham (with p-values)
+Pairwise FST: WeirCockerham (with p-values)
                 CapeCanaveral  Georgia   SouthCarolina  FloridaKeys  MideastGulf  NortheastGulf  SoutheastGulf 
 ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
  CapeCanaveral        0.0       0.17           0.66         0.01         0.01           0.08              0.01
@@ -117,24 +117,24 @@ Pairwise FST: Weir & Cockerham (with p-values)
 
 ```julia
 julia> sharks = @gulfsharks ;
-julia> pairwisefst(sharks, method = "Nei87", by = "locus")
-46389×4 DataFrame
-   Row │ pop1           pop2           locus         fst      
-       │ String         String         String        Float64  
-───────┼──────────────────────────────────────────────────────
-     1 │ CapeCanaveral  Georgia        contig_35208  -0.01309
-     2 │ CapeCanaveral  Georgia        contig_23109  -0.0235
-     3 │ CapeCanaveral  Georgia        contig_4493   -0.02533
-     4 │ CapeCanaveral  Georgia        contig_10742   0.01365
-     5 │ CapeCanaveral  Georgia        contig_14898   0.00107
-     6 │ CapeCanaveral  Georgia        contig_8483   -0.00372
-   ⋮   │       ⋮              ⋮             ⋮           ⋮
- 46384 │ NortheastGulf  SoutheastGulf  contig_43517  -0.00146
- 46385 │ NortheastGulf  SoutheastGulf  contig_27356   0.02708
- 46386 │ NortheastGulf  SoutheastGulf  contig_475     0.0081
- 46387 │ NortheastGulf  SoutheastGulf  contig_19384   0.05055
- 46388 │ NortheastGulf  SoutheastGulf  contig_22368  -0.0036
- 46389 │ NortheastGulf  SoutheastGulf  contig_2784   -0.00066
+julia> pairwisefst(sharks, method = Nei, by = "locus")
+Pairwise FST: Nei
+pop1           pop2           locus         fst      
+String         String         String        Float64  
+─────────────────────────────────────────────────────
+CapeCanaveral  Georgia        contig_35208  -0.01309
+CapeCanaveral  Georgia        contig_23109  -0.0235
+CapeCanaveral  Georgia        contig_4493   -0.02533
+CapeCanaveral  Georgia        contig_10742   0.01365
+CapeCanaveral  Georgia        contig_14898   0.00107
+CapeCanaveral  Georgia        contig_8483   -0.00372
+      ⋮              ⋮             ⋮           ⋮
+NortheastGulf  SoutheastGulf  contig_43517  -0.00146
+NortheastGulf  SoutheastGulf  contig_27356   0.02708
+NortheastGulf  SoutheastGulf  contig_475     0.0081
+NortheastGulf  SoutheastGulf  contig_19384   0.05055
+NortheastGulf  SoutheastGulf  contig_22368  -0.0036
+NortheastGulf  SoutheastGulf  contig_2784   -0.00066
                                             46377 rows omitted
 ```
 
