@@ -93,15 +93,13 @@ export hwetest, hwe
 include("FStatistics/FstGlobal.jl")
 include("FStatistics/FstByLocus.jl")
 include("FStatistics/PairwiseFST.jl")
+include("FStatistics/FstPermutations.jl")
 export pairwisefst
 
-include("FStatistics/FstPermutations.jl")
 include("Kinship/KinshipPairwise.jl")
 export kinship, mergeKinship
-
 include("Kinship/KinshipMoments.jl")
 export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran, Blouin, Loiselle #, Wang
-
 include("Kinship/KinshipPostHocs.jl")
 export kinshipposthoc
 
