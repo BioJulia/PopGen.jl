@@ -121,7 +121,7 @@ function LynchLi(ind1::T, ind2::T, alleles::U; kwargs...) where T <: GenoArray w
     return numerator / denom
 end
 
-
+#BUG not consistent with Coancestry
 function _lynchritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     a,b = geno1
     c,d = geno2
@@ -186,7 +186,7 @@ function Moran(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where 
     return numer/(denom / 2.0)
 end
 
-
+#BUG not consistent with Coancestry
 function _quellergoodnight(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     a,b = geno1
     c,d = geno2
@@ -225,7 +225,7 @@ function QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs
     return (numer1/denom1 + numer2/denom2)/2.0
 end
 
-
+#BUG Math not consistent with Coancestry
 function _ritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     a,b = geno1
     c,d = geno2
