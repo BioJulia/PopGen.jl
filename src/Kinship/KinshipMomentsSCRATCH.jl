@@ -19,7 +19,6 @@ function Blouin(ind1::GenoArray, ind2::GenoArray)::Float64
     return res / n / 2.0
 end
 
-# TODO check math, should diag = 1?
 function _lihorvitz(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8}
     @inbounds (geno1[1] == geno2[1]) + (geno1[1] == geno2[2]) + (geno1[2] == geno2[1]) + (geno1[2] == geno2[2]) 
 end
