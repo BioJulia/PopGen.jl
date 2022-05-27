@@ -110,15 +110,15 @@ function LynchLi(ind1::T, ind2::T, alleles::U; kwargs...) where T <: GenoArray w
         @inbounds i2 = ind2[i]
         @inbounds loc = values(alleles[i])
         S0 = _lynchliS0(loc)
-        denom += 1.0 - S0
         if (i1 === missing) | (i2 === missing)
             continue
         else
-            # this is Sxy
+            # this is Sxy - S0
             numerator += _lynchli(i1, i2) - S0
+            denom += 1.0 - S0
         end
     end
-    return Sxy / S0
+    return numerator / denom
 end
 
 
