@@ -1,3 +1,17 @@
+function testkin(x, y)
+    sym = Symbol(y)
+    old = kinship(x, method = y)
+    new = kinshiptotable(kinship_new(x, method = y))
+    old[:, sym] = round.(old[:, sym], digits = 5)
+    new[:, :kinship] = round.(new.kinship, digits = 5)
+    if old[:, sym] == new.kinship
+        return true
+    else
+        insertcols!(old, :new => new.kinship)
+        return old[old[:, sym] .!= old.new, :]
+    end
+end
+
 function kinship_new(data::PopData; method::Function, iterations::Int = 0, interval::Vector{Float64} = [0.025, 0.975])
     # sanity checks
     data.metadata.ploidy != 2 && error("kinship analyses currently only support diploid samples")
