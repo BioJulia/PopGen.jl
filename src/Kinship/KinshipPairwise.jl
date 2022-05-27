@@ -84,7 +84,7 @@ function _kinship_boot_all(data::PopData, sample_names::Vector{T}; method::F, it
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, n_pairs), 1:length(method))
     shared_loci = Vector{Int}(undef, n_pairs)
-    p = Progress(n_pairs*length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
+    #p = Progress(n_pairs*length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
     popdata_idx = groupby(data.genodata, :name)
     @inbounds for i in 1:n_pairs
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
@@ -99,8 +99,8 @@ function _kinship_boot_all(data::PopData, sample_names::Vector{T}; method::F, it
                 @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allelefrequencies, loc_n = n_per_loci, n_samples = n_samples, inbreeding = inbreeding)
                 boot_out = _bootstrapgenos_all(geno1, geno2, loci_names, n_per_loci, allelefrequencies, method = mthd, iterations = iterations, inbreeding = inbreeding, n = j+1)
                 @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = _bootstrapsummary(boot_out, interval)
-                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * " of " * "$(n_pairs)" * ")"
-                ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
+                #pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * " of " * "$(n_pairs)" * ")"
+                #ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
             end
         end
     end
@@ -147,7 +147,7 @@ function _kinship_boot_nonmissing(data::PopData, sample_names::Vector{T}; method
     boot_means, boot_medians, boot_ses = map(i -> deepcopy(relate_vecs), 1:3)
     boot_CI = map(i -> Vector{Union{Missing,Tuple{Float64,Float64}}}(undef, n_pairs), 1:length(method))
     shared_loci = Vector{Int}(undef, n_pairs)
-    p = Progress(n_pairs * length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
+    #p = Progress(n_pairs * length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
     popdata_idx = groupby(data.genodata, :name)
     @inbounds for i in 1:n_pairs
         @inbounds geno1 = popdata_idx[(sample_pairs[i][1],)].genotype
@@ -162,8 +162,8 @@ function _kinship_boot_nonmissing(data::PopData, sample_names::Vector{T}; method
                 @inbounds relate_vecs[j][i] = mthd(gen1, gen2, loc, allelefrequencies, loc_n = n_per_loc, n_samples = n_samples, inbreeding = inbreeding)
                 boot_out = _bootstrapgenos_nonmissing(gen1, gen2, loc, n_per_loc, allelefrequencies, method = mthd, iterations = iterations, inbreeding = inbreeding)
                 @inbounds boot_means[j][i], boot_medians[j][i], boot_ses[j][i], boot_CI[j][i] = _bootstrapsummary(boot_out, interval)
-                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * " of " * "$n_pairs" * ")"
-                ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
+                #pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * " of " * "$n_pairs" * ")"
+                #ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
             end
         end
     end
@@ -207,7 +207,7 @@ function _kinship_noboot(data::PopData, sample_names::Vector{T}; method::F, inbr
     allelefrequencies = allelefreq(data)
     relate_vecs = map(i -> Vector{Union{Missing,Float64}}(undef, n_pairs), 1:length(method))
     shared_loci = Vector{Int}(undef, n_pairs)
-    p = Progress(n_pairs* length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
+    #p = Progress(n_pairs* length(method), dt = 1, color = :blue, barglyphs = BarGlyphs("|=> |"), barlen = 30)
     popdata_idx = groupby(data.genodata, :name)
     @inbounds @sync for i in 1:n_pairs
         Base.Threads.@spawn begin
@@ -217,8 +217,8 @@ function _kinship_noboot(data::PopData, sample_names::Vector{T}; method::F, inbr
             @inbounds shared_loci[i] = length(keep_idx)
             @inbounds for (j, mthd) in enumerate(method)
                 @inbounds relate_vecs[j][i] = mthd(geno1[keep_idx], geno2[keep_idx], loci_names[keep_idx], allelefrequencies, loc_n = n_per_loci[keep_idx], n_samples = n_samples, inbreeding = inbreeding)
-                pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * " of " * "$(n_pairs)" * ")"
-                ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
+                #pair_text = sample_pairs[i][1] * " × " * sample_pairs[i][2] * "  ($i" * " of " * "$(n_pairs)" * ")"
+                #ProgressMeter.next!(p; showvalues = [(:Pair, pair_text), (:Method, mthd)])
             end
         end
     end
