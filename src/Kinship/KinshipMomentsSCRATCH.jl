@@ -87,7 +87,8 @@ function Loiselle(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) whe
     numer / denom + 2.0 / (2.0 * kwargs[:n_samples] - 1.0)
 end
 
-
+##BUG THIS DOESNT AGREE WITH THE ORIGINAL
+## CHECK AGAINST COANCESTRY
 function _lynchli(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8}
     a,b = geno1 ; c,d = geno2
     0.5 * (((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (a == b))) + ((a == c) + (a == d) + (b == c) + (b == d)) / (2.0 * (1.0 + (c == d))))
@@ -103,18 +104,19 @@ function _lynchliS0(alleles)::Float64
 end
 function LynchLi(ind1::T, ind2::T, alleles::U; kwargs...) where T <: GenoArray where U <: Tuple
     #TODO Change to unbiased formulation (eq 25)
-    Sxy = 0.0
-    S0 = 0.0
+    numerator = 0.0
+    denom = 0.0
     @inbounds for i in eachindex(ind1)
         @inbounds i1 = ind1[i]
         @inbounds i2 = ind2[i]
         @inbounds loc = values(alleles[i])
-        S0tmp = _lynchliS0(loc)
-        S0 += 1.0 - S0tmp
+        S0 = _lynchliS0(loc)
+        denom += 1.0 - S0
         if (i1 === missing) | (i2 === missing)
             continue
         else
-            Sxy += _lynchli(i1, i2) - S0tmp
+            # this is Sxy
+            numerator += _lynchli(i1, i2) - S0
         end
     end
     return Sxy / S0
@@ -156,14 +158,13 @@ function LynchRitland(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...)
     return numer / (denom / 2.0)
 end
 
-# FIX _MORAN MATH
 function _moran(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     num = 0.0 ; denom = 0.0
     @inbounds for (allele, fq) in frqdict
-        num += (((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) * (((geno2[1] == allele) + (geno2[2] == allele)) / 2.0)
-        #num += @inbounds ((sum(geno1 .== allele) / 2.0) - fq) * ((sum(geno2 .== allele) / 2.0) - fq)
-        denom += ((((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) - fq)^2 + ((((geno2[1] == allele) + (geno2[2] == allele)) / 2.0) - fq)^2
-        #denom += @inbounds (((sum(geno1 .== allele) / 2.0) - fq)^2 + ((sum(geno2 .== allele) / 2.0) - fq)^2)
+        g1 = ((((geno1[1] == allele) + (geno1[2] == allele)) / 2.0) - fq)
+        g2 = ((((geno2[1] == allele) + (geno2[2] == allele)) / 2.0) - fq)
+        num += g1 * g2
+        denom += ((g1^2) + (g2^2))
     end
     return (num, denom)
 end
@@ -226,7 +227,7 @@ function QuellerGoodnight(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs
 end
 
 
-function _Ritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+function _ritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
     a,b = geno1
     c,d = geno2
     A = length(frqdict) - 1.0
