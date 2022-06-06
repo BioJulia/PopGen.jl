@@ -64,6 +64,7 @@ using Term.progress
 using MultipleTesting, StatsBase
 import Clustering: kmeans, kmedoids, hclust, Hclust, cutree, fuzzy_cmeans, dbscan
 import MultivariateStats: fit, PCA
+import TSne: tsne
 
 
 #   o O       o O       o O       o O       o O
@@ -108,5 +109,8 @@ export cluster, kmeans, kmedoids, hclust, cutree, fuzzycmeans, dbscan
 
 include("PCA.jl")
 export pca
+
+include("TSne.jl")
+export tsne
 
 end # module PopGen
