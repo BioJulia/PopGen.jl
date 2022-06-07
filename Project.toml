@@ -33,6 +33,7 @@ PooledArrays = "1.1"
 PopGenCore = "0.5, 0.6"
 Reexport = "1"
 StatsBase = "0.33"
+TSne = "1"
 Term = "0.3"
 julia = "1.6"
 
