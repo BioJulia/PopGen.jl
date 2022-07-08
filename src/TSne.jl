@@ -26,9 +26,9 @@ are the same as `tsne` from `TSne.jl`.
 - `extended_output`: if `true`, returns a tuple of embedded coordinates matrix,
   point perplexities and final Kullback-Leibler divergence
 """
-function TSne.tsne(data::PopData, ndim, reduce_dims, max_iter, perplexit; kwargs...)
+function tsne(data::PopData, ndim, reduce_dims, max_iter, perplexity; kwargs...)
     mtx = freqmatrix_mean(data)
-    _sne = tsne(mtx, ndim, reduce_dims, max_iter, perplexit; kwargs...)
+    _sne = tsne(mtx, ndim, reduce_dims, max_iter, perplexity; kwargs...)
     res = DataFrame(_sne, String["dim"*"$i" for i in 1:size(_sne, 2)])
     insertcols!(res, 1, :name => data.sampleinfo.name, :population => data.sampleinfo.population)
     return res
