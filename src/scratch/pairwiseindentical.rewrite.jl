@@ -8,5 +8,5 @@ function pwsimilarhelper(x::Int8, y::Int8)
 end
 
 function pwsimilar(data::PopData)
-    allelemtx = allelematrix(data, by = "counts")
+    allelemtx = matrix(data, "count")
 end
