@@ -1,5 +1,2 @@
-name = "PopGenTests"
-uuid = "54eeba7d-de26-4030-99fd-627f64c31966"
-
 [deps]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
