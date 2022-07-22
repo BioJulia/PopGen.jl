@@ -13,7 +13,6 @@ jobs:
         version:
           - '1.6'
           - '1.7'
-          - '1.8'
         os:
           - ubuntu-latest
           - macOS-latest
@@ -36,7 +35,8 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
-      - uses: julia-actions/julia-buildpkg@latest
-      - name: Add upstream PopGenCore#dev
+      - name: Install PopGen
+        uses: julia-actions/julia-buildpkg@latest
+        #name: Add upstream PopGenCore#dev
         run: julia --color=yes -e 'using Pkg; Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev")'
       - uses: julia-actions/julia-runtest@latest
