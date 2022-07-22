@@ -29,7 +29,7 @@ function sig_within(data::PopData, results::DataFrame, population::String, itera
     n_iter = iterations - 1
     
     bootstrapped = [Vector{Float64}(undef, n_iter) for i in 1:length(estimators)]
-    p = Progress(iterations * length(estimators), dt = 1, color = :blue)
+    #p = Progress(iterations * length(estimators), dt = 1, color = :blue)
     
     for i in 1:length(estimators)
         est = estimators[i]
@@ -45,8 +45,8 @@ function sig_within(data::PopData, results::DataFrame, population::String, itera
                 
                 bootstrapped[i][j] = mu_within - mu_among
                 
-                pair_text =  population * "  $(iter_count)" * "/" * "$(iterations)"
-                ProgressMeter.next!(p; showvalues = [(:Population, pair_text), (:Method, string(est))])
+                #pair_text =  population * "  $(iter_count)" * "/" * "$(iterations)"
+                #ProgressMeter.next!(p; showvalues = [(:Population, pair_text), (:Method, string(est))])
             end
         end
     end
