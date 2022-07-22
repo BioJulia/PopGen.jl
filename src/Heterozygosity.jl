@@ -96,51 +96,57 @@ calculated as 1 - sum of the squared allele frequencies.
     1.0 - exp
 end
 
-
 """
-    heterozygosity(data::PopData; by::String = "locus")
+    heterozygosity(data::PopData; by::Union{Symbol,String} = "locus")
 Calculate observed and expected heterozygosity in a `PopData` object. For loci,
 heterozygosity is calculated in the Nei fashion, such that heterozygosity is
 calculated as the average over heterozygosity per locus per population.
 ### Modes
-- `"locus"` or `"loci"` : heterozygosity per locus (default)
-- `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
-- `"population"` or `"pop"` : heterozygosity per population
+- `"locus"` : heterozygosity per locus (default)
+- `"sample"` : heterozygosity per individual/sample
+- `"population"`: heterozygosity per population
 ## Example
 heterozygosity(@nancycats, by = "population" )
 """
-function heterozygosity(data::PopData; by::String = "locus")
-    if by ∈ ["locus", "loci"]
-        tmp = DataFrames.combine(
-                groupby(data.genodata, [:locus, :population]),
-                :genotype => nonmissing => :n_tmp,
-                :genotype => _hetero_obs => :het_pop_obs,
-                :genotype => _hetero_exp => :het_pop_exp
-            )
-        return DataFrames.combine(
-                groupby(tmp, :locus),
-                :n_tmp => sum => :n,
-                :het_pop_obs => (h_o -> mean(skipmissing(h_o))) => :het_obs,
-                :het_pop_exp => (h_e -> mean(skipmissing(h_e))) => :het_exp
-            )
-
-    elseif lowercase(by) ∈  ["sample", "ind", "individual"]
-        return DataFrames.combine(
-                groupby(data.genodata, :name),
-                :genotype => nonmissing => :n,
-                :genotype => _hetero_obs => :het_obs
-            )
-
-    elseif lowercase(by) ∈  ["pop", "population"]
-        return DataFrames.combine(
-                groupby(data.genodata, :population),
-                :genotype => nonmissing => :n,
-                :genotype => _hetero_obs => :het_obs,
-                :genotype => _hetero_exp => :het_exp
-            )
+function heterozygosity(data::PopData; by::Union{String, Symbol} = "locus")
+    strby = lowercase(string(by))
+    if strby ∈ ["locus", "sample", "population"]
+        _heterozygosity(data, Val(Symbol(strby)))
     else
         error("please specify by = \"locus\", \"sample\", or \"population\"")
     end
+end
+
+function _heterozygosity(data::PopData, ::Val{:locus})
+    tmp = DataFrames.combine(
+        groupby(data.genodata, [:locus, :population]),
+        :genotype => nonmissing => :n_tmp,
+        :genotype => _hetero_obs => :het_pop_obs,
+        :genotype => _hetero_exp => :het_pop_exp
+    )
+    DataFrames.combine(
+        groupby(tmp, :locus),
+        :n_tmp => sum => :n,
+        :het_pop_obs => (h_o -> mean(skipmissing(h_o))) => :het_obs,
+        :het_pop_exp => (h_e -> mean(skipmissing(h_e))) => :het_exp
+    )
+end
+
+function _heterozygosity(data::PopData, ::Val{:sample})
+    DataFrames.combine(
+        groupby(data.genodata, :name),
+        :genotype => nonmissing => :n,
+        :genotype => _hetero_obs => :het_obs
+    )
+end
+
+function _heterozygosity(data::PopData, ::Val{:population})
+    DataFrames.combine(
+        groupby(data.genodata, :population),
+        :genotype => nonmissing => :n,
+        :genotype => _hetero_obs => :het_obs,
+        :genotype => _hetero_exp => :het_exp
+    )
 end
 
 #NOTE this is not intended to be performant. It's a convenience function. 
