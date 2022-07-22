@@ -1,32 +1,41 @@
 """
-    missingdata(data::PopData; by::String = "sample")
+    missingdata(data::PopData; by::Union{String, Symbol} = "sample")
 Get missing genotype information in a `PopData`. Specify a mode of operation
 to return a DataFrame corresponding with that missing information.
 
 #### Modes
 - "sample" - returns a count and list of missing loci per individual (default)
-- "pop" - returns a count of missing genotypes per population
+- "population" - returns a count of missing genotypes per population
 - "locus" - returns a count of missing genotypes per locus
-- "full" - returns a count of missing genotypes per locus per population
+- "locusxpopulation" - returns a count of missing genotypes per locus per population
 
 ### Example:
 ```
 missingdata(@gulfsharks, by = "pop")
 ```
 """
-@inline function missingdata(data::PopData; by::String = "sample")
-    if by ∈ ["sample", "individual"]
-        gdf = DataFrames.groupby(data.genodata, :name)
-    elseif by ∈ ["pop", "population"]
-        gdf = DataFrames.groupby(data.genodata, :population)
-    elseif by ∈ ["locus", "loci"]
-        gdf = DataFrames.groupby(data.genodata, :locus)
-    elseif by ∈ ["detailed", "full"]
-        gdf = DataFrames.groupby(data.genodata, [:locus, :population])
+function missingdata(data::PopData; by::Union{String, Symbol} = "sample")
+    if string(by) ∈ ["sample", "population", "locus", "locusxpopulation"]
+        _missingdata(data, Val(Symbol(by)))
     else
-        throw(ArgumentError("Mode \"$by\" not recognized. Please specify one of: sample, pop, locus, or full"))
+        throw(ArgumentError("Mode \"$by\" not recognized. Please specify one of: sample, population, locus, or full"))
     end
-    return DataFrames.combine(gdf, :genotype => (i -> count(ismissing, i)) => :missing)
+end
+
+function _missingdata(data::PopData, ::Val{:sample})
+    DataFrames.combine(DataFrames.groupby(data.genodata, :name), :genotype => (i -> count(ismissing, i)) => :missing)
+end
+
+function _missingdata(data::PopData, ::Val{:population})
+    DataFrames.combine(DataFrames.groupby(data.genodata, :population), :genotype => (i -> count(ismissing, i)) => :missing)
+end
+
+function _missingdata(data::PopData, ::Val{:locus})
+    DataFrames.combine(DataFrames.groupby(data.genodata, :locus), :genotype => (i -> count(ismissing, i)) => :missing)
+end
+
+function _missingdata(data::PopData, ::Val{:locusxpopulation})
+    DataFrames.combine(DataFrames.groupby(data.genodata, [:locus, :population]), :genotype => (i -> count(ismissing, i)) => :missing)
 end
 
 
@@ -148,7 +157,7 @@ function pairwiseidentical(data::PopData, sample_names::Vector{T}) where T<:Abst
 end
 
 """
-    genofreqtable(data::PopData; by::String = "global")
+    genofreqtable(data::PopData; by::Union{Symbol,String} = "global")
 Return a table of the observed `global` (default) or `population` genotype frequencies in a PopData object.
 
 ### Example:
@@ -189,15 +198,16 @@ julia> genofreqtable(cats, by = "population")
                                         1086 rows omitted 
 ```
 """
-function genofreqtable(data::PopData; by::String = "global")
-    if by == "global"
+function genofreqtable(data::PopData; by::Union{Symbol,String} = "global")
+    strby = lowercase(string(by))
+    if strby == "global"
         grp = groupby(dropmissing(data.genodata, :genotype), [:locus, :genotype])
         counts = DataFrames.combine(grp, nrow => :count)
         counts = DataFrames.combine(
             groupby(counts, :locus), :genotype, :count,
             :count => (x -> x / sum(x)) => :frequency
         )
-    elseif by in ["local", "population"]
+    elseif strby == "population"
         grp = groupby(dropmissing(data.genodata, :genotype), [:locus, :population, :genotype])
         counts = DataFrames.combine(grp, nrow => :count)
         counts = DataFrames.combine(
@@ -211,7 +221,7 @@ end
 
 
 """
-    allelefreqtable(data::PopData; by::String = "global")
+    allelefreqtable(data::PopData; by::Union{Symbol,String} = "global")
 Return a table of the observed `global` (default) or `population` allele frequencies in a PopData object.
 
 ### Example:
@@ -251,8 +261,9 @@ julia> allelefreqtable(cats, by = "population")
                                     831 rows omitted
 ```
 """
-function allelefreqtable(data::PopData; by::String = "global")
-    if by == "global"
+function allelefreqtable(data::PopData; by::Union{Symbol,String} = "global")
+    strby = lowercase(string(by))
+    if strby == "global"
         grp = groupby(dropmissing(data.genodata, :genotype), :locus)
         _alleles = DataFrames.combine(grp, :genotype => alleles => :allele, ungroup = false)
         counts = DataFrames.combine(
@@ -266,7 +277,7 @@ function allelefreqtable(data::PopData; by::String = "global")
             nrow => :count,
             [:n, :allele] => ((n,al) -> length(al)/first(n)) => :frequency
         )
-    elseif by in ["local", "population"]
+    elseif strby == "population"
         grp = groupby(dropmissing(data.genodata, :genotype), [:locus, :population])
         _alleles = DataFrames.combine(grp, :genotype => alleles => :allele, ungroup = false)
         counts = DataFrames.combine(
