@@ -38,7 +38,7 @@ jobs:
       - name: Install PopGen
         uses: julia-actions/julia-buildpkg@latest
       - name: Upstream tests
-        shell: julia --color=yes {0}
+        shell: julia --color=yes --project=. {0}
         run: |
           using Pkg
           try
