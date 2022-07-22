@@ -37,7 +37,7 @@ jobs:
             # force it to use this PR's version of the package
             Pkg.develop(PackageSpec(path="."))  # resolver may fail with main deps
             Pkg.update()
-            Pkg.add("PopGenCore", rev = "dev")
+            Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev")
             Pkg.test()  # resolver may fail with test time deps
           catch err
             err isa Pkg.Resolve.ResolverError || rethrow()
