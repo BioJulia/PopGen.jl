@@ -60,7 +60,7 @@ using Distributions, DataFrames, PooledArrays, NamedArrays
 using Distances
 using Random: shuffle
 using OnlineStats
-using Term.progress
+using Term.Progress
 using MultipleTesting, StatsBase
 import Clustering: kmeans, kmedoids, hclust, Hclust, cutree, fuzzy_cmeans, dbscan
 import MultivariateStats: fit, PCA
