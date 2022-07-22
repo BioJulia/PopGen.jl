@@ -12,7 +12,7 @@ cats = @nancycats;
         @test missingdata(cats) isa DataFrame
         @test missingdata(cats, by = "population") isa DataFrame
         @test missingdata(cats, by = "locus") isa DataFrame
-        @test missingdata(cats, by = "full") isa DataFrame
+        @test missingdata(cats, by = "locusxpopulation") isa DataFrame
     end
 
     @testset "pairwise identical" begin
