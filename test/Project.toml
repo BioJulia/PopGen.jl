@@ -1,4 +1,4 @@
-name: "PopGenTests"
+name = "PopGenTests"
 uuid = "54eeba7d-de26-4030-99fd-627f64c31966"
 
 [deps]
