@@ -42,11 +42,7 @@ jobs:
         run: |
           using Pkg
           try
-            # force it to use this PR's version of the package
-            #Pkg.develop(PackageSpec(path="."))  # resolver may fail with main deps
             Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev")
-            #Pkg.add("Test")
-            #Pkg.update()
             Pkg.test()  # resolver may fail with test time deps
           catch err
             err isa Pkg.Resolve.ResolverError || rethrow()
@@ -56,9 +52,3 @@ jobs:
             @info "Not compatible with this release. No problem." exception=err
             exit(0)  # Exit immediately, as a success
           end
-
-#        run: |
-#          julia --color=yes -e 'import Pkg; Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev")'
-#          julia --color=yes -e 'import Pkg; Pkg.add("Test")'
-#      - name: Run tests
-#        uses: julia-actions/julia-runtest@latest
