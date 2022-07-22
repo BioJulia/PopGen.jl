@@ -38,6 +38,6 @@ jobs:
       - name: Install PopGen
         uses: julia-actions/julia-buildpkg@latest
       - name: Add upstream PopGenCore#dev
-        run: julia --color=yes -e 'using Pkg; Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev")'
+        run: julia --color=yes -e 'using Pkg; Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev"); Pkg.add("Test")'
       - name: Run tests
         uses: julia-actions/julia-runtest@latest
