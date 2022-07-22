@@ -6,7 +6,7 @@ on:
     branches: [dev]
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} Upstream
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - Upstream
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -37,7 +37,28 @@ jobs:
             ${{ runner.os }}-
       - name: Install PopGen
         uses: julia-actions/julia-buildpkg@latest
-      - name: Add upstream PopGenCore#dev
-        run: julia --color=yes -e 'using Pkg; Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev"); Pkg.add("Test")'
-      - name: Run tests
-        uses: julia-actions/julia-runtest@latest
+      - name: Upstream tests
+        shell: julia --color=yes
+        run: |
+          using Pkg
+          try
+            # force it to use this PR's version of the package
+            Pkg.develop(PackageSpec(path="."))  # resolver may fail with main deps
+            Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev")
+            Pkg.add("Test")
+            Pkg.update()
+            Pkg.test()  # resolver may fail with test time deps
+          catch err
+            err isa Pkg.Resolve.ResolverError || rethrow()
+            # If we can't resolve that means this is incompatible by SemVer and this is fine.
+            # It means we marked this as a breaking change, so we don't need to worry about.
+            # Mistakenly introducing a breaking change, as we have intentionally made one.
+            @info "Not compatible with this release. No problem." exception=err
+            exit(0)  # Exit immediately, as a success
+          end
+
+#        run: |
+#          julia --color=yes -e 'import Pkg; Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev")'
+#          julia --color=yes -e 'import Pkg; Pkg.add("Test")'
+#      - name: Run tests
+#        uses: julia-actions/julia-runtest@latest
