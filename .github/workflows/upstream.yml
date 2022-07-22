@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: ${{ matrix.package.user }}/${{ matrix.package.repo }}
-          path: downstream
+          path: upstream
       - name: Load this and run the tests against upstream PopGenCore
         shell: julia --color=yes --project=upstream {0}
         run: |
@@ -36,8 +36,8 @@ jobs:
           try
             # force it to use this PR's version of the package
             Pkg.develop(PackageSpec(path="."))  # resolver may fail with main deps
-            Pkg.update()
             Pkg.add(url="https://github.com/BioJulia/PopGenCore.jl", rev = "dev")
+            Pkg.update()
             Pkg.test()  # resolver may fail with test time deps
           catch err
             err isa Pkg.Resolve.ResolverError || rethrow()
