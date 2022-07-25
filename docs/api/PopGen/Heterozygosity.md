@@ -72,21 +72,32 @@ calculated as 1 - sum of the squared allele frequencies.
 
 ### 🔵 heterozygosity
 ```julia
-heterozygosity(data::PopData; by::String = "locus")
+heterozygosity(data::PopData; by::Union{Symbol,String} = "locus")
 ```
 Calculate observed and expected heterozygosity in a `PopData` object. For loci,
 heterozygosity is calculated in the Nei fashion, such that heterozygosity is
 calculated as the average over heterozygosity per locus per population.
 
 **Modes**
-- `"locus"` or `"loci"` : heterozygosity per locus (default)
-- `"sample"` or `"ind"` or `"individual"` : heterozygosity per individual/sample
-- `"population"` or `"pop"` : heterozygosity per population
+- `"locus"` : heterozygosity per locus (default)
+- `"sample"` : heterozygosity per individual/sample
+- `"population"`: heterozygosity per population
+
 **Example**
 ```julia
 heterozygosity(@nancycats, by = "population" )
 ```
 ----
+
+### 📦 _heterozygosity
+```julia
+_heterozygosity(data::PopData, ::Val{:locus})
+_heterozygosity(data::PopData, ::Val{:sample})
+_heterozygosity(data::PopData, ::Val{:population})
+```
+
+----
+
 ### 🔵 samplehet
 ```julia
 samplehet(data::PopData, individual::String)

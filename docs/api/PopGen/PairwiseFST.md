@@ -12,6 +12,15 @@ sidebar_label: PairwiseFST.jl
 ```julia
 Base.show(io::IO, data::PairwiseFST)
 ```
+----
+### 🔵 PairwiseFST
+```julia
+PairwiseFST
+    results::DataFrame
+    method::String
+```
+A convenience data structure which stores the `results` and `method` of a `pairwisefst` analysis.
+The object pretty-prints a bit more information to the console, especially when doing a global pairwise FST. 
 
 -----
 

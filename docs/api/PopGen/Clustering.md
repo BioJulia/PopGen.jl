@@ -134,16 +134,6 @@ julia> cats = @nancycats ;
 
 julia> km = kmeans(cats, k = 2)
 ```
-----
-
-### 📦 KMeansResults
-```julia
-struct KMeansResults
-```
-- `assignments`::DataFrame
-- `costs`::DataFrame
-- `other`::DataFrame
-- `centers`::NamedTuple
 
 ----
 

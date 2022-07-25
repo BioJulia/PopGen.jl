@@ -8,10 +8,10 @@ module.exports = {
       "gettingstarted/datasets"
     ],
     "File I/O": [
-      "io/readingdata",
-      "io/writingdata",
+      "io/readwrite",
       {
         "File Formats": [
+          "io/baypass",
           "io/delimited",
           "io/genepop",
           "io/structure",
@@ -36,7 +36,8 @@ module.exports = {
       "analyses/clustering",
       "analyses/fstatistics",
       "analyses/pca",
-      "analyses/relatedness",
+      "analyses/kinship",
+      "analyses/tsne"
     ],
     "Simulations":[
       "simulations/simulate_samples",

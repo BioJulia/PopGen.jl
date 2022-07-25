@@ -7,13 +7,16 @@ sidebar_label: FstPermutations.jl
 | 📦  not exported | 🔵  exported by PopGen.jl |
 |:---:|:---:|
 
-### 📦 _fst_permutation
+### 📦 _fst_permutate
 ```julia
-_fst_permutation(population_1::T, population_2::T) where T<:AbstractMatrix
+_fst_permute(population_1::T, population_2::T) where T<:AbstractMatrix
 ```
 Returns two matrices with rows (samples) shuffled between them. Respects the
 number of rows of the original matrices (i.e. population sizes).
 
+----
+
+### 📦 _fst_permutation
 ```julia
 _fst_permution(data::PopData, method::Function, iterations::Int64)
 ```

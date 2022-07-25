@@ -101,19 +101,29 @@ julia> genofreqtable(cats, by = "population")
 
 ### 🔵 missingdata
 ```julia
-missingdata(data::PopData; by::String = "sample")
+missingdata(data::PopData; by::Union{String, Symbol} = "sample")
 ```
-Get missing genotype information in a `PopData`. Specify a mode of operation to return a DataFrame corresponding with that missing information.
+Get missing genotype information in a `PopData`. Specify a mode of operation
+to return a DataFrame corresponding with that missing information.
 
 **Modes**
-- `"sample"` - returns a count and list of missing loci per individual (default)
-- `"pop"` - returns a count of missing genotypes per population
-- `"locus"` - returns a count of missing genotypes per locus
-- `"full"` - returns a count of missing genotypes per locus per population
+- "sample" - returns a count and list of missing loci per individual (default)
+- "population" - returns a count of missing genotypes per population
+- "locus" - returns a count of missing genotypes per locus
+- "locusxpopulation" - returns a count of missing genotypes per locus per population
+
 
 **Example**
 ```julia
 missingdata(@gulfsharks, by = "pop")
+```
+----
+### 📦 _missingdata
+```julia
+_missingdata(data::PopData, ::Val{:sample})
+_missingdata(data::PopData, ::Val{:population})
+_missingdata(data::PopData, ::Val{:locus})
+_missingdata(data::PopData, ::Val{:locusxpopulation})
 ```
 
 -----
