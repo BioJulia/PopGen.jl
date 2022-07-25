@@ -201,7 +201,7 @@ better analysis workflow, it would be useful to specify the method for this colu
 keep track of which estimator was used (e.g., `Blouin`, `LynchLi`, etc.)
 
 **Example**
-```julia`
+```julia
 julia> cats = @nancycats ; kin = kinship(cats, method = Moran) ;
 
 julia> kinshiptotable(kin, :Moran)
