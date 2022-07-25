@@ -11,6 +11,7 @@ PopGen.jl (via PopGenCore.jl) provides a handful of file readers and writers wit
 | [delimited](delimited.md)| `.csv`, `.txt`, `.tsv` | `?delimited`  |👍 | 👍 |
 | [genepop](genepop.md)| `.gen`, `.genepop`     | `?genepop`    |👍 | 👍 |
 | [structure](structure.md)| `.str`, `.structure`   | `?structure`  |👍 | 👍 |
+| [plink](plink.md) (ped) | `.ped` | `?plink` | 👍 | 👍 |
 | [variant call format (vcf)](variantcall.md) | `.vcf`, `.vcf.gz`| `?vcf`  |👍 | |
 | [variant call format (bcf)](variantcall.md) | `.bcf`, `.bcf.gz`| `?bcf`  | 👍| |
 | [baypass](baypass.md) | `.baypass` | `?baypass` | | 👍|
@@ -26,7 +27,7 @@ Make sure to change the backslashes `\` in your file path to double-backslashes 
 :::note monomorphic loci
 By default, the file reading methods drop monomorphic loci and inform you which were removed, so do not be alarmed if the number of loci in your `PopData` is different from the source data. You can disable this
 behavior with the argument `allow_monomorphic = true`. Monomorphic loci are removed by default because they
-can give spurious/misleading results for some analyses, such as relatedness estimators.
+can give spurious/misleading results for some analyses, such as kinship estimators.
 :::
 
 ## `PopGen.read()`
