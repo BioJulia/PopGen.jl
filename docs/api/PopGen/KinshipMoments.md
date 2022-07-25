@@ -9,7 +9,7 @@ sidebar_label: KinshipMoments.jl
 |:---:|:---:|
 
 ### 🔵 Blouin
-    Blouin(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
+    Blouin(ind1::GenoArray, ind2::GenoArray)::Float64
 Allele sharing index described by Blouin (1996)
 - Single Locus Equation: The number of alleles shared between individuals over ploidy.
     - If both allele positions are shared (e.g. AA x AA or AB x AB) then 1
@@ -19,6 +19,12 @@ Allele sharing index described by Blouin (1996)
 - Assumes no inbreeding
 
 Blouin, M. S., Parsons, M., Lacaille, V., & Lotz, S. (1996). Use of microsatellite loci to classify individuals by relatedness. Molecular ecology, 5(3), 393-401.
+
+----
+### 📦 _blouin
+```julia
+_blouin(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8} 
+```
 
 
 ----
@@ -35,11 +41,17 @@ Allele sharing index described by Li and Horvitz (1953)
 
 Li, C. C., & Horvitz, D. G. (1953). Some methods of estimating the inbreeding coefficient. American journal of human genetics, 5(2), 107.
 
+----
+
+### 📦 _lihorvitz
+```julia
+_lihorvitz(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8}
+```
 
 ----
 
 ### 🔵 Loiselle
-    Loiselle(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
+    Loiselle(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
 Calculates the moments based estimator of pairwise relatedness using the estimator propsed by
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 - Multiple Locus Equation:
@@ -53,11 +65,29 @@ Heuertz, M., Vekemans, X., Hausman, J. F., Palada, M., & Hardy, O. J. (2003). Es
 
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 
+----
+
+### 📦 _loiselle_num
+```julia
+_loiselle_num(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64})::Float64 where T<:Union{Int16, Int8}
+```
+----
+
+### 📦 _loiselle_denom
+```julia
+_loiselle_denom(freqs)::Float64
+```
+----
+
+### 📦 _lynch
+```julia
+_lynch(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8}
+```
 
 ----
 
 ### 🔵 Lynch
-    Lynch(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
+    Lynch(ind1::GenoArray, ind2::GenoArray)::Float64
 Allele sharing index described by Lynch (1988)
 - Single Locus Equation: If all alleles are the same between individuals (eg. AA x AA) then 1.
     - If both individuals are heterozygous with the same alleles or one is homozygous for the shared allele (eg. AB x AB or AA x AB) then 0.75.
@@ -72,7 +102,7 @@ Lynch, M. (1988). Estimation of relatedness by DNA fingerprinting. Molecular bio
 ----
 
 ### 🔵 LynchLi
-    LynchLi(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
+    LynchLi(ind1::T, ind2::T, alleles::U; kwargs...) where T <: GenoArray where U <: Tuple
 Calculates the moments based estimator of pairwise relatedness by Lynch (1988) & improved by Li et al. (1993).
 - Single Locus Equation:
 - How to combine multiple loci: Sum the difference between observed and expected similarity across all loci and then divide by the sum of 1 - the expected similarity
@@ -86,6 +116,19 @@ Wang, J. (2017). Estimating pairwise relatedness in a small sample of individual
 
 
 ----
+### 📦 _lynchli
+```julia
+_lynchli(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, Int8}
+```
+
+----
+### 📦 _lynchS0
+```julia
+_lynchliS0(alleles)::Float64
+```
+
+----
+
 
 ### 🔵 LynchRitland
     LynchRitland(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
@@ -100,7 +143,11 @@ Lynch, M., & Ritland, K. (1999). Estimation of pairwise relatedness with molecul
 
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 
-
+----
+### 📦 _lynchritland
+```julia
+_lynchritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+```
 ----
 
 ### 🔵 Moran
@@ -112,6 +159,12 @@ by Hardy and Vekemans (1999)
 
 Hardy, O. J., & Vekemans, X. (1999). Isolation by distance in a continuous population: reconciliation between spatial autocorrelation analysis and population genetics models. Heredity, 83(2), 145-154.
 
+
+----
+### 📦 _moran
+```julia
+_moran(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+```
 
 ----
 
@@ -129,6 +182,11 @@ Queller, D. C., & Goodnight, K. F. (1989). Estimating relatedness using genetic 
 
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 
+----
+### 📦 _quellergoodnight
+```julia
+_quellergoodnight(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
+```
 
 ----
 
@@ -145,25 +203,9 @@ Ritland, K. (1996). Estimators for pairwise relatedness and individual inbreedin
 
 Wang, J. (2017). Estimating pairwise relatedness in a small sample of individuals. Heredity, 119(5), 302-313.
 
-
 ----
-
-### 📦 _a_wang_base 
+### 📦 _ritland
 ```julia
-_a_wang_base(m::Int, alleles::Dict)
+_ritland(geno1::NTuple{2,T}, geno2::NTuple{2,T}, frqdict::Dict{T, Float64}) where T<:Union{Int16, Int8}
 ```
-
-### 📦 _a_wang 
-```julia
-_a_wang(N::Int, alleles::Dict)
-```
-### 📦 Wang
-    Wang(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
-Calculates the moments based estimator of pairwise relatedness by Wang (2002).
-- Single Locus Equation:
-- How to combine multiple loci: Each individual locus subcomponent (b-g) and each genotypic state (P1-P3) is averaged weighted by the average similarity of unrelated dyads at each locus. Then the values of V, Φ, Δ, and r are calculated
-- Assumes no inbreeding
-- Corrected for sampling bias in allele frequencies to get an unbiased estimator
-
-Wang, J. (2002). An estimator for pairwise relatedness using molecular markers. Genetics, 160(3), 1203-1215.
-
+----

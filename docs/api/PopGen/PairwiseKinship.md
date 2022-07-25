@@ -7,174 +7,124 @@ sidebar_label: PairwiseKinship.jl
 | 📦  not exported | 🔵  exported by PopGen.jl |
 |:---:|:---:|
 
-### 📦 _bootstrapsummary
-```julia
-_bootstrapsummary(::Vector{Union{Missing, Float64}}, width::Tuple{Float64, Float64})
-```
-Return the mean, median, standard error, and quantiles (given by `witdth`) of relatedness resampling.
-
-
-----
-
-### 📦 _bootstrapgenos_all
-```julia
-_bootstrapgenos_all(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
-```
-Perform `iterations` number of bootstrap resampling iterations of all genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
-of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `relatedness_boot_all`.
-
-----
-
-### 📦 _bootstrapgenos_nonmissing
-```julia
-bootstrapgenos_nonmissing(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}, n_per_loc::Vector{Int}, alleles::NamedTuple; method::Function, iterations::Int)
-```
-Perform `iterations` number of bootstrap resampling iterations of only shared (nonmissing) genotypes between pair (`ind1` `ind2`). Returns a vector of length `interatotions`
-of the relatedness estimate given by method `method`. This is an internal function with `locus_names`, `n_per_loc`, and `alleles` supplied by `relatedness_boot_nonmissing`.
-
-
-----
-
-### 📦 _kinship_boot_all
-```julia
-_kinship_boot_all(::PopData, sample_names::Vector{String}; method::Function, iterations::Int, interval::Tuple{Float64, Float64})
-```
-Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
-the `all` method, where resampling occurs over all loci. This is an internal function with all arguments provided by `relatedness`.
-
-
-----
-
-### 📦 _kinship_boot_nonmissing
-```julia
-_kinship_boot_nonmissing(::PopData, sample_names::Vector{String}; method::F, iterations::Int, interval::Tuple{Float64, Float64}) where F
-```
-Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. Bootstrapping resamples using
-the `nonmissing` method, where resampling occurs over only shared non-missing loci. This is an internal function with all arguments provided by `relatedness`.
-
-
-----
-
-### 📦 _kinship_noboot
-```julia
-_kinship_noboot(::PopData, sample_names::Vector{String}; method::F) where F
-```
-Calculate pairwise relatedness between all combinations of the provided `sample_names` for each `method` provided. 
-This is an internal function with arguments provided by `relatedness`.
-
-
-----
-
 ### 🔵 kinship
 ```julia
-# compare all samples
-kinship(::PopData; method::Function, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
-# to compare specific samples
-kinship(::PopData, samples; method::F, iterations::Int64, interval::Tuple{Float64, Float64}, resample::String, inbreeding::Bool = false)
+kinship(data::PopData; method::Function, iterations::Int = 0, interval::Vector{Float64} = [0.025, 0.975])
+kinship(data::PopData, samplenames::AbstractVector{T}; method::Function, iterations::Int = 0, interval::Vector{Float64} = [0.025, 0.975]) where T<:AbstractString
 ```
-Return a dataframe of pairwise relatedness estimates for all or select pairs of `samples` in a `PopData` object using 
-method(s) `F` where `F` is one or several of the methods listed below. If no bootstrapping is required, then the only 
-necessary keyword to provide is `method = ` and `inbreeding = ` for the `dyadicLikelihood` method (see examples below). **Note:** samples must be diploid.
-
-#### Estimator methods
-
-The available estimators are listed below and are functions themselves. `relatedness` takes the
-function names as arguments (**case sensitive**), therefore do not use quotes or colons
-in specifying the methods. Multiple methods can be supplied as a vector. All of these methods will tab-autocomplete.
-For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
-- `Blouin`
-- `dyadicLikelihood`
-- `LiHorvitz`
-- `Loiselle`
-- `Lynch`
-- `LynchLi`
-- `LynchRitland`
-- `Moran`
-- `QuellerGoodnight`
-- `Ritland`
-- `Wang`
-
-#### Inbreeding
-
-Use the `inbreeding` keyword to specify whether to allow inbreeding (`true`) or not (`false`, default).
-This is only relevant for the `dyadicLikelihood` method.
-
-#### Bootstrapping
-To calculate means, medians, standard errors, and confidence intervals using bootstrapping,
+Calculate pairwise relatedness estimates for all or specific individuals in a `PopData` object using 
+the specified `method` (see below). Returns a `NamedMatrix` if not performing bootstrapping, otherwise returns a `DataFrame` (since bootstrapping provides more output information). To calculate means, median, standard error, and confidence intervals using bootstrapping,
 set `iterations = n` where `n` is an integer greater than `0` (the default) corresponding to the number
-of bootstrap iterations you wish to perform for each pair. The default confidence interval is `(0.05, 0.95)` (i.e. 90%),
-however that can be changed by supplying the keyword `interval = (low, high)` where `low` and `high` are the intervals you want 
-(as `AbstractFloat`). The returned DataFrame will have 5 columns per `method` with bootstrapped parameters having the naming
-convention of `Method_parameter`. The output may have more columns than will fit on your screen, so `DataFrames.names(out_df)`
-may be useful to see a list of the column names.
+of bootstrap iterations you wish to perform for each pair. The default confidence interval is `[0.0275, 0.975]` (i.e. 95%), however that can be changed by supplying a `Vector{Float64}` of `[low, high]` to the keyword `interval`. **Note:** samples must be diploid.
 
-#### Resampling methods
+**Arguments**
+- `data` : A PopData object
+- `samplenames`: Vector of sample names (optional)
 
-There are two available resampling methods, `"all"` (default  & recommended) and `"nonmissing"`.
-- `"all"` : resamples all loci for a pair of individuals and then drops missing loci between them
-    - speed: slower
-    - pro: better resampling variation
-    - con: by chance some iterations may have a lot of missing loci that have to be dropped
-- `"nonmissing"` : resamples only the shared non-missing loci between the pair
-    - speed: faster
-    - pro: every iteration guarantees the same number of loci compared between the pair
-    - con: too-tight confidence intervals due to less possible variation
+**Keyword Arguments**
+- `method::Function` : A method function (see below)
+- `iterations::Int64` : The number of iterations to perform bootstrapping (default: `0`, will not perform bootstrapping)
+- `interval::Vector{Float64}` : A Vector of [low, high] indicating the confidence intervals you would like for bootstrapping (default: `[0.275, 0.975]`, i.e. 95%)
 
-#### Examples
-```
-julia> cats = @nancycats;
+**Methods**
+| Method | Type | Method Call |
+|:----|:-----|:-----|
+| [Blouin 1996](https://onlinelibrary.wiley.com/doi/10.1046/j.1365-294X.1996.00094.x) | moments-based | `Blouin` |
+| [Li & Horvitz 1953](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1716461/)| moments-based | `LiHorvitz` |
+| [Loiselle 1995](https://bsapubs.onlinelibrary.wiley.com/doi/abs/10.1002/j.1537-2197.1995.tb12679.x) | moments-based | `Loiselle` |
+| [Lynch 1988](https://pubmed.ncbi.nlm.nih.gov/3193879/) | moments-based | `Lynch` |
+| [Lynch/Li 1993](https://pubmed.ncbi.nlm.nih.gov/8514326/) | moments-based | `LynchLi` |
+| [Lynch & Ritland 1999](https://www.genetics.org/content/152/4/1753.short) | moments-based | `LynchRitland` |
+| [Moran 1950](https://www.jstor.org/stable/2332142?origin=crossref&seq=1#metadata_info_tab_contents) | moments-based | `Moran` |
+| [Queller & Goodnight 1989](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1989.tb04226.x) | moments-based | `QuellerGoodnight` |
+| [Ritland 1996](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1558-5646.1996.tb02347.x) | moments-based | `Ritland` |
 
-julia> kinship(cats, method = Ritland)
-27966×4 DataFrame
-│ Row   │ sample_1 │ sample_2 │ n_loci │ Ritland    │
-│       │ String   │ String   │ Int64  │ Float64?   │
-├───────┼──────────┼──────────┼────────┼────────────┤
-│ 1     │ N215     │ N216     │ 8      │ 0.258824   │
-│ 2     │ N215     │ N217     │ 8      │ 0.193238   │
-│ 3     │ N215     │ N218     │ 8      │ 0.127497   │
-⋮
-│ 27964 │ N281     │ N289     │ 8      │ 0.0892068  │
-│ 27965 │ N281     │ N290     │ 7      │ 0.104614   │
-│ 27966 │ N289     │ N290     │ 7      │ 0.0511663  │
 
-julia> kinship(cats, ["N7", "N111", "N115"], method = [Ritland, Wang])
-3×5 DataFrame
-│ Row │ sample_1 │ sample_2 │ n_loci │ Ritland    │ Wang      │
-│     │ String   │ String   │ Int64  │ Float64?   │ Float64?  │
-├─────┼──────────┼──────────┼────────┼────────────┼───────────┤
-│ 1   │ N7       │ N111     │ 9      │ -0.129432  │ -0.395806 │
-│ 2   │ N7       │ N115     │ 9      │ -0.0183925 │ 0.0024775 │
-│ 3   │ N111     │ N115     │ 9      │ 0.0240152  │ 0.183966  │
-
-julia> kinship(cats, ["N7", "N111", "N115"], method = [Loiselle, Moran], iterations = 100, interval = (0.025, 0.975))
-3×13 DataFrame. Omitted printing of 7 columns
-│ Row │ sample_1 │ sample_2 │ n_loci │ Loiselle   │ Loiselle_mean │ Loiselle_median │
-│     │ String   │ String   │ Int64  │ Float64?   │ Float64?      │ Float64?        │
-├─────┼──────────┼──────────┼────────┼────────────┼───────────────┼─────────────────┤
-│ 1   │ N7       │ N111     │ 9      │ -0.101618  │ 0.0141364     │ 0.00703954      │
-│ 2   │ N7       │ N115     │ 9      │ -0.0428898 │ 0.0743497     │ 0.0798708       │
-│ 3   │ N111     │ N115     │ 9      │ 0.13681    │ 0.266043      │ 0.257748        │
-
-julia> DataFrames.names(ans)
-13-element Array{String,1}:
- "sample_1"
- "sample_2"
- "n_loci"
- "Loiselle"
- "Loiselle_mean"
- "Loiselle_median"
- "Loiselle_SE"
- "Loiselle_CI_95"
- "Moran"
- "Moran_mean"
- "Moran_median"
- "Moran_SE"
- "Moran_CI_95"
-```
-
-### 🔵 merge_kinship
 ```julia
-merge_kinship(data::NamedTuple)
+julia> cats = @nancycats ; 
+
+julia> kin = kinship(cats, method = Moran)
+237×237 Named Matrix{Float64}
+A ╲ B │         N215          N216  …          N289          N290
+──────┼──────────────────────────────────────────────────────────
+N215  │ 8.13724e-316       1.62338  …       1.04589       1.15351
+N216  │      1.62338       0.29485         0.957724        1.1637
+N217  │     0.673577      0.587163         0.547427      0.709887
+N218  │     0.896935       0.72942         0.919448      0.791255
+⋮                  ⋮             ⋮  ⋱             ⋮             ⋮
+N297  │     0.757915      0.858834          1.15432        1.2677
+N281  │     0.686057      0.604236         0.942749       1.08762
+N289  │      1.04589      0.957724              0.0         1.104
+N290  │      1.15351        1.1637  …         1.104           0.0
+
+julia> kinship(cats, method = Moran, iterations = 100)
+27966×7 DataFrame
+   Row │ sample1  sample2  Moran     bootmean  std       CI_lower      CI_upper 
+       │ String   String   Float64   Float64   Float64   Float64       Float64  
+───────┼────────────────────────────────────────────────────────────────────────
+     1 │ N215     N216     1.62338   0.376626  0.27286    0.00274863   0.916719
+     2 │ N215     N217     0.673577  0.202888  0.20094    0.00105976   0.59871
+     3 │ N215     N218     0.896935  0.206272  0.232048   7.58373e-5   0.786113
+     4 │ N215     N219     0.988931  0.236503  0.221345  -0.00053018   0.718204
+   ⋮   │    ⋮        ⋮        ⋮         ⋮         ⋮           ⋮           ⋮
+ 27964 │ N281     N289     0.942749  0.220475  0.200358   0.001656     0.799307
+ 27965 │ N281     N290     1.08762   0.285053  0.289967   0.000299019  1.09343
+ 27966 │ N289     N290     1.104     0.277445  0.235519   0.00186445   0.858206
+                                                              27959 rows omitted
 ```
-A convenience function that takes the `NamedTuple` output from `kinship` performed with bootstrapping
-and returns one large DataFrame.
+----
+
+### 📦 _kinship_noboot_nofreq
+```julia
+_kinship_noboot_nofreq(data::PopData, method::Function)
+```
+----
+
+### 📦 _kinship_noboot_freq
+```julia
+_kinship_noboot_freq(data::PopData, method::Function)
+```
+----
+
+### 📦 _kinship_boot_nofreq
+```julia
+_kinship_boot_nofreq(data::PopData, method::Function, iterations::Int, interval::Vector{Float64} = [0.025, 0.975])
+```
+
+### 📦 _kinship_boot_freq
+```julia
+_kinship_boot_freq(data::PopData, method::Function, iterations::Int, interval::Vector{Float64} = [0.025, 0.975])
+```
+
+### 🔵 kinshiptotable
+```julia
+kinshiptotable(kinshipresults::T, methd::Symbol) where T<:NamedMatrix
+```
+Converts the `NamedMatrix` result from the non-bootstrapped `kinship()` results into a `DataFrame`.
+The second positonal argument (`methd`) is the name of the value column (default: `kinship`). For
+better analysis workflow, it would be useful to specify the method for this column, to
+keep track of which estimator was used (e.g., `Blouin`, `LynchLi`, etc.)
+**Example**
+```julia
+julia> cats = @nancycats ; kin = kinship(cats, method = Moran) ;
+julia> kinshiptotable(kin, :Moran)
+22366×3 DataFrame
+   Row │ sample1  sample2  Moran      
+       │ String   String   Float64      
+───────┼────────────────────────────────
+     1 │ cc_001   cc_002    0.00688008
+     2 │ cc_001   cc_003   -0.0286812
+     3 │ cc_001   cc_005   -0.000749142
+     4 │ cc_001   cc_007    0.0516361
+     5 │ cc_001   cc_008    0.0261128
+     6 │ cc_001   cc_009   -0.00187027
+     7 │ cc_001   cc_010    0.0182852
+   ⋮   │    ⋮        ⋮          ⋮
+ 22361 │ seg_028  seg_029  -0.0472928
+ 22362 │ seg_028  seg_030  -0.0172853
+ 22363 │ seg_028  seg_031  -0.00240921
+ 22364 │ seg_029  seg_030  -0.0278483
+ 22365 │ seg_029  seg_031   0.0297876
+ 22366 │ seg_030  seg_031  -0.0371295
+                      22353 rows omitted
+```
