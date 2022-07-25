@@ -43,7 +43,7 @@ using PopGenCore
     export PopData, PopDataInfo, GenoArray, Genotype, SNP, Msat
     export genodata, metadata, info
     export isbiallelic, ishom, ishet
-    export baypass, delimited, csv, genepop, vcf, bcf, @nancycats, @gulfsharks
+    export baypass, delimited, csv, genepop, vcf, bcf, plink, @nancycats, @gulfsharks
     export sampleinfo, sampleinfo!, locusinfo, locusinfo!, samplenames, loci
     export copy, size, sort, dropmonomorphic, dropmonomorphic!
     export dropmultiallelic, dropmultiallelic!
