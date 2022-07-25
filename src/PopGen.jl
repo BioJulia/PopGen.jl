@@ -43,7 +43,7 @@ using PopGenCore
     export PopData, PopDataInfo, GenoArray, Genotype, SNP, Msat
     export genodata, metadata, info
     export isbiallelic, ishom, ishet
-    export delimited, csv, genepop, vcf, bcf, @nancycats, @gulfsharks
+    export baypass, delimited, csv, genepop, vcf, bcf, @nancycats, @gulfsharks
     export sampleinfo, sampleinfo!, locusinfo, locusinfo!, samplenames, loci
     export copy, size, sort, dropmonomorphic, dropmonomorphic!
     export dropmultiallelic, dropmultiallelic!
@@ -98,7 +98,7 @@ include("FStatistics/FstPermutations.jl")
 export pairwisefst
 
 include("Kinship/KinshipPairwise.jl")
-export kinship, mergeKinship
+export kinship, kinshiptotable
 include("Kinship/KinshipMoments.jl")
 export QuellerGoodnight, Ritland, Lynch, LynchRitland, LynchLi, LiHorvitz, Moran, Blouin, Loiselle #, Wang
 include("Kinship/KinshipPostHocs.jl")
