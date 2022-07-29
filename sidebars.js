@@ -82,6 +82,7 @@ module.exports = {
           "api/PopGenCore/mathutils",
           "api/PopGenCore/missingutils",
           "api/PopGenCore/permutations",
+          "api/PopGenCore/plink",
           "api/PopGenCore/popdatawrappers",
           "api/PopGenCore/read",
           "api/PopGenCore/structure",
