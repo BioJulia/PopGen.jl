@@ -8,7 +8,7 @@ import TabItem from '@theme/TabItem';
 
 ## Allele frequency table
 ```julia
-allelefreqtable(data::PopData; by::String = "global")
+allelefreqtable(data::PopData; by::Union{String, Symbol} = "global")
 ```
 Return a table of the observed `global` (default) or `population` allele frequencies in a PopData object. Use this if you want to see what the frequencies are for every allele at every locus.
 
@@ -70,7 +70,7 @@ julia> allelefreqtable(cats, by = "population")
 
 ## Genotype frequency table
 ```julia
-genofreqtable(data::PopData; by::String = "global")
+genofreqtable(data::PopData; by::Union{String, Symbol} = "global")
 ```
 Return a table of the observed `global` (default) or `population` genotype frequencies in a PopData object. Use this if you want to see what the frequencies are for every genotype at every locus.
 
