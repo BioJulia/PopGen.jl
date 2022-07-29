@@ -272,7 +272,7 @@ BenchmarkTools.Trial:
 </TabItem>
 <TabItem value="jp">
 
-This is to demonstrate what the speed is like when starting Julia with 4 available threads via `julia --threads 6` (julia >= v1.5) or `JULIA_NUM_THREADS=6` (< v1.5).
+This is to demonstrate what the speed is like when starting Julia with 6 available threads via `julia --threads 6` (julia >= v1.5) or `JULIA_NUM_THREADS=6` (< v1.5).
 
 ```julia
 julia> @benchmark pairwise_fst(sharks) samples = 100 seconds = 700
