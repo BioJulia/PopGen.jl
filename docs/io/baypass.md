@@ -11,7 +11,7 @@ sidebar_label: Baypass
 ```
 baypass(data::PopData; filename::Union{String, Nothing} = nothing)
 ```
-Convert a `PopData` object into a Baypass-format matrix. The required input format for the Baypass software
+Convert a `PopData` object into a Baypass-format matrix. The input format for the Baypass software
 requires biallelic data. By default, it returns just the Baypass-format matrix; use the keyword argument `filename` to specify a file to write the matrix to.
 This function **does not perform a Baypass analysis**, but instead creates the input matrix necessary for it.
 
