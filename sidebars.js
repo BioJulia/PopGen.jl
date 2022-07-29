@@ -22,7 +22,6 @@ module.exports = {
     ],
     "Working with PopData": [
       "popdata/popdata",
-      "popdata/workingwithpopdata",
       "popdata/viewdata",
       "popdata/addingdata",
       "popdata/exclusion",
