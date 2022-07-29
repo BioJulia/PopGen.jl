@@ -264,10 +264,6 @@ julia> missingdata(sharks, by = "locusxpopulation")
 </TabItem>
 </Tabs>
 
-:::tip alternative names
-Each mode of operation has an extra synonymous (alternative) name just because we can and want you to have the option of more explicitly legible code. If you get the `by = `  argument wrong, it will let you know with an error message and run the default `"sample"` mode anyway.
-:::
-
 
 ## Pairwise Identical Genotypes
 While not a substitute for a [kinship analysis](docs/analyses/kinship), it may be useful to know or verify how similar your data are in a very literal sense:
@@ -345,7 +341,7 @@ If you were curious about allelic richness (number of alleles per locus), then y
   defaultValue="l"
   values={[
     { label: 'by locus', value: 'l', },
-    { label: 'by locus by population', value: 'p', },
+    { label: 'by locusxpopulation', value: 'p', },
   ]
 }>
 <TabItem value="l">
