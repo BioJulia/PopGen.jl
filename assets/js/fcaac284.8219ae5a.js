@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkpop_gen_jl=self.webpackChunkpop_gen_jl||[]).push([[9182],{1418:function(e){e.exports=JSON.parse('{"permalink":"/PopGen.jl/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":3,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);
