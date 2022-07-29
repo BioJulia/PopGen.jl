@@ -24,7 +24,7 @@ a specific method, read more below or see its docstring in a Julia session with 
 |`kmedoids`| K-medoids | `k`, `iterations` |
 |`hclust`| Hierarchical Clustering | `linkage`, `branchorder`, `distance` |
 |`fuzzycmeans`| Fuzzy C-means | `c`, `fuzziness`, `iterations` |
-|`dbscan`| Density-based Spatial Clustering of Applications with Noise (DBSCAN) | `k`, `iterations` |`radius`, `minpoints`, `distance` |
+|`dbscan`| Density-based Spatial Clustering of Applications with Noise (DBSCAN) | `radius`, `minpoints`, `distance` |
 
 #### Examples
 ```julia
