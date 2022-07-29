@@ -51,15 +51,18 @@ julia> using PopGen
 
 Feel free to play around with the test data in `/data/` or add it to your workspace with the `@nancycats` and `@gulfsharks` commands.
 
+<details>
+<summary>For ArchLinux users</summary>
 
-:::note Arch Linux users
 If you compiled Julia from source, your PopGen.jl installation may fail due to incorrectly building `Arpack`, which is expected to be in one place, but the compilation puts in another.
 
 **Solutions**:
 
 - install official Julia binaries from the AUR (`julia-bin`), which includes a correctly bundled `Arpack` (recommended)
 - if Julia was compiled from source: install `julia-arpack` from the AUR and make sure to delete `~/.julia/packages/Arpack` if it exists. That *should* fix things, but sometimes it still acts up.
-:::
+
+</details>
+
 
 ## "Installing" the docs
 The magic of Docusaurus (the engine these docs are built on) lets you "install" this documentation as a progressive web app (fancy web shortcut) if you're using a Chromium-based browser (e.g. Chrome, Chromium, Brave, Vivaldi, Edge). Doing so gives you quick-access to these docs as easy as double-clicking an application. Here's what that looks like using the Edge browser on Windows:
