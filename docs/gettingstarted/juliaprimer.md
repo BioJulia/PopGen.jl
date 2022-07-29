@@ -16,7 +16,7 @@ There is nothing inherently special about this documentation relative to other d
 Work with Julia using VSCode, Jupyter, Pluto.jl, command line
 :::
 
-Everyone has their own particular workflows, and if you're new to Julia, you might not have established one yet. Julia can be used rather comfortably using its built-in interpreter. For an RStudio-like experience, we recommend using the [VScode Julia extension](https://www.julia-vscode.org), but you can also use [Atom](https://junolab.org/) add-on). If you're already a fan of Jupyter notebooks (or [**nteract**](https://nteract.io/)), then all you need is to install the `IJulia` package in Julia and you have full Jupyter support for Julia! You can also use the new reactive notebooks provided by [Pluto.jl](https://github.com/fonsp/Pluto.jl).
+Everyone has their own particular workflows, and if you're new to Julia, you might not have established one yet. Julia can be used rather comfortably using its built-in interpreter. For an RStudio-like experience, we recommend using the [VScode Julia extension](https://www.julia-vscode.org). If you're a fan of Jupyter notebooks, then all you need is to install the `IJulia` package in Julia and you have full Jupyter support for Julia! Alternatively, you can use the built-in Jupyter engine inside VScode with the Jupyter and Julia VScode extensions. You can also use the new reactive notebooks provided by [Pluto.jl](https://github.com/fonsp/Pluto.jl).
 
 :::note Trivia
 If you didn't already know,  the name "Jupyter" is actually a concatenation of **Ju** (julia) **Pyt** (python) and **eR** (R). 🤯
