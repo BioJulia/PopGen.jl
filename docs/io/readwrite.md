@@ -1,5 +1,5 @@
 ---
-id: readingdata
+id: readwrite
 title: Read/Write data
 sidebar_label: Read/Write data
 ---
@@ -11,7 +11,7 @@ PopGen.jl (via PopGenCore.jl) provides a handful of file readers and writers wit
 | [delimited](delimited.md)| `.csv`, `.txt`, `.tsv` | `?delimited`  |👍 | 👍 |
 | [genepop](genepop.md)| `.gen`, `.genepop`     | `?genepop`    |👍 | 👍 |
 | [structure](structure.md)| `.str`, `.structure`   | `?structure`  |👍 | 👍 |
-| [plink](plink.md) (ped) | `.ped` | `?plink` | 👍 | 👍 |
+| [plink (ped)](plink.md) | `.ped` | `?plink` | 👍 | 👍 |
 | [variant call format (vcf)](variantcall.md) | `.vcf`, `.vcf.gz`| `?vcf`  |👍 | |
 | [variant call format (bcf)](variantcall.md) | `.bcf`, `.bcf.gz`| `?bcf`  | 👍| |
 | [baypass](baypass.md) | `.baypass` | `?baypass` | | 👍|

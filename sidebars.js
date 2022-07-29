@@ -14,6 +14,7 @@ module.exports = {
           "io/baypass",
           "io/delimited",
           "io/genepop",
+          "io/plink",
           "io/structure",
           "io/vcf"
         ]

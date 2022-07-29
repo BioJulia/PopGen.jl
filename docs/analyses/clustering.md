@@ -18,16 +18,13 @@ chosen method must also be supplied with the appropriate keyword arguments for t
 a specific method, read more below or see its docstring in a Julia session with `?methodname` (e.g., `?kmediods`). The keyword argument `matrixtype` refers to which input matrix you would like to use for clustering, one of either `:pca` (default, principal components of the scaled allele frequencies) or `:freq` (scaled allele frequencies).
 
 #### Clustering Methods
-- `kmeans`: K-means++ clustering
-  - kwargs: `k`, `iterations`
-- `kmedoids`: K-medoids clustering
-  - kwargs: `k`, `iterations`, `distance`
-- `hclust`: Hierarchical clustering
-  - kwargs: `linkage`, `branchorder`, `distance`
-- `fuzzycmeans`: Fuzzy C-means lustering
-  - kwargs: `c`, `fuzziness`, `iterations`
-- `dbscan`: Density-based Spatial Clustering of Applications with Noise (DBSCAN)
-  - kwargs: `radius`, `minpoints`, `distance`
+| Method Name | Method Type | Keyword Arguments |
+|:---|:---|:---|
+|`kmeans`| K-means++ | `k`, `iterations` |
+|`kmedoids`| K-medoids | `k`, `iterations` |
+|`hclust`| Hierarchical Clustering | `linkage`, `branchorder`, `distance` |
+|`fuzzycmeans`| Fuzzy C-means | `c`, `fuzziness`, `iterations` |
+|`dbscan`| Density-based Spatial Clustering of Applications with Noise (DBSCAN) | `k`, `iterations` |`radius`, `minpoints`, `distance` |
 
 #### Examples
 ```julia

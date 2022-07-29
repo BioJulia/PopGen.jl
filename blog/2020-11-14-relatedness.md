@@ -10,6 +10,11 @@ tags: [tutorials]
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+:::info PopGen.jl <0.9.0
+The kinship interface has changed a bit between versions 0.7 and 0.9. This
+post has not yet been updated for versions 0.9.0+. To follow along, use versions 0.8.0 or lower.
+:::
+
 ## Getting Started
 In a population genetics study, you often need to identify if there are kin in your data. This may be necessary because you are trying to remove kin from your data (because of Hardy-Weinberg assumptions), or maybe kinship is a central interest in your study. Either way, the goal of this tutorial is to provide you with a basic tutorial on using PopGen.jl to perform a relatedness analysis, which is sometimes called a _kinship_ analysis. To follow along, you'll need to have Julia, along with the packages PopGen.jl, PopGenSims.jl, and StatsBase.jl installed. We'll be using the `nancycats` data because it's smaller than `gulfsharks`, so things should be a lot quicker.
 

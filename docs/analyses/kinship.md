@@ -273,4 +273,4 @@ julia> kinshipposthoc(cats, rel_out)
 
 ---------------------
 ## Acknowledgements
-The kinship methods were dutifully written and verified against R analogues by Jason Selwyn. These anaylses can take a while, especially if performing bootstrapping; we provide a progress bar via [Term.jl](https://github.com/FedeClaudi/Term.jl) so you can move on and focus on other things in the meantime. 
+The kinship methods were dutifully written and verified against R analogues by Jason Selwyn. They have since been rewritten twice for speed and memory optimization (14mb vs 14gb!). These anaylses can take a while, especially if performing bootstrapping; we provide a progress bar via [Term.jl](https://github.com/FedeClaudi/Term.jl) so you can move on and focus on other things in the meantime. 

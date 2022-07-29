@@ -4,7 +4,11 @@ title: t-SNE
 sidebar_label: t-SNE
 ---
 
-t-distributed stochastic neighbor embedding (_a.k.a._ t-SNE) is a dimensionality reduction technique for visualizing high-dimensional data. It does this by giving each datapoint a location in a two or three-dimensional map by minimizing the Kullback–Leibler divergence between the high and low dimensionality probability distributions with respect to the locations of the points in the map. It models each high-dimensional object by a two- or three-dimensional point so similar objects are appear nearer and dissimilar objects appear further apart.
+:::warning expect future deprecation
+The next major release of PopGen.jl will remove TSNE.jl as a dependency and this page will instead be a guide on how to use PopGen.jl and TSNE.jl together.
+:::
+
+t-distributed stochastic neighbor embedding (_a.k.a._ t-SNE) is a dimensionality reduction technique for visualizing high-dimensional data. It does this by giving each datapoint a location in a two or three-dimensional map by minimizing the Kullback–Leibler divergence between the high and low dimensionality probability distributions with respect to the locations of the points in the map. It models each high-dimensional object by a two- or three-dimensional point so similar objects are appear nearer and dissimilar objects appear further apart. Read more about it [here](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding).
 
 :::caution careful parameterization
 Visual clusters can be seriously influenced by the parameters. For example, parameters can be chosen in such a way to identify clusters in data that has none. So, a good understanding of the parameters for t-SNE is necessary. **Although a useful tool, t-SNE is not commonly used in population genetic analysis.** It has been included in this package as a wrapper for [TSNE.jl](https://github.com/lejon/TSne.jl) due to its utility in other disciplines.
