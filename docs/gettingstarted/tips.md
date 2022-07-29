@@ -26,7 +26,7 @@ functions you aren't expected to use start with underscores `_`
 It's pretty common to have a series of user-facing functions in a package (the ones that get exported)
 along with a series of unexported ones that are useful for development or are helper functions for the
 exported ones. If you see a function that starts with an underscore, like `_adjacency_matrix`, then you
-(as a user) aren't expected to know or worry about it, let alone use it. I mean, you totally can, but
+(as a user) aren't expected to know or worry about it, let alone use it. You totally can, but
 not all of them have docstrings.
 
 ### Function names
@@ -67,11 +67,11 @@ before calling up the docstring.
 
 If you plan on extending PopGen.jl, here are some useful tips we learned the hard way:
 - Most basic (non-mathematic) or fundamental operations live in PopGenCore.jl
-- Math fundementals and allele/genotype matrix operations live in PopGen.jl
+- Math and analyses live in PopGen.jl
 - It's ok to write something functional but not efficient. Things we can always be improved later!
 - Allocations are the enemy
     - Ignore this recommendation if the goal is a first draft or proof of concept
-    - Creating Arrays is costly and that cost scales **tremendously** with core operations
+    - Creating Arrays is costly and that cost scales **tremendously** with core operations occurring thousands/millions of times
     - If the goal is to be performant, aim for as few allocations as possible
     - Embrace loops
 - `if` statements inside loops slow them down
@@ -89,7 +89,7 @@ for i in 1:something
 end
 
 # example 2: Incrementing inside list comprehension 
-# not performant
+# not as performant
 n = 0
 [n+= 1 for i:something]
 ```
