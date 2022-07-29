@@ -133,17 +133,17 @@ julia> genofreqtable(cats, by = "population")
 ## Missing Data
 
 ```julia
-missingdata(data::PopData; by::String = "sample")
+missingdata(data::PopData; by::Union{String, Symbol} = "sample")
 ```
 
 Get missing genotype information in a `PopData` object. Specify a mode of operation using the `by =` keyword to return a table corresponding with that missing information type.
 
-|     by     | alternative name | what it does                                                 |
-| :--------: | :--------------: | ------------------------------------------------------------ |
-| `"sample"` |  `"individual"`  | returns a count of missing loci per individual (default)     |
-|  `"pop"`   |  `"population"`  | returns a count of missing genotypes per population          |
-| `"locus"`  |     `"loci"`     | returns a count of missing genotypes per locus               |
-|  `"full"`  |   `"detailed"`   | returns a count of missing genotypes per locus per population |
+|     by                |  what it does                                                  |
+| :-------------------: |  ------------------------------------------------------------  |
+| `"sample"`            |  returns a count of missing loci per individual (default)      |
+|  `"population"`       | returns a count of missing genotypes per population            |
+| `"locus"`             |  returns a count of missing genotypes per locus                |
+|  `"locusxpopulation"` |  returns a count of missing genotypes per locus per population |
 
 <Tabs
   block={true}
@@ -152,7 +152,7 @@ Get missing genotype information in a `PopData` object. Specify a mode of operat
     { label: 'sample', value: 's', },
     { label: 'population', value: 'p', },
     { label: 'locus', value: 'l', },
-    { label: 'detailed', value: 'f', },
+    { label: 'locusxpopulation', value: 'f', },
   ]
 }>
 <TabItem value="s">
@@ -189,7 +189,7 @@ julia> missingdata(sharks)
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missingdata(sharks, by = "pop")
+julia> missingdata(sharks, by = "population")
 7×2 DataFrame
  Row │ population      missing
      │ String          Int64
@@ -238,7 +238,7 @@ julia> missingdata(sharks, by = "locus")
 ```
 julia> sharks = @gulfsharks ;
 
-julia> missingdata(sharks, by = "full")
+julia> missingdata(sharks, by = "locusxpopulation")
 15463×3 DataFrame
    Row │ locus         population      missing
        │ String        String          Int64
