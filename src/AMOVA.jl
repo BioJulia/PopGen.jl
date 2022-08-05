@@ -9,7 +9,8 @@ end
 function _missinglocusfilter(data::PopData, cutoff::Float64)
     miss = missingdata(data, by = "locus")
     passing = findall(<=(cutoff), miss.percent)
-    @info "removing $(data.metadata.loci - length(passing)) loci with >$cutoff percent missingness"
+    length(passing) != data.metadata.loci &&
+        @info "removing $(data.metadata.loci - length(passing)) loci with >$(cutoff*100)% missing data"
     data[data.genodata.locus .∈ Ref(loci(data)[passing])]
 end
 
