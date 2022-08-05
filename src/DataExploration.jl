@@ -4,10 +4,10 @@ Get missing genotype information in a `PopData`. Specify a mode of operation
 to return a DataFrame corresponding with that missing information.
 
 #### Modes
-- "sample" - returns a count and list of missing loci per individual (default)
-- "population" - returns a count of missing genotypes per population
-- "locus" - returns a count of missing genotypes per locus
-- "locusxpopulation" - returns a count of missing genotypes per locus per population
+- "sample" - returns a count and percent and list of missing loci per individual (default)
+- "population" - returns a count and percent of missing genotypes per population
+- "locus" - returns a count and percent of missing genotypes per locus
+- "locusxpopulation" - returns a count and percent of missing genotypes per locus per population
 
 ### Example:
 ```
@@ -23,19 +23,29 @@ function missingdata(data::PopData; by::Union{String, Symbol} = "sample")
 end
 
 function _missingdata(data::PopData, ::Val{:sample})
-    DataFrames.combine(DataFrames.groupby(data.genodata, :name), :genotype => (i -> count(ismissing, i)) => :missing)
+    df = DataFrames.combine(DataFrames.groupby(data.genodata, :name), :genotype => (i -> count(ismissing, i)) => :missing)
+    df[:, :percent] = round.(df.missing ./ data.metadata.loci, digits = 3)
+    df
 end
 
 function _missingdata(data::PopData, ::Val{:population})
-    DataFrames.combine(DataFrames.groupby(data.genodata, :population), :genotype => (i -> count(ismissing, i)) => :missing)
+    df = DataFrames.combine(DataFrames.groupby(data.genodata, :population), :genotype => (i -> count(ismissing, i)) => :missing, :genotype => length => :n)
+    df[:, :percent] = round.(df.missing ./ df.n, digits = 3)
+    select!(df, 1, 2, 4)
+    df
 end
 
 function _missingdata(data::PopData, ::Val{:locus})
-    DataFrames.combine(DataFrames.groupby(data.genodata, :locus), :genotype => (i -> count(ismissing, i)) => :missing)
+    df = DataFrames.combine(DataFrames.groupby(data.genodata, :locus), :genotype => (i -> count(ismissing, i)) => :missing)
+    df[:, :percent] = round.(df.missing ./ data.metadata.samples, digits = 3)
+    df
 end
 
 function _missingdata(data::PopData, ::Val{:locusxpopulation})
-    DataFrames.combine(DataFrames.groupby(data.genodata, [:locus, :population]), :genotype => (i -> count(ismissing, i)) => :missing)
+    df = DataFrames.combine(DataFrames.groupby(data.genodata, [:locus, :population]), :genotype => (i -> count(ismissing, i)) => :missing, :genotype => length => :n)
+    df[:, :percent] = round.(df.missing ./ df.n, digits = 3)
+    select!(df, 1, 2,3,5)
+    df
 end
 
 
