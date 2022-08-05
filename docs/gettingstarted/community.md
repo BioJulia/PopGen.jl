@@ -4,11 +4,11 @@ title: Community
 sidebar_label: Community
 ---
 
-## Join the Slack channel!
+## Join the Julia Slack workspace!
 
-Have questions, want to talk population genetics, or have ideas?
+Have questions, want to talk population genetics, or have ideas, then join the official Julia Slack workspace and navigate to the `#Biology` channel!
 
- [![alt text](https://img.shields.io/badge/slack-join%20PopGen.jl-9d72b1?style=for-the-badge&logo=slack)](https://join.slack.com/t/popgenjl/shared_invite/zt-deam65n8-DuBs2z1oDtsbBuRplJW~Pg)
+ [![join the julia slack](https://img.shields.io/badge/slack-join%20Julia-9d72b1?style=for-the-badge&logo=slack)](https://julialang.org/slack/)
 
 :::note Community Standards
 The PopGen.jl community is committed to maintaining a welcoming, inclusive, civil, and constructive environment. We expect the following standards to be observed and upheld by all participants during all forms of communication.
