@@ -8,13 +8,18 @@ end
 
 function _missinglocusfilter(data::PopData, cutoff::Float64)
     miss = missingdata(data, by = "locus")
-    passing = findall(<=(cutoff), miss.percent)
-    length(passing) != data.metadata.loci &&
-        @info "removing $(data.metadata.loci - length(passing)) loci with >$(cutoff*100)% missing data"
-    data[data.genodata.locus .∈ Ref(loci(data)[passing])]
+    #passing = findall(<=(cutoff), miss.percent)
+    failing = findall(>=(cutoff), miss.percent)
+    if isempty(failing)
+        return data
+    else
+        @info "removing $(length(failing)) loci with >$(cutoff*100)% missing data"
+        #return data[data.genodata.locus .∈ Ref(loci(data)[passing])]
+        return data[data.genodata.locus .∉ Ref(loci(data)[failing])]
+    end
 end
 
-function amova(data::PopData; hierarchy::String, missing_cutoff::Float64 = 0.05)
+function amova(data::PopData; hierarchy::String, missing_cutoff::Union{Nothing,Float64} = 0.05)
     # remove any whitespace and split by /
     groups = Symbol.(split(replace(hierarchy, " " => ""), r"/"))
     # pull out sample name and stratification columns
@@ -27,9 +32,9 @@ function amova(data::PopData; hierarchy::String, missing_cutoff::Float64 = 0.05)
         throw(ArgumentError("Columns {$missingcolumns} not found in metadata.sampleinfo dataframe."))
     end
     # filter out loci with too much missingness
-    newdat = _missinglocusfilter(data, missing_cutoff)
+    data = isnothing(missing_cutoff) ? data : _missinglocusfilter(data, missing_cutoff)
     # matrix of allele frequencies
-    mtx = matrix(newdat)  
+    mtx = matrix(data)  
     # Squared Eucledian distance matrix based on allele freqs
     #2 .* pairwise(SqEuclidean(), mtx, dims=1)
     distmtx = pairwise(SqEuclidean(), mtx, dims=1)
