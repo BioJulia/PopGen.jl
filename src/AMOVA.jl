@@ -29,15 +29,13 @@ function amova(data::PopData; hierarchy::String, missing_cutoff::Union{Nothing,F
     catch
         erroridx = groups .∉ Ref(propertynames(data.metadata.sampleinfo))
         missingcolumns = join(groups[erroridx], ", ")
-        throw(ArgumentError("Columns {$missingcolumns} not found in metadata.sampleinfo dataframe."))
+        throw(ArgumentError("Columns {$missingcolumns} not found in the PopData.sampleinfo dataframe."))
     end
     # filter out loci with too much missingness
     data = isnothing(missing_cutoff) ? data : _missinglocusfilter(data, missing_cutoff)
-    # matrix of allele frequencies
-    mtx = matrix(data)  
     # Squared Eucledian distance matrix based on allele freqs
     #2 .* pairwise(SqEuclidean(), mtx, dims=1)
-    distmtx = pairwise(SqEuclidean(), mtx, dims=1)
+    distmtx = pairwise(SqEuclidean(), matrix(data), dims=1)
 
     group = groups[1]
     grpcol = @view strata[:,group]
@@ -45,8 +43,9 @@ function amova(data::PopData; hierarchy::String, missing_cutoff::Union{Nothing,F
     # create vector of vectors containing indices for each unique group
     groupidx = map(x -> findall(==(x),grpcol), levels)
     #popstats = Dict{Symbol, Float64}[Dict{Symbol, Float64}() for i in 1:length(levels)]
-    N = length(levels) - 1
+    df_among = length(levels) - 1
     df_within = 0
+    N = data.metadata.samples
     SS_within = 0.0
     SS_among = 0.0
     for j in groupidx
@@ -57,7 +56,6 @@ function amova(data::PopData; hierarchy::String, missing_cutoff::Union{Nothing,F
         SS_within += dw / 2n
         SS_among += ((da + dw) / 2N) - (dw / 2n)
     end
-    df_among = N - 1
     df_total = df_among + df_within
     SS_total = SS_within + SS_among
     σ²_within = SS_within / df_within
