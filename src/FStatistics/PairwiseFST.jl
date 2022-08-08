@@ -19,7 +19,7 @@ function Base.show(io::IO, data::PairwiseFST)
     rwnames = issymmetrical ? names(data.results) : nothing
     show(
         io,
-        data.results,
+        round.(data.results, digits = 4),
         show_row_number = false,
         rowlabel = Symbol(" "),
         eltypes = false,
