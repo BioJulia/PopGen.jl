@@ -48,7 +48,7 @@ function _fst_permutation(data::PopData, method::Function, iterations::Int64)
             end
             @inbounds results[i,j] = fst_val
             @inbounds results[j,i] = (pval + 1) / iterations 
-            progress.update!(job)
+            update!(job)
         end
     end
     stop!(pbar)
