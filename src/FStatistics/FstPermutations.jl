@@ -22,6 +22,7 @@ dataframe has FST values below the diagonal and P values above it. This method i
 and wrapped by the public API provided in `pairwisefst()`.
 """
 function _fst_permutation(data::PopData, method::Function, iterations::Int64)
+    method == AMOVA && return _amovafst_permutation(data, iterations)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
@@ -66,6 +67,9 @@ function _amovafst_permutation(data::PopData, iterations::Int64)
     #permNs = length.(groupidx)
     results = zeros(Float64, npops, npops)
     df_among = 1
+    pbar = ProgressBar(;refresh_rate=90, transient = true)
+    job = addjob!(pbar; description= "AMOVA-based FST: ", N = Int64((npops * (npops-1))/2))
+    start!(pbar)
     for i in 2:npops
         pop1 = groupidx[i]
         n1 = length(pop1)
@@ -93,21 +97,24 @@ function _amovafst_permutation(data::PopData, iterations::Int64)
             
             pval = 0
             @inbounds @sync for iter in 1:iterations-1
-                p1, p2 = partitionarray(shuffle(vcat(pop1, pop2)), [n1, n2])
-                i_dw1 = reduce(+, view(distmtx, p1, p1))
-                i_SS_within1 = i_dw1 / 2n1
-                i_dw2 = reduce(+, view(distmtx, p2, p2))
-                i_da = reduce(+, view(distmtx, p1, p2))
-                i_SS_among1 = ((i_da + i_dw1) / 2N) - (i_dw1 / 2n1)
-                i_SS_among2 = ((i_da + i_dw2) / 2N) - (i_dw2 / 2n2)
-                i_SS_among = i_SS_among1 + i_SS_among2
-                i_σ²_within = (i_SS_within1 + (i_dw2 / 2n2)) / df_within
-                i_n_c = (N - ((n1^2 + n2^2)/N)) #/ df_among
-                i_σ²_among = ((i_SS_among / df_among) - i_σ²_within) / i_n_c
-                i_FST = i_σ²_among / (i_σ²_among + i_σ²_within)
-                pval += FST <= iFST
+                Base.Threads.@spawn begin
+                    p1, p2 = partitionarray(shuffle(vcat(pop1, pop2)), [n1, n2])
+                    i_dw1 = reduce(+, view(distmtx, p1, p1))
+                    i_SS_within1 = i_dw1 / 2n1
+                    i_dw2 = reduce(+, view(distmtx, p2, p2))
+                    i_da = reduce(+, view(distmtx, p1, p2))
+                    i_SS_among1 = ((i_da + i_dw1) / 2N) - (i_dw1 / 2n1)
+                    i_SS_among2 = ((i_da + i_dw2) / 2N) - (i_dw2 / 2n2)
+                    i_SS_among = i_SS_among1 + i_SS_among2
+                    i_σ²_within = (i_SS_within1 + (i_dw2 / 2n2)) / df_within
+                    i_n_c = (N - ((n1^2 + n2^2)/N)) #/ df_among
+                    i_σ²_among = ((i_SS_among / df_among) - i_σ²_within) / i_n_c
+                    i_FST = i_σ²_among / (i_σ²_among + i_σ²_within)
+                    pval += FST <= i_FST
+                end
             end
-            @inbounds results[j,i] = (pval + 1) / iterations 
+            @inbounds results[j,i] = (pval + 1) / iterations
+            update!(job)
         end
 
     end
