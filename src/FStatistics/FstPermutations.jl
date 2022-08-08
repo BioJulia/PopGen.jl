@@ -54,7 +54,7 @@ function _fst_permutation(data::PopData, method::Function, iterations::Int64)
     end
     stop!(pbar)
     println("Below diagonal: FST values | Above diagonal: P values")
-    return PairwiseFST(DataFrame(results, Symbol.(pops)), "$method estimator (with p-values)")
+    return PairwiseFST(DataFrame(results, Symbol.(pops)), "$method (with p-values)")
 end
 
 function _amovafst_permutation(data::PopData, iterations::Int64)
@@ -118,5 +118,5 @@ function _amovafst_permutation(data::PopData, iterations::Int64)
         end
 
     end
-    return PairwiseFST(DataFrame(results, Symbol.(levels)), "AMOVA-based estimator (with p-values)")
+    return PairwiseFST(DataFrame(results, Symbol.(levels)), "AMOVA-based (with p-values)")
 end
