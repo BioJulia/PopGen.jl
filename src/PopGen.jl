@@ -64,6 +64,7 @@ using Term.Progress
 using MultipleTesting, StatsBase
 import Clustering: kmeans, kmedoids, hclust, Hclust, cutree, fuzzy_cmeans, dbscan
 import MultivariateStats: fit, PCA
+import Printf
 
 #   o O       o O       o O       o O       o O
 # o | | O   o | | O   o | | O   o | | O   o | | O
