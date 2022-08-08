@@ -254,5 +254,5 @@ function AMOVA(data::PopData)
         end
 
     end
-    return PairwiseFST(DataFrame(results, Symbol.(levels)), "AMOVA")
+    return PairwiseFST(DataFrame(results, Symbol.(levels)), "AMOVA-based")
 end

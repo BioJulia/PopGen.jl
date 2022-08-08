@@ -38,9 +38,10 @@ P-values of statistical significance. Use `by = "locus"` to perform a locus-by-l
 population pairs (iterations and significance testing ignored). Returns a `PairwiseFST` object,
 stores a `DataFrame` of the `results`, along with the `method` used to obtain the estimates. 
 #### Methods:
+- `AMOVA`: AMOVA-based (Excoffier, 1992) FST as described by Bird et al. (2011) (default)
 - `Hudson`: Hudson et al. (1992) method (only for biallelic data)
 - `Nei`: Nei (1987) method
-- `WeirCockerham` : Weir & Cockerham (1984) method (default)
+- `WeirCockerham` : Weir & Cockerham (1984) method
 
 **Examples**
 ```julia
@@ -49,11 +50,11 @@ wc = pairwise_fst(data, method = WeirCockerham)
 wc_sig = pairwise_fst(data, iterations = 1000)
 ```
 """
-function pairwisefst(data::PopData; method::Function = WeirCockerham, by::String = "global", iterations::Int64 = 0)
+function pairwisefst(data::PopData; method::Function = AMOVA, by::String = "global", iterations::Int64 = 0)
     # sanity checks
     mth = Symbol(method)
-    if mth ∉ [:Hudson, :Nei, :WeirCockerham]
-        throw(ArgumentError("The \`method\` keyword argument ($method) is not recognized and must be one of Hudson, Nei, or WeirCockerham. See ?pairwisefst for usage information"))
+    if mth ∉ [:Hudson, :Nei, :WeirCockerham, :AMOVA]
+        throw(ArgumentError("The \`method\` keyword argument ($method) is not recognized and must be one of Hudson, Nei, AMOVA, or WeirCockerham. See ?pairwisefst for usage information"))
     elseif mth == :Hudson
         isbiallelic(data) || throw(ArgumentError("Data must be biallelic to se the Hudson estimator"))
     end
