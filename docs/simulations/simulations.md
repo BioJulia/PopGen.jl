@@ -76,7 +76,7 @@ simulate(data::PopData; scale::Int)
 ```
 If you want to simulate data while keeping the proportion of individuals per population consistent with the source PopData, use `simulate(PopData, scale = Int)`, which takes a `PopData` object and simulates the same number of individuals per population multiplied by `scale` (i.e. if `scale=2`, there will be twice the number of simulated individuals compared to the original PopData). Returns a new PopData with samples having the same ploidy as the source `PopData`, but will **not** work on mixed-ploidy data. 
 
-In the example below, we simulate 3x the number of samples of the original nancycats data, which has 237 samples x 17 populations, therefore the resulting `PopData` will have 711 samples (237 samples x 3). In this example, each population will have 3x the number of samples as the original nancycats data.
+In the example below, we simulate 3x the number of samples of the original nancycats data, which has 237 samples x 17 populations, therefore the resulting `PopData` will have 711 samples (237 samples x 3).
 
 **Example**
 ```julia
