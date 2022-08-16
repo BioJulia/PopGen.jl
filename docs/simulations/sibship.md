@@ -41,7 +41,7 @@ The relationship between the newly generated samples can be identified by:
 - Their `population` name will be that of their relationship (e.g. "fullsib")
 
 :::tip plugging into relatedness
-The `relatedness` function will recognize the population names output from simulating siblingship
+The `kinship` function will recognize the population names output from simulating siblingship
 and only estimate relatedness for the appropriate pairs. If you need this functionality, you are
 strongly discouraged from manually editing the resulting `PopData` from `simulatekin`.
 :::
