@@ -25,11 +25,13 @@ a global allele pool derived from the given `data` (i.e. weighted by their frequ
 
 
 ### Relationship
-Simulated parents will be crossed to generate offspring depending on the `relationship`:
-- `fullsib` : 2 parents generate 2 full-sibling offspring, returns 2 offspring
-- `halfsib` : 3 parents generate 2 half-sibling offspring, returns 2 offspring
-- `unrelated` : returns 2 randomly generated individuals from the global allele pools
-- `parentoffspring` : 2 parents generate 1 offspring, returns 1 offspring and 1 parent
+Simulated parents will be crossed to generate samples depending on the `relationship`:
+| relationship | # parents | # offspring | returns |
+|:-------------|:---------:|:------------|:--------|
+|`fullsib`| 2 | 2 full siblings | 2 offspring |
+|`halfsib`| 3 | 2 half siblings | 2 offspring |
+|`unrelated`| - | - | 2 randomly generated individuals |
+|`parentoffspring`| 2 | 1 offspring | 1 parent + 1 offspring |
 
 ### Identifying pairs
 The relationship between the newly generated samples can be identified by:
