@@ -26,6 +26,7 @@ a global allele pool derived from the given `data` (i.e. weighted by their frequ
 
 ### Relationship
 Simulated parents will be crossed to generate samples depending on the `relationship`:
+
 | relationship | # parents | # offspring | returns |
 |:-------------|:---------:|:------------|:--------|
 |`fullsib`| 2 | 2 full siblings | 2 offspring |
