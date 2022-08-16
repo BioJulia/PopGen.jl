@@ -53,7 +53,7 @@ PopData{Diploid, 9 Microsatellite loci}
 ```julia
 simulate(data::PopData; n::Dict{Population,Int})
 ```
-If you want to simulate an arbitrary number of individuals for arbitrary populations, use `simulate(PopData, n = Dict{String, Int})`, which takes a `PopData` object and simulates samples within populations as specified in the input `Dict`. Returns a new PopData with samples having the same ploidy as the source `PopData`, but will **not** work on mixed-ploidy data.
+To simulate an arbitrary number of individuals for arbitrary populations, use `simulate(PopData, n = Dict{String, Int})`, which takes a `PopData` object and simulates samples within populations as specified in the input `Dict`, where `keys => values` are `population => n_samples`. Returns a new PopData with samples having the same ploidy as the source `PopData`, but will **not** work on mixed-ploidy data.
 
 In the example below, we create a dictionary with the notation `Population => #samples` to simulate a specific number of samples for 3 particular populations. The resulting PopData will have 28 samples (5+3+20) across 3 populations ("1", "8", "11").
 
@@ -72,7 +72,7 @@ PopData{Diploid, 9 Microsatellite loci}
 <TabItem value="p">
 
 ```julia
-simulate(data::PopData; n::Int)
+simulate(data::PopData; scale::Int)
 ```
 If you want to simulate data while keeping the proportion of individuals per population consistent with the source PopData, use `simulate(PopData, scale = Int)`, which takes a `PopData` object and simulates the same number of individuals per population multiplied by `scale` (i.e. if `scale=2`, there will be twice the number of simulated individuals compared to the original PopData). Returns a new PopData with samples having the same ploidy as the source `PopData`, but will **not** work on mixed-ploidy data. 
 
@@ -82,7 +82,7 @@ In the example below, we simulate 3x the number of samples of the original nancy
 ```julia
 julia> cats = @nancycats;
 
-julia> sims = simulate(cats , scale = 1)
+julia> sims = simulate(cats , scale = 3)
 PopData{Diploid, 9 Microsatellite loci}
   Samples: 711
   Populations: 17
