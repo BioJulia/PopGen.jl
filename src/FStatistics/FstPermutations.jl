@@ -22,7 +22,7 @@ dataframe has FST values below the diagonal and P values above it. This method i
 and wrapped by the public API provided in `pairwisefst()`.
 """
 function _fst_permutation(data::PopData, method::Function, iterations::Int64)
-    method == AMOVA && return _amovafst_permutation(data, iterations)
+    Symbol(method) == :AMOVA && return _amovafst_permutation(data, iterations)
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations

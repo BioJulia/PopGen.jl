@@ -53,23 +53,22 @@ wc_sig = pairwise_fst(data, iterations = 1000)
 function pairwisefst(data::PopData; method::Function = AMOVA, by::String = "global", iterations::Int64 = 0)
     # sanity checks
     mth = Symbol(method)
+    by = lowercase(by)
     if mth ∉ [:Hudson, :Nei, :WeirCockerham, :AMOVA]
         throw(ArgumentError("The \`method\` keyword argument ($method) is not recognized and must be one of Hudson, Nei, AMOVA, or WeirCockerham. See ?pairwisefst for usage information"))
     elseif mth == :Hudson
-        isbiallelic(data) || throw(ArgumentError("Data must be biallelic to se the Hudson estimator"))
+        isbiallelic(data) || throw(ArgumentError("Data must be biallelic to use the Hudson estimator"))
     end
 
     if by == "locus"
-        if mth == :Hudson
-            return _hudson_fst_lxl(data)
-        elseif mth == :Nei
-            return _nei_fst_lxl(data)
+        if mth ∈ [:Hudson, :Nei]
+            return _fst_lxl(data, Val(mth))
         else
             throw(ArgumentError("Method $mth is not (yet) supported for by-locus calculations."))
         end
     elseif by == "global"
         if iterations == 0
-            method(data)
+            _pairwisefst(data, Val(mth))
         else
             _fst_permutation(data, method, iterations)
         end

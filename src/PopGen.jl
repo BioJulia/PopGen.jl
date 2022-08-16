@@ -90,6 +90,9 @@ export alleleaverage, richness, summary, summarystats
 include("HardyWeinberg.jl")
 export hwetest, hwe
 
+include("AMOVA.jl")
+export amova
+
 include("FStatistics/FstGlobal.jl")
 include("FStatistics/FstByLocus.jl")
 include("FStatistics/PairwiseFST.jl")

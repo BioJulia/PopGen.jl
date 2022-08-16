@@ -1,4 +1,4 @@
-function _hudson_fst_lxl(data::PopData)
+function _fst_lxl(data::PopData,::Val{:Hudson})
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     nloci = data.metadata.loci
@@ -62,7 +62,7 @@ function _nei_fst_lxl(population_1::T, population_2::T) where T<:AbstractMatrix
   return result
 end
 
-function _nei_fst_lxl(data::PopData)
+function _fst_lxl(data::PopData, ::Val{:Nei})
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = length(pops)

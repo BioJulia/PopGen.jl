@@ -1,4 +1,4 @@
-function Hudson(data::PopData)
+function _pairwisefst(data::PopData, ::Val{:Hudson})
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
@@ -86,7 +86,7 @@ function Nei(population_1::T, population_2::T) where T<:AbstractMatrix
     return round((DSTtot/Ntot) / (HTtot/Ntot), digits = 5) 
 end
 
-function Nei(data::PopData)
+function _pairwisefst(data::PopData, ::Val{:Nei})
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
@@ -199,7 +199,7 @@ function WeirCockerham(population_1::T, population_2::T) where T<:AbstractMatrix
 end
 
 
-function WeirCockerham(data::PopData)
+function _pairwisefst(data::PopData, ::Val{:WeirCockerham})
     idx_pdata = groupby(data.genodata, :population)
     pops = getindex.(keys(idx_pdata), :population)
     npops = data.metadata.populations
@@ -218,7 +218,7 @@ function WeirCockerham(data::PopData)
 end
 
 
-function AMOVA(data::PopData)
+function _pairwisefst(data::PopData, ::Val{:AMOVA})
     distmtx = pairwise(SqEuclidean(), matrix(data), dims=1)
     grpcol = data.metadata.sampleinfo.population
     levels = unique(grpcol)

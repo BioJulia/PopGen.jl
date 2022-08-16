@@ -19,6 +19,9 @@ function _missinglocusfilter(data::PopData, cutoff::Float64)
     end
 end
 
+# this is needed for pairwisefst dispatch
+AMOVA(data::PopData; kwargs...) = amova(data, kwargs...)
+
 
 function amova(data::PopData; hierarchy::String, missing_cutoff::Union{Nothing,Float64} = 0.05)
     # remove any whitespace and split by /
