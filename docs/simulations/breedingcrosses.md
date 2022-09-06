@@ -39,13 +39,13 @@ Here is a look at the resulting `PopData`
 
 <Tabs
   block={true}
-  defaultValue="meta"
+  defaultValue="metadata"
   values={[
-    { label: 'meta', value: 'meta', },
-    { label: 'loci', value: 'loci', },
+    { label: 'metadata', value: 'metdata', },
+    { label: 'genodata', value: 'genodata', },
   ]
 }>
-<TabItem value="meta">
+<TabItem value="metadata">
 
 There are two things that should jump out at you:
 1. The `name` of offspring are prepended with `generation` and the `population` is the `generation`.
@@ -72,7 +72,7 @@ julia> f1.sampleinfo
 ```
 
 </TabItem>
-<TabItem value="loci">
+<TabItem value="genodata">
 
 ```
 julia> f1.genodata
