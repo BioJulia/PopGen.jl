@@ -1,7 +1,7 @@
 name = "PopGen"
 uuid = "af524d12-c74b-11e9-22a8-3b091653023f"
 authors = ["Pavel Dimens", "Jason Selwyn"]
-version = "0.9.2"
+version = "0.9.3"
 
 [deps]
 Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
@@ -21,21 +21,21 @@ TSne = "24678dba-d5e9-5843-a4c6-250288b04835"
 Term = "22787eb5-b846-44ae-b979-8e399b8463ab"
 
 [compat]
-Clustering = "0.14"
-DataFrames = "1.1"
-Distances = "0.10"
-Distributions = "0.25"
+Clustering = ">= 0.14"
+DataFrames = ">= 1.4"
+Distances = ">= 0.10"
+Distributions = ">= 0.25"
 MultipleTesting = "0.5"
-MultivariateStats = "0.9.1, 0.10"
+MultivariateStats = ">= 0.9.1"
 NamedArrays = "0.9"
 OnlineStats = "1"
-PooledArrays = "1.1"
+PooledArrays = ">= 1.1"
 PopGenCore = "0.7"
 Reexport = "1"
 StatsBase = "0.33"
 TSne = "1"
 Term = "1"
-julia = "1.6, 1.7"
+julia = ">= 1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
