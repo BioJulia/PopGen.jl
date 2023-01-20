@@ -95,7 +95,7 @@ include("FStatistics/FstGlobal.jl")
 include("FStatistics/FstByLocus.jl")
 include("FStatistics/PairwiseFST.jl")
 include("FStatistics/FstPermutations.jl")
-export pairwisefst
+export pairwisefst, Hudson, Nei, WeirCockerham
 
 include("Kinship/KinshipPairwise.jl")
 export kinship, kinshiptotable
