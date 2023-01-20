@@ -4,7 +4,7 @@ Population Genetics in Julia.
 
 [![alt text](https://img.shields.io/badge/docs-stable-informational?style=for-the-badge&logo=Read%20The%20Docs&logoColor=white)](https://BioJulia.net/PopGen.jl/) 
 [![Cite](https://img.shields.io/badge/Cite-10.5281/zenodo.6077852-e1e1e1?style=for-the-badge)](https://zenodo.org/badge/latestdoi/204318876) 
-![build_status](https://img.shields.io/github/workflow/status/pdimens/PopGen.jl/CI_dev?label=Dev%20Build&logo=GitHub&style=for-the-badge)
+![build status](https://img.shields.io/github/actions/workflow/status/BioJulia/PopGen.jl/pkgtests.yaml?branch=dev&label=Dev%20Build&logo=GitHub&style=for-the-badge)
 
 ### How to install:
 Invoke the package manager by pressing `]` on an empty line and `add PopGen`
