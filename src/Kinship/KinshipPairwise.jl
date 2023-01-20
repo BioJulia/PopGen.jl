@@ -129,7 +129,7 @@ function _kinship_boot_nofreq(data::PopData, method::Function, iterations::Int, 
                 @inbounds bresult[i,j] = bootstats.stats[1].μ
                 @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
                 @inbounds b_ci[i,j] = value(bootstats.stats[2])
-                progress.update!(job)
+                update!(job)
             end
         end
     end
@@ -179,7 +179,7 @@ function _kinship_boot_freq(data::PopData, method::Function, iterations::Int, in
                 @inbounds bresult[i,j] = bootstats.stats[1].μ
                 @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
                 @inbounds b_ci[i,j] = value(bootstats.stats[2])
-                progress.update!(job)
+                update!(job)
             end
         end
     end
