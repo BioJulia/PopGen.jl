@@ -41,7 +41,7 @@ function amova(data::PopData; hierarchy::String, missing_cutoff::Union{Nothing,F
     #2 .* pairwise(SqEuclidean(), mtx, dims=1)
     distmtx = pairwise(SqEuclidean(), matrix(data), dims=1)
 
-    group = groups[1]
+    group = first(groups)
     grpcol = @view strata[:,group]
     levels = unique(grpcol)
     # create vector of vectors containing indices for each unique group
@@ -126,10 +126,10 @@ function Base.show(io::IO, result::AMOVAResult)
 
     outrows[2, :] = [
         source[1],
-        Printf.@sprintf("%.0d", df[1]),
-        Printf.@sprintf("%.4f", ss[1]),
-        Printf.@sprintf("%.4f", ms[1]),
-        Printf.@sprintf("%.4f", σ²[1]),
+        Printf.@sprintf("%.0d", first(df)),
+        Printf.@sprintf("%.4f", first(ss)),
+        Printf.@sprintf("%.4f", first(ms)),
+        Printf.@sprintf("%.4f", first(σ²)),
         Printf.@sprintf("%.4f", result.FST)
     ]
 
