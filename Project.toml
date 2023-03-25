@@ -21,7 +21,7 @@ TSne = "24678dba-d5e9-5843-a4c6-250288b04835"
 Term = "22787eb5-b846-44ae-b979-8e399b8463ab"
 
 [compat]
-Clustering = "0.14"
+Clustering = "0.14, 0.15"
 DataFrames = "1.4"
 Distances = "0.10"
 Distributions = "0.25"
