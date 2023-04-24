@@ -19,7 +19,13 @@ module.exports = {
     docs : {
       sidebar: {
         hideable: true,
+        autoCollapseCategories: true
     }},
+    colorMode: {
+      defaultMode: 'light',
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
+    },
     announcementBar: {
       id: 'supportus',
       content:
