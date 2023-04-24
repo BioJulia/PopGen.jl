@@ -78,11 +78,11 @@ N290  │ 0.166667  0.166667  …  0.142857       1.0
 """
 function pairwiseidentical(data::PopData)
     locmtx = locimatrix(data)
-    ids = samplenames(data)
+    ids = string.(samplenames(data))
     n = length(ids)
     result = NamedArray(zeros(Float64, n, n))
-    setnames!(result, String.(ids),1)
-    setnames!(result, String.(ids),2)
+    setnames!(result, ids, 1)
+    setnames!(result, ids,2)
     @inbounds for i in 1:n-1
         @inbounds v1 = view(locmtx,i,:)
         @inbounds for j in i+1:n
