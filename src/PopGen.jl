@@ -1,7 +1,7 @@
 """
 # Population genetics analyses in Julia
 Repository:    https://www.github.com/biojulia/PopGen.jl/
-Documentation: https://biojulia.net/PopGen.jl/
+Documentation: https://biojulia.dev/PopGen.jl/
 
 \nA few things things you can do to get started:
 
