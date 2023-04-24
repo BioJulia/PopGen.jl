@@ -4,8 +4,8 @@
   <ShortName>PopGen.jl</ShortName>
   <Description>Search PopGen.jl</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Image width="16" height="16" type="image/x-icon">https://BioJulia.net/PopGen.jl/img/favicon.ico</Image>
-  <Url type="text/html" method="get" template="https://BioJulia.net/PopGen.jl/search?q={searchTerms}"/>
-  <Url type="application/opensearchdescription+xml" rel="self" template="https://BioJulia.net/PopGen.jl/opensearch.xml" />
-  <moz:SearchForm>https://BioJulia.net/PopGen.jl/</moz:SearchForm>
+  <Image width="16" height="16" type="image/x-icon">https://BioJulia.dev/PopGen.jl/img/favicon.ico</Image>
+  <Url type="text/html" method="get" template="https://BioJulia.dev/PopGen.jl/search?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://BioJulia.dev/PopGen.jl/opensearch.xml" />
+  <moz:SearchForm>https://BioJulia.dev/PopGen.jl/</moz:SearchForm>
 </OpenSearchDescription>
