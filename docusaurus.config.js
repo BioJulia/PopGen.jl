@@ -10,8 +10,13 @@ module.exports = {
   projectName: 'PopGen.jl', // Usually your repo name.
   trailingSlash: false,
   plugins: [
+    [
+      require.resolve("@cmfcmf/docusaurus-search-local"),
+      {
+        indexDocSidebarParentCategories: 2,
+      }
+    ],
     'plugin-image-zoom',
-    'docusaurus-lunr-search',
   ],
   stylesheets: [
     "https://fonts.googleapis.com/icon?family=Material+Icons",
