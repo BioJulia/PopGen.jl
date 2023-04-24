@@ -13,7 +13,7 @@ module.exports = {
     [
       require.resolve("@cmfcmf/docusaurus-search-local"),
       {
-        indexDocSidebarParentCategories: 2,
+        indexDocSidebarParentCategories: 0,
       }
     ],
     'plugin-image-zoom',
