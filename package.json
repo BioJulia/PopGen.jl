@@ -9,10 +9,10 @@
     "deploy": "docusaurus deploy"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.1.0",
-    "@docusaurus/plugin-ideal-image": "^2.1.0",
-    "@docusaurus/plugin-pwa": "^2.1.0",
-    "@docusaurus/preset-classic": "^2.1.0",
+    "@docusaurus/core": "^2.4.0",
+    "@docusaurus/plugin-ideal-image": "^2.4.0",
+    "@docusaurus/plugin-pwa": "^2.4.0",
+    "@docusaurus/preset-classic": "^2.4.0",
     "classnames": "^2.2.6",
     "clsx": "^1.1.1",
     "plugin-image-zoom": "github:ataft/plugin-image-zoom",
