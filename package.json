@@ -15,11 +15,13 @@
     "@docusaurus/preset-classic": "^2.4.0",
     "classnames": "^2.2.6",
     "clsx": "^1.1.1",
+    "docusaurus-theme-search-typesense": "^0.11.0-0",
     "plugin-image-zoom": "github:ataft/plugin-image-zoom",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "rehype-katex": "^4.0.0",
-    "remark-math": "^3.0.1"
+    "remark-math": "^3.0.1",
+    "update": "^0.7.4"
   },
   "browserslist": {
     "production": [
