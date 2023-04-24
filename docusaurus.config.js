@@ -10,12 +10,12 @@ module.exports = {
   projectName: 'PopGen.jl', // Usually your repo name.
   trailingSlash: false,
   plugins: [
-    'plugin-image-zoom'
+    'plugin-image-zoom',
+    'docusaurus-lunr-search',
   ],
   stylesheets: [
     "https://fonts.googleapis.com/icon?family=Material+Icons",
   ],
-  themes: ['docusaurus-theme-search-typesense'],
   themeConfig: {
     docs : {
       sidebar: {
@@ -38,38 +38,6 @@ module.exports = {
       additionalLanguages: ['julia', 'r'],
       theme: require('prism-react-renderer/themes/github'),
       darkTheme: require('prism-react-renderer/themes/oceanicNext'),
-    },
-    typesense: {
-      // Replace this with the name of your index/collection.
-      // It should match the "index_name" entry in the scraper's "config.json" file.
-      typesenseCollectionName: 'popgen_jl',
-
-      typesenseServerConfig: {
-        nodes: [
-          {
-            host: 'xxx-1.a1.typesense.net',
-            port: 443,
-            protocol: 'https',
-          },
-          {
-            host: 'xxx-2.a1.typesense.net',
-            port: 443,
-            protocol: 'https',
-          },
-          {
-            host: 'xxx-3.a1.typesense.net',
-            port: 443,
-            protocol: 'https',
-          },
-        ],
-        apiKey: 'xyz',
-      },
-
-      // Optional: Typesense search parameters: https://typesense.org/docs/0.24.0/api/search.html#search-parameters
-      typesenseSearchParameters: {},
-
-      // Optional
-      contextualSearch: true,
     },
     // algolia: {
     //  apiKey: '0fe48b3e529dd3af5c37979964b2ef41',
