@@ -19,7 +19,7 @@ cats = @nancycats;
         pw_i = pairwiseidentical(cats)
         @test pw_i isa AbstractMatrix
         @test size(pw_i) == (237, 237)
-        pw_i_2 = pairwiseidentical(cats, string.(cats.sampleinfo.name[1:10]))
+        pw_i_2 = pairwiseidentical(cats, samplenames(cats)[1:10])
         @test pw_i_2 isa AbstractMatrix
         @test size(pw_i_2) == (10, 10)
     end

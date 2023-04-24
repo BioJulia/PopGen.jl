@@ -78,7 +78,7 @@ N290  │ 0.166667  0.166667  …  0.142857       1.0
 """
 function pairwiseidentical(data::PopData)
     locmtx = locimatrix(data)
-    ids = string.(samplenames(data))
+    ids = String.(samplenames(data))
     n = length(ids)
     result = NamedArray(zeros(Float64, n, n))
     setnames!(result, ids, 1)
@@ -137,7 +137,7 @@ function pairwiseidentical(data::PopData, sample_names::Vector{T}) where T<:Abst
     locmtx = locimatrix(data)
     n = length(sampidx)
     result = NamedArray(zeros(Float64, n, n))
-    s_names = eltype(sample_names) == String ? sample_names : string.(sample_names)
+    s_names = eltype(sample_names) == String ? sample_names : String.(sample_names)
     setnames!(result, s_names, 1)
     setnames!(result, s_names, 2)
     @inbounds for i in 1:n-1
