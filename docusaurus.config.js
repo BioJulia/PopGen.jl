@@ -10,7 +10,8 @@ module.exports = {
   projectName: 'PopGen.jl', // Usually your repo name.
   trailingSlash: false,
   plugins: [
-    'plugin-image-zoom'
+    'plugin-image-zoom',
+    '@aldridged/docusaurus-plugin-lunr'
   ],
   stylesheets: [
     "https://fonts.googleapis.com/icon?family=Material+Icons",
@@ -38,12 +39,12 @@ module.exports = {
       theme: require('prism-react-renderer/themes/github'),
       darkTheme: require('prism-react-renderer/themes/oceanicNext'),
     },
-    algolia: {
-      apiKey: '0fe48b3e529dd3af5c37979964b2ef41',
-      indexName: 'popgen_jl',
-      appId: 'JASY30KF23', // Optional, if you run the DocSearch crawler on your own
-      //algoliaOptions: {}, // Optional, if provided by Algolia
-    },
+    // algolia: {
+    //  apiKey: '0fe48b3e529dd3af5c37979964b2ef41',
+    //  indexName: 'popgen_jl',
+    //  appId: 'JASY30KF23', // Optional, if you run the DocSearch crawler on your own
+    //  algoliaOptions: {}, // Optional, if provided by Algolia
+    //  },
     navbar: {
       hideOnScroll: true,
       title: 'PopGen.jl',
