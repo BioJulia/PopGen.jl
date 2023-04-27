@@ -107,33 +107,33 @@ function _kinship_boot_nofreq(data::PopData, method::Function, iterations::Int, 
     b_ci = Matrix{Vector{Float64}}(undef, n,n)
     pbar = ProgressBar(;refresh_rate=90, transient = true)
     job = addjob!(pbar; description= "Kinship: ", N= Int64((n * (n-1))/2))
-    start!(pbar)
-    @inbounds @sync for i in 1:n-1
-        Base.Threads.@spawn begin
-            @inbounds v1 = view(locmtx,i,:)
-            boot_idx = Vector{Int64}(undef, nloc)
-            sizehint!(boot_idx, nloc)
-            @inbounds for j in i+1:n
-                @inbounds v2 = view(locmtx,j,:)
-                @inbounds result[j,i] = result[i,j] = method(v1, v2)
-                bootstats = Series(Variance(), Quantile(interval))
-                k = 1
-                while k <= iterations
-                    k += 1
-                    @inbounds boot_idx .= rand(idxrange, nloc)
-                    v1b = @inbounds view(locmtx, i,boot_idx)
-                    v2b = @inbounds view(locmtx, j, boot_idx)
-                    b_est = method(v1b, v2b)
-                    isnan(b_est) ? continue : fit!(bootstats, b_est)
+    with(pbar) do
+        @inbounds @sync for i in 1:n-1
+            Base.Threads.@spawn begin
+                @inbounds v1 = view(locmtx,i,:)
+                boot_idx = Vector{Int64}(undef, nloc)
+                sizehint!(boot_idx, nloc)
+                @inbounds for j in i+1:n
+                    @inbounds v2 = view(locmtx,j,:)
+                    @inbounds result[j,i] = result[i,j] = method(v1, v2)
+                    bootstats = Series(Variance(), Quantile(interval))
+                    k = 1
+                    while k <= iterations
+                        k += 1
+                        @inbounds boot_idx .= rand(idxrange, nloc)
+                        v1b = @inbounds view(locmtx, i,boot_idx)
+                        v2b = @inbounds view(locmtx, j, boot_idx)
+                        b_est = method(v1b, v2b)
+                        isnan(b_est) ? continue : fit!(bootstats, b_est)
+                    end
+                    @inbounds bresult[i,j] = bootstats.stats[1].μ
+                    @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
+                    @inbounds b_ci[i,j] = value(bootstats.stats[2])
+                    update!(job)
                 end
-                @inbounds bresult[i,j] = bootstats.stats[1].μ
-                @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
-                @inbounds b_ci[i,j] = value(bootstats.stats[2])
-                update!(job)
             end
         end
     end
-    stop!(pbar)
     ci = uppertri2vec(b_ci)
     cilow = getindex.(ci, 1)
     cihi = getindex.(ci,2)
@@ -155,35 +155,35 @@ function _kinship_boot_freq(data::PopData, method::Function, iterations::Int, in
     b_sdev = similar(bresult)
     b_ci = Matrix{Vector{Float64}}(undef, n,n)
     pbar = ProgressBar(;refresh_rate=90, transient = true)
-    job = addjob!(pbar; description= "Kinship: ", N= Int64((n * (n-1))/2))
-    start!(pbar)
     allelefrequencies = @inbounds Tuple(allelefreq(i) for i in eachcol(locmtx))
-    @inbounds @sync for i in 1:n-1
-        Base.Threads.@spawn begin
-            @inbounds v1 = view(locmtx,i,:)
-            boot_idx = Vector{Int64}(undef, nloc)
-            sizehint!(boot_idx, nloc)
-            @inbounds for j in i+1:n
-                @inbounds v2 = view(locmtx,j,:)
-                @inbounds result[j,i] = result[i,j] = method(v1, v2, allelefrequencies, n_samples = n)
-                bootstats = Series(Variance(), Quantile(interval))
-                k = 1
-                while k <= iterations
-                    k += 1
-                    @inbounds boot_idx .= rand(idxrange, nloc)
-                    v1b = @inbounds view(locmtx, i,boot_idx)
-                    v2b = @inbounds view(locmtx, j, boot_idx)
-                    b_est = method(v1b, v2b, allelefrequencies, n_samples = n)
-                    isnan(b_est) ? continue : fit!(bootstats, b_est)
+    job = addjob!(pbar; description= "Kinship: ", N= Int64((n * (n-1))/2))
+    with(pbar) do
+        @inbounds @sync for i in 1:n-1
+            Base.Threads.@spawn begin
+                @inbounds v1 = view(locmtx,i,:)
+                boot_idx = Vector{Int64}(undef, nloc)
+                sizehint!(boot_idx, nloc)
+                @inbounds for j in i+1:n
+                    @inbounds v2 = view(locmtx,j,:)
+                    @inbounds result[j,i] = result[i,j] = method(v1, v2, allelefrequencies, n_samples = n)
+                    bootstats = Series(Variance(), Quantile(interval))
+                    k = 1
+                    while k <= iterations
+                        k += 1
+                        @inbounds boot_idx .= rand(idxrange, nloc)
+                        v1b = @inbounds view(locmtx, i,boot_idx)
+                        v2b = @inbounds view(locmtx, j, boot_idx)
+                        b_est = method(v1b, v2b, allelefrequencies, n_samples = n)
+                        isnan(b_est) ? continue : fit!(bootstats, b_est)
+                    end
+                    @inbounds bresult[i,j] = bootstats.stats[1].μ
+                    @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
+                    @inbounds b_ci[i,j] = value(bootstats.stats[2])
+                    update!(job)
                 end
-                @inbounds bresult[i,j] = bootstats.stats[1].μ
-                @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
-                @inbounds b_ci[i,j] = value(bootstats.stats[2])
-                update!(job)
             end
         end
     end
-    stop!(pbar)
     ci = uppertri2vec(b_ci)
     cilow = getindex.(ci, 1)
     cihi = getindex.(ci,2)
