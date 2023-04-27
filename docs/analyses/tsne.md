@@ -22,8 +22,8 @@ Visual clusters can be seriously influenced by the parameters. For example, para
 ## Step 1: Create the allele frequency matrix
 You will need to input an allele frequency matrix into the `tsne` function. fortunately, PopGenCore.jl has the a `matrix` method to do that. Missing values in the matrix will be replaced with the global mean frequency of that allele.
 ```julia
+julia> using TSne
 julia> cats = @nancycats;
-
 julia> mtx = matrix(cats, missings = "mean")
 237×108 Matrix{Float64}:
  0.00230415  0.00230415  …  0.0  0.0  0.0
@@ -33,13 +33,7 @@ julia> mtx = matrix(cats, missings = "mean")
  0.0         0.0            0.0  0.0  0.0
  0.0         0.0         …  0.0  0.0  0.0
  0.0         0.0            0.0  0.0  0.0
- 0.0         0.0            0.0  0.0  0.0
- 0.0         0.0            0.0  0.0  0.0
- 0.0         0.0            0.0  0.0  0.0
  ⋮                       ⋱  ⋮         
- 0.0         0.0            0.0  0.0  0.0
- 0.0         0.0            0.0  0.0  0.0
- 0.0         0.0         …  0.0  0.0  0.0
  0.0         0.0            0.0  0.0  0.0
  0.0         0.0            0.5  0.0  0.0
  0.0         0.0            0.0  0.0  0.0
@@ -53,34 +47,9 @@ The method signature for `tsne` is:
 ```julia
 tsne(mtx, ndim, reduce_dims, max_iter, perplexity; kwargs...)
 ```
-Once you have the allele frequency matrix, you just plug it into `tsne` from `TSne.jl` as the first positional argument.
-```julia
-julia> results_tsne = tsne(mtx, 5, 0, 100)
-237×5 Matrix{Float64}:
-  2.33077   -0.313104   …   0.261691
- -1.41855   -1.16244        3.90946
-  0.181728  -0.15139       -0.0399188
- -1.24196    0.676003       0.567271
- -1.94341   -0.221126       2.64668
- -1.87612   -0.280161   …  -0.272155
- -0.283864   0.322579      -0.181031
-  5.43832   11.368         -0.450306
- -0.980308   0.0930013     -0.373325
- -0.742185  -0.263201      -0.0796079
-  ⋮                     ⋱  
-  0.866269  -0.822154      -0.451724
-  3.9457    -0.636641      -2.93651
-  5.34851   -2.43159    …  -3.27327
- 11.3574     7.64794       -0.495769
-  8.05785    1.7843         5.63656
- -0.23807    0.729471      -0.0126313
- -0.264675  -0.0643155     -1.40175
-  5.07462   -0.467093   …   1.40149
- -4.76319    7.16874        9.06195
-```
-
 ### Arguments
-- `ndim`: Dimension of the embedded space (default: `2`)
+- `mtx`: the allele frequency matrix
+- `ndim`: dimension of the embedded space (default: `2`)
 - `reduce_dims` the number of the first dimensions of X PCA to use for t-SNE, if 0, all available dimension are used (default: `0`)
 - `max_iter`: how many iterations of t-SNE to do (default: `1000`)
 - `perplexity`: the perplexity is related to the number of nearest neighbors that is used in other manifold learning algorithms. Larger datasets usually require a larger perplexity. Consider selecting a value between 5 and 50. Different values can result in significantly different results (default: `30`)
@@ -93,10 +62,32 @@ julia> results_tsne = tsne(mtx, 5, 0, 100)
 - `min_gain`, `eta`, `initial_momentum`, `final_momentum`, `momentum_switch_iter`, `stop_cheat_iter`, `cheat_scale`: low-level parameters of t-SNE optimization
 - `extended_output`: if `true`, returns a tuple of embedded coordinates matrix, point perplexities and final Kullback-Leibler divergence
 
+Once you have the allele frequency matrix, you just plug it into `tsne` from `TSne.jl` as the first positional argument.
+
+
+```julia
+julia> results_tsne = tsne(mtx, 5, 0, 100)
+237×5 Matrix{Float64}:
+  2.33077   -0.313104   …   0.261691
+ -1.41855   -1.16244        3.90946
+  0.181728  -0.15139       -0.0399188
+ -1.24196    0.676003       0.567271
+ -1.94341   -0.221126       2.64668
+ -1.87612   -0.280161   …  -0.272155
+ -0.283864   0.322579      -0.181031
+  ⋮                     ⋱  
+ 11.3574     7.64794       -0.495769
+  8.05785    1.7843         5.63656
+ -0.23807    0.729471      -0.0126313
+ -0.264675  -0.0643155     -1.40175
+  5.07462   -0.467093   …   1.40149
+ -4.76319    7.16874        9.06195
+```
+
 
 
 ## Step 3: Nicer formatting for results
-The results can look nicer and more legible with this code snippet. You may need to import `DataFrames`, since PopGen.jl doesn't reexport the `DataFrame` function.
+The results can look like a nice legible dataframe with this code snippet. You may need to import `DataFrames`, since PopGen.jl doesn't reexport the `DataFrame` function.
 ```julia
 julia> df_tsne = DataFrame(results_tsne, String["dim"*"$i" for i in 1:size(results_tsne, 2)]); 
 julia> insertcols!(df_tsne, 1, :name => samplenames(cats), :population => cats.sampleinfo.population)
