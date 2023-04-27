@@ -1,7 +1,7 @@
 name = "PopGen"
 uuid = "af524d12-c74b-11e9-22a8-3b091653023f"
 authors = ["Pavel Dimens", "Jason Selwyn"]
-version = "0.9.4"
+version = "0.10.0"
 
 [deps]
 Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
@@ -17,7 +17,6 @@ PopGenCore = "45b36091-5ef7-4b08-b448-aaf24c763a14"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-TSne = "24678dba-d5e9-5843-a4c6-250288b04835"
 Term = "22787eb5-b846-44ae-b979-8e399b8463ab"
 
 [compat]
@@ -33,7 +32,6 @@ PooledArrays = "1.1"
 PopGenCore = "0.7"
 Reexport = "1"
 StatsBase = "0.33"
-TSne = "1"
 Term = "2"
 julia = "1.6, 1.7, 1.8"
 

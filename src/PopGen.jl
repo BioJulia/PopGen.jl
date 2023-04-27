@@ -48,7 +48,7 @@ using PopGenCore
     export copy, size, sort, dropmonomorphic, dropmonomorphic!
     export dropmultiallelic, dropmultiallelic!
     export locationdata, locationdata!
-    export locidataframe, locimatrix
+    export locidataframe, locimatrix, matrix, featurematrix
     export genotypes, genotypes
     export populations, populations!
     export exclude, remove, omit, exclude!, remove!, omit!, keep, keep!
@@ -64,8 +64,7 @@ using Term.Progress
 using MultipleTesting, StatsBase
 import Clustering: kmeans, kmedoids, hclust, Hclust, cutree, fuzzy_cmeans, dbscan
 import MultivariateStats: fit, PCA
-import TSne: tsne
-
+import Printf
 
 #   o O       o O       o O       o O       o O
 # o | | O   o | | O   o | | O   o | | O   o | | O
@@ -91,6 +90,9 @@ export alleleaverage, richness, summary, summarystats
 include("HardyWeinberg.jl")
 export hwetest, hwe
 
+include("AMOVA.jl")
+export amova
+
 include("FStatistics/FstGlobal.jl")
 include("FStatistics/FstByLocus.jl")
 include("FStatistics/PairwiseFST.jl")
@@ -109,8 +111,5 @@ export cluster, kmeans, kmedoids, hclust, cutree, fuzzycmeans, dbscan
 
 include("PCA.jl")
 export pca
-
-include("TSne.jl")
-export tsne
 
 end # module PopGen
