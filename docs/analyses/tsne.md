@@ -4,16 +4,16 @@ title: t-SNE
 sidebar_label: t-SNE
 ---
 
-:::note
-PopGen.jl v0.10x removed TSNE.jl as a dependency and instead this page is inteded to walk you through how to use PopGen.jl and [TSne.jl](https://github.com/lejon/TSne.jl) together. You will need to install TSNE.jl with
+t-distributed stochastic neighbor embedding (_a.k.a._ t-SNE) is a dimensionality reduction technique for visualizing high-dimensional data. It does this by giving each datapoint a location in a two or three-dimensional map by minimizing the Kullback–Leibler divergence between the high and low dimensionality probability distributions with respect to the locations of the points in the map. It models each high-dimensional object by a two- or three-dimensional point so similar objects are appear nearer and dissimilar objects appear further apart. Read more about it [here](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding).
+
+PopGen.jl v0.10x removed TSNE.jl as a dependency and instead this page is inteded to walk you through how to use PopGen.jl and [TSne.jl](https://github.com/lejon/TSne.jl) together. You will need to install TSne.jl with
+
 ```julia
-julia> ]add TSNE
+julia> ]add TSne
 # or #
 julia> using Pkg; Pkg.add("TSne")
 ```
-:::
 
-t-distributed stochastic neighbor embedding (_a.k.a._ t-SNE) is a dimensionality reduction technique for visualizing high-dimensional data. It does this by giving each datapoint a location in a two or three-dimensional map by minimizing the Kullback–Leibler divergence between the high and low dimensionality probability distributions with respect to the locations of the points in the map. It models each high-dimensional object by a two- or three-dimensional point so similar objects are appear nearer and dissimilar objects appear further apart. Read more about it [here](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding).
 
 :::caution careful parameterization
 Visual clusters can be seriously influenced by the parameters. For example, parameters can be chosen in such a way to identify clusters in data that has none. So, a good understanding of the parameters for t-SNE is necessary. **Although a useful tool, t-SNE is not commonly used in population genetic analysis.** It is included here due to its utility in adjacent disciplines.
@@ -123,3 +123,48 @@ julia> insertcols!(df_tsne, 1, :name => samplenames(cats), :population => cats.s
                                    2 columns and 222 rows omitted
 ```
 
+## Step 4: Make fancy 3D plot
+People tend to like plotting PCA and t-SNE as 3-dimensional scatterplots because you can see, well, 3 dimensions at once. Below is a code snippet
+that uses `PlotlyJS.jl` to make an interactive 3-dimensional scatterplot
+of the t-SNE results. It's not the most intuitive plotting library in Julia (can use [Plots.jl](https://github.com/JuliaPlots/Plots.jl) with a plotly backend, or [GLMakie](https://github.com/MakieOrg/Makie.jl/tree/master/GLMakie)), but both of those
+have large dependencies that would be a big ask for a simple tutorial.
+```
+using PlotlyJS
+
+function tsne_plot(data::DataFrame)
+    # load data and restrict to just 10 populations for simplicity
+    pops = unique(data.population)[1:10]
+    colors = ["#ccec48","#1feadb","#d05790","#c16c82","#7d0eef", "#288fb4","#bef2a5", "#7c3dae", "#16952b", "#772932"]
+    plotdat = GenericTrace[]
+
+    for (i, nm) in enumerate(pops)
+        df = data[data.population .== nm, :]
+        x=df.dim1
+        y=df.dim2
+        z=df.dim3
+        trace = scatter3d(;
+          name = nm,
+          mode = "markers",
+          marker_size = 5,
+          marker_color = colors[i],
+          marker_line_width = 0,
+          x = x,
+          y = y,
+          z = z
+        )
+        push!(plotdat, trace)
+    end
+    layout = Layout(
+      margin=attr(l=0, r=0, t=0, b=0),
+      title = "Nancycats t-SNE",
+      xaxis=attr(title="Dimension 1"),
+      yaxis=attr(title="Dimension 2"),
+      zaxis=attr(title="Dimension 3")
+      )
+    plot(plotdat, layout)
+end
+
+tsne_plot(df_tsne)
+```
+
+![tnse plot](/img/tsne.svg)
