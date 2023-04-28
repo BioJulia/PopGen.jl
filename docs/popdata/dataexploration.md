@@ -1,6 +1,6 @@
 ---
 id: dataexploration
-title: Data Exploration
+title: Data exploration
 sidebar_label: Data exploration
 ---
 import Tabs from '@theme/Tabs';

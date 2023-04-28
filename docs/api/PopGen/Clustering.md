@@ -4,7 +4,7 @@ title: Clustering.jl
 sidebar_label: Clustering.jl
 ---
 
-## PopGen.jl/src/KMeans.jl
+## PopGen.jl/src/Clustering.jl
 | 📦  not exported | 🔵  exported by PopGen.jl |
 |:---:|:---:|
 

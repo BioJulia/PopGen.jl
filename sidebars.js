@@ -1,11 +1,11 @@
 module.exports = {
   "docs": {
     "Getting Started": [
-      "gettingstarted/install",
       "gettingstarted/juliaprimer",
-      "gettingstarted/tips",
       "gettingstarted/comparison",
-      "gettingstarted/datasets"
+      "gettingstarted/install",
+      "gettingstarted/tips",
+      "gettingstarted/datasets",
     ],
     "File I/O": [
       "io/readwrite",
@@ -22,44 +22,46 @@ module.exports = {
     ],
     "Working with PopData": [
       "popdata/popdata",
-      "popdata/viewdata",
       "popdata/addingdata",
-      "popdata/exclusion",
+      "popdata/advancedindexing",
       "popdata/conditionals",
-      "popdata/populationdata",
-      "popdata/locationdata",
       "popdata/dataexploration",
-      "popdata/advancedindexing"
+      "popdata/exclusion",
+      "popdata/locationdata",
+      "popdata/populationdata",
+      "popdata/viewdata",
     ],
     "Analyses":[
-      "analyses/hardyweinberg",
+      "analyses/amova",
       "analyses/clustering",
       "analyses/fstatistics",
-      "analyses/pca",
+      "analyses/hardyweinberg",
       "analyses/kinship",
+      "analyses/pca",
       "analyses/tsne"
     ],
     "Simulations":[
-      "simulations/simulate_samples",
       "simulations/breedingcrosses",
+      "simulations/simulate_samples",
       "simulations/sibship_simulations",
     ],    
     "API": [
       "api/api",
       {
         "PopGen":[
+          "api/PopGen/amova",
+          "api/PopGen/clustering",
           "api/PopGen/dataexploration",
           "api/PopGen/fstbylocus",
           "api/PopGen/fstglobal",
           "api/PopGen/fstpermutations",
           "api/PopGen/hardyweinberg",
           "api/PopGen/heterozygosity",
-          "api/PopGen/clustering",
+          "api/PopGen/kinshipmoments",
+          "api/PopGen/kinshipposthocs",
           "api/PopGen/pca",
           "api/PopGen/pairwisefst",
           "api/PopGen/pairwisekinship",
-          "api/PopGen/kinshipmoments",
-          "api/PopGen/kinshipposthocs",
           "api/PopGen/summaryinfo",
           "api/PopGen/utils",
         ]
