@@ -155,7 +155,7 @@ function dbscan(data::PopData; radius::Float64, minpoints::Int64 = 2, distance::
         pairwise(distance, pca(data, center = false, scale = true).proj |> permutedims, dims = 2) : matrixtype == :freq ?
         pairwise(distance, matrix(data, center = false, scale = true), dims = 1) : 
         throw(ArgumentError("matrixtype :$matrixtype invalid, choose between :pca or :freq"))
-    dbscan(mtx, radius, minpoints)
+    dbscan(mtx, radius, min_neighbors = minpoints, metric = nothing)
 end
 
 """
