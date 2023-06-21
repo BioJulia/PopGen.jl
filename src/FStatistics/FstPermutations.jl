@@ -40,15 +40,15 @@ function _fst_permutation(data::PopData, method::Function, iterations::Int64)
                 n_pop2 = size(pop2, 1)
                 merged = vcat(pop1, pop2)
                 fst_val = method(pop1,pop2)
-                pval = 0
-                @inbounds @sync for iter in 1:iterations-1
+                pval = Threads.Atomic{Int}(0)
+                @inbounds for iter in 1:iterations-1
                     Base.Threads.@spawn begin
-                        @inbounds perm_p1, perm_p2 = _fst_permute(merged, n_pop1, n_pop2)
-                        pval += fst_val <= method(perm_p1, perm_p2)
+                       @inbounds perm_p1, perm_p2 = _fst_permute(merged, n_pop1, n_pop2)
+                       Base.Threads.atomic_add!(pval, Int(fst_val <= method(perm_p1, perm_p2)))
                     end
                 end
                 @inbounds results[i,j] = fst_val
-                @inbounds results[j,i] = (pval + 1) / iterations 
+                @inbounds results[j,i] = (pval[] + 1) / iterations 
                 update!(job)
             end
         end
@@ -95,8 +95,7 @@ function _amovafst_permutation(data::PopData, iterations::Int64)
                 FST = σ²_among / (σ²_among + σ²_within)
                 #@inbounds results[i,j] =  results[j,i] = FST
                 @inbounds results[i,j] = FST
-                
-                pval = 0
+                pval = Threads.Atomic{Int}(0)
                 @inbounds @sync for iter in 1:iterations-1
                     Base.Threads.@spawn begin
                         p1, p2 = partitionarray(shuffle(vcat(pop1, pop2)), [n1, n2])
@@ -111,10 +110,10 @@ function _amovafst_permutation(data::PopData, iterations::Int64)
                         i_n_c = (N - ((n1^2 + n2^2)/N)) #/ df_among
                         i_σ²_among = ((i_SS_among / df_among) - i_σ²_within) / i_n_c
                         i_FST = i_σ²_among / (i_σ²_among + i_σ²_within)
-                        pval += FST <= i_FST
+                        Base.Threads.atomic_add!(pval, Int(FST <= i_FST))
                     end
                 end
-                @inbounds results[j,i] = (pval + 1) / iterations
+                @inbounds results[j,i] = (pval[] + 1) / iterations
                 update!(job)
             end
         end
