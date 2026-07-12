@@ -268,7 +268,7 @@ julia> missingdata(sharks, by = "locusxpopulation")
 
 
 ## Pairwise Identical Genotypes
-While not a substitute for a [kinship analysis](docs/analyses/kinship), it may be useful to know or verify how similar your data are in a very literal sense:
+While not a substitute for a [kinship analysis](../analyses/kinship), it may be useful to know or verify how similar your data are in a very literal sense:
 how many identical genotypes do two individuals have across all loci? To do this, we use `pairwiseidentical()` to perform an all x all comparison of identical genotypes. This can be done for all individuals in a `PopData` object, or restricted to a specific set of individuals:
 
 <Tabs
