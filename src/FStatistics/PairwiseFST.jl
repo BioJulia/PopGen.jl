@@ -14,17 +14,17 @@ struct PairwiseFST
 end
 
 # pretty-printing of FST results
-function Base.show(io::IO, data::PairwiseFST)
+function Base.show(io::IO, data::PopGen.PairwiseFST)
     issymmetrical = size(data.results, 1) == size(data.results, 2)
     rwnames = issymmetrical ? names(data.results) : nothing
     show(
         io,
-        round.(data.results, digits = 4),
-        show_row_number = false,
-        rowlabel = Symbol(" "),
-        eltypes = false,
-        row_names =  rwnames,
-        title = "Pairwise FST: " * data.method
+        round.(data.results, digits=4),
+        show_row_number=false,
+        row_number_column_label=" ",
+        row_labels=rwnames,
+        eltypes=false,
+        title="Pairwise FST: " * data.method
     )
 end
 
