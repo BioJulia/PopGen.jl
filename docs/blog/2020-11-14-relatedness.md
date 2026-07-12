@@ -3,8 +3,6 @@ slug: relatedness
 title: Relatedness Tutorial
 authors: pdimens
 tags: [tutorials]
-mdx:
-  format: md
 ---
 
 Diving into kinship
