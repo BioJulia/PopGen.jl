@@ -160,3 +160,4 @@ end
 fst_speed = [.580, 0.299, 199.48]
 tt = comparison_plot_3x(pop_p_hierf, fst_speed, "Seconds", "Weir & Cockerham Pairwise FST (less is better)")
 save("static/img/fstplot.png", tt)
+
