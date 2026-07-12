@@ -123,7 +123,7 @@ julia> populations(sharks, counts = true)
 </TabItem>
 <TabItem value="vec">
 
-:::caution not recommended
+:::warning
 These methods _are_ available, but the `Dict` method is recommended instead of (1) and the reassign-by-sample method is recommended
 instead of (2)
 :::

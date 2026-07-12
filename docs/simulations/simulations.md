@@ -6,7 +6,7 @@ sidebar_label: Simulating Samples
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::note Requires PopGenSims.jl
+:::note
 To perfom simulations, you will need add and import the package `PopGenSims.jl` (available [here](https://github.com/pdimens/PopGenSims.jl)).
 :::
 

@@ -2,10 +2,9 @@
 id: heterozygosity
 title: Heterozygosity.jl
 sidebar_label: Heterozygosity.jl
+mdx:
+  format: md
 ---
-import useBaseUrl from "@docusaurus/useBaseUrl";
-
-<link rel="stylesheet" href={useBaseUrl("katex/katex.min.css")} />
 
 ## PopGen.jl/src/Heterozygosity.jl
 | 📦  not exported | 🔵  exported by PopGen.jl |

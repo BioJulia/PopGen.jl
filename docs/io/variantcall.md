@@ -38,7 +38,7 @@ julia> mydata = bcf("path/to/file.bcf", silent = true, rename_loci = true) ;
 julia> mydata.genodata.genotype =  mydata.genodata.genotype |> Array{Union{Missing, NTuple}}
 ```
 
-:::caution WIP
+:::warning
 The extra step required by mixed-ploidy data is a work in progress. Feel free to submit a PR if you have ideas!
 :::
 

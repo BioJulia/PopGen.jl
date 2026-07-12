@@ -2,6 +2,8 @@
 id: latest
 title: What's New
 sidebar_label: What's New
+mdx:
+  format: md
 ---
 ## v0.8
 ### v0.8.0

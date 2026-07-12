@@ -33,8 +33,8 @@ must be in the same order as the samples in `sampleinfo(popdata)`.
 **Example**
 ```
 cats = @nancycats ;
-sampleinfo!(cats, :whiskerlength => rand(metadata(cats).samples))
-sampleinfo!(cats, "tailcolor" => rand(["orange", "brown"], metadata(cats).samples), categorical = true)
+sampleinfo!(cats, :whiskerlength => rand(cats.metadata.samples))
+sampleinfo!(cats, "tailcolor" => rand(["orange", "brown"], cats.metadata.samples), categorical = true)
 cats
 PopData{Diploid, 9 Microsatellite loci}
   Samples: 237
@@ -58,7 +58,7 @@ must be in the same order as the samples in `locusinfo(PopData)`.
 **Example**
 ```julia
 cats = @nancycats
-locusinfo!(cats, :quality => rand(metadata(cats).loci))
+locusinfo!(cats, :quality => rand(cats.metadata.loci))
 cats
 PopData{Diploid, 9 Microsatellite loci}
   Samples: 237

@@ -29,7 +29,7 @@ As you can see, a `PopData` is made up of two components, one called `metadata` 
 
 ![PopData](/img/popdata.png)
 
-:::note The "PopObj"
+:::note
 `PopData` falls under an AbstractType we call `PopObj`, which is short for "PopGen Object". While not implemented yet,
 `PopObj` exists to futureproof some flexibility into niche data types. Fun fact: we decided to pronounce PopObj as "pop ob" with a silent j because it sounds better than saying "pop obj", but writing it as PopOb looks weird. It's a silly little detail that Pavel seems to care a lot about.
 :::
@@ -49,7 +49,7 @@ information.
 The genotype information is stored in a separate table lovingly called `genodata`. This table is rather special in that it is stored in "long" format, i.e. one record per row. Storing data this way makes it a lot easier to interrogate the data and write new functions. It also means the table will have as many rows as loci x samples, which can become a lot. To reduce redundant objects inflating object size, the columns name, population, and locus are each a special type of compressed vector from [PooledArrays.jl](https://github.com/JuliaData/PooledArrays.jl), which is a memory-saving data structure for long repetitive categorical data. Without using this format, `gulfsharks`, whose source file is 3.2mb, would occupy about 27mb in your RAM! The classes of `.genodata` can be directly accessed with `PopData.genodata.colname` where `PopData` is the name of your PopData object, and `colname` is one of `name, population, locus, genotype`. See [Advanced Indexing](/popdata/advancedindexing.md) for a deeper
 dive into manipulating genodata.
 
-:::caution immutable genotypes
+:::warning
 We use the Tuple type for genotypes of individuals because they are **immutable** (cannot be changed). By the time you're using PopGen.jl, your data should already be filtered and screened. Hand-editing of genotype alleles is **strongly** discouraged, so we outlawed it.
 :::
 
@@ -82,7 +82,7 @@ AbstractVector{S} where S<:Union{Missing,Genotype}
 
 As you can guess from the name, this Type wraps `Genotype` into a Vector, while permitting `missing` values (what's genetics without missing data!?). By using `AbstractVector` (rather than `Vector`), we also have the flexibility of functions working on things like `SubArrays` out of the box. 
 
-:::note why bother defining these aliases?
+:::note
 Getting the most out of Julia and demonstrating good practices means making sure functions work on the things they're supposed to, and give informative error messages when the input isn't suitable for the function (a rare case of _wanting_ MethodErrors). Without these aliases, functions would either have vague definitions like `f(x,y,z) where x <: AbstractArray` and potentially cause errors, or overly complicated definitions like `f(x::AbstractVector{S},y,z) where {N, T<:Signed,S<:NTuple{N,T}}` and not be very legible. Instead, functions are written as `f(x,y,z) where x<:GenotypeArray`, and that seems like a good compromise of getting the latter while looking like the former.
 :::
 

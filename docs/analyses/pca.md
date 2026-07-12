@@ -8,7 +8,7 @@ A common way to analyze genetic data is dimensionality reduction, and PopGen.jl 
 function wraps `fit(PCA, ...)` from ([MultivariateStats.jl](https://github.com/JuliaStats/MultivariateStats.jl)) to be used on `PopData` objects.
 The genotypes are processed into a matrix of (rows: samples, cols: allele frequencies), giving you the option of how to manage `missing` data, and the PCA is performed on this allele-frequency matrix. 
 
-:::tip suppressing output
+:::tip
 For datasets greater than 10 loci, we recommend appending a semicolon to the end of the function call to suppress output to the REPL. ([issue #186](https://github.com/JuliaStats/MultivariateStats.jl/issues/186))
 :::
 

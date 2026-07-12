@@ -1,7 +1,7 @@
 ---
 id: advancedindexing
 title: Advanced PopData Indexing
-sidebar_label: Advanced Indexing
+sidebar_label: Advanced indexing
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';

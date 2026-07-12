@@ -13,13 +13,6 @@ info(::PopData)
 Display the metadata (PopDataInfo) of a PopData object.
 
 ----
-### 🟪🔵 metadata
-```julia
-metadata(::PopData)
-```
-Display the metadata (PopDataInfo) of a PopData object.
-
-----
 ### 🟪🔵 sampleinfo
 ```julia
 sampleinfo(::PopData)

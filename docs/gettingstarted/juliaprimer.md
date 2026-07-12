@@ -12,18 +12,18 @@ There is nothing inherently special about this documentation relative to other d
 
 
 ## Using Julia
-:::tip TLDR
+:::tip
 Work with Julia using VSCode, Jupyter, Pluto.jl, command line
 :::
 
 Everyone has their own particular workflows, and if you're new to Julia, you might not have established one yet. Julia can be used rather comfortably using its built-in interpreter. For an RStudio-like experience, we recommend using the [VScode Julia extension](https://www.julia-vscode.org). If you're a fan of Jupyter notebooks, then all you need is to install the `IJulia` package in Julia and you have full Jupyter support for Julia! Alternatively, you can use the built-in Jupyter engine inside VScode with the Jupyter and Julia VScode extensions. You can also use the new reactive notebooks provided by [Pluto.jl](https://github.com/fonsp/Pluto.jl).
 
-:::note Trivia
+:::note
 If you didn't already know,  the name "Jupyter" is actually a concatenation of **Ju** (julia) **Pyt** (python) and **eR** (R). 🤯
 :::
 
 ## First-time Performance
-:::tip TLDR
+:::tip
 Non standard-library packages (like this one) often have a bit of lag when running a function the first time.
 :::
 
@@ -37,7 +37,7 @@ julia> @time using PopGen
 ```
 
 ## Semicolons
-:::tip TLDR
+:::tip
 Semicolons after a command suppress output, and between commands are like a "newline" for brevity.
 :::
 
@@ -80,7 +80,7 @@ julia> y = [3,4]
 We sometimes choose this writing format for very quick  and small assignments hoping to save some visual space. Use whichever method is most comfortable and sensible for you!
 
 ## Help mode
-:::tip TLDR
+:::tip
 Activate help mode (to read docstrings) with `?` on an empty line.
 :::
 
@@ -102,7 +102,7 @@ View unique population ID's and their counts in a `PopData`.
 ```
 
 ## Type information
-:::tip TLDR
+:::tip
 Types have the format `variable::type` in function singatures. `<:` is a shorthand for "is a subtype of", and `{T} where T` is a shorthand for
 broadening or restricting type signatures. Unions allow for multiple types.
 :::
@@ -152,13 +152,13 @@ So, instead of writing `thing1::Float64, thing2::Float64, thing3::Float64`, we j
 
 
 ## Functions vs. Methods 
-:::tip TLDR
+:::tip
 A function is made up of mulitple methods. They all share the same name and differ in the input types/order. A MethodError means you're trying to use a known function but your inputs don't match any of its methods.
 :::
 
 As part of Julia's type-safe paradigm and multiple dispatch (see "ERROR: MethodError: no method matching" below), type specifications in functions often reduce runtime of functions, but also establish function identity. Multiple dispatch refers to several different functions having the same name, but employing different *methods* depending on the input. In Julia, it's easier to write a single function with multiple type-safe methods, rather than one mega-function that accepts any type and have a bunch of `if` statements that determines what the program does depending on the input. 
 
-:::info Best Practice
+:::info
 As a rule of thumb, `for`  loops with `if` conditions in them slow down the compiler, so best-practice often encourages us to write type-specific methods.
 :::
 In practice, this looks like:
@@ -205,13 +205,13 @@ The functions within `PopGen` are almost always explicitly typed, so if you are 
 
 Sometimes you might include an argument with a keyword when there isn't one, or include an argument without a keyword when there needs to be one (honestly, we make that mistake too and we *wrote* this stuff). To help minimize those mistakes, please read below about which arguments have keywords and which don't.
 
-:::note MethodErrors
+:::note
 MethodError's can definitely get annoying, but they are more commonly the result of incorrect inputs versus being bugs. If you double-checked your inputs and things still don't work, please submit an issue. Thanks!
 :::
 
 
 ## Functions with and without keywords 
-:::tip TLDR
+:::tip
 -  arguments before a semicolon have no keyword and follow an explicit order
 -  arguments after a semicolon have a keyword `argument = value` and their order doesn't matter
 -  `MethodError: no methods matching` is often a user error and not a bug, but if it is, please open an issue!

@@ -4,7 +4,7 @@ title: Simulate Sibling Pairs
 sidebar_label: Sibling Pairs
 ---
 
-:::note Requires PopGenSims.jl
+:::note
 To perfom simulations, you will need add and import the package `PopGenSims.jl` (available [here](https://github.com/pdimens/PopGenSims.jl)).
 :::
 
@@ -41,7 +41,7 @@ The relationship between the newly generated samples can be identified by:
     - example: `sim005_fullsib_1` = `[simulation 005]_[full sibling]_[offspring 1]`
 - Their `population` name will be that of their relationship (e.g. "fullsib")
 
-:::tip plugging into relatedness
+:::tip
 The `kinship` function will recognize the population names output from simulating siblingship
 and only estimate relatedness for the appropriate pairs. If you need this functionality, you are
 strongly discouraged from manually editing the resulting `PopData` from `simulatekin`.
@@ -50,7 +50,7 @@ strongly discouraged from manually editing the resulting `PopData` from `simulat
 ### Ploidy
 By default, the ploidy of the simulated parents and offspring are inferred from the supplied `PopData`.
 
-:::note adjusting ploidy
+:::note
 If you have mixed-ploidy data or wish to generate parents and offspring of a ploidy different than the source
 `PopData` you can specify the ploidy with which to simulate parents and offspring. For example, if your `PopData`
 is diploid, but you wish to generate triploid or octoploid parents and offspring, you would specify `ploidy = 3`

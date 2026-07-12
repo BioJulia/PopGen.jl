@@ -23,7 +23,7 @@ genepop(infile; kwargs...)
 - `diploid::Bool`  : whether samples are diploid for parsing optimizations (default: `true`)
 - `silent::Bool`   : whether to print file information during import (default: `false`)
 
-:::info population names
+:::info
 By default, the file reader will assign numbers as population ID's (as Strings) in order of appearance in the genepop file. Use the `populations!` function to rename these with your own population ID's.
 :::
 

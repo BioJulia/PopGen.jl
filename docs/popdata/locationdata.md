@@ -70,6 +70,6 @@ longitude = ["-43 54 11", "22 23 11N"]
 latitude = ["11 44 31", "-25 41 13"]
 ```
 
-:::caution Missing values
+:::warning
 This method tolerates `missing` values, but you will need to `replace!` instances of `missing` with the string `"missing"`.
 :::

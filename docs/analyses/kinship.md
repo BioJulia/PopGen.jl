@@ -21,7 +21,7 @@ Broadly speaking there are two different ways of estimating genetic relatedness 
 
 PopGen.jl implements a wide variety of moments-based estimators: Blouin, Li & Horvitz, Loiselle, Lynch, Lynch/Li, Lynch & Ritland, Moran, Queller & Goodnight, Ritland, and Wang. Along with these, we provide an option to estimate mean, median, standard error, and confidence intervals using bootstrapping. Have a look at [the guide](/blog/relatedness) we provide detailing how to perform a basic relatedness analysis.
 
-:::note A note about removing kin
+:::note
 There are reasons for removing kin in population genetics datasets. For one, there are no siblings/kin or mixed-generations in a Hardy-Weinberg Equilibrium population, and the inclusion of siblings/kin in analyses that rely on HWE assumptions [technically] violate those assumptions. However, there are also arguments to keep kin/siblings in your data, those data are important for effective population size, linkage disequilibrium, etc. 
 
 see  [Waples and Anderson (2017)](https://onlinelibrary.wiley.com/doi/full/10.1111/mec.14022)
@@ -196,7 +196,7 @@ There are several estimators available and are listed below. `kinship` takes the
 function names as arguments (**case sensitive**), therefore do not use quotes or colons
 in specifying the methods.
 
-:::tip autocompletion
+:::tip
 Since the methods correspond to function names, they will tab-autocomplete when 
 inputting them. For more information on a specific method, please see the respective docstring (e.g. `?Loiselle`).
 :::
@@ -215,7 +215,7 @@ inputting them. For more information on a specific method, please see the respec
 | [Milligan 2003](https://pubmed.ncbi.nlm.nih.gov/12663552/) "DyadML" | maximum-likelihood | incomplete* |
 | [Wang 2002](https://www.genetics.org/content/160/3/1203.short) | moments-based | incomplete* |
 
-:::note *more kinship estimators
+:::note
 Contact us or submit a pull request if you're interested in contributing to the kinship methods. DyadML and Wang (2002) estimators are currently incomplete and the others
 could use some optimizations. More help is always welcomed! Our wishlist also includes the KING method :smile:
 :::
@@ -236,7 +236,7 @@ kinshipposthoc(data::PopData, results::Union{DataFrame, NamedTuple}; iterations:
 #### Keyword Arguments
 - `iterations` : number of iterations for the permutation tests (default: `20000`)
 
-:::tip not a great name
+:::tip
 We admit "kinshipposthoc" is not a great name for this function. Please
 contact us with better ideas! :grin:
 :::

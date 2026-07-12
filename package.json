@@ -3,36 +3,52 @@
   "version": "0.10.0",
   "private": true,
   "scripts": {
+    "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy"
+    "deploy": "docusaurus deploy",
+    "clear": "docusaurus clear",
+    "serve": "docusaurus serve",
+    "write-translations": "docusaurus write-translations",
+    "write-heading-ids": "docusaurus write-heading-ids"
   },
   "dependencies": {
-    "@cmfcmf/docusaurus-search-local": "^1.1.0",
-    "@docusaurus/core": "^2.4.0",
-    "@docusaurus/plugin-ideal-image": "^2.4.0",
-    "@docusaurus/plugin-pwa": "^2.4.0",
-    "@docusaurus/preset-classic": "^2.4.0",
-    "classnames": "^2.2.6",
-    "clsx": "^1.1.1",
-    "plugin-image-zoom": "github:ataft/plugin-image-zoom",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "rehype-katex": "^4.0.0",
-    "remark-math": "^3.0.1",
-    "update": "^0.7.4"
+    "@cmfcmf/docusaurus-search-local": "^2.0.1",
+    "@docusaurus/core": "^3.10.2",
+    "@docusaurus/faster": "3.10.2",
+    "@docusaurus/preset-classic": "^3.10.2",
+    "@mdx-js/react": "^3.0.0",
+    "classnames": "^2.5.1",
+    "clsx": "^2.0.0",
+    "docusaurus-plugin-image-zoom": "^3.0.1",
+    "prism-react-renderer": "^2.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "3.10.2",
+    "@docusaurus/types": "3.10.2"
   },
   "browserslist": {
     "production": [
-      ">0.2%",
+      ">0.5%",
       "not dead",
       "not op_mini all"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "last 3 chrome version",
+      "last 3 firefox version",
+      "last 5 safari version"
     ]
+  },
+  "engines": {
+    "node": ">=20.0"
+  },
+  "allowScripts": {
+    "@swc/core@1.15.43": true,
+    "core-js@3.49.0": true
   }
 }

@@ -2,6 +2,8 @@
 id: popgensims_utils
 title: Utils.jl
 sidebar_label: Utils.jl
+mdx:
+  format: md
 ---
 ## PopGenSims.jl/src/Utils.jl
 | 📦  not exported | 🟪  exported by PopGenSims.jl |

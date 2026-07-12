@@ -31,7 +31,7 @@ Often, we are interested in pairwise $F_{ST}$, which is a type of coefficient th
 
 However, it's not a linear relationship, and Wright considered 0.125 as the cutoff for when to determine populations as divergent.
 
-:::note $F_{ST}$ isn't everything
+:::note
 An important caveat to always consider is that $F_{ST}$ is just one tool to help us understand trends and not the entire picture.
 The genetic data we collect is just a snapshot in current time and populations can be completely isolated but still have near-zero
 $F_{ST}$ values for a number of reasons (slow divergence time, recent introgression, etc.). Significance testing helps add context
@@ -47,7 +47,7 @@ to a value greater than `0` to perform a single-tailed permutation test to obtai
 P-values of statistical significance. Use `by = "locus"` to perform a locus-by-locus FST for
 population pairs (iterations and significance testing ignored). `WeirCockerham is not yet implmented for by-locus $F_{ST}$. 
 
-:::note custom output type
+:::note
 The returned object for is a custom `PairwiseFST` type with the fields `results` (stores the dataframe of $F_{ST}$ values) and `method` (a string of which method was used to calculate it). This was done to define a custom `show` method to make the results a little nicer, and so you never lose track of which method was used for the calculation. If you want to access the dataframe directly, you will need to do so with `varname.results` where `varname` is whatever you named the output.  
 :::
 

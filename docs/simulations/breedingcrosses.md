@@ -7,7 +7,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-:::note Requires PopGenSims.jl
+:::note
 To perfom simulations, you will need add and import the package `PopGenSims.jl` (available [here](https://github.com/pdimens/PopGenSims.jl)).
 :::
 
@@ -134,7 +134,7 @@ julia> f2_backcross.sampleinfo
 │ 100000 │ F2_manycats_offspring_100000 │ 2      │ F2_manycats │ ("N111", "F1_offspring_99") │
 ```
 
-:::caution
+:::warning
 When crossing parents from different `PopData`, the parents must have the same loci. You will see error messages if they don't.
 :::
 

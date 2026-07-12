@@ -1,7 +1,7 @@
 ---
 id: exclusion
 title: Data exclusion
-sidebar_label: Data Exclusion
+sidebar_label: Data exclusion
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -105,7 +105,7 @@ PopData{Diploid, 2208 SNP loci}
 
 The in-place variant `exclude!()` follows all the same syntax as `exclude()`, therefore all examples above would be identical for `exclude!()`.
 
-:::note alias functions
+:::note
 The exclusion commands are interchangeable with `omit` and `remove`, both with and
 without the bang (`!`). This was done so you can use the function comfortably without
 needing to remember the specific name to perform it. Maybe you just prefer the word 

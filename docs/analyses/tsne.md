@@ -15,7 +15,7 @@ julia> using Pkg; Pkg.add("TSne")
 ```
 
 
-:::caution careful parameterization
+:::warning
 Visual clusters can be seriously influenced by the parameters. For example, parameters can be chosen in such a way to identify clusters in data that has none. So, a good understanding of the parameters for t-SNE is necessary. **Although a useful tool, t-SNE is not commonly used in population genetic analysis.** It is included here due to its utility in adjacent disciplines.
 :::
 

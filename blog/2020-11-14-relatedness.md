@@ -1,16 +1,20 @@
 ---
 slug: relatedness
 title: Relatedness Tutorial
-author: Pavel Dimens
-author_title: Little this, little that
-author_url: https://github.com/pdimens
-author_image_url: https://avatars1.githubusercontent.com/u/19176506?s=460&u=3afad1d1ef3b09ddc4ab7108143f515be3412d5a&v=4
+authors: pdimens
 tags: [tutorials]
+mdx:
+  format: md
 ---
+
+Diving into kinship
+<!-- truncate -->
+
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::info PopGen.jl <0.9.0
+:::info
 The kinship interface has changed a bit between versions 0.7 and 0.9. This
 post has not yet been updated for versions 0.9.0+. To follow along, use versions 0.8.0 or lower.
 :::
@@ -92,7 +96,7 @@ julia> rel_out.LynchLi
 
 And while it's totally optional, we can plot the distribution of values for some visual data exploration. For that we'll use Plots.jl and StatsPlots.jl. 
 
-:::note plotting packages
+:::note
 We could have used any plotting package, but Plots.jl was chosen for simplicity. Other great
 options are (and not limited to): Makie.jl, Gadfly.jl, VegaLite.jl, and PlotlyJS.jl.
 :::
@@ -111,7 +115,7 @@ julia> title!("LynchLi relatedness")
 
 ### 3. Create CI's for the sibships
 
-:::note There's more???
+:::note
 The next set of steps seem like a lot more work, so allow me to explain. The estimators all generally give you some value between 0-1 (or 0-0.5, same idea) and you can intuit that certain values mean certain things, like that `0` is "unrelated", `0.25` is "half-sib", and `0.5` is "full-sib". However, those are fixed values, so how do we know how far we can deviate from 0.25 (for example) and still call our pair half-siblings? Instead of hand-waving, we can create confidence intervals from simulated data to act as sibship ranges for our data. If this doesn't make sense yet, it will below. Promise! 
 :::
 

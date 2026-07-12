@@ -16,7 +16,15 @@ const config: Config = {
 
   // Required as of v3: what to do with broken links (was implicit "warn" before)
   onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks : {
+      onBrokenMarkdownLinks: 'warn',
+    }
+  },
+
+  future: {
+    v4: true, // Improve compatibility with the upcoming Docusaurus v4
+  },
 
   i18n: {
     defaultLocale: 'en',
@@ -30,7 +38,7 @@ const config: Config = {
         indexDocSidebarParentCategories: 0,
       },
     ],
-    'docusaurus-plugin-image-zoom',
+    require.resolve('docusaurus-plugin-image-zoom'),
   ],
   stylesheets: [
     'https://fonts.googleapis.com/icon?family=Material+Icons',

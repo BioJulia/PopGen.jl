@@ -7,7 +7,7 @@ sidebar_label: PopGen.jl tips
 Here are some useful tips to getting comfortable with PopGen.jl.
 
 ### PopGen vs PopGenCore
-:::tip TLDR
+:::tip
 PopGen is for analyses, PopGenCore is for everything else
 :::
 
@@ -19,7 +19,7 @@ should be enough.
 
 
 ### Internal functions
-:::tip TLDR
+:::tip
 functions you aren't expected to use start with underscores `_`
 :::
 
@@ -30,7 +30,7 @@ exported ones. If you see a function that starts with an underscore, like `_adja
 not all of them have docstrings.
 
 ### Function names
-:::tip TLDR
+:::tip
 all user functions in PopGen.jl (not including PopGenCore.jl) are lowercase and use no underscores
 :::
 
@@ -48,7 +48,7 @@ if you wanted to perform a pairwise FST, the function is called `pairwisefst` --
 that doesn't fit this mold, please submit a Pull Request!
 
 ### Argument names
-:::tip TLDR
+:::tip
 all user functions in PopGen.jl have descriptive keyword argument names
 :::
 
@@ -59,7 +59,7 @@ keywords using _entire_ words, and hopefully words that are intuitive if you wer
 before calling up the docstring. 
 
 ### Dev tips
-:::tip TLDR
+:::tip
 - Avoid allocations when possible
 - First drafts don't need to be efficient or performant
 - When in doubt, roll your own helper functions

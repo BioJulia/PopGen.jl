@@ -37,7 +37,7 @@ julia> cluster(cats, dbscan, matrixtype = :freq)
 
 The results of these clustering methods can then be used for validation using any methods available in [Clustering.jl](https://github.com/JuliaStats/Clustering.jl).
 
-:::info skipping the wrapper
+:::info
 Since the clustering methods are exported, you can technically skip the `cluster` wrapper and use any of the methods directly (e.g. `kmeans(PopData, k = 5)`), although `cluster()` is the preferred method.
 :::
 

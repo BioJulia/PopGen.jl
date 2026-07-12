@@ -20,11 +20,11 @@ PopGen.jl (via PopGenCore.jl) provides a handful of file readers and writers wit
 ## Read in data
 You're encouraged to use these functions, but PopGen.jl also provides you with an all-encompassing wrapper  `PopGen.read()`. Given the ubiquity of the function name, it is not exported. If using PopGenCore.jl directly, you will need to call it with `PopGenCore.read`.
 
-:::caution Windows users
+:::warning
 Make sure to change the backslashes `\` in your file path to double-backslashes `\\` or forward slashes `/` 
 :::
 
-:::note monomorphic loci
+:::note
 By default, the file reading methods drop monomorphic loci and inform you which were removed, so do not be alarmed if the number of loci in your `PopData` is different from the source data. You can disable this
 behavior with the argument `allow_monomorphic = true`. Monomorphic loci are removed by default because they
 can give spurious/misleading results for some analyses, such as kinship estimators.

@@ -10,7 +10,7 @@ Have questions, want to talk population genetics, or have ideas, then join the o
 
  [![join the julia slack](https://img.shields.io/badge/slack-join%20Julia-9d72b1?style=for-the-badge&logo=slack)](https://julialang.org/slack/)
 
-:::note Community Standards
+:::note
 The PopGen.jl community is committed to maintaining a welcoming, inclusive, civil, and constructive environment. We expect the following standards to be observed and upheld by all participants during all forms of communication.
 
 #### Be respectful and inclusive

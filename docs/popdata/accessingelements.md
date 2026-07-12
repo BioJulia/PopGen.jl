@@ -8,7 +8,7 @@ import TabItem from '@theme/TabItem';
 
 PopGen.jl includes commands to provide obvious methods to inspect and alter `PopData`. Using standard Julia conventions, only commands ending with a bang `!` are mutable, meaning they alter the input data. So, commands like `populations` will show you population information, whereas `populations!` will change that information in your `PopData`. The mutable commands here alter the data in your `PopData`, but not the source data (i.e. the files used to create the `PopData`). The "manipulation" commands were separated into smaller sections to make it less overwhelming, and using the `gulfsharks` data, you can explore each of the sections like a little tutorial. The sections don't follow any particular order, so feel free to jump around however you like. 
 
-:::caution avoid accessing fields directly
+:::warning
 **TL;DR**: End-users (vs developers) shouldn't access PopData fields directly and use the access functions instead
 
 In earlier versions of PopGen.jl, you were encouraged to directly access the internal fields of PopData. After careful consideration
@@ -19,7 +19,7 @@ errors, but also means a user has less to learn to get started.
 
 A little hands-on training will probably go a long way, so let's through some of the functions available in PopGen.jl with the included data. This tutorial will include both inputs and outputs so you can be confident what you're seeing in your Julia session is exactly what's supposed to happen. Sometimes the outputs can be a little lengthy, so they will be arranged in code "tabs".
 
-:::danger don't manually edit or sort
+:::danger
 There are specific relationships between the record entries in `PopData` objects, so **do not use** `sort`, `sort!`, or manually arrange/add/delete anything in PopData. There are included functions to remove samples or loci, rename things, add location data, etc. 
 :::
 
@@ -38,9 +38,9 @@ Now that we have nancycats loaded in, we can use standard Julia accessor convent
 
 ## The metadata (data about the data)
 Some critical information about the data is front-loaded into a PopData object to eliminate constantly getting these values in calculations.
-To view this information, use `metadata()`.
+To view this information, use `info()`.
 ```
-julia> metadata(ncats)
+julia> info(ncats)
  ploidy:      2
  loci:        9
  samples:     237
@@ -48,7 +48,7 @@ julia> metadata(ncats)
  biallelic:   false
  ```
 
-Included in `metadata` are two DataFrames, one for sample information, and another for locus information.
+Included in `PopData.metadata` are two DataFrames, one for sample information, and another for locus information.
 <Tabs
   block={true}
   defaultValue="s"

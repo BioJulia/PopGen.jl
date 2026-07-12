@@ -6,7 +6,7 @@ sidebar_label: Conditionals
 
 Included in PopGen.jl are some functions to help discriminate your data a bit more. Like all conditionalsℹ️, these return `true` or `false` depending on the test.
 
-:::note ℹ️ Missing values
+:::note
 By Julia's design, conditionals on `missing` values return `missing`. For
 indexing and subsetting reasons, `ishom` and `ishet` return `false` on
 missing values, however unexported methods `_ishom` and `_ishet` return
@@ -55,7 +55,7 @@ julia> ishom(subset)
  0
  1
 ```
-:::note using skipmissing
+:::note
 If you want to avoid `missing` genotypes, you can use `skipmissing` to ignore them. This also works for `ishet`.
 ```julia
 julia> ishom(skipmissing(subset))

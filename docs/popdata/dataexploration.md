@@ -2,6 +2,8 @@
 id: dataexploration
 title: Data exploration
 sidebar_label: Data exploration
+mdx:
+  format: md
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -444,6 +446,6 @@ julia> summary(@nancycats, by = "locus")
 </TabItem>
 </Tabs>
 
-:::tip prime symbol
+:::tip
 The column names above use the unicode prime symbol `′` to better reflect the actual coefficient ("FST prime" etc.). To print that character, press `\prime<TAB>`, which reads "backslash, the word 'prime', and the TAB button".
 :::

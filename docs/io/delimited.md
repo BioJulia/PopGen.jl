@@ -82,7 +82,7 @@ Missing genotypes can be formatted as all-zeros (ex.`000000`) or negative-nine `
 #### Location data
 If location data is missing for a sample (which is ok!), make sure the value is blank, otherwise there will be transcription errors! (example at line 3 in the example above)
 
-:::info alias
+:::info
 You can also use the command `csv()` synonymously with `delimited()`. 
 :::
 

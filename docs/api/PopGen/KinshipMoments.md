@@ -2,6 +2,8 @@
 id: kinshipmoments
 title: KinshipMoments.jl
 sidebar_label: KinshipMoments.jl
+mdx:
+  format: md
 ---
 
 ## PopGen.jl/src/Kinship/KinshipMoments.jl
@@ -9,7 +11,9 @@ sidebar_label: KinshipMoments.jl
 |:---:|:---:|
 
 ### 🔵 Blouin
-    Blouin(ind1::GenoArray, ind2::GenoArray)::Float64
+```julia
+Blouin(ind1::GenoArray, ind2::GenoArray)::Float64
+```
 Allele sharing index described by Blouin (1996)
 - Single Locus Equation: The number of alleles shared between individuals over ploidy.
     - If both allele positions are shared (e.g. AA x AA or AB x AB) then 1
@@ -30,7 +34,9 @@ _blouin(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16, I
 ----
 
 ### 🔵 LiHorvitz
-    LiHorvitz(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
+```julia
+LiHorvitz(ind1::GenoArray, ind2::GenoArray, locus_names::Vector{Symbol}; alleles::NamedTuple)
+```
 Allele sharing index described by Li and Horvitz (1953)
 - Single Locus Equation: If all alleles are the same between individuals (eg. AA x AA) then 1.
     - If two alleles are shared between individuals (eg.  AA x AB or AB x AB) then 0.5.
@@ -51,7 +57,9 @@ _lihorvitz(geno1::NTuple{2,T}, geno2::NTuple{2,T})::Float64 where T<:Union{Int16
 ----
 
 ### 🔵 Loiselle
-    Loiselle(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
+```julia
+Loiselle(ind1::GenoArray, ind2::GenoArray, allelefrq::U; kwargs...) where U <: Tuple
+```
 Calculates the moments based estimator of pairwise relatedness using the estimator propsed by
 Loiselle et al (1995) and modified to individual dyads by Heuertz et al. (2003).
 - Multiple Locus Equation:
