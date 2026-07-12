@@ -1,6 +1,10 @@
-const remarkMath = require("remark-math");
-const rehypeKatex = require("rehype-katex");
-module.exports = {
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import {themes as prismThemes} from 'prism-react-renderer';
+import type {Config} from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
+
+const config: Config = {
   title: 'PopGen.jl',
   tagline: 'A package suite for population genetics analyses, written in Julia',
   url: 'https://BioJulia.dev',
@@ -9,24 +13,35 @@ module.exports = {
   organizationName: 'BioJulia', // Usually your GitHub org/user name.
   projectName: 'PopGen.jl', // Usually your repo name.
   trailingSlash: false,
+
+  // Required as of v3: what to do with broken links (was implicit "warn" before)
+  onBrokenLinks: 'warn',
+  onBrokenMarkdownLinks: 'warn',
+
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en'],
+  },
+
   plugins: [
     [
-      require.resolve("@cmfcmf/docusaurus-search-local"),
+      '@cmfcmf/docusaurus-search-local',
       {
         indexDocSidebarParentCategories: 0,
-      }
+      },
     ],
-    'plugin-image-zoom',
+    'docusaurus-plugin-image-zoom',
   ],
   stylesheets: [
-    "https://fonts.googleapis.com/icon?family=Material+Icons",
+    'https://fonts.googleapis.com/icon?family=Material+Icons',
   ],
   themeConfig: {
-    docs : {
+    docs: {
       sidebar: {
         hideable: true,
-        autoCollapseCategories: true
-    }},
+        autoCollapseCategories: true,
+      },
+    },
     colorMode: {
       defaultMode: 'light',
       disableSwitch: false,
@@ -37,12 +52,18 @@ module.exports = {
       content:
         '🔵 Like PopGen.jl? Give it a ⭐ on <a target="_blank" rel="noopener noreferrer" href="https://github.com/BioJulia/PopGen.jl">GitHub!</a>! 🟣',
     },
-    zoomSelector: '.markdown :not(em) > img',
+    // renamed themeConfig key for docusaurus-plugin-image-zoom v3
+    zoom: {
+      selector: '.markdown :not(em) > img',
+      background: {
+        light: 'rgb(255, 255, 255)',
+        dark: 'rgb(50, 50, 50)',
+      },
+    },
     prism: {
-      //defaultLanguage: 'julia',
       additionalLanguages: ['julia', 'r'],
-      theme: require('prism-react-renderer/themes/github'),
-      darkTheme: require('prism-react-renderer/themes/oceanicNext'),
+      theme: prismThemes.github,
+      darkTheme: prismThemes.oceanicNext,
     },
     // algolia: {
     //  apiKey: '0fe48b3e529dd3af5c37979964b2ef41',
@@ -73,12 +94,12 @@ module.exports = {
           to: 'docs/gettingstarted/about',
           label: 'About',
           position: 'left',
-        },        
+        },
         {to: 'blog', label: 'Blog', position: 'left'},
         {
-        to: 'docs/latest',
-        label: 'News',
-        position: 'left',
+          to: 'docs/latest',
+          label: 'News',
+          position: 'left',
         },
         {
           to: 'docs/gettingstarted/community',
@@ -86,10 +107,10 @@ module.exports = {
           position: 'left',
         },
         {
-        href: 'https://github.com/pdimens/popgen.jl',
-        position: 'right',
-        className: 'header-github-link',
-        'aria-label': 'GitHub repository',
+          href: 'https://github.com/pdimens/popgen.jl',
+          position: 'right',
+          className: 'header-github-link',
+          'aria-label': 'GitHub repository',
         },
       ],
     },
@@ -97,16 +118,13 @@ module.exports = {
       style: 'dark',
       copyright: `Copyright © ${new Date().getFullYear()} Pavel Dimens & Jason Selwyn. Built with Docusaurus. Rawr!`,
     },
-  },
+  } satisfies Preset.ThemeConfig,
   presets: [
     [
-      '@docusaurus/preset-classic',
+      'classic',
       {
         docs: {
-          // It is recommended to set document id as docs home page (`docs/` path).
-          //homePageId: 'docs/',
-          sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
+          sidebarPath: './sidebars.js',
           editUrl: 'https://github.com/BioJulia/PopGen.jl/edit/documentation/',
           showLastUpdateTime: true,
           remarkPlugins: [remarkMath],
@@ -114,23 +132,23 @@ module.exports = {
         },
         blog: {
           showReadingTime: true,
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/BioJulia/PopGen.jl/edit/documentation/',
+          editUrl: 'https://github.com/BioJulia/PopGen.jl/edit/documentation/',
           feedOptions: {
             type: 'all',
+            limit: false, // keep old "unlimited feed" behavior (v3 default is 20)
             copyright: `Copyright © ${new Date().getFullYear()} PopGen.jl`,
           },
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: './src/css/custom.css',
         },
         sitemap: {
-          //cacheTime: 600 * 1000, // 600 sec - cache purge period
-          changefreq: "weekly",
+          changefreq: 'weekly',
           priority: 0.5,
         },
-      },
+      } satisfies Preset.Options,
     ],
   ],
 };
+
+export default config;
