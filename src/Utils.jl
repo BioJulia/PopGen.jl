@@ -73,3 +73,9 @@ feature_req() = "\nPlease open an Issue or Pull Request on https://www.github.co
 Returns `false` if in a normal session, `true` if in a CI/HPC environment 
 """
 _is_logging(io) = isa(io, Base.TTY) == false || (get(ENV, "CI", nothing) == "true")
+
+
+function in_notebook()
+    isdefined(Main, :IJulia) &&
+    getfield(Main.IJulia, :inited)
+end

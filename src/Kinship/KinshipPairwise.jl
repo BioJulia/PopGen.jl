@@ -105,8 +105,13 @@ function _kinship_boot_nofreq(data::PopData, method::Function, iterations::Int, 
     bresult = Matrix{Float64}(undef, n,n)
     b_sdev = similar(bresult)
     b_ci = Matrix{Vector{Float64}}(undef, n,n)
-    pbar = ProgressBar(;refresh_rate=90, transient = true)
-    job = addjob!(pbar; description= "Kinship: ", N= Int64((n * (n-1))/2))
+    _tty = !in_notebook()
+    if _tty
+        pbar = ProgressBar(;refresh_rate=90, transient = true)
+        job = addjob!(pbar; description= "Kinship: ", N= Int64((n * (n-1))/2))
+    else 
+        pbar = nothing
+    end
     with(pbar) do
         @inbounds @sync for i in 1:n-1
             Base.Threads.@spawn begin
@@ -129,7 +134,9 @@ function _kinship_boot_nofreq(data::PopData, method::Function, iterations::Int, 
                     @inbounds bresult[i,j] = bootstats.stats[1].μ
                     @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
                     @inbounds b_ci[i,j] = value(bootstats.stats[2])
-                    update!(job)
+                    if _tty
+                        update!(job)
+                    end
                 end
             end
         end
@@ -154,9 +161,14 @@ function _kinship_boot_freq(data::PopData, method::Function, iterations::Int, in
     bresult = Matrix{Float64}(undef, n,n)
     b_sdev = similar(bresult)
     b_ci = Matrix{Vector{Float64}}(undef, n,n)
-    pbar = ProgressBar(;refresh_rate=90, transient = true)
     allelefrequencies = @inbounds Tuple(allelefreq(i) for i in eachcol(locmtx))
-    job = addjob!(pbar; description= "Kinship: ", N= Int64((n * (n-1))/2))
+    _tty = !in_notebook()
+    if _tty
+        pbar = ProgressBar(;refresh_rate=90, transient = true)
+        job = addjob!(pbar; description= "Kinship: ", N= Int64((n * (n-1))/2))
+    else
+        pbar = nothing
+    end
     with(pbar) do
         @inbounds @sync for i in 1:n-1
             Base.Threads.@spawn begin
@@ -179,7 +191,9 @@ function _kinship_boot_freq(data::PopData, method::Function, iterations::Int, in
                     @inbounds bresult[i,j] = bootstats.stats[1].μ
                     @inbounds b_sdev[i,j] = sqrt(bootstats.stats[1].σ2)
                     @inbounds b_ci[i,j] = value(bootstats.stats[2])
-                    update!(job)
+                    if _tty
+                        update!(job)
+                    end
                 end
             end
         end

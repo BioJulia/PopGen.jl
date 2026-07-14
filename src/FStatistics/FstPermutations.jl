@@ -29,8 +29,13 @@ function _fst_permutation(data::PopData, method::Function, iterations::Int64)
     n_loci = data.metadata.loci
     results = zeros(Float64, npops, npops)
     #perm_vector = zeros(Int64, iterations-1)
-    pbar = ProgressBar(;refresh_rate=90, transient = true)
-    job = addjob!(pbar; description= "$(string(method)) FST: ", N = Int64((npops * (npops-1))/2))
+    _tty = !in_notebook()
+    if _tty
+        pbar = ProgressBar(;refresh_rate=90, transient = true)
+        job = addjob!(pbar; description= "$(string(method)) FST: ", N = Int64((npops * (npops-1))/2))
+    else
+        pbar = nothing
+    end
     with(pbar) do
         @inbounds for i in 2:npops
             pop1 = reshape(idx_pdata[i].genotype, :, n_loci)
@@ -41,7 +46,7 @@ function _fst_permutation(data::PopData, method::Function, iterations::Int64)
                 merged = vcat(pop1, pop2)
                 fst_val = method(pop1,pop2)
                 pval = Threads.Atomic{Int}(0)
-                @inbounds for iter in 1:iterations-1
+                @inbounds @sync for iter in 1:iterations-1
                     Base.Threads.@spawn begin
                        @inbounds perm_p1, perm_p2 = _fst_permute(merged, n_pop1, n_pop2)
                        Base.Threads.atomic_add!(pval, Int(fst_val <= method(perm_p1, perm_p2)))
@@ -49,7 +54,9 @@ function _fst_permutation(data::PopData, method::Function, iterations::Int64)
                 end
                 @inbounds results[i,j] = fst_val
                 @inbounds results[j,i] = (pval[] + 1) / iterations 
-                update!(job)
+                if _tty
+                    update!(job)
+                end
             end
         end
     end
@@ -68,8 +75,13 @@ function _amovafst_permutation(data::PopData, iterations::Int64)
     #permNs = length.(groupidx)
     results = zeros(Float64, npops, npops)
     df_among = 1
-    pbar = ProgressBar(;refresh_rate=90, transient = true)
-    job = addjob!(pbar; description= "AMOVA-based FST: ", N = Int64((npops * (npops-1))/2))
+    _tty = !in_notebook()
+    if _tty
+        pbar = ProgressBar(;refresh_rate=90, transient = true)
+        job = addjob!(pbar; description= "AMOVA-based FST: ", N = Int64((npops * (npops-1))/2))
+    else
+        pbar = nothing
+    end
     with(pbar) do
         for i in 2:npops
             pop1 = groupidx[i]
@@ -114,7 +126,9 @@ function _amovafst_permutation(data::PopData, iterations::Int64)
                     end
                 end
                 @inbounds results[j,i] = (pval[] + 1) / iterations
-                update!(job)
+                if _tty
+                    update!(job)
+                end
             end
         end
     end
